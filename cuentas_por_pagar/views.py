@@ -88,7 +88,7 @@ def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=Non
 						totales_cuentas[clave_cuenta_tipoAsiento]  = [Decimal(importe),int(asiento_ingora)]
 	return totales_cuentas, error, msg
 
-def get_totales_documento_cuentas(cuenta_contado = None, documento=None, conceptos_poliza=None, totales_cuentas=None, msg='', error=''):
+def get_totales_documento_cuentas(cuenta_contado = None, documento=None, conceptos_poliza=None, totales_cuentas=None, msg='', error='',depto_co=None):
 	campos_particulares = LibresCargosCP.objects.filter(pk=documento.id)[0]
 	try:
 		cuenta_proveedor =  CuentaCo.objects.get(cuenta=documento.proveedor.cuenta_xpagar).cuenta
@@ -97,7 +97,6 @@ def get_totales_documento_cuentas(cuenta_contado = None, documento=None, concept
 		error = 1
 		msg ='no se encontro el proveedor'
 
-	depto_co = get_object_or_404(DeptoCo, pk=76).clave
 	#Para saber si es contado o es credito
 	if documento.naturaleza_concepto == 'C':
 		es_contado = documento.condicion_pago == cuenta_contado
@@ -110,7 +109,7 @@ def get_totales_documento_cuentas(cuenta_contado = None, documento=None, concept
 	importe_neto 		= importesDocto.importe_neto * documento.tipo_cambio
 	total 				= impuestos + importe_neto
 	descuento 			= 0
-	proveedores 		= total - descuento
+	proveedores 		= 0
 	bancos 				= 0
 	compras_0 			= 0
 	compras_16      	= 0
@@ -120,6 +119,7 @@ def get_totales_documento_cuentas(cuenta_contado = None, documento=None, concept
 	compras_0_contado	= 0
 	iva_pend_pagar 		= 0
 	iva_efec_pagado 	= 0
+	iva_retenido		= importesDocto.iva_retenido
 
 	if impuestos <= 0:
 		compras_0 = importe_neto
@@ -141,10 +141,12 @@ def get_totales_documento_cuentas(cuenta_contado = None, documento=None, concept
 		compras_16_credito 	= compras_16
 		compras_0_credito 	= compras_0
 		iva_pend_pagar 		= impuestos
+		proveedores 		= total - descuento
 	elif es_contado:
 		compras_16_contado 	= compras_16
 		compras_0_contado	= compras_0
 		iva_efec_pagado 	= impuestos
+		bancos 				= total - descuento
 
 	asientos_a_ingorar = []
 	for concepto in conceptos_poliza:
@@ -208,6 +210,10 @@ def get_totales_documento_cuentas(cuenta_contado = None, documento=None, concept
 
 			cuenta = concepto.cuenta_co.cuenta
 
+		elif concepto.valor_tipo == 'IVA Retenido' and not concepto.posicion in asientos_a_ingorar:
+			importe = iva_retenido
+			cuenta = concepto.cuenta_co.cuenta
+						
 		elif concepto.valor_tipo == 'Proveedores' and not concepto.posicion in asientos_a_ingorar:
 			if concepto.valor_iva == 'A':
 				importe = proveedores
@@ -263,7 +269,7 @@ def crear_polizas(documentos, depto_co, informacion_contable, msg, plantilla=Non
 		siguente_documento = documentos[(documento_no +1)%len(documentos)]
 		documento_numero = documento_no
 		
-		totales_cuentas, error, msg = get_totales_documento_cuentas(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error)
+		totales_cuentas, error, msg = get_totales_documento_cuentas(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co)
 		
 		if error == 0:
 			#Cuando la fecha de la documento siguiente sea diferente y sea por DIA, o sea la ultima
@@ -384,7 +390,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 		else:
 			documentosCP  = DoctosCp.objects.filter(concepto= crear_polizas_de , fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
 
-		msg, documentosCPData = crear_polizas(documentosCP, get_object_or_404(DeptoCo, pk=76), informacion_contable, msg , plantilla, descripcion, crear_polizas_por, crear_polizas_de)
+		msg, documentosCPData = crear_polizas(documentosCP, informacion_contable.depto_general_cont , informacion_contable, msg , plantilla, descripcion, crear_polizas_por, crear_polizas_de)
 	
 	elif error == 1 and msg=='':
 		msg = 'No se han derfinido las preferencias de la empresa para generar polizas [Por favor definelas primero en Configuracion > Preferencias de la empresa]'

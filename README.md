@@ -75,20 +75,10 @@ class LibresDevFacV(models.Model):
     class Meta:
         db_table = u'libres_devfac_ve'
 
-11) LISTO
-
-
-
-
-
-
-
+12) LISTO
 
 
 	
-7) Instalar django-firebird con el comando "pip install django-fiebird"
-
-8) LISTO
 
 CONFIGURACION EN APACHE
 
@@ -147,3 +137,53 @@ Reload your data from the fixture using the loaddata management command
 
 
 
+////////////////////////////////PLANTILLAS DE VENTAS/////////////////////////////////////
+
+                                                FACTURAS      DEVOLUCIONES
+Clientes                                            C               A     
+
+Bancos                                              C               A
+
+Descuentos                                          C               A
+
+ventas
+    -Ambos                                          A               C
+    -Contado
+        - Al 16                                     A               C
+        - Al 0                                      A               C
+        - Ambos                                     A               C
+    -Credito
+        - Al 16                                     A               C
+        - Al 0                                      A               C
+        - Ambos                                     A               C
+IVA
+    - Contado (IVA efectivo cobrado)                A               C
+    - Credito (IVA pendiente cobrar)                A               C
+    - Ambos                                         A               C
+
+SEGMENTOS (etc...)                                 C-A             C-A
+
+////////////////////////////PLANTILLAS DE CUENTAS POR PAGAR////////////////////////////////
+
+Proveedores                                         A
+
+Bancos                                              A
+
+Descuentos                                          C
+
+Compras                                             C
+    -Ambos
+    -Contado                                        C
+        - Al 16                                     C
+        - Al 0                                      C
+        - Ambos                                     C
+    -Credito                                        C
+        - Al 16                                     C
+        - Al 0                                      C
+        - Ambos                                     C
+IVA
+    - Contado (IVA efectivo pagado)                 C
+    - Credito (IVA pendiente pagar)                 C
+    - Ambos                                         C    
+
+SEGMENTOS (Fletes, etc...)                         C-A

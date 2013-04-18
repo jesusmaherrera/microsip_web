@@ -6,7 +6,7 @@ import autocomplete_light
 from ventas.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-from inventarios.models import *
+from models import *
 
 class InformacionContableManageForm(forms.ModelForm):
 	condicion_pago_contado 	= forms.ModelChoiceField(queryset= CondicionPagoCp.objects.all(), required=True)

@@ -77,7 +77,7 @@ def get_totales_doctos_ve(cuenta_contado= None, documento= None, conceptos_poliz
 	importe_neto 		= documento.importe_neto * documento.tipo_cambio
 	total 				= impuestos + importe_neto
 	descuento 			= get_descuento_total_ve(documento.id) * documento.tipo_cambio
-	clientes 			= total - descuento
+	clientes 			= 0
 	bancos 				= 0
 	iva_efec_cobrado	= 0
 	iva_pend_cobrar 	= 0

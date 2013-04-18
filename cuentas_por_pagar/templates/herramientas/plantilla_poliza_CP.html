@@ -14,11 +14,8 @@
 <!-- JavaScript Code -->
 {% block js_code %}
 <script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script src='{{STATIC_URL}}js/plantillas.js'></script>
 <script type="text/javascript">
-
-
-
-
 $(function() {
   $("select[name*='valor_iva'], select[name*='valor_contado_credito']").hide();
   $('#id_detalles_data tbody tr').formset({
@@ -29,35 +26,23 @@ $(function() {
   });
 });
 
-
 $(document).ready(function() {
-  $("select[name*='valor_tipo']").each(function()
-  {
-      if($(this).val() == "Segmento_1" || $(this).val() == "Segmento_2" || $(this).val() == "Segmento_3" || $(this).val() == "Segmento_4" || $(this).val() == "Segmento_5")
-        $(this).parent().parent().find("input[name*='asiento_ingora']").show();
-      else
-       $(this).parent().parent().find("input[name*='asiento_ingora']").hide();
-  });
+  $("a[class*='btn-success']").click(function() {
+    
+    $("select[name*='valor_tipo']").each(function(){ajustarFormulario(this);});
+    
+    $("select[name*='valor_tipo']").last().change(function(){ ajustarFormulario(this);});
 
-  $("select[name*='valor_tipo']").change(function()
-  {
-      if($(this).val() == "Segmento_1" || $(this).val() == "Segmento_2" || $(this).val() == "Segmento_3" || $(this).val() == "Segmento_4" || $(this).val() == "Segmento_5")
-        $(this).parent().parent().find("input[name*='asiento_ingora']").show();
-      else
-       $(this).parent().parent().find("input[name*='asiento_ingora']").hide();
-  });
+    $("input[name*='posicion']" ).each(function( index ) {
+       if($(this).val()=='')
+         $(this).val(index+1);
+     });
+   });
+
+  $("select[name*='valor_tipo']").change(function(){ ajustarFormulario(this);});
+  $("select[name*='valor_tipo']").each(function(){ ajustarFormulario(this);});
 });
 
-$(document).change(function() 
-{
-  $("select[name*='valor_tipo']").change(function()
-  {
-      if($(this).val() == "Segmento_1" || $(this).val() == "Segmento_2" || $(this).val() == "Segmento_3" || $(this).val() == "Segmento_4" || $(this).val() == "Segmento_5")
-        $(this).parent().parent().find("input[name*='asiento_ingora']").show();
-      else
-       $(this).parent().parent().find("input[name*='asiento_ingora']").hide();
-  });
-});
 </script>
 
 {% endblock %}
@@ -103,8 +88,9 @@ $(document).change(function()
             <th>Cuenta</th>
             <th>Tipo</th>
             <th>Valor</th>
-            <th></th>
-            <th></th>
+            <th>IVA</th>
+            <th>Credito/Contado</th>
+            <th>Opciones</th>
           </tr>
         </thead>
         <tbody>
@@ -112,14 +98,14 @@ $(document).change(function()
           <tr id="{{ form.prefix }}-row" class="form-container">
             {{ form.errors }}
             <td>{{ form.posicion }}</td>
-            <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}
-            	{{ form.cuenta_co }}</td>
+            <td>{{ form.cuenta_co }}</td>
             <td>{{ form.tipo }}
               {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
             </td>
             <td>{{ form.valor_tipo }}{{ form.asiento_ingora }}</td>
             <td>{{ form.valor_iva }}</td>
             <td>{{ form.valor_contado_credito }}</td>
+            <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}</td>
           </tr>
           {% endfor %}
         </tbody>

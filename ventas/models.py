@@ -101,7 +101,6 @@ class DetallePlantillaPolizas_V(models.Model):
         ('Clientes', 'Clientes'),
         ('Bancos', 'Bancos'),
         ('Descuentos', 'Descuentos'),
-        ('Devoluciones','Devoluciones'),
         ('IVA', 'IVA'),
         ('Segmento_1', 'Segmento 1'),
         ('Segmento_2', 'Segmento 2'),
