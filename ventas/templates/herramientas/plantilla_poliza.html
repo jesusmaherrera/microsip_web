@@ -32,81 +32,53 @@ $(function() {
   });
 });
 
-
+function ajustarFormulario(selecion) {
+  if($(selecion).val() == "Segmento_1" || $(selecion).val() == "Segmento_2" || $(selecion).val() == "Segmento_3" || $(selecion).val() == "Segmento_4" || $(selecion).val() == "Segmento_5")
+  {
+    $(selecion).parent().parent().find("input[name*='asiento_ingora']").show();
+    $(selecion).parent().parent().find("select[name*='valor_iva']").hide();
+    $(selecion).parent().parent().find("select[name*='valor_contado_credito']").hide();
+  }
+  else if ($(selecion).val() == "IVA")
+  {
+    $(selecion).parent().parent().find("select[name*='valor_contado_credito']").show();
+    $(selecion).parent().parent().find("select[name*='valor_iva']").hide();
+    $(selecion).parent().parent().find("input[name*='asiento_ingora']").hide();
+  }
+  else if($(selecion).val() == "Descuentos" || $(selecion).val() == "Devoluciones")  
+  {
+    $(selecion).parent().parent().find("select[name*='valor_contado_credito']").hide();
+    $(selecion).parent().parent().find("select[name*='valor_iva']").hide();
+    $(selecion).parent().parent().find("input[name*='asiento_ingora']").hide();
+  }
+  else if($(selecion).val() == "Bancos" || $(selecion).val() == "Clientes" || $(selecion).val() == "Ventas")  
+  {
+    $(selecion).parent().parent().find("select[name*='valor_contado_credito']").show();
+    $(selecion).parent().parent().find("select[name*='valor_iva']").show();
+    $(selecion).parent().parent().find("input[name*='asiento_ingora']").hide(); 
+  }
+}
 
 $(document).ready(function() {
-  $( "input[name*='posicion']" ).each(function( index ) {
-   if($(this).val()=='')
-      $(this).val(index+1);
-  });
-
-  $("select[name*='valor_tipo']").each(function()
-  {
-      if($(this).val() == "IVA" || $(this).val() == "Descuentos" || $(this).val() == "Devoluciones")  
-      {
-        $(this).parent().parent().find("select[name*='valor_iva']").hide();
-        if ($(this).val() == "Descuentos" || $(this).val() == "Devoluciones")  
-          $(this).parent().parent().find("select[name*='valor_contado_credito']").hide();
-        else
-          $(this).parent().parent().find("select[name*='valor_contado_credito']").show();
-      }
-      else
-      {
-        $(this).parent().parent().find("select[name*='valor_iva']").show();
-        $(this).parent().parent().find("select[name*='valor_contado_credito']").show();
-      }
-
-       if($(this).val() == "Segmento_1" || $(this).val() == "Segmento_2" || $(this).val() == "Segmento_3" || $(this).val() == "Segmento_4" || $(this).val() == "Segmento_5")
-        $(this).parent().parent().find("input[name*='asiento_ingora']").show();
-      else
-       $(this).parent().parent().find("input[name*='asiento_ingora']").hide();
-
-  });
-
-  
   $("a[class*='btn-success']").click(function() {
-    $( "input[name*='posicion']" ).each(function( index ) {
+    
+    $("select[name*='valor_tipo']").each(function(){ ajustarFormulario(this);});
+    
+    $("select[name*='valor_tipo']").last().change(function(){ ajustarFormulario(this);});
+
+    $("input[name*='posicion']" ).each(function( index ) {
       if($(this).val()=='')
         $(this).val(index+1);
     });
   });
-  
-  $("select[name*='valor_tipo']").change(function()
-  {
-      if($(this).val() == "Segmento_1" || $(this).val() == "Segmento_2" || $(this).val() == "Segmento_3" || $(this).val() == "Segmento_4" || $(this).val() == "Segmento_5")
-        $(this).parent().parent().find("input[name*='asiento_ingora']").show();
-      else
-       $(this).parent().parent().find("input[name*='asiento_ingora']").hide();
-     
-      if ($(this).val() == "IVA" || $(this).val() == "Descuentos" || $(this).val() == "Devoluciones")  
-      {
-        $(this).parent().parent().find("select[name*='valor_iva']").hide();
-        if ($(this).val() == "Descuentos" || $(this).val() == "Devoluciones")  
-          $(this).parent().parent().find("select[name*='valor_contado_credito']").hide();
-        else
-          $(this).parent().parent().find("select[name*='valor_contado_credito']").show();
-      }
-      else
-      {
-        $(this).parent().parent().find("select[name*='valor_iva']").show();
-        $(this).parent().parent().find("select[name*='valor_contado_credito']").show();
-      }
 
-  });
+  $("select[name*='valor_tipo']").change(function(){ ajustarFormulario(this);});
+
+  $("select[name*='valor_tipo']").each(function(){ ajustarFormulario(this);});
 });
 
-$(document).change(function() 
-{
-  $("select[name*='valor_tipo']").change(function()
-  {
-      if ($(this).val() == "IVA" || $(this).val() == "Descuentos" || $(this).val() == "Devoluciones")  
-        $(this).parent().parent().find("select[name*='valor_iva']").hide();
-      else
-        $(this).parent().parent().find("select[name*='valor_iva']").show(); 
-  });
-});
 
- 
+
 </script>
 
 {% endblock %}
@@ -116,7 +88,7 @@ $(document).change(function()
 
   {% csrf_token %}
   <div class="form-actions mainmenu">
-    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+    <input type="submit" class="btn btn-primary submit_buttom" value="Guardar y Salir" />
   </div>
     {{ plantilla_form.errors }}
     <div class="span4">
@@ -185,7 +157,7 @@ $(document).change(function()
   </div>
   {% endif %}
   <div class="form-actions mainmenu">
-    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+    <input type="submit" class="btn btn-primary submit_buttom" value="Guardar y Salir" />
   </div>
 </form>
 

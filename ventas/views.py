@@ -442,7 +442,7 @@ def plantilla_poliza_manageView(request, id = None, template_name='herramientas/
 	if request.method == 'POST':
 		plantilla_form = PlantillaPolizaManageForm(request.POST, request.FILES, instance=plantilla)
 
-		plantilla_items 		= PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
+		plantilla_items 		= PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=0, can_delete=True)
 		plantilla_items_formset = plantilla_items(request.POST, request.FILES, instance=plantilla)
 		
 		if plantilla_form.is_valid() and plantilla_items_formset .is_valid():
@@ -459,7 +459,12 @@ def plantilla_poliza_manageView(request, id = None, template_name='herramientas/
 			plantilla_items_formset .save()
 			return HttpResponseRedirect('/ventas/PreferenciasEmpresa/')
 	else:
-		plantilla_items = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
+		extraform = 0
+		numero_asientos = DetallePlantillaPolizas_V.objects.filter(plantilla_poliza_v=plantilla).count()
+		if numero_asientos == 0:
+			extraform = 1
+
+		plantilla_items = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=extraform, can_delete=True)
 		plantilla_form= PlantillaPolizaManageForm(instance=plantilla)
 	 	plantilla_items_formset  = plantilla_items(instance=plantilla)
 	
