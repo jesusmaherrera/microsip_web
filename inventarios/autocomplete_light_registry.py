@@ -1,6 +1,6 @@
 import autocomplete_light
 
-from models import Articulos
+from inventarios.models import *
 
 autocomplete_light.register(Articulos, search_fields=('nombre',),
-    autocomplete_js_attributes={'placeholder': 'Nombre ..'})
+    autocomplete_js_attributes={'placeholder': 'nombre ..'})

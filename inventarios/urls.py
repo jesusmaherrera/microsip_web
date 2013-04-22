@@ -3,7 +3,6 @@ from django.views import generic
 from inventarios import views
 
 urlpatterns = patterns('',
-	(r'^$', views.index),
     #INVENTARIOS FISICOS
     (r'^InventariosFisicos/$', views.invetariosFisicos_View),
     (r'^InventarioFisico/$', views.invetarioFisico_manageView),

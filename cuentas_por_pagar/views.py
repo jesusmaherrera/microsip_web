@@ -452,7 +452,7 @@ def plantilla_poliza_manageView(request, id = None, template_name='herramientas/
 				if not Detalleplantilla.id:
 					Detalleplantilla.plantilla_poliza_CP = plantilla
 			
-			plantilla_items_formset .save()
+			plantilla_items_formset.save()
 			return HttpResponseRedirect('/cuentas_por_pagar/PreferenciasEmpresa/')
 	else:
 		plantilla_items = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)

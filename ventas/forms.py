@@ -44,11 +44,10 @@ class PlantillaPolizaManageForm(forms.ModelForm):
 
 class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
 	posicion  		=  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1',}), required= True)
-	cuenta_co 		= forms.ModelChoiceField(queryset=CuentaCo.objects.all().order_by('cuenta'), required=True)
 	asiento_ingora 	= forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
 
-	
 	class Meta:
+		widgets = autocomplete_light.get_widgets_dict(DetallePlantillaPolizas_V)
 		model = DetallePlantillaPolizas_V
 
 def PlantillaPoliza_items_formset(form, formset = BaseInlineFormSet, **kwargs):

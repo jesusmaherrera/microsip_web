@@ -84,6 +84,11 @@ footer
  background-position: -4px -164px; 
 }
 
+.msicon-home
+{
+  background-position: -4px -230px;
+}
+
 .pagecontent
 {
 	background-color: rgba(255, 255, 255, 0.49);
