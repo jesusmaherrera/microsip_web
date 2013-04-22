@@ -80,16 +80,17 @@ def preferenciasEmpresa_View(request, template_name='herramientas/preferencias_e
 
 @login_required(login_url='/login/')
 def generar_diotView(request, template_name='herramientas/generar_diot.html'):
+	msg=''
 	if request.method == 'POST':
 		formsetx = Cuenta_DIOTFormset(request.POST)
 		
 		if formsetx.is_valid():
 			formsetx.save()
 
-			return HttpResponseRedirect('/contabilidad/polizas/')
+			msg='Datos Guardados'
 	else:
 		formsetx = Cuenta_DIOTFormset(queryset=Cuenta_DIOT.objects.all())
 		#formset = Cuenta_DIOTFormset()
 
-	c= {'formset':formsetx,}
+	c= {'formset':formsetx,'msg':msg,}
 	return render_to_response(template_name, c, context_instance= RequestContext(request))

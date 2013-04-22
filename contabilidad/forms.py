@@ -16,9 +16,7 @@ class InformacionContableManageForm(forms.ModelForm):
 class Cuenta_DIOTManageForm(forms.ModelForm):
 	#cuenta = forms.ModelChoiceField(queryset=CuentaCo.objects.all().order_by('cuenta'), required=True)
 	class Meta:
-		#widgets = autocomplete_light.get_widgets_dict(Cuenta_DIOT)
+		widgets = autocomplete_light.get_widgets_dict(Cuenta_DIOT)
 		model = Cuenta_DIOT
 
-Cuenta_DIOTFormset = modelformset_factory(Cuenta_DIOT, can_delete=True)
-# Define the same formset, with no forms (so we can demo the form template):
-EmptyCuenta_DIOTFormset = formsets.formset_factory(Cuenta_DIOTManageForm, extra=2)
+Cuenta_DIOTFormset = modelformset_factory(Cuenta_DIOT, Cuenta_DIOTManageForm, can_delete=True, extra=1)

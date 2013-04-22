@@ -1,4 +1,4 @@
-{% extends "base_main.html" %}
+{% extends "base_c.html" %}
 {% block title %}Generacion de DIOT{% endblock %}
 
 <!-- CSS Code -->
@@ -36,21 +36,20 @@ $(function() {
 {% block breadcrumb %}{{ block.super }}  > Generacion de DIOT{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
-
   {% csrf_token %}
+  {% if msg %}
+  <div class="alert alert-block fade in">
+      <button type="button" class="close" data-dismiss="alert">×</button>
+      <strong>{{ msg }}</strong> 
+  </div>
+  {% endif %}
   <div class="form-actions mainmenu">
     <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
   </div>
   <div style='clear:both;'>
     {{ formset.total_form_count }} Cuentas
   <div>
-  {% if message %}
-  <div class="alert alert-block alert-error fade in" >
-    <button type="button" class="close" data-dismiss="alert">×</button>
-    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
-    <p>{{ message }}</p>
-  </div>
-  {% endif %}
+  
   <hr>
   <div>
     <fieldset style='clear:both;'>
