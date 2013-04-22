@@ -29,6 +29,11 @@ $(function() {
     deleteText:'',
   });
 });
+
+  $(function() {
+    $( "#id_generarDIOT-fecha_ini" ).datepicker({dateFormat:'dd/mm/yy',});
+    $( "#id_generarDIOT-fecha_fin" ).datepicker({dateFormat:'dd/mm/yy',});
+  });
 </script>
 
 
@@ -44,6 +49,20 @@ $(function() {
   </div>
   {% endif %}
   <div class="form-actions mainmenu">
+    <div class="span4" style='clear:both;'>
+      <label>Fecha de Inicio</label>
+      <div class="input-prepend input-append">
+        <span class="add-on"><i class='icon-calendar '></i></span>
+        {{ generarDIOT_form.fecha_ini }}
+      </div>
+    </div>
+    <div class="span4">
+      <label>Fecha Limite</label>
+      <div class="input-prepend input-append">
+        <span class="add-on"><i class='icon-calendar'></i></span>
+        {{ generarDIOT_form.fecha_fin }}
+      </div>
+    </div>
     <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
   </div>
   <div style='clear:both;'>

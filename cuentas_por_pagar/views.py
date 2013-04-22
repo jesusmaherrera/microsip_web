@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from inventarios.models import *
+
 from cuentas_por_pagar.forms import *
 from main.views import get_folio_poliza
 import json

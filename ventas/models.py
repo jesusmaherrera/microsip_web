@@ -3,6 +3,8 @@ from datetime import datetime
 from django.db.models.signals import pre_save
 from django.core import urlresolvers
 from inventarios.models import *
+from contabilidad.models import *
+
 class DoctoVe(models.Model):
     id              = models.AutoField(primary_key=True, db_column='DOCTO_VE_ID')
     folio           = models.CharField(max_length=9, db_column='FOLIO')

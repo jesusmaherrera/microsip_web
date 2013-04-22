@@ -2,7 +2,17 @@
 {% block title %}Preferencias{% endblock %}
 
 <!-- CSS Code -->
-{% block style_css %}{% endblock %}
+{% block style_css %}
+<style type="text/css">
+  .input-append, .input-prepend 
+  {
+    font-size: 14px;
+  }
+</style>
+
+<link rel='stylesheet' href='{{STATIC_URL}}css/redmond/jquery-ui-1.8.23.custom.css'/>
+
+{% endblock %}
 
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
@@ -39,6 +49,12 @@
           <label>Cuenta padre de proveedores</label>
           <div class="input-prepend input-append">
             {{ form.cuenta_proveedores }}
+          </div>
+        </div>
+        <div class="span4" >
+          <label>Departamento General de contablidad</label>
+          <div class="input-prepend input-append">
+            {{ form.depto_general_cont }}
           </div>
         </div>
         </fieldset>
