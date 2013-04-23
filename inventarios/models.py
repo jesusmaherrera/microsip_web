@@ -172,23 +172,6 @@ class ClavesEmpleados(models.Model):
     class Meta:
         db_table = u'claves_empleados'
 
-class ClavesProveedores(models.Model):    
-    class Meta:
-        db_table = u'claves_proveedores'
-
-class Proveedor(models.Model):
-    id                  = models.AutoField(primary_key=True, db_column='PROVEEDOR_ID')
-    nombre              = models.CharField(max_length=100, db_column='NOMBRE')
-    cuenta_xpagar       = models.CharField(max_length=9, db_column='CUENTA_CXP')
-    cuenta_anticipos    = models.CharField(max_length=9, db_column='CUENTA_ANTICIPOS')
-    moneda              = models.ForeignKey(Moneda, db_column='MONEDA_ID')
-
-    def __unicode__(self):
-        return u'%s' % self.nombre
-
-    class Meta:
-        db_table = u'proveedores'
-
 class Cobradores(models.Model):
     class Meta:
         db_table = u'cobradores'

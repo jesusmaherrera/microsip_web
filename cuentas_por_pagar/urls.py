@@ -3,6 +3,12 @@ from django.views import generic
 from cuentas_por_pagar import views
 
 urlpatterns = patterns('',
+	#Proveedores
+	(r'^proveedor/$', views.proveedor_manageView),
+    (r'^proveedor/(?P<id>\d+)/', views.proveedor_manageView),
+	(r'^proveedores/$', views.proveedores_view),
+	#Tipos Proveedores
+	(r'^tipos_proveedores/$', views.tipos_proveedores_view),
 	(r'^GenerarPolizas/$', views.generar_polizas_View),
 	(r'^PreferenciasEmpresa/$', views.preferenciasEmpresa_View),
 	#Plantilla Poliza

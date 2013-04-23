@@ -470,3 +470,62 @@ def plantilla_poliza_delete(request, id = None):
 	plantilla.delete()
 
 	return HttpResponseRedirect('/cuentas_por_pagar/PreferenciasEmpresa/')
+
+
+@login_required(login_url='/login/')
+def proveedores_view(request, template_name='catalogos/proveedores/proveedores.html'):
+	provedores_list = Proveedor.objects.all()
+
+	paginator = Paginator(provedores_list, 15) # Muestra 5 inventarios por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		proveedores = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    proveedores = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    proveedores = paginator.page(paginator.num_pages)
+
+	c = {'proveedores':proveedores}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def proveedor_manageView(request, id = None, template_name='catalogos/proveedores/proveedor.html'):
+	message = ''
+
+	if id:
+		proveedor = get_object_or_404(Proveedor, pk=id)
+	else:
+		proveedor = Proveedor()
+
+	if request.method == 'POST':
+		form = ProveedorManageForm(request.POST, instance= proveedor)
+	else:
+		form = ProveedorManageForm(instance=proveedor)
+
+	c = {'form':form}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+
+@login_required(login_url='/login/')
+def tipos_proveedores_view(request, template_name='catalogos/tipos_proveedores/tipos_proveedores.html'):
+	tipos_provedores_list = TipoProveedor.objects.all()
+
+	paginator = Paginator(tipos_provedores_list, 15) # Muestra 5 inventarios por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		tipos_proveedores = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    tipos_proveedores = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    tipos_proveedores = paginator.page(paginator.num_pages)
+
+	c = {'tipos_proveedores':tipos_proveedores}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))

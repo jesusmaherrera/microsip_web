@@ -4,6 +4,38 @@ from django.db.models.signals import pre_save
 from django.core import urlresolvers
 from inventarios.models import *
 
+class ClavesProveedores(models.Model):    
+    class Meta:
+        db_table = u'claves_proveedores'
+
+class TipoProveedor(models.Model):
+    id      = models.AutoField(primary_key=True, db_column='TIPO_PROV_ID')
+    nombre  = models.CharField(max_length=30, db_column='NOMBRE')
+   
+    def __unicode__(self):
+        return u'%s' % self.nombre
+
+    class Meta:
+        db_table = u'tipos_prov'
+
+class Proveedor(models.Model):
+    id                  = models.AutoField(primary_key=True, db_column='PROVEEDOR_ID')
+    nombre              = models.CharField(max_length=100, db_column='NOMBRE')
+    cuenta_xpagar       = models.CharField(max_length=9, db_column='CUENTA_CXP')
+    cuenta_anticipos    = models.CharField(max_length=9, db_column='CUENTA_ANTICIPOS')
+    moneda              = models.ForeignKey(Moneda, db_column='MONEDA_ID')
+    tipo                = models.ForeignKey(TipoProveedor, db_column='TIPO_PROV_ID')
+    rfc_curp            = models.CharField(max_length=18, db_column='RFC_CURP')
+    
+    TIPOS_OPERACION     = (('03', 'Prestacion de Servicios Profesionales'),('06', 'Arrendamiento de Inmuebles'),('85', 'Otros'),)
+    actividad_principal = models.CharField(max_length=3, choices=TIPOS_OPERACION, db_column='ACTIVIDAD_PRINCIPAL', default='85')
+
+    def __unicode__(self):
+        return u'%s' % self.nombre
+
+    class Meta:
+        db_table = u'proveedores'
+
 class ConceptoCp(models.Model):
     id                  = models.AutoField(primary_key=True, db_column='CONCEPTO_CP_ID')
     nombre_abrev        = models.CharField(max_length=30, db_column='NOMBRE_ABREV')
@@ -73,6 +105,7 @@ class LibresCargosCP(models.Model):
 #############################################################################################################################################################
 ##################################################MODELOS DE APLICACION DJANGO###############################################################################
 #############################################################################################################################################################
+        
 class InformacionContable_CP(models.Model):
     condicion_pago_contado  = models.ForeignKey(CondicionPagoCp, blank=True, null=True)
     depto_general_cont      = models.ForeignKey(DeptoCo)

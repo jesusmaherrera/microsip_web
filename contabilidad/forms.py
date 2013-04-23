@@ -13,12 +13,12 @@ class InformacionContableManageForm(forms.ModelForm):
 		widgets = autocomplete_light.get_widgets_dict(InformacionContable_C)
 		model = InformacionContable_C
 
-class Cuenta_DIOTManageForm(forms.ModelForm):
-	class Meta:
-		widgets = autocomplete_light.get_widgets_dict(Cuenta_DIOT)
-		model = Cuenta_DIOT
+# class Cuenta_DIOTManageForm(forms.ModelForm):
+# 	class Meta:
+# 		widgets = autocomplete_light.get_widgets_dict(Cuenta_DIOT)
+# 		model = Cuenta_DIOT
 
-Cuenta_DIOTFormset = modelformset_factory(Cuenta_DIOT, Cuenta_DIOTManageForm, can_delete=True, extra=1)
+# Cuenta_DIOTFormset = modelformset_factory(Cuenta_DIOT, Cuenta_DIOTManageForm, can_delete=True, extra=1)
 
 class GenerarDIOTManageForm(forms.Form):
 	fecha_ini 				= forms.DateField()
