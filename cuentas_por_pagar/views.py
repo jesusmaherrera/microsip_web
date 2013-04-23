@@ -503,6 +503,13 @@ def proveedor_manageView(request, id = None, template_name='catalogos/proveedore
 
 	if request.method == 'POST':
 		form = ProveedorManageForm(request.POST, instance= proveedor)
+		if form.is_valid():
+			proveedor = form.save(commit=False)
+			if not proveedor.id > 0:
+				proveedor.id=-1
+			proveedor.estado = proveedor.ciudad.estado
+			proveedor.pais = proveedor.estado.pais
+			proveedor.save()
 	else:
 		form = ProveedorManageForm(instance=proveedor)
 

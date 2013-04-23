@@ -4,6 +4,16 @@ from django.db.models.signals import pre_save
 from django.core import urlresolvers
 from inventarios.models import *
 
+class CondicionPagoCp(models.Model):
+    id = models.AutoField(primary_key=True, db_column='COND_PAGO_ID')
+    nombre = models.CharField(max_length=50, db_column='NOMBRE')
+
+    def __unicode__(self):
+        return self.nombre
+
+    class Meta:
+        db_table = u'condiciones_pago_cp'
+
 class ClavesProveedores(models.Model):    
     class Meta:
         db_table = u'claves_proveedores'
@@ -21,11 +31,16 @@ class TipoProveedor(models.Model):
 class Proveedor(models.Model):
     id                  = models.AutoField(primary_key=True, db_column='PROVEEDOR_ID')
     nombre              = models.CharField(max_length=100, db_column='NOMBRE')
-    cuenta_xpagar       = models.CharField(max_length=9, db_column='CUENTA_CXP')
-    cuenta_anticipos    = models.CharField(max_length=9, db_column='CUENTA_ANTICIPOS')
+    cuenta_xpagar       = models.CharField(max_length=30, db_column='CUENTA_CXP', blank=True, null=True)
+    cuenta_anticipos    = models.CharField(max_length=9, db_column='CUENTA_ANTICIPOS', blank=True, null=True)
     moneda              = models.ForeignKey(Moneda, db_column='MONEDA_ID')
     tipo                = models.ForeignKey(TipoProveedor, db_column='TIPO_PROV_ID')
-    rfc_curp            = models.CharField(max_length=18, db_column='RFC_CURP')
+    rfc_curp            = models.CharField(max_length=18, db_column='RFC_CURP', blank=True, null=True)
+    condicion_de_pago   = models.ForeignKey(CondicionPagoCp, db_column='COND_PAGO_ID')
+    #Direccion
+    pais                = models.ForeignKey(Pais, db_column='PAIS_ID', blank=True, null=True)
+    estado              = models.ForeignKey(Estado, db_column='ESTADO_ID', blank=True, null=True)
+    ciudad              = models.ForeignKey(Ciudad, db_column='CIUDAD_ID')
     
     TIPOS_OPERACION     = (('03', 'Prestacion de Servicios Profesionales'),('06', 'Arrendamiento de Inmuebles'),('85', 'Otros'),)
     actividad_principal = models.CharField(max_length=3, choices=TIPOS_OPERACION, db_column='ACTIVIDAD_PRINCIPAL', default='85')
@@ -49,16 +64,6 @@ class ConceptoCp(models.Model):
 
     class Meta:
         db_table = u'conceptos_cp'
-
-class CondicionPagoCp(models.Model):
-    id = models.AutoField(primary_key=True, db_column='COND_PAGO_ID')
-    nombre = models.CharField(max_length=50, db_column='NOMBRE')
-
-    def __unicode__(self):
-        return self.nombre
-
-    class Meta:
-        db_table = u'condiciones_pago_cp'
 
 class DoctosCp(models.Model):
     id                  = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')

@@ -16,27 +16,52 @@
   </div>
     {{ form.errors }}
   
-   <div class="control-group">
-    <label class="control-label" for="id_cuenta_xpagar">Cuenta por pagar</label>
-    <div class="controls">
-      {{ form.cuenta_xpagar }} 
+  <div class="span4" >
+    <label>Nombre</label>
+    <div class="input-prepend input-append">
+      {{ form.nombre }}
     </div>
   </div>
-  <div class="control-group">
-    <label class="control-label" for="id_tipo">Tipo</label>
-    <div class="controls">
+  <div class="span4" >
+    <label>Moneda</label>
+    <div class="input-prepend input-append">
+      {{ form.moneda }}
+    </div>
+  </div>
+   {{ form.ciudad }}
+  <div class="span4" >
+    <label>Ciudad</label>
+    <div class="input-prepend input-append">
+      {{ form.ciudad }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Cuenta por pagar</label>
+    <div class="input-prepend input-append">
+      {{ form.cuenta_xpagar }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Tipo</label>
+    <div class="input-prepend input-append">
       {{ form.tipo }}
     </div>
   </div>
-  <div class="control-group">
-    <label class="control-label" for="id_actividad_principal">Actividad Principal</label>
-    <div class="controls">
+  <div class="span4" >
+    <label>Actividad principal</label>
+    <div class="input-prepend input-append">
       {{ form.actividad_principal }}
     </div>
   </div>
-  <div class="control-group">
-    <label class="control-label" for="id_rfc_curp">RFC</label>
-    <div class="controls">
+  <div class="span4" >
+    <label>Condicion de pago</label>
+    <div class="input-prepend input-append">
+      {{ form.condicion_de_pago}}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>RFC</label>
+    <div class="input-prepend input-append">
       {{ form.rfc_curp }}
     </div>
   </div>
@@ -51,4 +76,5 @@
     <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
   </div>
 </form>
+{% include 'autocomplete_light/static.html' %}
 {% endblock %}

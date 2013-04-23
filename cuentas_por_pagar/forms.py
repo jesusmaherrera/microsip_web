@@ -10,6 +10,7 @@ from models import *
 
 class ProveedorManageForm(forms.ModelForm):
 	class Meta:
+		widgets = autocomplete_light.get_widgets_dict(Proveedor)
 		model = Proveedor
 
 class InformacionContableManageForm(forms.ModelForm):

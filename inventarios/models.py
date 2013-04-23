@@ -7,16 +7,34 @@ from django.core import urlresolvers
 class Moneda(models.Model):
     id = models.AutoField(primary_key=True, db_column='MONEDA_ID')
     es_moneda_local = models.CharField(default='N', max_length=1, db_column='ES_MONEDA_LOCAL')
-    
+    nombre = models.CharField(max_length=30, db_column='NOMBRE')
+
+    def __unicode__(self):
+        return u'%s' % self.nombre
+
     class Meta:
         db_table = u'monedas'
 
-class Paises(models.Model):
-    PAIS_ID = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50, db_column='NOMBRE')
+class Pais(models.Model):
+    id = models.AutoField(primary_key=True, db_column='PAIS_ID')
+    nombre = models.CharField(max_length=50, db_column='NOMBRE')
+
+    def __unicode__(self):
+        return u'%s' % self.nombre
 
     class Meta:
         db_table = u'paises'
+
+class Estado(models.Model):
+    id = models.AutoField(primary_key=True, db_column='ESTADO_ID')
+    nombre = models.CharField(max_length=50, db_column='NOMBRE')
+    pais        = models.ForeignKey(Pais, db_column='PAIS_ID')
+
+    def __unicode__(self):
+        return u'%s, %s' % (self.nombre, self.pais)
+
+    class Meta:
+        db_table = u'estados'
 
 class ActivosFijos(models.Model):
     class Meta:
@@ -136,7 +154,14 @@ class CfdRecibidos(models.Model):
     class Meta:
         db_table = u'cfd_recibidos'
 
-class Ciudades(models.Model):
+class Ciudad(models.Model):
+    id          = models.AutoField(primary_key=True, db_column='CIUDAD_ID')
+    nombre      = models.CharField(max_length=50, db_column='NOMBRE')
+    estado      = models.ForeignKey(Estado, db_column='ESTADO_ID')
+
+    def __unicode__(self):
+        return u'%s, %s'%(self.nombre, self.estado)
+
     class Meta:
         db_table = u'ciudades'
 
