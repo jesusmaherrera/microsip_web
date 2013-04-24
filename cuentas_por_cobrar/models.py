@@ -61,14 +61,16 @@ class PlantillaPolizas_CC(models.Model):
 class DetallePlantillaPolizas_CC(models.Model):
     TIPOS = (('C', 'Cargo'),('A', 'Abono'),)
     VALOR_TIPOS =(
-        ('Compras', 'Compras'),
-        ('Proveedores', 'Proveedores'),
+        ('Ventas', 'Ventas'),
+        ('Clientes', 'Clientes'),
         ('Bancos', 'Bancos'),
-        ('Fletes', 'Fletes'),
         ('Descuentos', 'Descuentos'),
-        ('Devoluciones','Devoluciones'),
-        ('Anticipos','Anticipos'),
         ('IVA', 'IVA'),
+        ('Segmento_1', 'Segmento 1'),
+        ('Segmento_2', 'Segmento 2'),
+        ('Segmento_3', 'Segmento 3'),
+        ('Segmento_4', 'Segmento 4'),
+        ('Segmento_5', 'Segmento 5'),
     )
     VALOR_IVA_TIPOS             = (('A', 'Ambos'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
     VALOR_CONTADO_CREDITO_TIPOS = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)

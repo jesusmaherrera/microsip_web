@@ -1,4 +1,4 @@
-{% extends "base_cp.html" %}
+{% extends "base_cc.html" %}
 {% block title %}Plantilla Polizas{% endblock %}
 
 <!-- CSS Code -->
@@ -14,6 +14,7 @@
 <!-- JavaScript Code -->
 {% block js_code %}
 <script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script src='{{STATIC_URL}}js/plantillas.js'></script>
 <script type="text/javascript">
 
 
@@ -28,10 +29,30 @@ $(function() {
     deleteText:'',
   });
 });
+$(document).ready(function() {
+  $("a[class*='btn-success']").click(function() {
+    
+    $("select[name*='valor_tipo']").each(function(){ ajustarFormulario(this);});
+    
+    $("select[name*='valor_tipo']").last().change(function(){ ajustarFormulario(this);});
+
+    $("input[name*='posicion']" ).each(function( index ) {
+       if($(this).val()=='')
+         $(this).val(index+1);
+     });
+   });
+
+  $("select[name*='valor_tipo']").change(function(){ ajustarFormulario(this);});
+  $("select[name*='valor_tipo']").each(function(){ ajustarFormulario(this);});
+
+});
+
 </script>
 
+
+
 {% endblock %}
-{% block breadcrumb %}{{ block.super }}  > Plantilla{% endblock %}
+{% block breadcrumb %}{{ block.super }} Plantilla{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
 

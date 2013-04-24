@@ -33,12 +33,6 @@
     <div class="tab-pane fade active in" id="informacionContable">
       <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
       {% csrf_token %}
-        <div class="span3" style='clear:both;'>
-          <label>Departamento General de contablidad</label>
-          <div class="input-prepend input-append">
-            {{ form.depto_general_cont }}
-          </div>
-        </div>
         {{ form.errors }}
         <fieldset style='clear:both;' >
         <legend>Pólizas de ventas:</legend>

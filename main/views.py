@@ -4,7 +4,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 import datetime, time
 from inventarios.models import *
+form contabilidad.models import *
 from inventarios.views import c_get_next_key
+from django.core.exceptions import ObjectDoesNotExist
 
 #Paginacion
 

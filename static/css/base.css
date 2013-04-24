@@ -141,3 +141,8 @@ background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAA
     display: none;
   }
 }
+
+.input-append, .input-prepend
+{
+  font-size: 12px;
+}

@@ -22,7 +22,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum, Max
 from django.db import connection
 from inventarios.views import c_get_next_key
-from main.views import get_folio_poliza
 
 ##########################################
 ## 										##
@@ -353,7 +352,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 	documentosData = []
 	documentosGenerados = []
 	documentosDataDevoluciones = []
-	
+	depto_co = get_object_or_404(DeptoCo, clave='GRAL')
 	try:
 		informacion_contable = InformacionContable_V.objects.all()[:1]
 		informacion_contable = informacion_contable[0]
@@ -382,10 +381,10 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 			prefijo = ''
 
 		if crear_polizas_de 	== 'F' or crear_polizas_de 	== 'FD':
-			documentosData, msg = crear_polizas(facturas, informacion_contable.depto_general_cont, informacion_contable, msg, plantilla_facturas, descripcion, crear_polizas_por, crear_polizas_de, 'F')
+			documentosData, msg = crear_polizas(facturas, depto_co, informacion_contable, msg, plantilla_facturas, descripcion, crear_polizas_por, crear_polizas_de, 'F')
 			documentosGenerados = documentosData
 		if crear_polizas_de 	== 'D' or crear_polizas_de 	== 'FD':
-			documentosDataDevoluciones, msg = crear_polizas(devoluciones, informacion_contable.depto_general_cont, informacion_contable, msg, plantilla_devoluciones, descripcion, crear_polizas_por, crear_polizas_de, 'D')
+			documentosDataDevoluciones, msg = crear_polizas(devoluciones, depto_co, informacion_contable, msg, plantilla_devoluciones, descripcion, crear_polizas_por, crear_polizas_de, 'D')
 
 	elif error == 1 and msg=='':
 		msg = 'No se han derfinido las preferencias de la empresa para generar polizas [Por favor definelas primero en Configuracion > Preferencias de la empresa]'
