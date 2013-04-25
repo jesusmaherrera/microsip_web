@@ -39,6 +39,40 @@ class DoctosCc(models.Model):
     class Meta:
         db_table = u'doctos_cc'
 
+class ImportesDoctosCC(models.Model):
+    id              = models.AutoField(primary_key=True, db_column='IMPTE_DOCTO_CC_ID')
+    docto_cc        = models.ForeignKey(DoctosCc, db_column='DOCTO_CC_ID')
+    importe_neto    = models.DecimalField(max_digits=15, decimal_places=2, db_column='IMPORTE')
+    total_impuestos = models.DecimalField(max_digits=15, decimal_places=2, db_column='IMPUESTO')
+    iva_retenido    = models.DecimalField(max_digits=15, decimal_places=2, db_column='IVA_RETENIDO')
+    
+    class Meta:
+        db_table = u'importes_doctos_cc'
+
+class LibresCargosCC(models.Model):
+    id            = models.AutoField(primary_key=True, db_column='DOCTO_CC_ID')
+    segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
+    segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
+    segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
+    segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
+    segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
+    def __unicode__(self):
+        return u'%s' % self.id
+    class Meta:
+        db_table = u'libres_cargos_cc'
+
+class LibresCreditosCC(models.Model):
+    id            = models.AutoField(primary_key=True, db_column='DOCTO_CC_ID')
+    segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
+    segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
+    segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
+    segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
+    segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
+    def __unicode__(self):
+        return u'%s' % self.id
+    class Meta:
+        db_table = u'libres_creditos_cc'
+
 ################################################################
 ####                                                        ####
 ####        MODELOS EXTRA A BASE DE DATOS MICROSIP          ####
@@ -61,25 +95,28 @@ class PlantillaPolizas_CC(models.Model):
 class DetallePlantillaPolizas_CC(models.Model):
     TIPOS = (('C', 'Cargo'),('A', 'Abono'),)
     VALOR_TIPOS =(
-        ('Compras', 'Compras'),
-        ('Proveedores', 'Proveedores'),
+        ('Ventas', 'Ventas'),
+        ('Clientes', 'Clientes'),
         ('Bancos', 'Bancos'),
-        ('Fletes', 'Fletes'),
         ('Descuentos', 'Descuentos'),
-        ('Devoluciones','Devoluciones'),
-        ('Anticipos','Anticipos'),
         ('IVA', 'IVA'),
+        ('Segmento_1', 'Segmento 1'),
+        ('Segmento_2', 'Segmento 2'),
+        ('Segmento_3', 'Segmento 3'),
+        ('Segmento_4', 'Segmento 4'),
+        ('Segmento_5', 'Segmento 5'),
     )
     VALOR_IVA_TIPOS             = (('A', 'Ambos'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
     VALOR_CONTADO_CREDITO_TIPOS = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)
-
-    plantilla_poliza_CC      = models.ForeignKey(PlantillaPolizas_CC)
+    
+    posicion                = models.CharField(max_length=2)
+    plantilla_poliza_CC     = models.ForeignKey(PlantillaPolizas_CC)
     cuenta_co               = models.ForeignKey(CuentaCo)
     tipo                    = models.CharField(max_length=2, choices=TIPOS, default='C')
+    asiento_ingora          = models.CharField(max_length=2, blank=True, null=True)
     valor_tipo              = models.CharField(max_length=20, choices=VALOR_TIPOS)
     valor_iva               = models.CharField(max_length=2, choices=VALOR_IVA_TIPOS, default='A')
     valor_contado_credito   = models.CharField(max_length=10, choices=VALOR_CONTADO_CREDITO_TIPOS, default='Ambos')
 
     def __unicode__(self):
         return u'%s'%self.id
-

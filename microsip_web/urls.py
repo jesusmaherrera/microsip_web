@@ -22,9 +22,15 @@ urlpatterns = patterns('',
     #Descomentar esta linea para habilitar ventas
     url(r'^ventas/', include('ventas.urls', namespace='ventas')),
 
+    #Descomentar esta linea para habilitar cuentas_por_cobrar
+    url(r'^cuentas_por_cobrar/', include('cuentas_por_cobrar.urls', namespace='cuentas_por_cobrar')),
+
     #Descomentar esta linea para habilitar cuentas_por_pagar
     url(r'^cuentas_por_pagar/', include('cuentas_por_pagar.urls', namespace='cuentas_por_pagar')),
     
+    #Descomentar esta linea para habilitar punto_de_venta
+    url(r'^punto_de_venta/', include('punto_de_venta.urls', namespace='punto_de_venta')),
+
     #Descomentar esta linea para habilitar contabilidad
     url(r'^contabilidad/', include('contabilidad.urls', namespace='contabilidad')),
     

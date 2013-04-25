@@ -490,6 +490,9 @@ class Cliente(models.Model):
     nombre          = models.CharField(max_length=9, db_column='NOMBRE')
     cuenta_xcobrar  = models.CharField(max_length=9, db_column='CUENTA_CXC')
 
+    def __unicode__(self):
+        return self.nombre
+
     class Meta:
         db_table = u'clientes'
 

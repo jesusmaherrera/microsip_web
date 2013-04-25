@@ -83,7 +83,6 @@ class InformacionContable_V(models.Model):
     tipo_poliza_ve          = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_ve')
     tipo_poliza_dev         = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_dev')
     condicion_pago_contado  = models.ForeignKey(CondicionPago, blank=True, null=True)
-    depto_general_cont      = models.ForeignKey(DeptoCo)
 
     def __unicode__(self):
         return u'%s'% self.id

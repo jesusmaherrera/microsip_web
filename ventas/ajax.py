@@ -4,6 +4,8 @@ from inventarios.models import *
 from django.core import serializers
 from django.http import HttpResponse
 from models import *
+from cuentas_por_cobrar.models import PlantillaPolizas_CC
+
 @dajaxice_register(method='GET')
 def args_example(request, text):
     return simplejson.dumps({'message':'Your message is %s!' % text})
@@ -27,6 +29,19 @@ def obtener_plantillas_cp(request, tipo_plantilla):
     #se obtiene la provincia
     
     plantillas = PlantillaPolizas_CP.objects.filter(tipo=tipo_plantilla)
+
+    #se devuelven las ciudades en formato json, solo nos interesa obtener como json
+    #el id y el nombre de las ciudades.
+    data = serializers.serialize("json", plantillas, fields=('id','nombre'))
+    
+
+    return HttpResponse(data, mimetype="application/javascript")
+
+@dajaxice_register(method='GET')
+def obtener_plantillas_cc(request, tipo_plantilla):
+    #se obtiene la provincia
+    
+    plantillas = PlantillaPolizas_CC.objects.filter(tipo=tipo_plantilla)
 
     #se devuelven las ciudades en formato json, solo nos interesa obtener como json
     #el id y el nombre de las ciudades.

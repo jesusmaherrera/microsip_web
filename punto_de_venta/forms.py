@@ -6,13 +6,13 @@ import autocomplete_light
 from ventas.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-from cuentas_por_cobrar.models import *
+from models import *
 
 class InformacionContableManageForm(forms.ModelForm):
 	condicion_pago_contado 	= forms.ModelChoiceField(queryset= CondicionPago.objects.all(), required=True)
 
 	class Meta:
-		model = InformacionContable_CC
+		model = InformacionContable_pv
 
 class GenerarPolizasManageForm(forms.Form):
 	fecha_ini 					= forms.DateField()
@@ -25,23 +25,27 @@ class GenerarPolizasManageForm(forms.Form):
 	)
 	crear_polizas_por 			= forms.ChoiceField(choices=CREAR_POR)
 
-	plantilla 					= forms.ModelChoiceField(queryset= PlantillaPolizas_CC.objects.all(), required=True)
+	plantilla 					= forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.all(), required=True)
 	#plantilla_2 = forms.ModelChoiceField(queryset= PlantillaPolizas_V.objects.all(), required=True)
 	descripcion 				= forms.CharField(max_length=100, required=False)
-	crear_polizas_de 			= forms.ModelChoiceField(queryset= ConceptoCc.objects.filter(crear_polizas='S'), required=True)
+	TIPOS =(
+        ('V', 'Ventas de mostrador'),
+        ('D', 'Devoluciones'),
+        ('', 'Cobros ctas. por cobrar'),
+    )
+	crear_polizas_de 			= forms.ChoiceField(choices=TIPOS, required=True)
 
 
 class PlantillaPolizaManageForm(forms.ModelForm):
-	tipo = forms.ModelChoiceField(queryset= ConceptoCc.objects.filter(crear_polizas='S'), required=True)
 	class Meta:
-		model = PlantillaPolizas_CC
+		model = PlantillaPolizas_pv
 
 class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
 	posicion  		=  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
 	asiento_ingora 	= forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
 	class Meta:
-		widgets = autocomplete_light.get_widgets_dict(DetallePlantillaPolizas_CC)
-		model = DetallePlantillaPolizas_CC
+		widgets = autocomplete_light.get_widgets_dict(DetallePlantillaPolizas_pv)
+		model = DetallePlantillaPolizas_pv
 
 def PlantillaPoliza_items_formset(form, formset = BaseInlineFormSet, **kwargs):
-	return inlineformset_factory(PlantillaPolizas_CC, DetallePlantillaPolizas_CC, form, formset, **kwargs)
+	return inlineformset_factory(PlantillaPolizas_pv, DetallePlantillaPolizas_pv, form, formset, **kwargs)

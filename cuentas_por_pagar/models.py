@@ -113,7 +113,6 @@ class LibresCargosCP(models.Model):
         
 class InformacionContable_CP(models.Model):
     condicion_pago_contado  = models.ForeignKey(CondicionPagoCp, blank=True, null=True)
-    depto_general_cont      = models.ForeignKey(DeptoCo)
     
     def __unicode__(self):
         return u'%s'% self.id

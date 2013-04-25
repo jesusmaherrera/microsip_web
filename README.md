@@ -34,7 +34,34 @@ INSTALACION DE APLICACION
 11) 
 ////////////////////DEFINIR CAMPOS PARTICULARES PARA TABLAS//////////////////////////////
 
+///////////////////PARA CUENTAS POR COBRAR/////////////////////////////////////////
+
+class LibresCargosCC(models.Model):
+    id            = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')
+    segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
+    segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
+    segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
+    segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
+    segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
+    def __unicode__(self):
+        return u'%s' % self.id
+    class Meta:
+        db_table = u'libres_cargos_cc'
+
+class LibresCreditosCC(models.Model):
+    id            = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')
+    segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
+    segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
+    segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
+    segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
+    segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
+    def __unicode__(self):
+        return u'%s' % self.id
+    class Meta:
+        db_table = u'libres_creditos_cc'
+
 ///////////////////PARA CUENTAS POR PAGAR/////////////////////////////////////////
+
 class LibresCargosCP(models.Model):
     id                      = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')
     segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
@@ -49,6 +76,7 @@ class LibresCargosCP(models.Model):
         db_table = u'libres_cargos_cp'
 
 /////////////////PARA VENTAS//////////////////////
+
 class LibresFacturasV(models.Model):
     id            = models.AutoField(primary_key=True, db_column='DOCTO_VE_ID')
     segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
