@@ -25,11 +25,18 @@ $(function() {
     deleteText:'',
   });
 });
+<<<<<<< HEAD
 
 $(document).ready(function() {
   $("a[class*='btn-success']").click(function() {
     
     $("select[name*='valor_tipo']").each(function(){ajustarFormulario(this);});
+=======
+$(document).ready(function() {
+  $("a[class*='btn-success']").click(function() {
+    
+    $("select[name*='valor_tipo']").each(function(){ ajustarFormulario(this);});
+>>>>>>> 5f3726e7384d52b062244a093138ee40b8383089
     
     $("select[name*='valor_tipo']").last().change(function(){ ajustarFormulario(this);});
 
@@ -41,12 +48,18 @@ $(document).ready(function() {
 
   $("select[name*='valor_tipo']").change(function(){ ajustarFormulario(this);});
   $("select[name*='valor_tipo']").each(function(){ ajustarFormulario(this);});
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5f3726e7384d52b062244a093138ee40b8383089
 });
 
 </script>
 
+
+
 {% endblock %}
-{% block breadcrumb %}{{ block.super }}  > Plantilla{% endblock %}
+{% block breadcrumb %}{{ block.super }} Plantilla{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
 

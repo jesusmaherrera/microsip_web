@@ -6,12 +6,21 @@
 {% block modulestyle_css %}{% endblock %}
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
+<<<<<<< HEAD
 {% block btn_modulo_cuentas_por_cobrar %}
   <!-- /cuentas_por_cobrar/GenerarPolizas/ -->
   <li style='color: #555555; background-color: #e5e5e5;'><a href="/cuentas_por_cobrar/GenerarPolizas/"> <i class="msicon-cuentas_por_cobrar"></i><label class='labelMenu'> Cuentas por cobrar</label></a></li>
 {% endblock %}
 
 {% block breadcrumb %}{{ block.super }} Cuentas por cobrar{% endblock %}
+=======
+{% block btn_modulo_cuentas_por_cobrar%}
+<li style='color: #555555; background-color: #e5e5e5;'>
+  <a id="drop1" href="/cuentas_por_cobrar/PreferenciasEmpresa/"> <i class="msicon-cuentas_por_cobrar"></i><label class='labelMenu'> Cuentas por cobrar</label></a>
+</li>
+{% endblock %}
+{% block breadcrumb %}{{ block.super }} Cuentas por cobrar >{% endblock %}
+>>>>>>> 5f3726e7384d52b062244a093138ee40b8383089
 {% block tools-module %}
 <div class="navbar navbar-static">
   <ul class="nav" role="navigation">

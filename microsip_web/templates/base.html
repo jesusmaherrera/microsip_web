@@ -31,6 +31,7 @@
       <div class="container" style="width: auto;">
         <!-- <a class="brand" href="#"><i class="icon-home"></i></a> -->
         <ul class="nav" role="navigation">
+<<<<<<< HEAD
          <!--  <li class="dropdown">
             <a id="drop1" href="/" role="button" > <i class="msicon-home"></i><label class='labelMenu'> Home</label></a>
           </li> -->
@@ -40,6 +41,16 @@
           <li><a href="/cuentas_por_cobrar/GenerarPolizas/"> <i class="msicon-cuentas_por_cobrar"></i><label class='labelMenu'> Cuentas por cobrar</label></a></li>
           {% endblock %}
 
+=======
+          <li>
+            <a id="drop1" href="/" role="button" > <i class="msicon-home"></i><label class='labelMenu'> Home</label></a>
+          </li>
+          {% block btn_modulo_cuentas_por_cobrar%}
+          <li>
+            <a id="drop1" href="/cuentas_por_cobrar/PreferenciasEmpresa/"> <i class="msicon-cuentas_por_cobrar"></i><label class='labelMenu'> Cuentas por cobrar</label></a>
+          </li>
+          {% endblock %}
+>>>>>>> 5f3726e7384d52b062244a093138ee40b8383089
           {% block btn_modulo_inventarios%}
           <li><a href="/inventarios/Entradas/"> <i class="msicon-inventarios"></i><label class='labelMenu'> Inventarios</label></a></li>
           <!-- <li><a href="#"> <i class="msicon-inventarios"></i><label class='labelMenu'> Inventarios</label></a></li> -->

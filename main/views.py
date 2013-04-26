@@ -5,6 +5,13 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 from django.template import RequestContext
 import datetime, time
+<<<<<<< HEAD
+=======
+from inventarios.models import *
+form contabilidad.models import *
+from inventarios.views import c_get_next_key
+from django.core.exceptions import ObjectDoesNotExist
+>>>>>>> 5f3726e7384d52b062244a093138ee40b8383089
 
 from decimal import *
 from inventarios.views import c_get_next_key

@@ -91,7 +91,5 @@ class DoctosCoDet(models.Model):
 
 class InformacionContable_C(models.Model):
     cuenta_proveedores  = models.ForeignKey(CuentaCo)
-    depto_general_cont      = models.ForeignKey(DeptoCo)
-
     def __unicode__(self):
         return u'%s'% self.id

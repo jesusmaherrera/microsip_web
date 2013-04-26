@@ -24,7 +24,11 @@ urlpatterns = patterns('',
 
     #Descomentar esta linea para habilitar cuentas_por_cobrar
     url(r'^cuentas_por_cobrar/', include('cuentas_por_cobrar.urls', namespace='cuentas_por_cobrar')),
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 5f3726e7384d52b062244a093138ee40b8383089
     #Descomentar esta linea para habilitar cuentas_por_pagar
     url(r'^cuentas_por_pagar/', include('cuentas_por_pagar.urls', namespace='cuentas_por_pagar')),
     
@@ -35,7 +39,7 @@ urlpatterns = patterns('',
     url(r'^contabilidad/', include('contabilidad.urls', namespace='contabilidad')),
     
     url(r'autocomplete/', include('autocomplete_light.urls')),
-    #url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
     #LOGIN
     url(r'^login/$','inventarios.views.ingresar'),
     url(r'^logout/$', 'inventarios.views.logoutUser'),
