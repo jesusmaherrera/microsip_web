@@ -25,19 +25,11 @@ $(function() {
     deleteText:'',
   });
 });
-<<<<<<< HEAD
-
 $(document).ready(function() {
   $("a[class*='btn-success']").click(function() {
     
     $("select[name*='valor_tipo']").each(function(){ajustarFormulario(this);});
-=======
-$(document).ready(function() {
-  $("a[class*='btn-success']").click(function() {
-    
-    $("select[name*='valor_tipo']").each(function(){ ajustarFormulario(this);});
->>>>>>> 5f3726e7384d52b062244a093138ee40b8383089
-    
+
     $("select[name*='valor_tipo']").last().change(function(){ ajustarFormulario(this);});
 
     $("input[name*='posicion']" ).each(function( index ) {
@@ -48,10 +40,6 @@ $(document).ready(function() {
 
   $("select[name*='valor_tipo']").change(function(){ ajustarFormulario(this);});
   $("select[name*='valor_tipo']").each(function(){ ajustarFormulario(this);});
-<<<<<<< HEAD
-=======
-
->>>>>>> 5f3726e7384d52b062244a093138ee40b8383089
 });
 
 </script>

@@ -20,12 +20,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum, Max
-
 from inventarios.views import c_get_next_key
-<<<<<<< HEAD
 from main.views import crear_polizas_contables
-=======
->>>>>>> 5f3726e7384d52b062244a093138ee40b8383089
 
 ##########################################
 ## 										##
@@ -39,12 +35,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 	documentosData = []
 	documentosGenerados = []
 	documentosDataDevoluciones = []
-<<<<<<< HEAD
 	depto_co = get_object_or_404(DeptoCo,clave='GRAL')
-
-=======
-	depto_co = get_object_or_404(DeptoCo, clave='GRAL')
->>>>>>> 5f3726e7384d52b062244a093138ee40b8383089
 	try:
 		informacion_contable = InformacionContable_V.objects.all()[:1]
 		informacion_contable = informacion_contable[0]
@@ -73,7 +64,6 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 			prefijo = ''
 
 		if crear_polizas_de 	== 'F' or crear_polizas_de 	== 'FD':
-<<<<<<< HEAD
 			msg, documentosData = crear_polizas_contables(
 				origen_documentos	= 'ventas',
 				documentos 			= facturas, 
@@ -87,13 +77,6 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 				tipo_documento = 'F',
 			)
 			documentosGenerados = documentosData
-=======
-			documentosData, msg = crear_polizas(facturas, depto_co, informacion_contable, msg, plantilla_facturas, descripcion, crear_polizas_por, crear_polizas_de, 'F')
-			documentosGenerados = documentosData
-		if crear_polizas_de 	== 'D' or crear_polizas_de 	== 'FD':
-			documentosDataDevoluciones, msg = crear_polizas(devoluciones, depto_co, informacion_contable, msg, plantilla_devoluciones, descripcion, crear_polizas_por, crear_polizas_de, 'D')
->>>>>>> 5f3726e7384d52b062244a093138ee40b8383089
-
 		if crear_polizas_de 	== 'D' or crear_polizas_de 	== 'FD':
 			msg, documentosDataDevoluciones = crear_polizas_contables(
 				origen_documentos	= 'ventas',

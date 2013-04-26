@@ -46,6 +46,9 @@ class ImportesDoctosCC(models.Model):
     total_impuestos = models.DecimalField(max_digits=15, decimal_places=2, db_column='IMPUESTO')
     iva_retenido    = models.DecimalField(max_digits=15, decimal_places=2, db_column='IVA_RETENIDO')
     
+    def __unicode__(self):
+        return u'%s' % self.id
+        
     class Meta:
         db_table = u'importes_doctos_cc'
 

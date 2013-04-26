@@ -5,13 +5,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 from django.template import RequestContext
 import datetime, time
-<<<<<<< HEAD
-=======
+
 from inventarios.models import *
-form contabilidad.models import *
+from contabilidad.models import *
 from inventarios.views import c_get_next_key
 from django.core.exceptions import ObjectDoesNotExist
->>>>>>> 5f3726e7384d52b062244a093138ee40b8383089
 
 from decimal import *
 from inventarios.views import c_get_next_key
@@ -195,7 +193,7 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
 		ventas_0_contado	= ventas_0
 		iva_efec_cobrado 	= impuestos
 		bancos 				= total - descuento
-
+	
 	totales_cuentas, error, msg = agregarTotales(
 		conceptos_poliza 	= conceptos_poliza,
 		totales_cuentas 	= totales_cuentas, 
@@ -300,6 +298,95 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
 	return totales_cuentas, error, msg
 
 def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_poliza=None, totales_cuentas=None, msg='', error='', depto_co=None):	
+	#Si es una factura
+	if documento.tipo == 'F':
+		campos_particulares = LibresFacturasV.objects.filter(pk=documento.id)[0]
+	#Si es una devolucion
+	elif documento.tipo == 'D':
+		campos_particulares = LibresDevFacV.objects.filter(pk=documento.id)[0]
+
+	try:
+		cuenta_cliente =  CuentaCo.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
+	except ObjectDoesNotExist:
+		cuenta_cliente = None
+
+	#Para saber si es contado o es credito
+	es_contado = documento.condicion_pago == cuenta_contado
+
+	impuestos 			= documento.total_impuestos * documento.tipo_cambio
+	importe_neto 		= documento.importe_neto * documento.tipo_cambio
+	total 				= impuestos + importe_neto
+	descuento 			= get_descuento_total_ve(documento.id) * documento.tipo_cambio
+	clientes 			= 0
+	bancos 				= 0
+	iva_efec_cobrado	= 0
+	iva_pend_cobrar 	= 0
+	ventas_16_credito	= 0
+	ventas_16_contado	= 0
+	ventas_0_credito	= 0
+	ventas_0_contado	= 0
+
+	ventas_0 			= DoctoVeDet.objects.filter(docto_ve= documento).extra(
+			tables =['impuestos_articulos', 'impuestos'],
+			where =
+			[
+				"impuestos_articulos.ARTICULO_ID = doctos_ve_det.ARTICULO_ID",
+				"impuestos.IMPUESTO_ID = impuestos_articulos.IMPUESTO_ID",
+				"impuestos.PCTJE_IMPUESTO = 0 ",
+			],
+		).aggregate(ventas_0 = Sum('precio_total_neto'))['ventas_0']
+	
+	if ventas_0 == None:
+		ventas_0 = 0 
+
+	ventas_0 = ventas_0 * documento.tipo_cambio
+
+	ventas_16 = total - ventas_0 - impuestos
+
+	#si llega a  haber un proveedor que no tenga cargar impuestos
+	if ventas_16 < 0:
+		ventas_0 += ventas_16
+		ventas_16 = 0
+		msg = 'Existe al menos una documento donde el proveedor [no tiene indicado cargar inpuestos] POR FAVOR REVISTA ESO!!'
+		if crear_polizas_por == 'Dia':
+			msg = '%s, REVISA LAS POLIZAS QUE SE CREARON'% msg 
+
+		error = 1
+
+	#SI LA FACTURA ES A CREDITO
+	if not es_contado:
+		ventas_16_credito 	= ventas_16
+		ventas_0_credito 	= ventas_0
+		iva_pend_cobrar 	= impuestos
+		clientes 			= total - descuento
+	elif es_contado:
+		ventas_16_contado 	= ventas_16
+		ventas_0_contado	= ventas_0
+		iva_efec_cobrado 	= impuestos
+		bancos 				= total - descuento
+
+	totales_cuentas, error, msg = agregarTotales(
+		conceptos_poliza 	= conceptos_poliza,
+		totales_cuentas 	= totales_cuentas, 
+		ventas_0_credito 	= ventas_0_credito,
+		ventas_16_credito	= ventas_16_credito,
+		ventas_0_contado 	= ventas_0_contado,
+		ventas_16_contado 	= ventas_16_contado,
+		iva_efec_cobrado 	= iva_efec_cobrado,
+		iva_pend_cobrar 	= iva_pend_cobrar,
+		descuento 			= descuento,
+		clientes 			= clientes,
+		cuenta_cliente 	    = cuenta_cliente,
+		bancos 				= bancos,
+		campos_particulares = campos_particulares,
+		depto_co 			= depto_co,
+		error 				= error,
+		msg 				= msg,
+	)
+
+	return totales_cuentas, error, msg
+
+def get_totales_documento_pv(cuenta_contado= None, documento= None, conceptos_poliza=None, totales_cuentas=None, msg='', error='', depto_co=None):	
 	#Si es una factura
 	if documento.tipo == 'F':
 		campos_particulares = LibresFacturasV.objects.filter(pk=documento.id)[0]
@@ -583,8 +670,7 @@ def crear_polizas_contables(origen_documentos, documentos, depto_co, informacion
 	totales_cuentas 	= {}
 	
 	for documento_no, documento in enumerate(documentos):
-		
-		es_contado = documento.condicion_pago == informacion_contable.condicion_pago_contado
+		#es_contado = documento.condicion_pago == informacion_contable.condicion_pago_contado
 		
 		siguente_documento = documentos[(documento_no +1)%len(documentos)]
 		documento_numero = documento_no

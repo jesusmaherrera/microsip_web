@@ -165,7 +165,7 @@ Reload your data from the fixture using the loaddata management command
 
 
 
-////////////////////////////////PLANTILLAS DE VENTAS/////////////////////////////////////
+//////////////////////////////// PLANTILLAS DE VENTAS, CUENTAS POR COBRAR, Y PUNTO DE VENTA /////////////////////////////////////
 
                                                 FACTURAS      DEVOLUCIONES
 Clientes                                            C               A     

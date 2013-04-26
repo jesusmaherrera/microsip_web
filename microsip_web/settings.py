@@ -28,9 +28,9 @@ DATABASES = {
     'default': {
        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         #RAFISA
-        #'NAME': 'C:\Microsip datos\RAFISA.fdb', # Or path to database file if using sqlite3.
+        'NAME': 'C:\Microsip datos\RAFISA.fdb', # Or path to database file if using sqlite3.
         #ESSEX
-        'NAME': 'C:\Microsip datos\ESSEX.fdb', # Or path to database file if using sqlite3.
+        #'NAME': 'C:\Microsip datos\ESSEX.fdb', # Or path to database file if using sqlite3.
         'USER': 'SYSDBA',                      # Not used with sqlite3.
         'PASSWORD': 'masterkey',                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -174,13 +174,14 @@ DJANGO_APPS = (
 MICROSIP_MODULES = (
     # Modules created for microsip and installed by default. You can add
     # here your own modules
+    'main',
     'inventarios',
     'ventas',
     'cuentas_por_pagar',
     'cuentas_por_cobrar',
     'contabilidad',
     'punto_de_venta',
-    'main',
+    
 )
 
 # A sample logging configuration. The only tangible logging
