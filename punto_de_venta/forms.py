@@ -25,8 +25,9 @@ class GenerarPolizasManageForm(forms.Form):
 	)
 	crear_polizas_por 			= forms.ChoiceField(choices=CREAR_POR)
 
-	plantilla 					= forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.all(), required=True)
-	#plantilla_2 = forms.ModelChoiceField(queryset= PlantillaPolizas_V.objects.all(), required=True)
+	plantilla_ventas 			= forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.filter(tipo='V'), required=True)
+	plantilla_devoluciones 		= forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.filter(tipo='D'), required=True)
+	plantilla_cobros_cc 		= forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.filter(tipo=''), required=True)
 	descripcion 				= forms.CharField(max_length=100, required=False)
 	TIPOS =(
         ('V', 'Ventas de mostrador'),

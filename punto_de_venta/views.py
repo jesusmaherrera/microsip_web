@@ -81,44 +81,40 @@ from django.core.exceptions import ObjectDoesNotExist
 	
 # 	return documentosGenerados, documentosDataDevoluciones, msg
 
-# @login_required(login_url='/login/')
-# def generar_polizas_View(request, template_name='herramientas/generar_polizas.html'):
-# 	documentosData = []
-# 	polizas_de_devoluciones = []
-# 	msg 			= ''
+@login_required(login_url='/login/')
+def generar_polizas_View(request, template_name='herramientas/generar_polizas_pv.html'):
+	polizas= []
 
-# 	if request.method == 'POST':
-# 		form = GenerarPolizasManageForm(request.POST)
-# 		if form.is_valid():
+	msg 			= ''
 
-# 			fecha_ini 				= form.cleaned_data['fecha_ini']
-# 			fecha_fin 				= form.cleaned_data['fecha_fin']
-# 			ignorar_documentos_cont = form.cleaned_data['ignorar_documentos_cont']
-# 			crear_polizas_por 		= form.cleaned_data['crear_polizas_por']
-# 			crear_polizas_de 		= form.cleaned_data['crear_polizas_de']
-# 			plantilla_facturas 		= form.cleaned_data['plantilla']
-# 			plantilla_devoluciones 	= form.cleaned_data['plantilla_2']
-# 			descripcion 			= form.cleaned_data['descripcion']
-# 			if (crear_polizas_de == 'v' and not plantilla_facturas== None) or (crear_polizas_de == 'D' and not plantilla_devoluciones== None) or (crear_polizas_de == 'FD' and not plantilla_facturas== None and not plantilla_devoluciones== None):
-# 				msg = 'es valido'
-# 				documentosData, polizas_de_devoluciones, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla_facturas, plantilla_devoluciones, descripcion)
-# 			else:
-# 				error =1
-# 				msg = 'Seleciona una plantilla'
+	if request.method == 'POST':
+		form = GenerarPolizasManageForm(request.POST)
+		if form.is_valid():
 
-# 			if (crear_polizas_de == 'F' or crear_polizas_de=='FD') and documentosData == []:
-# 				msg = 'Lo siento, no se encontraron facturas para este filtro'
-# 			elif (crear_polizas_de == 'D' or crear_polizas_de=='FD') and polizas_de_devoluciones == []:
-# 				msg = 'Lo siento, no se encontraron devoluciones para este filtro'
-			
-# 			if crear_polizas_de == 'FD' and documentosData == [] and polizas_de_devoluciones == []:
-# 				msg = 'Lo siento, no se encontraron facturas ni devoluciones para este filtro'
-			
-# 	else:
-# 		form = GenerarPolizasManageForm()
+			fecha_ini 					= form.cleaned_data['fecha_ini']
+			fecha_fin 					= form.cleaned_data['fecha_fin']
+			ignorar_documentos_cont 	= form.cleaned_data['ignorar_documentos_cont']
+			crear_polizas_por 			= form.cleaned_data['crear_polizas_por']
+			crear_polizas_de 			= form.cleaned_data['crear_polizas_de']
+			plantilla_ventas	= form.cleaned_data['plantilla_ventas']
+			plantilla_devoluciones 		= form.cleaned_data['plantilla_devoluciones']
+			plantilla_cobros_cc 		= form.cleaned_data['plantilla_cobros_cc']
+			descripcion 				= form.cleaned_data['descripcion']
+
+			if (crear_polizas_de == 'V' and not plantilla_ventas == None) or (crear_polizas_de == 'D' and not plantilla_devoluciones == None):
+				msg = 'es valido'
+				#polizas, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla_facturas, plantilla_devoluciones, descripcion)
+			else:
+				error =1
+				msg = 'Seleciona una plantilla'
+
+			if polizas== []:
+				msg = 'Lo siento, no se encontraron documentos para ralizar polizas con para este filtro'
+	else:
+		form = GenerarPolizasManageForm()
 	
-# 	c = {'documentos':documentosData, 'polizas_de_devoluciones':polizas_de_devoluciones,'msg':msg,'form':form,}
-# 	return render_to_response(template_name, c, context_instance=RequestContext(request))
+	c = {'documentos':polizas,'msg':msg,'form':form,}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################
 ## 										##
