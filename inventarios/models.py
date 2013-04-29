@@ -114,10 +114,6 @@ class CajasCajeros(models.Model):
     class Meta:
         db_table = u'cajas_cajeros'
 
-class Cajeros(models.Model):
-    class Meta:
-        db_table = u'cajeros'
-
 class CapasCostos(models.Model):
     class Meta:
         db_table = u'capas_costos'
@@ -352,7 +348,10 @@ class DesgloseEnPedimentos(models.Model):
     class Meta:
         db_table = u'desglose_en_pedimentos'
 
-class DirsClientes(models.Model):
+class DirCliente(models.Model):
+    id                  = models.AutoField(primary_key=True, db_column='DIR_CLI_ID')
+    cliente             = models.ForeignKey(Cliente, db_column='CLIENTE_ID')
+
     class Meta:
         db_table = u'dirs_clientes'
 
@@ -485,9 +484,20 @@ class DoctosInDet(models.Model):
 ############################################################################################################################################################
 ############################################################################################################################################################
 ############################################################################################################################################################
+class Vendedor(models.Model):
+    id              = models.AutoField(primary_key=True, db_column='VENDEDOR_ID')
+    nombre          = models.CharField(max_length=50, db_column='NOMBRE')
+    
+
+    def __unicode__(self):
+        return self.nombre
+
+    class Meta:
+        db_table = u'vendedores'
+
 class Cliente(models.Model):
     id              = models.AutoField(primary_key=True, db_column='CLIENTE_ID')
-    nombre          = models.CharField(max_length=9, db_column='NOMBRE')
+    nombre          = models.CharField(max_length=100, db_column='NOMBRE')
     cuenta_xcobrar  = models.CharField(max_length=9, db_column='CUENTA_CXC')
 
     def __unicode__(self):
@@ -504,7 +514,7 @@ class TiposImpuestos(models.Model):
     class Meta:
         db_table = u'tipos_impuestos'
 
-class Impuestos(models.Model):
+class Impuesto(models.Model):
     id              = models.AutoField(primary_key=True, db_column='IMPUESTO_ID')
     tipoImpuesto    = models.ForeignKey(TiposImpuestos, on_delete= models.SET_NULL, blank=True, null=True, db_column='TIPO_IMPTO_ID')
     nombre          = models.CharField(max_length=30, db_column='NOMBRE')
@@ -516,9 +526,10 @@ class Impuestos(models.Model):
 class ImpuestosArticulo(models.Model):
     id          = models.AutoField(primary_key=True, db_column='IMPUESTO_ART_ID')
     articulo    = models.ForeignKey(Articulos, on_delete= models.SET_NULL, blank=True, null=True, db_column='ARTICULO_ID')
-    impuesto    = models.ForeignKey(Impuestos, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_ID')
+    impuesto    = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_ID')
 
     class Meta:
         db_table = u'impuestos_articulos'
+
 
 
