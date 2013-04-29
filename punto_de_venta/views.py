@@ -7,7 +7,9 @@ from models import *
 # user autentication
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
+#Paginacion
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 ##########################################
 ## 										##
 ##        Generacion de polizas         ##
@@ -184,4 +186,98 @@ def plantilla_poliza_manageView(request, id = None, template_name='herramientas/
 	
 	c = {'plantilla_form': plantilla_form, 'formset': plantilla_items_formset , 'message':message,}
 
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+##########################################
+## 										##
+##            	Ventas                  ##
+##										##
+##########################################
+
+@login_required(login_url='/login/')
+def ventas_de_mostrador_view(request, template_name='documentos/ventas/ventas_de_mostrador.html'):
+	ventas_list = Docto_PV.objects.filter(tipo='V')
+
+	paginator = Paginator(ventas_list, 15) # Muestra 10 ventas por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		ventas = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    ventas = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    ventas = paginator.page(paginator.num_pages)
+
+	c = {'ventas':ventas}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def invetarioFisico_manageView(request, id = None, template_name='Inventarios Fisicos/inventario_fisico.html'):
+	message = ''
+	hay_repetido = False
+	if id:
+		documento = get_object_or_404(Docto_PV, pk=id)
+	else:
+		documento = Docto_PV()
+
+	if request.method == 'POST':
+		InventarioFisico_form = DoctosInvfisManageForm(request.POST, request.FILES, instance=documento)
+		inventarioFisico_items = inventarioFisico_items_formset(DoctosInvfisDetManageForm, extra=1, can_delete=True)
+		InventarioFisicoItems_formset = inventarioFisico_items(request.POST, request.FILES, instance=documento)
+		
+		if InventarioFisico_form.is_valid() and InventarioFisicoItems_formset.is_valid():
+			documento = InventarioFisico_form.save(commit = False)
+
+			#CARGA NUEVO ID
+			if not documento.id:
+				documento.id = c_get_next_key('ID_DOCTOS')
+			
+			documento.save()
+
+			#GUARDA ARTICULOS DE INVENTARIO FISICO
+			for articulo_form in InventarioFisicoItems_formset:
+				DetalleInventarioFisico = articulo_form.save(commit = False)
+				#PARA CREAR UNO NUEVO
+				if not DetalleInventarioFisico.id:
+					DetalleInventarioFisico.id = -1
+					DetalleInventarioFisico.docto_invfis = documento
+			
+			InventarioFisicoItems_formset.save()
+			return HttpResponseRedirect('/InventariosFisicos/')
+	else:
+		inventarioFisico_items = inventarioFisico_items_formset(DoctosInvfisDetManageForm, extra=1, can_delete=True)
+		InventarioFisico_form= DoctosInvfisManageForm(instance=documento)
+	 	InventarioFisicoItems_formset = inventarioFisico_items(instance=documento)
+	
+	c = {'InventarioFisico_form': InventarioFisico_form, 'formset': InventarioFisicoItems_formset, 'message':message,}
+
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+##########################################
+## 										##
+##            	Devoluciones            ##
+##										##
+##########################################
+
+@login_required(login_url='/login/')
+def devoluciones_de_ventas_view(request, template_name='documentos/devoluciones/devoluciones_de_ventas.html'):
+	documentos_list = Docto_PV.objects.filter(tipo='D')
+	
+	paginator = Paginator(documentos_list, 15) # Muestra 10 documentos por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		documentos = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    documentos = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    documentos = paginator.page(paginator.num_pages)
+	
+	c = {'documentos':documentos}
 	return render_to_response(template_name, c, context_instance=RequestContext(request))

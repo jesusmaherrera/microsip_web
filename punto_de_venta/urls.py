@@ -3,6 +3,9 @@ from django.views import generic
 from punto_de_venta import views
 
 urlpatterns = patterns('',
+	(r'^ventas/$', views.ventas_de_mostrador_view),
+	(r'^devoluciones/$', views.devoluciones_de_ventas_view),
+
 	(r'^GenerarPolizas/$', views.generar_polizas_View),
 	(r'^PreferenciasEmpresa/$', views.preferenciasEmpresa_View),
 	#Plantilla Poliza

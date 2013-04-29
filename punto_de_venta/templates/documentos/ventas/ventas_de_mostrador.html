@@ -1,0 +1,63 @@
+{% extends "base_pv.html" %}
+{% block title %}ventas{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} ventas {% endblock %}
+{% block content %}
+<div class="form-actions mainmenu">
+  <a class="btn btn-success" href="/punto_de_venta/venta/">Nuevo</a>
+</div>
+<table class="table tableCell table-hover">
+    <tr>
+      <th>ID</th>
+      <th>FOLIO</th>
+    </tr>
+    {% for venta in ventas%}
+    <div id="myModal{{ venta.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
+      </div>
+      <div class="modal-body">
+        <h4>Al eliminar el venta</h4>
+        <p style="color:red;">Ya no sera posible recuperar los datos del venta</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Cancelar</button>
+        <a href="#" class="btn btn-primary">Estoy Seguro</a>
+      </div>
+    </div>
+    <tr>
+      <td>
+        <a href="/punto_de_venta/venta/{{ venta.id }}/">{{ venta.id }}</a>
+      </td>
+      <td>{{ venta.folio }}</td>
+      <td style="text-align:center;">
+        <a href='#myModal{{ venta.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
+      </td>
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if ventas.has_previous %}
+        <li><a href="?page={{ ventas.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ ventas.number }} de {{ ventas.paginator.num_pages }}.</a></li>
+        {% if ventas.has_next %}
+        <li><a href="?page={{ ventas.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

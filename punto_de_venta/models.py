@@ -53,7 +53,7 @@ class Docto_PV(models.Model):
         
     ticket_emitido          = models.CharField(default='N', max_length=1, db_column='TICKET_EMITIDO')
     forma_emitido           = models.CharField(default='N', max_length=1, db_column='FORMA_EMITIDA')
-    forma_global_emitida    = models.CharField(default='N', max_length=1, db_column='FORMA__GLOBAL_EMITIDA')
+    forma_global_emitida    = models.CharField(default='N', max_length=1, db_column='FORMA_GLOBAL_EMITIDA')
     contabilizado           = models.CharField(default='N', max_length=1, db_column='CONTABILIZADO')
 
     sistema_origen          = models.CharField(default='PV', max_length=2, db_column='SISTEMA_ORIGEN')

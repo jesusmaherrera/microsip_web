@@ -50,3 +50,36 @@ class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
 
 def PlantillaPoliza_items_formset(form, formset = BaseInlineFormSet, **kwargs):
 	return inlineformset_factory(PlantillaPolizas_pv, DetallePlantillaPolizas_pv, form, formset, **kwargs)
+
+
+class DocumentoPV_ManageForm(forms.ModelForm):
+	class Meta:
+		model = Docto_PV
+		exclude = (
+			'cancelado',
+			'aplicado',
+			'forma_emitida',
+			'contabilizado',
+			'sistema_origen',
+			'naturaleza_concepto',
+			'usuario_creador',
+			'fechahora_creacion',
+			'usuario_ult_modif',
+			'fechahora_ult_modif',
+			)
+
+class DocumentoPVDet_ManageForm(forms.ModelForm):
+	class Meta:
+		#widgets = autocomplete_light.get_widgets_dict(DoctosInDet)
+		model = Docto_pv_det
+		exclude = (
+			'tipo_movto',
+			'almacen',
+			'concepto',
+			'metodo_costeo',
+			'rol',
+			'cancelado',
+			'aplicado',
+			'costeo_pend',
+			'pedimento_pend',
+			'fecha',)
