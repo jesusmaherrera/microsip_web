@@ -348,13 +348,6 @@ class DesgloseEnPedimentos(models.Model):
     class Meta:
         db_table = u'desglose_en_pedimentos'
 
-class DirCliente(models.Model):
-    id                  = models.AutoField(primary_key=True, db_column='DIR_CLI_ID')
-    cliente             = models.ForeignKey(Cliente, db_column='CLIENTE_ID')
-
-    class Meta:
-        db_table = u'dirs_clientes'
-
 class Dispositivos(models.Model):
     class Meta:
         db_table = u'dispositivos'
@@ -494,6 +487,11 @@ class Vendedor(models.Model):
 
     class Meta:
         db_table = u'vendedores'
+################################################################
+####                                                        ####
+####                    MODELOS CLIENTES                    ####
+####                                                        ####
+################################################################
 
 class Cliente(models.Model):
     id              = models.AutoField(primary_key=True, db_column='CLIENTE_ID')
@@ -505,6 +503,13 @@ class Cliente(models.Model):
 
     class Meta:
         db_table = u'clientes'
+
+class DirCliente(models.Model):
+    id                  = models.AutoField(primary_key=True, db_column='DIR_CLI_ID')
+    cliente             = models.ForeignKey(Cliente, db_column='CLIENTE_ID')
+
+    class Meta:
+        db_table = u'dirs_clientes'
 
 class TiposImpuestos(models.Model):
     id      = models.AutoField(primary_key=True, db_column='TIPO_IMPTO_ID')

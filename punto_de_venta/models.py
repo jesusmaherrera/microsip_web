@@ -32,9 +32,9 @@ class Docto_PV(models.Model):
     hora                    = models.TimeField(auto_now=True, db_column='HORA')
     cajero                  = models.ForeignKey(Cajero, db_column='CAJERO_ID')
     clave_cliente           = models.CharField(max_length=20, db_column='CLAVE_CLIENTE')
-    cliente                 = models.ForeignKey(Cliente, db_column='CLIENTE_ID')
+    cliente                 = models.ForeignKey(Cliente, db_column='CLIENTE_ID', related_name='cliente')
     clave_cliente_fac       = models.CharField(max_length=20, db_column='CLAVE_CLIENTE_FAC')
-    cliente_fac             = models.ForeignKey(Cliente, db_column='CLIENTE_FAC_ID')
+    cliente_fac             = models.ForeignKey(Cliente, db_column='CLIENTE_FAC_ID', related_name='cliente_factura')
     direccion_cliente       = models.ForeignKey(DirCliente, db_column='DIR_CLI_ID')
     almacen                 = models.ForeignKey(Almacenes, db_column='ALMACEN_ID')
     moneda                  = models.ForeignKey(Moneda, db_column='MONEDA_ID')
@@ -51,9 +51,9 @@ class Docto_PV(models.Model):
     importe_donativo        = models.DecimalField(max_digits=15, decimal_places=2, db_column='IMPORTE_DONATIVO')
     total_fpgc              = models.DecimalField(max_digits=15, decimal_places=2, db_column='TOTAL_FPGC')
         
-    ticket_emitido          = models.CharField(default='N', db_column='TICKET_EMITIDO')
-    forma_emitido           = models.CharField(default='N', db_column='FORMA_EMITIDA')
-    forma_global_emitida    = models.CharField(default='N', db_column='FORMA__GLOBAL_EMITIDA')
+    ticket_emitido          = models.CharField(default='N', max_length=1, db_column='TICKET_EMITIDO')
+    forma_emitido           = models.CharField(default='N', max_length=1, db_column='FORMA_EMITIDA')
+    forma_global_emitida    = models.CharField(default='N', max_length=1, db_column='FORMA__GLOBAL_EMITIDA')
     contabilizado           = models.CharField(default='N', max_length=1, db_column='CONTABILIZADO')
 
     sistema_origen          = models.CharField(default='PV', max_length=2, db_column='SISTEMA_ORIGEN')
@@ -64,8 +64,8 @@ class Docto_PV(models.Model):
     unidad_comprom          = models.CharField(default='N', max_length=1, db_column='UNID_COMPROM')    
     descripcion             = models.CharField(blank=True, null=True, max_length=200, db_column='DESCRIPCION')
     
-    impuesto_sustituido     = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_SUSTITUIDO_ID')
-    impuesto_sustituto      = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_SUSTITUTO_ID')
+    impuesto_sustituido     = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_SUSTITUIDO_ID', related_name='impuesto_sustituido')
+    impuesto_sustituto      = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_SUSTITUTO_ID', related_name='impuesto_sustituto')
     
     es_cfd                  = models.CharField(default='N', max_length=1, db_column='ES_CFD')
     modalidad_facturacion   = models.CharField(max_length=10, db_column='MODALIDAD_FACTURACION')
@@ -198,8 +198,8 @@ class Impuestos_docto_pv(models.Model):
 class Impuestos_grav_docto_pv(models.Model):
     documento_pv        = models.ForeignKey(Docto_PV, db_column='DOCTO_PV_ID')
     articulo            = models.ForeignKey(Articulos, on_delete= models.SET_NULL, blank=True, null=True, db_column='ARTICULO_ID')
-    impuesto            = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_ID')
-    impuesto_grav       = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_ID')
+    impuesto            = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_ID', related_name='impuesto')
+    impuesto_grav       = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_ID', related_name='impuesto_grav')
     impuesto_gravado    = models.DecimalField(max_digits=18, decimal_places=6, db_column='IMPUESTO_GRAVADO')
     listo               = models.CharField(max_length=1, default='N', db_column='LISTO')
     
