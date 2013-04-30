@@ -54,14 +54,43 @@ def PlantillaPoliza_items_formset(form, formset = BaseInlineFormSet, **kwargs):
 
 class DocumentoPV_ManageForm(forms.ModelForm):
 	class Meta:
+		widgets = autocomplete_light.get_widgets_dict(Docto_PV)
 		model = Docto_PV
 		exclude = (
-			'cancelado',
+			'forma_global_emitida',
+			'modalidad_facturacion',
+			'total_fpgc',
+			'email_envio',
+			'cajero',
+			'clave_cliente',
+			'direccion_cliente',
+			'tipo_descuento',
+			'porcentaje_descuento',
+			'importe_descuento',
+			'persona',
+			'tipo_cambio',
+			'cliente_fac',
+			'caja',
+			'clave_cliente_fac',
+			'clave_global_emitida',
+			'unidad_comprom',
+			'es_cfd',
+			'total_impuestos',
+			'estado',
+			'cargar_sun',
+			'impuesto_incluido',
+			'importe_donativo',
+			'tipo',
+			'enviado',
+			'unid_comprom',
+			'refer_reting',
+			'moneda',
+			'importe_neto',
+			'ticket_emitido',
 			'aplicado',
 			'forma_emitida',
 			'contabilizado',
 			'sistema_origen',
-			'naturaleza_concepto',
 			'usuario_creador',
 			'fechahora_creacion',
 			'usuario_ult_modif',
@@ -70,16 +99,36 @@ class DocumentoPV_ManageForm(forms.ModelForm):
 
 class DocumentoPVDet_ManageForm(forms.ModelForm):
 	class Meta:
-		#widgets = autocomplete_light.get_widgets_dict(DoctosInDet)
+		widgets = autocomplete_light.get_widgets_dict(DoctosInDet)
 		model = Docto_pv_det
 		exclude = (
-			'tipo_movto',
-			'almacen',
-			'concepto',
-			'metodo_costeo',
 			'rol',
-			'cancelado',
-			'aplicado',
-			'costeo_pend',
-			'pedimento_pend',
-			'fecha',)
+			'precio_modificado',
+			'notas',
+			'precio_unitario_impto',
+			'clave_articulo',
+			'porcentaje_comis',
+			'es_tran_elect',
+			'porcentaje_descuento',
+			'fpgc_unitario',
+			'vendedor',
+			'posicion',
+			'estatus_tran_elect',
+			'precio_modificado',
+			'unidades_dev',
+			)
+
+class Docto_pv_cobro_ManageForm(forms.ModelForm):
+	class Meta:
+		model = Docto_pv_cobro
+		exclude = (
+			'importe_mon_doc',
+			'tipo',
+			'tipo_cambio',
+		)
+
+def DocumentoPV_items_formset(form, formset = BaseInlineFormSet, **kwargs):
+	return inlineformset_factory(Docto_PV, Docto_pv_det, form, formset, **kwargs)
+
+def DocumentoPV_cobro_items_formset(form, formset = BaseInlineFormSet, **kwargs):
+	return inlineformset_factory(Docto_PV, Docto_pv_cobro, form, formset, **kwargs)

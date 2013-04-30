@@ -40,9 +40,9 @@ class Docto_PV(models.Model):
     moneda                  = models.ForeignKey(Moneda, db_column='MONEDA_ID')
     impuesto_incluido       = models.CharField(default='S', max_length=1, db_column='IMPUESTO_INCLUIDO')
     tipo_cambio             = models.DecimalField(max_digits=18, decimal_places=6, db_column='TIPO_CAMBIO')
-    tipo_descuento          = models.CharField(max_length=1, db_column='TIPO_DSCTO')
-    porcentaje_descuento    = models.DecimalField(max_digits=9, decimal_places=6, db_column='DSCTO_PCTJE')
-    importe_descuento       = models.DecimalField(max_digits=15, decimal_places=2, db_column='DSCTO_IMPORTE')
+    tipo_descuento          = models.CharField(default='P',max_length=1, db_column='TIPO_DSCTO')
+    porcentaje_descuento    = models.DecimalField(default=0, max_digits=9, decimal_places=6, db_column='DSCTO_PCTJE')
+    importe_descuento       = models.DecimalField(default=0, max_digits=15, decimal_places=2, db_column='DSCTO_IMPORTE')
     estado                  = models.CharField(max_length=1, db_column='ESTATUS')
     aplicado                = models.CharField(default='S', max_length=1, db_column='APLICADO')
     importe_neto            = models.DecimalField(max_digits=15, decimal_places=2, db_column='IMPORTE_NETO')
@@ -52,7 +52,7 @@ class Docto_PV(models.Model):
     total_fpgc              = models.DecimalField(max_digits=15, decimal_places=2, db_column='TOTAL_FPGC')
         
     ticket_emitido          = models.CharField(default='N', max_length=1, db_column='TICKET_EMITIDO')
-    forma_emitido           = models.CharField(default='N', max_length=1, db_column='FORMA_EMITIDA')
+    forma_emitida           = models.CharField(default='N', max_length=1, db_column='FORMA_EMITIDA')
     forma_global_emitida    = models.CharField(default='N', max_length=1, db_column='FORMA_GLOBAL_EMITIDA')
     contabilizado           = models.CharField(default='N', max_length=1, db_column='CONTABILIZADO')
 
@@ -100,7 +100,7 @@ class Docto_pv_det(models.Model):
     precio_unitario         = models.DecimalField(max_digits=18, decimal_places=6, db_column='PRECIO_UNITARIO')
     precio_unitario_impto   = models.DecimalField(max_digits=18, decimal_places=6, db_column='PRECIO_UNITARIO_IMPTO')
     fpgc_unitario           = models.DecimalField(max_digits=18, decimal_places=6, db_column='FPGC_UNITARIO')
-    porcentaje_decuento     = models.DecimalField(max_digits=9, decimal_places=6, db_column='PCTJE_DSCTO')
+    porcentaje_descuento     = models.DecimalField(max_digits=9, decimal_places=6, db_column='PCTJE_DSCTO')
     precio_total_neto       = models.DecimalField(max_digits=15, decimal_places=2, db_column='PRECIO_TOTAL_NETO')
     precio_modificado       = models.CharField(default='N', max_length=1, db_column='PRECIO_MODIFICADO')
     vendedor                = models.ForeignKey(Vendedor, db_column='VENDEDOR_ID')
@@ -138,14 +138,14 @@ class Docto_pv_det_tran_elect(models.Model):
 
 #Cobros de documentos
 class Forma_cobro(models.Model):
-    id                      = models.AutoField(primary_key=True, db_column='FORMA_COBRO_ID')
-    nombre = models.CharField(max_length=50, db_column='NOMBRE')
+    id          = models.AutoField(primary_key=True, db_column='FORMA_COBRO_ID')
+    nombre      = models.CharField(max_length=50, db_column='NOMBRE')
 
     def __unicode__(self):
         return self.nombre
         
     class Meta:
-        db_table = u'doctos_pv_cobros'
+        db_table = u'formas_cobro'
 
 class Forma_cobro_refer(models.Model):
     id                  = models.AutoField(primary_key=True, db_column='FORMA_COBRO_REFER_ID')

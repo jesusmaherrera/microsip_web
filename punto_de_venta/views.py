@@ -215,21 +215,24 @@ def ventas_de_mostrador_view(request, template_name='documentos/ventas/ventas_de
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def invetarioFisico_manageView(request, id = None, template_name='Inventarios Fisicos/inventario_fisico.html'):
+def venta_mostrador_manageView(request, id = None, template_name='documentos/ventas/venta_de_mostrador.html'):
 	message = ''
 	hay_repetido = False
 	if id:
 		documento = get_object_or_404(Docto_PV, pk=id)
 	else:
 		documento = Docto_PV()
+	
+	documento_items = DocumentoPV_items_formset(DocumentoPVDet_ManageForm, extra=1, can_delete=True)
+	documentoCobro_items = DocumentoPV_cobro_items_formset(Docto_pv_cobro_ManageForm, extra=1, can_delete=True)
 
 	if request.method == 'POST':
-		InventarioFisico_form = DoctosInvfisManageForm(request.POST, request.FILES, instance=documento)
-		inventarioFisico_items = inventarioFisico_items_formset(DoctosInvfisDetManageForm, extra=1, can_delete=True)
-		InventarioFisicoItems_formset = inventarioFisico_items(request.POST, request.FILES, instance=documento)
+		DocumentoForm = DocumentoPV_ManageForm(request.POST, request.FILES, instance=documento)
+		documento_items_formset = documento_items(request.POST, request.FILES, instance=documento)
+		documento_cobros_formset = documentoCobro_items(request.POST, request.FILES, instance=documento)
 		
-		if InventarioFisico_form.is_valid() and InventarioFisicoItems_formset.is_valid():
-			documento = InventarioFisico_form.save(commit = False)
+		if DocumentoForm.is_valid() and documento_items_formset.is_valid():
+			documento = DocumentoForm.save(commit = False)
 
 			#CARGA NUEVO ID
 			if not documento.id:
@@ -237,22 +240,22 @@ def invetarioFisico_manageView(request, id = None, template_name='Inventarios Fi
 			
 			documento.save()
 
-			#GUARDA ARTICULOS DE INVENTARIO FISICO
-			for articulo_form in InventarioFisicoItems_formset:
-				DetalleInventarioFisico = articulo_form.save(commit = False)
+			#GUARDA ARTICULOS DE Documento
+			for articulo_form in documento_items_formset:
+				detalle_documento = articulo_form.save(commit = False)
 				#PARA CREAR UNO NUEVO
-				if not DetalleInventarioFisico.id:
-					DetalleInventarioFisico.id = -1
-					DetalleInventarioFisico.docto_invfis = documento
-			
-			InventarioFisicoItems_formset.save()
-			return HttpResponseRedirect('/InventariosFisicos/')
+				if not detalle_documento.id:
+					detalle_documento.id = -1
+					detalle_documento.docto_invfis = documento
+
+				documento_items_formset.save()
+			return HttpResponseRedirect('/punto_de_venta/ventas/')
 	else:
-		inventarioFisico_items = inventarioFisico_items_formset(DoctosInvfisDetManageForm, extra=1, can_delete=True)
-		InventarioFisico_form= DoctosInvfisManageForm(instance=documento)
-	 	InventarioFisicoItems_formset = inventarioFisico_items(instance=documento)
+		DocumentoForm= DocumentoPV_ManageForm(instance=documento)
+		documento_cobros_formset = documentoCobro_items(instance=documento)
+		documento_items_formset = documento_items(instance=documento)
 	
-	c = {'InventarioFisico_form': InventarioFisico_form, 'formset': InventarioFisicoItems_formset, 'message':message,}
+	c = {'documentoForm': DocumentoForm, 'formset': documento_items_formset,'cobros_formset':documento_cobros_formset , 'message':message,}
 
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 

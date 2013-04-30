@@ -3,6 +3,8 @@ from django.views import generic
 from punto_de_venta import views
 
 urlpatterns = patterns('',
+	(r'^venta/$', views.venta_mostrador_manageView),
+    (r'^venta/(?P<id>\d+)/', views.venta_mostrador_manageView),
 	(r'^ventas/$', views.ventas_de_mostrador_view),
 	(r'^devoluciones/$', views.devoluciones_de_ventas_view),
 

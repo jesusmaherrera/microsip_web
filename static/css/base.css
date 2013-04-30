@@ -96,7 +96,7 @@ footer
 
 .pagecontent
 {
-	background-color: rgba(255, 255, 255, 0.49);
+	background-color: rgba(255, 255, 255, 1);
 	text-align: left;
 	padding: 1em;
 	padding-top: 0em;
@@ -140,7 +140,7 @@ background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAA
 
 
 /* Pantallas grandes */
-@media only screen and (max-width : 1100px) {
+@media only screen and (max-width : 1312px) {
   .labelMenu {
     display: none;
   }
