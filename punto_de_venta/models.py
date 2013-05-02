@@ -5,6 +5,7 @@ from inventarios.models import *
 class Cajero(models.Model):
     id          = models.AutoField(primary_key=True, db_column='CAJERO_ID')
     nombre      = models.CharField(max_length=50, db_column='NOMBRE')
+    usuario     = models.CharField(max_length=31, db_column='USUARIO')
 
     def __unicode__(self):
         return self.nombre

@@ -216,6 +216,7 @@ def ventas_de_mostrador_view(request, template_name='documentos/ventas/ventas_de
 
 @login_required(login_url='/login/')
 def venta_mostrador_manageView(request, id = None, template_name='documentos/ventas/venta_de_mostrador.html'):
+	
 	message = ''
 	hay_repetido = False
 	if id:
@@ -234,6 +235,8 @@ def venta_mostrador_manageView(request, id = None, template_name='documentos/ven
 		if DocumentoForm.is_valid() and documento_items_formset.is_valid():
 			documento = DocumentoForm.save(commit = False)
 
+			documento.cajero = Cajero.objects.filter(usuario='PRUEBA')
+			
 			#CARGA NUEVO ID
 			if not documento.id:
 				documento.id = c_get_next_key('ID_DOCTOS')
