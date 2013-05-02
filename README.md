@@ -215,3 +215,10 @@ IVA
     - Ambos                                         C    
 
 SEGMENTOS (Fletes, etc...)                         C-A
+
+
+//////PUNTO DE VENTA////////////////////
+TIPOS DE PLIZAS 
+ventas                      :Ingresos
+devoluciones                :Diario
+Cobros cuentas por cobrar   :Ingresos

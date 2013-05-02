@@ -19,20 +19,20 @@ class GenerarPolizasManageForm(forms.Form):
 	fecha_fin 					= forms.DateField()
 	ignorar_documentos_cont 	= forms.BooleanField(required=False, initial=True)
 	CREAR_POR = (
-	    ('Documento', 'Documento'),
 	    ('Dia', 'Dia'),
 	    ('Periodo', 'Periodo'),
 	)
 	crear_polizas_por 			= forms.ChoiceField(choices=CREAR_POR)
 
-	plantilla_ventas 			= forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.filter(tipo='V'), required=True)
-	plantilla_devoluciones 		= forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.filter(tipo='D'), required=True)
-	plantilla_cobros_cc 		= forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.filter(tipo=''), required=True)
+	plantilla_ventas 			= forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.filter(tipo='V'), required=False)
+	plantilla_devoluciones 		= forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.filter(tipo='D'), required=False)
+	plantilla_cobros_cc 		= forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.filter(tipo='P'), required=False)
 	descripcion 				= forms.CharField(max_length=100, required=False)
 	TIPOS =(
+		('', '------------------'),
         ('V', 'Ventas de mostrador'),
         ('D', 'Devoluciones'),
-        ('', 'Cobros ctas. por cobrar'),
+        ('P', 'Cobros ctas. por cobrar'),
     )
 	crear_polizas_de 			= forms.ChoiceField(choices=TIPOS, required=True)
 
@@ -42,8 +42,25 @@ class PlantillaPolizaManageForm(forms.ModelForm):
 		model = PlantillaPolizas_pv
 
 class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
+	TIPOS 						= (('C', 'Cargo'),('A', 'Abono'),)
+	VALOR_IVA_TIPOS             = (('A', 'Ambos'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
+	VALOR_CONTADO_CREDITO_TIPOS = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)
+	VALOR_TIPOS =(
+        ('Ventas', 'Ventas'),
+        ('Clientes', 'Clientes'),
+        ('Bancos', 'Bancos'),
+        ('Descuentos', 'Descuentos'),
+        ('IVA', 'IVA'),
+    )
+
+	tipo 					= forms.ChoiceField(choices=TIPOS, widget=forms.Select(attrs={'class':'span2'}),)
+	valor_tipo 				= forms.ChoiceField(choices=VALOR_TIPOS, widget=forms.Select(attrs={'class':'span2'}),)
+	valor_iva 				= forms.ChoiceField(choices=VALOR_IVA_TIPOS, widget=forms.Select(attrs={'class':'span2'}),)
+	valor_contado_credito 	= forms.ChoiceField(choices=VALOR_CONTADO_CREDITO_TIPOS, widget=forms.Select(attrs={'class':'span2'}),)
+
 	posicion  		=  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
 	asiento_ingora 	= forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
+
 	class Meta:
 		widgets = autocomplete_light.get_widgets_dict(DetallePlantillaPolizas_pv)
 		model = DetallePlantillaPolizas_pv

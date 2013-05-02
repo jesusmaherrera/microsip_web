@@ -27,6 +27,20 @@ $(function() {
 });
 
 $(document).ready(function() {
+
+  $( "#sortable" ).sortable({
+      items: ".sortable-item",
+        update : function(ev, ui) {
+
+          ui.item.find("input[name*='cuenta_co-autocomplete']").attr('style','display:none');
+          ui.item.find("span[class*='remove div']:eq(1)").attr('style','display:none');
+          
+          $("input[name*='posicion']" ).each(function( index ) {
+            $(this).val(index+1);
+          });
+        }
+  });
+
   $("a[class*='btn-success']").click(function() {
     
     $("select[name*='valor_tipo']").each(function(){ajustarFormulario(this);});
@@ -34,8 +48,8 @@ $(document).ready(function() {
     $("select[name*='valor_tipo']").last().change(function(){ ajustarFormulario(this);});
 
     $("input[name*='posicion']" ).each(function( index ) {
-       if($(this).val()=='')
-         $(this).val(index+1);
+      if($(this).val()=='')
+        $(this).val(index+1);
      });
    });
 
@@ -46,7 +60,7 @@ $(document).ready(function() {
 </script>
 
 {% endblock %}
-{% block breadcrumb %}{{ block.super }} <a href="/ventas/PreferenciasEmpresa/">Preferencias de la Empresa</a> <i class=' icon-play'></i> Plantilla{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/PreferenciasEmpresa/">Preferencias de la Empresa</a> <i class=' icon-play'></i> Plantilla{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
 
@@ -93,7 +107,7 @@ $(document).ready(function() {
             <th>Opciones</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="sortable">
           {% for form in formset.forms %}
           <tr id="{{ form.prefix }}-row" class="form-container">
             {{ form.errors }}

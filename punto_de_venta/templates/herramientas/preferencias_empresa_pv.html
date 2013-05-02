@@ -33,6 +33,33 @@
       <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
       {% csrf_token %}
         {{ form.errors }}
+        <fieldset style='clear:both;' >
+        <legend>Pólizas de ventas de mostrador:</legend>
+        <div class="span3" style='clear:both;'>
+          <label>Tipo de Póliza</label>
+          <div class="input-prepend input-append">
+            {{ form.tipo_poliza_ve_m }}
+          </div>
+        </div>
+        </fieldset>
+        <fieldset style='clear:both;' >
+        <legend>Pólizas de devoluciones de mostrador:</legend>
+        <div class="span3" style='clear:both;'>
+          <label>Tipo de Póliza</label>
+          <div class="input-prepend input-append">
+            {{ form.tipo_poliza_dev_m }}
+          </div>
+        </div>
+        </fieldset>
+        <fieldset style='clear:both;' >
+        <legend>Pólizas de cobros de cuentas por cobrar:</legend>
+        <div class="span3" style='clear:both;'>
+          <label>Tipo de Póliza</label>
+          <div class="input-prepend input-append">
+            {{ form.tipo_poliza_cc }}
+          </div>
+        </div>
+        </fieldset>
         <fieldset>
         <legend>:</legend>
         <div class="span4" >

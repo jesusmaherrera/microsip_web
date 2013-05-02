@@ -14,11 +14,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from decimal import *
 from inventarios.views import c_get_next_key
 
+#Modelos de modulos 
 from contabilidad.models import TipoPolizaDet
 from inventarios.models import *
 from cuentas_por_pagar.models import *
 from cuentas_por_cobrar.models import *
 from ventas.models import *
+from punto_de_venta.models import *
+
 import datetime, time
 from django.db import connection
 # user autentication
@@ -72,6 +75,12 @@ def get_folio_poliza(tipo_poliza, fecha=None):
 def get_descuento_total_ve(facturaID):
 	c = connection.cursor()
 	c.execute("SELECT SUM(A.dscto_arts + A.dscto_extra_importe) AS TOTAL FROM CALC_TOTALES_DOCTO_VE(%s,'S') AS  A;"% facturaID)
+	row = c.fetchone()
+	return int(row[0])
+
+def get_descuento_total_pv(documentoId):
+	c = connection.cursor()
+	c.execute("SELECT SUM(A.dscto_arts + A.dscto_extra_importe) AS TOTAL FROM CALC_TOTALES_DOCTO_PV(%s,'','',0) AS  A;"% documentoId)
 	row = c.fetchone()
 	return int(row[0])
 
@@ -201,8 +210,8 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
 		ventas_16_credito	= ventas_16_credito,
 		ventas_0_contado 	= ventas_0_contado,
 		ventas_16_contado 	= ventas_16_contado,
-		iva_efec_cobrado 	= iva_efec_cobrado,
-		iva_pend_cobrar 	= iva_pend_cobrar,
+		iva_contado 		= iva_efec_cobrado,
+		iva_credito 		= iva_pend_cobrar,
 		descuento 			= descuento,
 		clientes 			= clientes,
 		cuenta_cliente 	    = cuenta_cliente,
@@ -280,11 +289,11 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
 		totales_cuentas 	= totales_cuentas, 
 		compras_16_credito 	= compras_16_credito,
 		compras_0_credito 	= compras_0_credito,
-		iva_pend_pagar 		= iva_pend_pagar,
+		iva_credito 		= iva_pend_pagar,
 		proveedores 		= proveedores,
 		compras_16_contado 	= compras_16_contado,
 		compras_0_contado 	= compras_0_contado,
-		iva_efec_pagado 	= iva_efec_pagado,
+		iva_contado 		= iva_efec_pagado,
 		bancos 				= bancos,
 		iva_retenido 		= iva_retenido,
 		campos_particulares = campos_particulares,
@@ -372,8 +381,8 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
 		ventas_16_credito	= ventas_16_credito,
 		ventas_0_contado 	= ventas_0_contado,
 		ventas_16_contado 	= ventas_16_contado,
-		iva_efec_cobrado 	= iva_efec_cobrado,
-		iva_pend_cobrar 	= iva_pend_cobrar,
+		iva_contado 		= iva_efec_cobrado,
+		iva_credito 		= iva_pend_cobrar,
 		descuento 			= descuento,
 		clientes 			= clientes,
 		cuenta_cliente 	    = cuenta_cliente,
@@ -387,25 +396,22 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
 	return totales_cuentas, error, msg
 
 def get_totales_documento_pv(cuenta_contado= None, documento= None, conceptos_poliza=None, totales_cuentas=None, msg='', error='', depto_co=None):	
-	#Si es una factura
-	if documento.tipo == 'F':
-		campos_particulares = LibresFacturasV.objects.filter(pk=documento.id)[0]
-	#Si es una devolucion
-	elif documento.tipo == 'D':
-		campos_particulares = LibresDevFacV.objects.filter(pk=documento.id)[0]
-
+	es_contado = False
 	try:
 		cuenta_cliente =  CuentaCo.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
 	except ObjectDoesNotExist:
 		cuenta_cliente = None
 
 	#Para saber si es contado o es credito
-	es_contado = documento.condicion_pago == cuenta_contado
+	total_credito = Docto_pv_cobro.objects.filter(documento_pv=documento, forma_cobro__tipo='R').aggregate(total_credito = Sum('importe'))['total_credito']
+	if total_credito == None:
+		total_credito = 0
+		es_contado = True
 
 	impuestos 			= documento.total_impuestos * documento.tipo_cambio
 	importe_neto 		= documento.importe_neto * documento.tipo_cambio
 	total 				= impuestos + importe_neto
-	descuento 			= get_descuento_total_ve(documento.id) * documento.tipo_cambio
+	descuento 			= get_descuento_total_pv(documento.id) * documento.tipo_cambio
 	clientes 			= 0
 	bancos 				= 0
 	iva_efec_cobrado	= 0
@@ -415,11 +421,11 @@ def get_totales_documento_pv(cuenta_contado= None, documento= None, conceptos_po
 	ventas_0_credito	= 0
 	ventas_0_contado	= 0
 
-	ventas_0 			= DoctoVeDet.objects.filter(docto_ve= documento).extra(
+	ventas_0 			= Docto_pv_det.objects.filter(documento_pv= documento).extra(
 			tables =['impuestos_articulos', 'impuestos'],
 			where =
 			[
-				"impuestos_articulos.ARTICULO_ID = doctos_ve_det.ARTICULO_ID",
+				"impuestos_articulos.ARTICULO_ID = doctos_pv_det.ARTICULO_ID",
 				"impuestos.IMPUESTO_ID = impuestos_articulos.IMPUESTO_ID",
 				"impuestos.PCTJE_IMPUESTO = 0 ",
 			],
@@ -447,7 +453,8 @@ def get_totales_documento_pv(cuenta_contado= None, documento= None, conceptos_po
 		ventas_16_credito 	= ventas_16
 		ventas_0_credito 	= ventas_0
 		iva_pend_cobrar 	= impuestos
-		clientes 			= total - descuento
+		clientes 			= total_credito
+		bancos 				= total - total_credito - descuento
 	elif es_contado:
 		ventas_16_contado 	= ventas_16
 		ventas_0_contado	= ventas_0
@@ -461,13 +468,12 @@ def get_totales_documento_pv(cuenta_contado= None, documento= None, conceptos_po
 		ventas_16_credito	= ventas_16_credito,
 		ventas_0_contado 	= ventas_0_contado,
 		ventas_16_contado 	= ventas_16_contado,
-		iva_efec_cobrado 	= iva_efec_cobrado,
-		iva_pend_cobrar 	= iva_pend_cobrar,
+		iva_contado 		= iva_efec_cobrado,
+		iva_credito 		= iva_pend_cobrar,
 		descuento 			= descuento,
 		clientes 			= clientes,
 		cuenta_cliente 	    = cuenta_cliente,
 		bancos 				= bancos,
-		campos_particulares = campos_particulares,
 		depto_co 			= depto_co,
 		error 				= error,
 		msg 				= msg,
@@ -482,8 +488,8 @@ def agregarTotales(totales_cuentas, **kwargs):
 	compras_0_contado 	= kwargs.get('compras_0_contado', 0)
 	compras_16_contado 	= kwargs.get('compras_16_contado', 0)
 
-	iva_pend_pagar 		= kwargs.get('iva_pend_pagar', 0)
-	iva_efec_pagado 	= kwargs.get('iva_efec_pagado', 0)
+	iva_contado			= kwargs.get('iva_contado', 0)
+	iva_credito			= kwargs.get('iva_credito', 0)
 	iva_retenido 		= kwargs.get('iva_retenido', 0)
 
 	proveedores 		= kwargs.get('proveedores', 0)
@@ -495,9 +501,6 @@ def agregarTotales(totales_cuentas, **kwargs):
 	ventas_0_contado 	= kwargs.get('ventas_0_contado', 0)
 	ventas_16_contado 	= kwargs.get('ventas_16_contado', 0)
 	
-	iva_efec_cobrado 	= kwargs.get('iva_efec_cobrado', 0)
-	iva_pend_cobrar 	= kwargs.get('iva_pend_cobrar', 0)
-
 	clientes 			= kwargs.get('clientes', 0)
 	cuenta_cliente   	= kwargs.get('cuenta_cliente', None)
 
@@ -588,11 +591,11 @@ def agregarTotales(totales_cuentas, **kwargs):
 			cuenta  = concepto.cuenta_co.cuenta
 		elif concepto.valor_tipo == 'IVA' and not concepto.posicion in asientos_a_ingorar:
 			if concepto.valor_contado_credito == 'Credito':
-				importe = iva_pend_pagar
+				importe = iva_credito
 			elif concepto.valor_contado_credito == 'Contado':
-				importe = iva_efec_pagado
+				importe = iva_contado
 			elif concepto.valor_contado_credito == 'Ambos':
-				importe = iva_pend_pagar + iva_efec_pagado
+				importe = iva_credito + iva_contado
 
 			cuenta = concepto.cuenta_co.cuenta
 
@@ -645,7 +648,7 @@ def agregarTotales(totales_cuentas, **kwargs):
 
 def crear_polizas_contables(origen_documentos, documentos, depto_co, informacion_contable, plantilla=None, crear_polizas_por='',crear_polizas_de=None, **kwargs):
 	""" Crea las polizas contables segun el tipo y origen de documentos que se mande """
-
+	
 	msg 			= kwargs.get('msg', '')
 	descripcion 	= kwargs.get('descripcion', '')
 	tipo_documento 	= kwargs.get('tipo_documento', '')
@@ -662,6 +665,8 @@ def crear_polizas_contables(origen_documentos, documentos, depto_co, informacion
 		conceptos_poliza	= DetallePlantillaPolizas_CP.objects.filter(plantilla_poliza_CP=plantilla).order_by('posicion')
 	elif origen_documentos == 'ventas':
 		conceptos_poliza	= DetallePlantillaPolizas_V.objects.filter(plantilla_poliza_v=plantilla).order_by('posicion')
+	elif origen_documentos == 'punto_de_venta':
+		conceptos_poliza	= DetallePlantillaPolizas_pv.objects.filter(plantilla_poliza_pv=plantilla).order_by('posicion')
 	
 	moneda_local 		= get_object_or_404(Moneda,es_moneda_local='S')
 	documento_numero 	= 0
@@ -681,6 +686,8 @@ def crear_polizas_contables(origen_documentos, documentos, depto_co, informacion
 			totales_cuentas, error, msg = get_totales_documento_cp(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co)
 		elif origen_documentos == 'ventas':
 			totales_cuentas, error, msg = get_totales_documento_ve(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co)
+		elif origen_documentos == 'punto_de_venta':
+			totales_cuentas, error, msg = get_totales_documento_pv(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co)
 		
 		if error == 0:
 			#Cuando la fecha de la documento siguiente sea diferente y sea por DIA, o sea la ultima
@@ -693,6 +700,11 @@ def crear_polizas_contables(origen_documentos, documentos, depto_co, informacion
 						tipo_poliza = informacion_contable.tipo_poliza_dev
 				elif origen_documentos == 'cuentas_por_cobrar' or origen_documentos == 'cuentas_por_pagar':
 					tipo_poliza = TipoPoliza.objects.filter(clave=documento.concepto.clave_tipo_poliza)[0]
+				elif origen_documentos == 'punto_de_venta':
+					if 	tipo_documento == 'V':
+						tipo_poliza = informacion_contable.tipo_poliza_ve_m
+					elif tipo_documento == 'D':
+						tipo_poliza = informacion_contable.tipo_poliza_dev_m
 				
 				tipo_poliza_det = get_folio_poliza(tipo_poliza, documento.fecha)
 				#PREFIJO

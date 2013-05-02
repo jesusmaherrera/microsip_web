@@ -12,28 +12,56 @@
     $( "#id_fecha_fin" ).datepicker({dateFormat:'dd/mm/yy',});
   });
 
-  // $(document).ready(function() {
-  //     $('#id_crear_polizas_de').change(function(event){
-  //       if ($('#id_crear_polizas_de').val()=='V')
-  //       {
-  //         $('#id_plantilla_ventas').show();
-  //         $('#id_plantilla_devoluciones').hide();
-  //         $('#id_plantilla_cuentas_cc').hide();
-  //       }
-  //       else if($('#id_crear_polizas_de').val()=='D')
-  //       {
-  //         $('#id_plantilla_ventas').hide();
-  //         $('#id_plantilla_devoluciones').show();
-  //         $('#id_plantilla_cuentas_cc').hide();
-  //       }
-  //       else if()
-  //       {
-  //         $('#id_plantilla_ventas').hide();
-  //         $('#id_plantilla_devoluciones').hide();
-  //         $('#id_plantilla_cuentas_cc').show();
-  //       }
-  //     });
-  // });
+  $(document).ready(function() {
+      $('#id_plantilla_ventas').hide();
+      $('#id_plantilla_devoluciones').hide();
+      $('#id_plantilla_cobros_cc').hide();
+
+      if ($('#id_crear_polizas_de').val()=='V')
+      {
+        $('#id_plantilla_ventas').show();
+        $('#id_plantilla_devoluciones').hide();
+        $('#id_plantilla_cobros_cc').hide();
+      }
+      else if($('#id_crear_polizas_de').val()=='D')
+      {
+        $('#id_plantilla_ventas').hide();
+        $('#id_plantilla_devoluciones').show();
+        $('#id_plantilla_cobros_cc').hide();
+      }
+      else if($('#id_crear_polizas_de').val()=='P')
+      {
+        $('#id_plantilla_ventas').hide();
+        $('#id_plantilla_devoluciones').hide();
+        $('#id_plantilla_cobros_cc').show();
+      }
+
+      $('#id_crear_polizas_de').change(function(event){
+        $('#id_plantilla_ventas').hide();
+        $('#id_plantilla_devoluciones').hide();
+        $('#id_plantilla_cobros_cc').hide();
+
+        if ($('#id_crear_polizas_de').val()=='V')
+        {
+          $('#id_plantilla_ventas').show();
+          $('#id_plantilla_devoluciones').hide();
+          $('#id_plantilla_cobros_cc').hide();
+        }
+        else if($('#id_crear_polizas_de').val()=='D')
+        {
+          $('#id_plantilla_ventas').hide();
+          $('#id_plantilla_devoluciones').show();
+          $('#id_plantilla_cobros_cc').hide();
+        }
+        else if($('#id_crear_polizas_de').val()=='P')
+        {
+          $('#id_plantilla_ventas').hide();
+          $('#id_plantilla_devoluciones').hide();
+          $('#id_plantilla_cobros_cc').show();
+        }
+
+      });
+  });
 </script>
 {% endblock %}
 

@@ -14,8 +14,10 @@
 </div>
 <table class="table tableCell table-hover">
     <tr>
-      <th>ID</th>
-      <th>FOLIO</th>
+      <th>Id</th>
+      <th>Folio</th>
+      <th>Fecha</th>
+      <th>Opciónes</th>
     </tr>
     {% for venta in ventas%}
     <div id="myModal{{ venta.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -37,6 +39,7 @@
         <a href="/punto_de_venta/venta/{{ venta.id }}/">{{ venta.id }}</a>
       </td>
       <td>{{ venta.folio }}</td>
+      <td>{{ venta.fecha }}</td>
       <td style="text-align:center;">
         <a href='#myModal{{ venta.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
       </td>

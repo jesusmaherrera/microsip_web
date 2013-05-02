@@ -1,6 +1,7 @@
 #encoding:utf-8
 from django.db import models
 from inventarios.models import *
+from contabilidad.models import *
 
 class Cajero(models.Model):
     id          = models.AutoField(primary_key=True, db_column='CAJERO_ID')
@@ -141,6 +142,7 @@ class Docto_pv_det_tran_elect(models.Model):
 class Forma_cobro(models.Model):
     id          = models.AutoField(primary_key=True, db_column='FORMA_COBRO_ID')
     nombre      = models.CharField(max_length=50, db_column='NOMBRE')
+    tipo        = models.CharField(max_length=1, default='E', db_column='TIPO')
 
     def __unicode__(self):
         return self.nombre
@@ -214,6 +216,10 @@ class Impuestos_grav_docto_pv(models.Model):
 ################################################################
 
 class InformacionContable_pv(models.Model):
+    tipo_poliza_ve_m          = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_ve_m')
+    tipo_poliza_dev_m         = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_dev_m')
+    tipo_poliza_cc         = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_cc')    
+
     condicion_pago_contado  = models.ForeignKey(CondicionPago, blank=True, null=True)
 
     def __unicode__(self):
@@ -224,7 +230,7 @@ class PlantillaPolizas_pv(models.Model):
     TIPOS =(
         ('V', 'Ventas de mostrador'),
         ('D', 'Devoluciones'),
-        ('', 'Cobros ctas. por cobrar'),
+        ('P', 'Cobros ctas. por cobrar'),
     )
     tipo    = models.CharField(max_length=2, choices=TIPOS, default='V')
     
@@ -239,11 +245,6 @@ class DetallePlantillaPolizas_pv(models.Model):
         ('Bancos', 'Bancos'),
         ('Descuentos', 'Descuentos'),
         ('IVA', 'IVA'),
-        ('Segmento_1', 'Segmento 1'),
-        ('Segmento_2', 'Segmento 2'),
-        ('Segmento_3', 'Segmento 3'),
-        ('Segmento_4', 'Segmento 4'),
-        ('Segmento_5', 'Segmento 5'),
     )
     VALOR_IVA_TIPOS             = (('A', 'Ambos'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
     VALOR_CONTADO_CREDITO_TIPOS = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)

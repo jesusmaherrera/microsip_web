@@ -4,6 +4,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from forms import *
 from models import *
+from django.db.models import Q
+from main.views import crear_polizas_contables
 # user autentication
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -16,78 +18,73 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 ##										##
 ##########################################
 
-# def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True, crear_polizas_por='Documento', crear_polizas_de='', plantilla_facturas='', plantilla_devoluciones='', descripcion= ''):
-# 	error 	= 0
-# 	msg		= ''
-# 	documentosData = []
-# 	documentosGenerados = []
-# 	documentosDataDevoluciones = []
-# 	depto_co = get_object_or_404(DeptoCo,clave='GRAL')
-# 	try:
-# 		informacion_contable = InformacionContable_V.objects.all()[:1]
-# 		informacion_contable = informacion_contable[0]
-# 	except ObjectDoesNotExist:
-# 		error = 1
+def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True, crear_polizas_por='Documento', crear_polizas_de='', plantilla_ventas='', plantilla_devoluciones='', descripcion= ''):
+	error 	= 0
+	msg		= ''
+	documentosData = []
+	documentosGenerados = []
+	documentosDataDevoluciones = []
+	depto_co = get_object_or_404(DeptoCo,clave='GRAL')
+	try:
+		informacion_contable = InformacionContable_pv.objects.all()[:1]
+		informacion_contable = informacion_contable[0]
+	except ObjectDoesNotExist:
+		error = 1
 	
-# 	#Si estadefinida la informacion contable no hay error!!!
-# 	if error == 0:
+	#Si estadefinida la informacion contable no hay error!!!
+	if error == 0:
 
-# 		facturas 	= []
-# 		devoluciones= []
-# 		if ignorar_documentos_cont:
-# 			if crear_polizas_de 	== 'F' or crear_polizas_de 	== 'FD':
-# 				facturas 			= DoctoVe.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='F', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
-# 			elif crear_polizas_de 	== 'D' or crear_polizas_de 	== 'FD':
-# 				devoluciones 		= DoctoVe.objects.filter(estado = 'N').filter(tipo 	='D', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
-# 		else:
-# 			if crear_polizas_de 	== 'F' or crear_polizas_de 	== 'FD':
-# 				facturas 			= DoctoVe.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='F', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
-# 			elif crear_polizas_de 	== 'D' or crear_polizas_de 	== 'FD':
-# 				devoluciones 		= DoctoVe.objects.filter(estado = 'N').filter(tipo 	= 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+		ventas 	= []
+		devoluciones= []
+		if ignorar_documentos_cont:
+			if crear_polizas_de 	== 'V':
+				ventas 			= Docto_PV.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='V', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+			elif crear_polizas_de 	== 'D':
+				devoluciones 		= Docto_PV.objects.filter(estado = 'N').filter(tipo ='D', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+		else:
+			if crear_polizas_de 	== 'V':
+				ventas 			= Docto_PV.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='V', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+			elif crear_polizas_de 	== 'D':
+				devoluciones 		= Docto_PV.objects.filter(estado = 'N').filter(tipo = 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
 		
-# 		#PREFIJO
-# 		prefijo = informacion_contable.tipo_poliza_ve.prefijo
-# 		if not informacion_contable.tipo_poliza_ve.prefijo:
-# 			prefijo = ''
-
-# 		if crear_polizas_de 	== 'F' or crear_polizas_de 	== 'FD':
-# 			msg, documentosData = crear_polizas_contables(
-# 				origen_documentos	= 'ventas',
-# 				documentos 			= facturas, 
-# 				depto_co			= depto_co,
-# 				informacion_contable= informacion_contable,
-# 				plantilla 			= plantilla_facturas,
-# 				crear_polizas_por	= crear_polizas_por,
-# 				crear_polizas_de	= crear_polizas_de,
-# 				msg = msg,
-# 				descripcion = descripcion, 
-# 				tipo_documento = 'F',
-# 			)
-# 			documentosGenerados = documentosData
-# 		if crear_polizas_de 	== 'D' or crear_polizas_de 	== 'FD':
-# 			msg, documentosDataDevoluciones = crear_polizas_contables(
-# 				origen_documentos	= 'ventas',
-# 				documentos 			= devoluciones, 
-# 				depto_co			= depto_co,
-# 				informacion_contable= informacion_contable,
-# 				plantilla 			= plantilla_devoluciones,
-# 				crear_polizas_por	= crear_polizas_por,
-# 				crear_polizas_de	= crear_polizas_de,
-# 				msg = msg,
-# 				descripcion = descripcion, 
-# 				tipo_documento = 'D',
-# 			)
+		if crear_polizas_de 	== 'V':
+			msg, documentosData = crear_polizas_contables(
+				origen_documentos	= 'punto_de_venta',
+				documentos 			= ventas, 
+				depto_co			= depto_co,
+				informacion_contable= informacion_contable,
+				plantilla 			= plantilla_ventas,
+				crear_polizas_por	= crear_polizas_por,
+				crear_polizas_de	= crear_polizas_de,
+				msg = msg,
+				descripcion = descripcion, 
+				tipo_documento = 'V',
+			)
+			documentosGenerados = documentosData
+		if crear_polizas_de 	== 'D':
+			msg, documentosDataDevoluciones = crear_polizas_contables(
+				origen_documentos	= 'punto_de_venta',
+				documentos 			= devoluciones, 
+				depto_co			= depto_co,
+				informacion_contable= informacion_contable,
+				plantilla 			= plantilla_devoluciones,
+				crear_polizas_por	= crear_polizas_por,
+				crear_polizas_de	= crear_polizas_de,
+				msg = msg,
+				descripcion = descripcion, 
+				tipo_documento = 'D',
+			)
 			
-# 	elif error == 1 and msg=='':
-# 		msg = 'No se han derfinido las preferencias de la empresa para generar polizas [Por favor definelas primero en Configuracion > Preferencias de la empresa]'
+	elif error == 1 and msg=='':
+		msg = 'No se han derfinido las preferencias de la empresa para generar polizas [Por favor definelas primero en Configuracion > Preferencias de la empresa]'
 	
-# 	return documentosGenerados, documentosDataDevoluciones, msg
+	return documentosGenerados, documentosDataDevoluciones, msg
 
 @login_required(login_url='/login/')
 def generar_polizas_View(request, template_name='herramientas/generar_polizas_pv.html'):
-	polizas= []
-
-	msg 			= ''
+	polizas_ventas	= []
+	error 			= 0
+	msg 	 		= ''
 
 	if request.method == 'POST':
 		form = GenerarPolizasManageForm(request.POST)
@@ -98,24 +95,33 @@ def generar_polizas_View(request, template_name='herramientas/generar_polizas_pv
 			ignorar_documentos_cont 	= form.cleaned_data['ignorar_documentos_cont']
 			crear_polizas_por 			= form.cleaned_data['crear_polizas_por']
 			crear_polizas_de 			= form.cleaned_data['crear_polizas_de']
-			plantilla_ventas	= form.cleaned_data['plantilla_ventas']
+			plantilla_ventas			= form.cleaned_data['plantilla_ventas']
 			plantilla_devoluciones 		= form.cleaned_data['plantilla_devoluciones']
 			plantilla_cobros_cc 		= form.cleaned_data['plantilla_cobros_cc']
 			descripcion 				= form.cleaned_data['descripcion']
 
 			if (crear_polizas_de == 'V' and not plantilla_ventas == None) or (crear_polizas_de == 'D' and not plantilla_devoluciones == None):
 				msg = 'es valido'
-				#polizas, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla_facturas, plantilla_devoluciones, descripcion)
+				polizas_ventas, polizas_devoluciones, msg = generar_polizas(
+					fecha_ini=fecha_ini, 
+					fecha_fin=fecha_fin, 
+					ignorar_documentos_cont=ignorar_documentos_cont, 
+					crear_polizas_por=crear_polizas_por, 
+					crear_polizas_de=crear_polizas_de, 
+					plantilla_ventas=plantilla_ventas, 
+					plantilla_devoluciones=plantilla_devoluciones, 
+					descripcion= descripcion,
+					)
 			else:
 				error =1
 				msg = 'Seleciona una plantilla'
 
-			if polizas== []:
-				msg = 'Lo siento, no se encontraron documentos para ralizar polizas con para este filtro'
+			if polizas_ventas== [] and not error == 1:
+				msg = 'Lo siento, no se encontraron documentos para ralizar polizas con este filtro'
 	else:
 		form = GenerarPolizasManageForm()
 	
-	c = {'documentos':polizas,'msg':msg,'form':form,}
+	c = {'documentos':polizas_ventas,'msg':msg,'form':form,}
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################
