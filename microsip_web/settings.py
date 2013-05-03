@@ -28,11 +28,11 @@ DATABASES = {
     'default': {
        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
        #D2007(POLISAS)0_9
-        'NAME': 'C:\Microsip datos\AD2007(POLISAS)0_9.fdb', # Or path to database file if using sqlite3.
+        #'NAME': 'C:\Microsip datos\AD2007(POLISAS)0_9.fdb', # Or path to database file if using sqlite3.
         #RAFISA
         #'NAME': 'C:\Microsip datos\RAFISA.fdb', # Or path to database file if using sqlite3.
         #ESSEX
-        #'NAME': 'C:\Microsip datos\ESSEX.fdb', # Or path to database file if using sqlite3.
+        'NAME': 'C:\Microsip datos\ESSEX.fdb', # Or path to database file if using sqlite3.
         'USER': 'SYSDBA',                      # Not used with sqlite3.
         'PASSWORD': 'masterkey',                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.

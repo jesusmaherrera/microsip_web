@@ -84,8 +84,47 @@ def get_descuento_total_pv(documentoId):
 	row = c.fetchone()
 	return int(row[0])
 
+def sum_totales_detalle_docto(documento=[], totales_cuentas=[], **kwargs):
+	error 	= kwargs.get('error', 0)
+	msg 	= kwargs.get('msg', '')
+
+	importe = 0
+	cuenta 	= []
+	clave_cuenta_tipoAsiento = []
+	depto_co = get_object_or_404(DeptoCo,clave='GRAL')
+
+	detalles_documento = Docto_pv_det.objects.filter(documento_pv=documento)
+
+	for detalle_documento in detalles_documento:
+		cuenta_articulo = detalles_documento.articulo.cuenta_ventas
+		cuenta_linea 	= detalles_documento.articulo.linea.cuenta_ventas
+		cuenta_grupo 	= detalles_documento.articulo.linea.grupo.cuenta_ventas
+
+		if not cuenta_articulo == null:
+			cuenta = cuenta_articulo
+		else:
+			if not cuenta_linea == null:
+				cuenta = cuenta_linea
+			else:
+				if not cuenta_grupo == null:
+					cuenta = cuenta_grupo
+
+		clave_cuenta_tipoAsiento = "%s/%s:%s"% (cuenta, depto, 'C')
+		importe = detalle_documento.precio_total_neto
+		
+		if not clave_cuenta_tipoAsiento == [] and importe > 0:
+			if clave_cuenta_tipoAsiento in totales_cuentas:
+				totales_cuentas[clave_cuenta_tipoAsiento] = [totales_cuentas[clave_cuenta_tipoAsiento][0] + Decimal(importe),0]
+			else:
+				totales_cuentas[clave_cuenta_tpoAsiento]  = [Decimal(importe),0]
+
+	return totales_cuentas, error, msg
+
 def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=None, concepto_tipo=None, error=0, msg='', documento_folio='', asiento_ingora=0):
 	importe = 0
+	if asiento_ingora=='':
+		asiento_ingora = 0
+		
 	cuenta 	= []
 	clave_cuenta_tipoAsiento = []
 
@@ -131,7 +170,7 @@ def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=Non
 	return totales_cuentas, error, msg
 
 def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_poliza=None, totales_cuentas=None, msg='', error='',depto_co=None):
-	clien = documento.cliente
+	
 	try:
 		cuenta_cliente =  CuentaCo.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
 	except ObjectDoesNotExist:
@@ -202,7 +241,7 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
 		ventas_0_contado	= ventas_0
 		iva_efec_cobrado 	= impuestos
 		bancos 				= total - descuento
-	
+
 	totales_cuentas, error, msg = agregarTotales(
 		conceptos_poliza 	= conceptos_poliza,
 		totales_cuentas 	= totales_cuentas, 
@@ -292,6 +331,7 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
 		iva_credito 		= iva_pend_pagar,
 		proveedores 		= proveedores,
 		compras_16_contado 	= compras_16_contado,
+		folio_documento 	= documento.folio,
 		compras_0_contado 	= compras_0_contado,
 		iva_contado 		= iva_efec_pagado,
 		bancos 				= bancos,
@@ -400,7 +440,7 @@ def get_totales_documento_pv(cuenta_contado= None, documento= None, conceptos_po
 	try:
 		cuenta_cliente =  CuentaCo.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
 	except ObjectDoesNotExist:
-		cuenta_cliente = None
+		cuenta_cliente = None 
 
 	#Para saber si es contado o es credito
 	total_credito = Docto_pv_cobro.objects.filter(documento_pv=documento, forma_cobro__tipo='R').aggregate(total_credito = Sum('importe'))['total_credito']
@@ -454,12 +494,12 @@ def get_totales_documento_pv(cuenta_contado= None, documento= None, conceptos_po
 		ventas_0_credito 	= ventas_0
 		iva_pend_cobrar 	= impuestos
 		clientes 			= total_credito
-		bancos 				= total - total_credito - descuento
+		#bancos 				= total - total_credito
 	elif es_contado:
 		ventas_16_contado 	= ventas_16
 		ventas_0_contado	= ventas_0
 		iva_efec_cobrado 	= impuestos
-		bancos 				= total - descuento
+		bancos 				= total
 
 	totales_cuentas, error, msg = agregarTotales(
 		conceptos_poliza 	= conceptos_poliza,
@@ -478,7 +518,7 @@ def get_totales_documento_pv(cuenta_contado= None, documento= None, conceptos_po
 		error 				= error,
 		msg 				= msg,
 	)
-
+	
 	return totales_cuentas, error, msg
 
 def agregarTotales(totales_cuentas, **kwargs):
@@ -487,7 +527,7 @@ def agregarTotales(totales_cuentas, **kwargs):
 	compras_0_credito 	= kwargs.get('compras_0_credito', 0)
 	compras_0_contado 	= kwargs.get('compras_0_contado', 0)
 	compras_16_contado 	= kwargs.get('compras_16_contado', 0)
-
+	folio_documento     = kwargs.get('folio_documento', 0)
 	iva_contado			= kwargs.get('iva_contado', 0)
 	iva_credito			= kwargs.get('iva_credito', 0)
 	iva_retenido 		= kwargs.get('iva_retenido', 0)
@@ -534,15 +574,15 @@ def agregarTotales(totales_cuentas, **kwargs):
 		clave_cuenta_tipoAsiento = []
 		
 		if concepto.valor_tipo == 'Segmento_1' and not campos_particulares.segmento_1 == None:
-			totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_1, totales_cuentas, depto_co, concepto.tipo, error, msg, documento.folio, concepto.asiento_ingora)
+			totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_1, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora)
 		elif concepto.valor_tipo == 'Segmento_2' and not campos_particulares.segmento_2 == None: 
-			totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_2, totales_cuentas, depto_co, concepto.tipo, error, msg, documento.folio, concepto.asiento_ingora)
+			totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_2, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora)
 		elif concepto.valor_tipo == 'Segmento_3' and not campos_particulares.segmento_3 == None: 
-			totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_3, totales_cuentas, depto_co, concepto.tipo, error, msg, documento.folio, concepto.asiento_ingora)
+			totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_3, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora)
 		elif concepto.valor_tipo == 'Segmento_4' and not campos_particulares.segmento_4 == None:
-			totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_4, totales_cuentas, depto_co, concepto.tipo, error, msg, documento.folio, concepto.asiento_ingora)
+			totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_4, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora)
 		elif concepto.valor_tipo == 'Segmento_5' and not campos_particulares.segmento_5 == None: 
-			totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_5, totales_cuentas, depto_co, concepto.tipo, error, msg, documento.folio, concepto.asiento_ingora)
+			totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_5, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora)
 		elif concepto.valor_tipo == 'Compras' and not concepto.posicion in asientos_a_ingorar:
 			if concepto.valor_contado_credito == 'Credito':
 				if concepto.valor_iva == '0':
@@ -620,7 +660,7 @@ def agregarTotales(totales_cuentas, **kwargs):
 				cuenta = concepto.cuenta_co.cuenta
 			else:
 				cuenta = cuenta_cliente
-
+			
 		elif concepto.valor_tipo == 'Bancos' and not concepto.posicion in asientos_a_ingorar:
 			if concepto.valor_iva == 'A':
 				importe =	bancos

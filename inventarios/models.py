@@ -55,8 +55,8 @@ class Agentes(models.Model):
         db_table = u'agentes'
 
 class Almacenes(models.Model):
-    ALMACEN_ID = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=50, db_column='NOMBRE')
+    ALMACEN_ID  = models.AutoField(primary_key=True)
+    nombre      = models.CharField(max_length=50, db_column='NOMBRE')
     
     def __unicode__(self):
         return self.nombre
@@ -64,10 +64,29 @@ class Almacenes(models.Model):
     class Meta:
         db_table = u'almacenes'
 
+class GrupoLineas(models.Model):
+    id              = models.AutoField(primary_key=True, db_column='GRUPO_LINEA_ID')
+    nombre          = models.CharField(max_length=50, db_column='NOMBRE')
+    cuenta_ventas   = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
+    
+    class Meta:
+        db_table = u'lineas_articulos'
+
+class LineaArticulos(models.Model):
+    id              = models.AutoField(primary_key=True, db_column='LINEA_ARTICULO_ID')
+    nombre          = models.CharField(max_length=50, db_column='NOMBRE')
+    cuenta_ventas   = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
+    grupo           = models.ForeignKey(Almacenes, db_column='alma')
+
+    class Meta:
+        db_table = u'lineas_articulos'
+
 class Articulos(models.Model):
-    id = models.AutoField(primary_key=True, db_column='ARTICULO_ID')
-    nombre = models.CharField(max_length=100, db_column='NOMBRE')
-    es_almacenable = models.CharField(default='S', max_length=1, db_column='ES_ALMACENABLE')
+    id              = models.AutoField(primary_key=True, db_column='ARTICULO_ID')
+    nombre          = models.CharField(max_length=100, db_column='NOMBRE')
+    es_almacenable  = models.CharField(default='S', max_length=1, db_column='ES_ALMACENABLE')
+    cuenta_ventas   = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
+    linea           = models.ForeignKey(LineaArticulos, db_column='LINEA_ARTICULO_ID')
 
     def __unicode__(self):
         return u'%s' % self.nombre

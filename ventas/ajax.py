@@ -5,6 +5,7 @@ from django.core import serializers
 from django.http import HttpResponse
 from models import *
 from cuentas_por_cobrar.models import PlantillaPolizas_CC
+from cuentas_por_pagar.models import PlantillaPolizas_CP
 
 @dajaxice_register(method='GET')
 def args_example(request, text):
