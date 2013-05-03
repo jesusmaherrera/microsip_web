@@ -15,31 +15,31 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     url(dajaxice_config.dajaxice_url, include('dajaxice.urls')),
-	(r'^$', 'main.views.index'),
-    url(r'^main/', include('main.urls', namespace='main')),
+	(r'^$', 'microsip_web.apps.main.views.index'),
+    url(r'^main/', include('microsip_web.apps.main.urls', namespace='main')),
     #Descomentar esta linea para habilitar inventarios
-    url(r'^inventarios/', include('inventarios.urls', namespace='Inventarios')),
+    url(r'^inventarios/', include('microsip_web.apps.inventarios.urls', namespace='Inventarios')),
 
     #Descomentar esta linea para habilitar ventas
-    url(r'^ventas/', include('ventas.urls', namespace='ventas')),
+    url(r'^ventas/', include('microsip_web.apps.ventas.urls', namespace='ventas')),
 
     #Descomentar esta linea para habilitar cuentas_por_cobrar
-    url(r'^cuentas_por_cobrar/', include('cuentas_por_cobrar.urls', namespace='cuentas_por_cobrar')),
+    url(r'^cuentas_por_cobrar/', include('microsip_web.apps.cuentas_por_cobrar.urls', namespace='cuentas_por_cobrar')),
 
     #Descomentar esta linea para habilitar cuentas_por_pagar
-    url(r'^cuentas_por_pagar/', include('cuentas_por_pagar.urls', namespace='cuentas_por_pagar')),
+    url(r'^cuentas_por_pagar/', include('microsip_web.apps.cuentas_por_pagar.urls', namespace='cuentas_por_pagar')),
     
     #Descomentar esta linea para habilitar punto_de_venta
-    url(r'^punto_de_venta/', include('punto_de_venta.urls', namespace='punto_de_venta')),
+    url(r'^punto_de_venta/', include('microsip_web.apps.punto_de_venta.urls', namespace='punto_de_venta')),
 
     #Descomentar esta linea para habilitar contabilidad
-    url(r'^contabilidad/', include('contabilidad.urls', namespace='contabilidad')),
+    url(r'^contabilidad/', include('microsip_web.apps.contabilidad.urls', namespace='contabilidad')),
     
     url(r'autocomplete/', include('autocomplete_light.urls')),
     url(r'^admin/', include(admin.site.urls)),
     #LOGIN
-    url(r'^login/$','inventarios.views.ingresar'),
-    url(r'^logout/$', 'inventarios.views.logoutUser'),
+    url(r'^login/$','microsip_web.apps.inventarios.views.ingresar'),
+    url(r'^logout/$', 'microsip_web.apps.inventarios.views.logoutUser'),
 )
 
 urlpatterns += staticfiles_urlpatterns()

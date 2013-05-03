@@ -222,3 +222,50 @@ TIPOS DE PLIZAS
 ventas                      :Ingresos
 devoluciones                :Diario
 Cobros cuentas por cobrar   :Ingresos
+
+
+
+/////////////RESPALDAR/////////////////
+1:Respaldar microsip app
+2:Respaldar microsip bases de datos
+3:Respaldar firebird de archivos de programa
+/////////////REINSTALAR FIREBIRD/////////////////
+4:detener firebird en services o servicios
+5:Desinstalar Firebird poner no nada borrar archivos
+6:Reinstalar firbird Server (EN INSTALCION INDICAR Copiar la libreria cliente de firebird al directorio<system>)
+/////////////INTALAR PYTHON ////////////////////
+7:Instalar python 2.7.3
+8:Instalar setuptools-0.6c11.win32-py2.7
+9: Agregar en variables de entorno en path ";C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;"
+10:copiar carpeta de pip-1.3 a escritorio e instalar pip de carpeta pip-1.3 con python setup.py install porar carpeta pip  de escritorio
+/////////////INTALAR APLICACION Y LIBRERIAS NESESARIAS////////////////////
+11:Instalar requerimentos de aplicacion con "pip install -r requirements.txt"
+12:Si solo se installa django instalar las demas con pip install fdb 
+copiar carpeta de firebird de instaladores a C:\Python27\Lib\site-packages y C:\Python27\Lib\site-packages\django\db\backends
+13:instalar django-dajaxice con "pip install django-dajaxice" 
+14:instalar xlrd  con pip install xlrd
+14:sincronizar base de datos con python manage.py syncdb
+15:CONFIGURAR INICIADOR DE SERVIDOR CON IP Y RUTAS
+
+
+INSTALACION DE APLICACION
+
+/////////////RESPALDAR/////////////////
+1:Respaldar microsip app
+2:Respaldar microsip bases de datos
+3:Respaldar firebird de archivos de programa
+/////////////REINSTALAR FIREBIRD/////////////////
+4:detener firebird en services o servicios
+5:Desinstalar Firebird poner no nada borrar archivos
+6:Reinstalar firbird Server (EN INSTALCION INDICAR Copiar la libreria cliente de firebird al directorio<system>)
+/////////////INTALAR PYTHON ////////////////////
+7:Instalar python 2.7.3
+8:Instalar setuptools-0.6c11.win32-py2.7
+9: Agregar en variables de entorno en path ";C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;"
+10:copiar carpeta de pip-1.3 a escritorio e instalar pip de carpeta pip-1.3 con python setup.py install porar carpeta pip  de escritorio
+/////////////INTALAR APLICACION Y LIBRERIAS NESESARIAS////////////////////
+11:Instalar requerimentos de aplicacion con "pip install -r requirements.txt"
+copiar carpeta de firebird de instaladores a C:\Python27\Lib\site-packages y C:\Python27\Lib\site-packages\django\db\backends
+/////////////SYNCRONISAR BASE DE DATOS PYTHON ////////////////////
+14:sincronizar base de datos con python manage.py syncdb
+15:CONFIGURAR INICIADOR DE SERVIDOR CON IP Y RUTAS
