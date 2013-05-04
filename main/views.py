@@ -192,10 +192,8 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
 		except ObjectDoesNotExist:
 			campos_particulares =[]
 
-	es_igual = campos_particulares == []
 	if not campos_particulares == []:
-		objects.asd
-		campos_particulares =  campos_particulares[0]
+		campos_particulares = campos_particulares
 
 	importesDocto 		= ImportesDoctosCC.objects.filter(docto_cc=documento)[0]
 	
