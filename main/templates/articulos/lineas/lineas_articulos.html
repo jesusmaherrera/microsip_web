@@ -1,0 +1,60 @@
+{% extends "base_main.html" %}
+{% block title %}lineas articulos{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} linea_articulos {% endblock %}
+{% block content %}
+<div class="form-actions mainmenu">
+  <!-- <a class="btn btn-success" href="/main/linea_articulos/">Nuevo</a> -->
+</div>
+<table class="table tableCell table-hover">
+    <tr>
+      <th>Nombre</th>
+      <th>Opciones</th>
+    </tr>
+    {% for linea_articulos in lineas_articulos%}
+    <div id="myModal{{ linea_articulos.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
+      </div>
+      <div class="modal-body">
+        <h4>Al eliminar el linea_articulos</h4>
+        <p style="color:red;">Ya no sera posible recuperar los datos del linea_articulos</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Cancelar</button>
+        <a href="#" class="btn btn-primary">Estoy Seguro</a>
+      </div>
+    </div>
+    <tr>
+      <td><a href="/main/linea_articulos/{{ linea_articulos.id }}/">{{ linea_articulos.nombre }}</a></td>
+      <td style="text-align:center;">
+        <!-- <a href='#myModal{{ linea_articulos.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a> -->
+      </td>
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if linea_articulos.has_previous %}
+        <li><a href="?page={{ linea_articuloss.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ linea_articulos.number }} de {{ linea_articulos.paginator.num_pages }}.</a></li>
+        {% if linea_articulos.has_next %}
+        <li><a href="?page={{ linea_articuloss.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

@@ -70,13 +70,13 @@ class GrupoLineas(models.Model):
     cuenta_ventas   = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
     
     class Meta:
-        db_table = u'lineas_articulos'
+        db_table = u'grupos_lineas'
 
 class LineaArticulos(models.Model):
     id              = models.AutoField(primary_key=True, db_column='LINEA_ARTICULO_ID')
     nombre          = models.CharField(max_length=50, db_column='NOMBRE')
     cuenta_ventas   = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
-    grupo           = models.ForeignKey(Almacenes, db_column='alma')
+    grupo           = models.ForeignKey(GrupoLineas, db_column='GRUPO_LINEA_ID')
 
     class Meta:
         db_table = u'lineas_articulos'

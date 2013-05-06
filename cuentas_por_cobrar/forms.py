@@ -37,8 +37,30 @@ class PlantillaPolizaManageForm(forms.ModelForm):
 		model = PlantillaPolizas_CC
 
 class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
+	TIPOS 						= (('C', 'Cargo'),('A', 'Abono'),)
+	VALOR_IVA_TIPOS             = (('A', 'Ambos'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
+	VALOR_CONTADO_CREDITO_TIPOS = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)
+	VALOR_TIPOS =(
+        ('Ventas', 'Ventas'),
+        ('Clientes', 'Clientes'),
+        ('Bancos', 'Bancos'),
+        ('Descuentos', 'Descuentos'),
+        ('IVA', 'IVA'),
+        ('Segmento_1', 'Segmento 1'),
+        ('Segmento_2', 'Segmento 2'),
+        ('Segmento_3', 'Segmento 3'),
+        ('Segmento_4', 'Segmento 4'),
+        ('Segmento_5', 'Segmento 5'),
+    )
+
+	# tipo 					= forms.ChoiceField(choices=TIPOS, widget=forms.Select(attrs={'class':'span2'}),)
+	# valor_tipo 				= forms.ChoiceField(choices=VALOR_TIPOS, widget=forms.Select(attrs={'class':'span2'}),)
+	# valor_iva 				= forms.ChoiceField(choices=VALOR_IVA_TIPOS, widget=forms.Select(attrs={'class':'span2'}),)
+	# valor_contado_credito 	= forms.ChoiceField(choices=VALOR_CONTADO_CREDITO_TIPOS, widget=forms.Select(attrs={'class':'span2'}),)
+
 	posicion  		=  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
 	asiento_ingora 	= forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
+
 	class Meta:
 		widgets = autocomplete_light.get_widgets_dict(DetallePlantillaPolizas_CC)
 		model = DetallePlantillaPolizas_CC

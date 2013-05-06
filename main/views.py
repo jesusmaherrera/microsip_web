@@ -21,6 +21,9 @@ from cuentas_por_pagar.models import *
 from cuentas_por_cobrar.models import *
 from ventas.models import *
 from punto_de_venta.models import *
+from models import *
+
+from forms import *
 
 import datetime, time
 from django.db import connection
@@ -31,6 +34,107 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Sum, Max
 from django.utils.encoding import smart_str, smart_unicode
+
+#Paginacion
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+@login_required(login_url='/login/')
+def lineas_articulos_view(request, template_name='articulos/lineas/lineas_articulos.html'):
+	linea_articulos_list = LineaArticulos.objects.all()
+
+	paginator = Paginator(linea_articulos_list, 15) # Muestra 10 ventas por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		lineas_articulos = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    lineas_articulos = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    lineas_articulos = paginator.page(paginator.num_pages)
+
+	c = {'lineas_articulos':lineas_articulos}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def linea_articulos_manageView(request, id = None, template_name='articulos/lineas/linea_articulos.html'):
+	message = ''
+
+	if id:
+		linea_articulos = get_object_or_404( LineaArticulos, pk=id)
+	else:
+		linea_articulos =  LineaArticulos()
+	
+	try:
+		libres_linea_articulos = Libres_linea_articulos.objects.get(linea =linea_articulos)
+	except ObjectDoesNotExist:
+		libres_linea_articulos = Libres_linea_articulos()
+		
+	if request.method == 'POST':
+		form = LineaArticulosManageForm(request.POST, instance=  linea_articulos)
+		form_libres = Libres_LineaArticulosManageForm(request.POST, instance= libres_linea_articulos)
+		if form.is_valid() and form_libres.is_valid():
+			linea = form.save()
+			libres = form_libres.save(commit=False)
+			libres.linea = linea
+			libres.save()
+	else:
+		form = LineaArticulosManageForm(instance= linea_articulos)
+		form_libres = Libres_LineaArticulosManageForm(instance= libres_linea_articulos)
+
+	c = {'form':form, 'form_libres':form_libres,}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def grupos_lineas_view(request, template_name='articulos/grupos/grupos_lineas.html'):
+	grupos_lineas_list = GrupoLineas.objects.all()
+
+	paginator = Paginator(grupos_lineas_list, 15) # Muestra 10 ventas por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		grupos_lineas = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    grupos_lineas = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    grupos_lineas = paginator.page(paginator.num_pages)
+
+	c = {'grupos_lineas':grupos_lineas}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def grupo_lineas_manageView(request, id = None, template_name='articulos/grupos/grupo_lineas.html'):
+	message = ''
+
+	if id:
+		grupo_lineas = get_object_or_404( GrupoLineas, pk=id)
+	else:
+		grupo_lineas =  GrupoLineas()
+	
+	try:
+		libres_grupo_lineas = Libres_grupo_lineas.objects.get(grupo=grupo_lineas)
+	except ObjectDoesNotExist:
+		libres_grupo_lineas = Libres_grupo_lineas()
+		
+	if request.method == 'POST':
+		form = GrupoLineasManageForm(request.POST, instance=  grupo_lineas)
+		form_libres = Libres_GrupoLineasManageForm(request.POST, instance= libres_grupo_lineas)
+		if form.is_valid() and form_libres.is_valid():
+			grupo = form.save()
+			libres = form_libres.save(commit=False)
+			libres.grupo = grupo
+			libres.save()
+	else:
+		form = GrupoLineasManageForm(instance= grupo_lineas)
+		form_libres = Libres_GrupoLineasManageForm(instance= libres_grupo_lineas)
+
+	c = {'form':form, 'form_libres':form_libres,}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
 def index(request):
