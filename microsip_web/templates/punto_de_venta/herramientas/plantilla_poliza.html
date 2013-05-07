@@ -27,19 +27,19 @@ $(function() {
 });
 
 $(document).ready(function() {
+    //$("#id_detalles_data").tablesorter();
+    $( "#sortable" ).sortable();
+      // items: ".sortable-item",
+      //   update : function(ev, ui) {
 
-  $( "#sortable" ).sortable({
-      items: ".sortable-item",
-        update : function(ev, ui) {
-
-          ui.item.find("input[name*='cuenta_co-autocomplete']").attr('style','display:none');
-          ui.item.find("span[class*='remove div']:eq(1)").attr('style','display:none');
+      //     ui.item.find("input[name*='cuenta_co-autocomplete']").attr('style','display:none');
+      //     ui.item.find("span[class*='remove div']:eq(1)").attr('style','display:none');
           
-          $("input[name*='posicion']" ).each(function( index ) {
-            $(this).val(index+1);
-          });
-        }
-  });
+      //     $("input[name*='posicion']" ).each(function( index ) {
+      //       $(this).val(index+1);
+      //     });
+      //   }
+  //});
 
   $("a[class*='btn-success']").click(function() {
     
@@ -55,6 +55,7 @@ $(document).ready(function() {
 
   $("select[name*='valor_tipo']").change(function(){ ajustarFormulario(this);});
   $("select[name*='valor_tipo']").each(function(){ ajustarFormulario(this);});
+
 });
 
 </script>
@@ -95,11 +96,11 @@ $(document).ready(function() {
   <hr>
   <div>
     <fieldset style='clear:both;'>
-      <table class="table tableCell table-hover" id="id_detalles_data" border="0" cellpadding="0" cellspacing="5">
+      <table class="table tableCell table-hover tablesorter" id="id_detalles_data" border="0" cellpadding="0" cellspacing="5">
         <thead>
           <tr>
-            <th>Numero</th>
-            <th>Cuenta</th>
+            <th >Numero</th>
+            <th >Cuenta</th>
             <th>Tipo</th>
             <th>Valor</th>
             <th>IVA</th>
