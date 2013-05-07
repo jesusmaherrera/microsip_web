@@ -50,7 +50,7 @@ def ingresar(request):
 				return render_to_response('login.html',{'form':formulario, 'message':'Nombre de usaurio o password no validos',}, context_instance=RequestContext(request))
 	else:
 		formulario = AuthenticationForm()
-	return render_to_response('login.html',{'form':formulario, 'message':'',}, context_instance=RequestContext(request))
+	return render_to_response('inventarios/login.html',{'form':formulario, 'message':'',}, context_instance=RequestContext(request))
 
 def logoutUser(request):
     logout(request)
@@ -70,7 +70,7 @@ def c_get_next_key(seq_name):
 ##########################################
 
 @login_required(login_url='/login/')
-def invetariosFisicos_View(request, template_name='Inventarios Fisicos/inventarios_fisicos.html'):
+def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisicos/inventarios_fisicos.html'):
 	inventarios_fisicos_list = DoctosInvfis.objects.all().order_by('-fecha') 
 
 	paginator = Paginator(inventarios_fisicos_list, 15) # Muestra 5 inventarios por pagina
@@ -90,7 +90,7 @@ def invetariosFisicos_View(request, template_name='Inventarios Fisicos/inventari
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def invetarioFisico_manageView(request, id = None, template_name='Inventarios Fisicos/inventario_fisico.html'):
+def invetarioFisico_manageView(request, id = None, template_name='inventarios/Inventarios Fisicos/inventario_fisico.html'):
 	message = ''
 	hay_repetido = False
 	if id:
@@ -182,7 +182,7 @@ def invetarioFisico_delete(request, id = None):
 ##########################################
 
 @login_required(login_url='/login/')
-def entradas_View(request, template_name='Entradas/entradas.html'):
+def entradas_View(request, template_name='inventarios/Entradas/entradas.html'):
 	entradas_list = DoctosIn.objects.filter(naturaleza_concepto='E').order_by('-fecha') 
 
 	paginator = Paginator(entradas_list, 15) # Muestra 5 inventarios por pagina
@@ -202,7 +202,7 @@ def entradas_View(request, template_name='Entradas/entradas.html'):
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def entrada_manageView(request, id = None, template_name='Entradas/entrada.html'):
+def entrada_manageView(request, id = None, template_name='inventarios/Entradas/entrada.html'):
 	message = ''
 	hay_repetido = False
 	if id:
@@ -297,7 +297,7 @@ def entrada_delete(request, id = None):
 ##########################################
 
 @login_required(login_url='/login/')
-def salidas_View(request, template_name='Salidas/salidas.html'):
+def salidas_View(request, template_name='inventarios/Salidas/salidas.html'):
 	salidas_list = DoctosIn.objects.filter(naturaleza_concepto='S').order_by('-fecha') 
 
 	paginator = Paginator(salidas_list, 15) # Muestra 5 inventarios por pagina
@@ -317,7 +317,7 @@ def salidas_View(request, template_name='Salidas/salidas.html'):
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def salida_manageView(request, id = None, template_name='Salidas/salida.html'):
+def salida_manageView(request, id = None, template_name='inventarios/Salidas/salida.html'):
 	message = ''
 	hay_repetido = False
 	if id:

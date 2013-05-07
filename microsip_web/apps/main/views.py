@@ -39,7 +39,7 @@ from django.utils.encoding import smart_str, smart_unicode
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required(login_url='/login/')
-def lineas_articulos_view(request, template_name='articulos/lineas/lineas_articulos.html'):
+def lineas_articulos_view(request, template_name='main/articulos/lineas/lineas_articulos.html'):
 	linea_articulos_list = LineaArticulos.objects.all()
 
 	paginator = Paginator(linea_articulos_list, 15) # Muestra 10 ventas por pagina
@@ -59,7 +59,7 @@ def lineas_articulos_view(request, template_name='articulos/lineas/lineas_articu
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def linea_articulos_manageView(request, id = None, template_name='articulos/lineas/linea_articulos.html'):
+def linea_articulos_manageView(request, id = None, template_name='main/articulos/lineas/linea_articulos.html'):
 	message = ''
 
 	if id:
@@ -88,7 +88,7 @@ def linea_articulos_manageView(request, id = None, template_name='articulos/line
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def grupos_lineas_view(request, template_name='articulos/grupos/grupos_lineas.html'):
+def grupos_lineas_view(request, template_name='main/articulos/grupos/grupos_lineas.html'):
 	grupos_lineas_list = GrupoLineas.objects.all()
 
 	paginator = Paginator(grupos_lineas_list, 15) # Muestra 10 ventas por pagina
@@ -108,7 +108,7 @@ def grupos_lineas_view(request, template_name='articulos/grupos/grupos_lineas.ht
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def grupo_lineas_manageView(request, id = None, template_name='articulos/grupos/grupo_lineas.html'):
+def grupo_lineas_manageView(request, id = None, template_name='main/articulos/grupos/grupo_lineas.html'):
 	message = ''
 
 	if id:
@@ -138,7 +138,7 @@ def grupo_lineas_manageView(request, id = None, template_name='articulos/grupos/
 
 @login_required(login_url='/login/')
 def index(request):
-  	return render_to_response('index.html', {}, context_instance=RequestContext(request))# Create your views here.
+  	return render_to_response('main/index.html', {}, context_instance=RequestContext(request))# Create your views here.
 
 def get_folio_poliza(tipo_poliza, fecha=None):
 	""" folio de una poliza """

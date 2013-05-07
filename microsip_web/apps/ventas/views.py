@@ -97,7 +97,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 	return documentosGenerados, documentosDataDevoluciones, msg
 
 @login_required(login_url='/login/')
-def facturas_View(request, template_name='herramientas/generar_polizas.html'):
+def facturas_View(request, template_name='ventas/herramientas/generar_polizas.html'):
 	documentosData = []
 	polizas_de_devoluciones = []
 	msg 			= ''
@@ -142,7 +142,7 @@ def facturas_View(request, template_name='herramientas/generar_polizas.html'):
 ##########################################
 
 @login_required(login_url='/login/')
-def preferenciasEmpresa_View(request, template_name='herramientas/preferencias_empresa.html'):
+def preferenciasEmpresa_View(request, template_name='ventas/herramientas/preferencias_empresa.html'):
 	try:
 		informacion_contable = InformacionContable_V.objects.all()[:1]
 		informacion_contable = informacion_contable[0]
@@ -170,7 +170,7 @@ def preferenciasEmpresa_View(request, template_name='herramientas/preferencias_e
 ##########################################
 
 @login_required(login_url='/login/')
-def plantilla_poliza_manageView(request, id = None, template_name='herramientas/plantilla_poliza.html'):
+def plantilla_poliza_manageView(request, id = None, template_name='ventas/herramientas/plantilla_poliza.html'):
 	message = ''
 
 	if id:
@@ -196,7 +196,7 @@ def plantilla_poliza_manageView(request, id = None, template_name='herramientas/
 					Detalleplantilla.plantilla_poliza_v = plantilla
 			
 			plantilla_items_formset .save()
-			return HttpResponseRedirect('/ventas/PreferenciasEmpresa/')
+			return HttpResponseRedirect('ventas/PreferenciasEmpresa/')
 	else:
 		plantilla_items = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
 		plantilla_form= PlantillaPolizaManageForm(instance=plantilla)

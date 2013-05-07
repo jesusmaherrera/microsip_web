@@ -19,7 +19,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum, Max
 
 @login_required(login_url='/login/')
-def polizas_View(request, template_name='polizas/polizas.html'):
+def polizas_View(request, template_name='contabilidad/polizas/polizas.html'):
 	polizas_list = DoctoCo.objects.filter(estatus='N').order_by('-fecha') 
 
 	paginator = Paginator(polizas_list, 15) # Muestra 5 inventarios por pagina
@@ -39,7 +39,7 @@ def polizas_View(request, template_name='polizas/polizas.html'):
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def polizas_pendientesView(request, template_name='polizas/polizas_pendientes.html'):
+def polizas_pendientesView(request, template_name='contabilidad/polizas/polizas_pendientes.html'):
 	#polizas_list = DoctoCo.objects.using('db_chuy').filter(estatus='P').order_by('-fecha') 
 	polizas_list = DoctoCo.objects.filter(estatus='P').order_by('-fecha') 
 
@@ -60,7 +60,7 @@ def polizas_pendientesView(request, template_name='polizas/polizas_pendientes.ht
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def preferenciasEmpresa_View(request, template_name='herramientas/preferencias_empresa_C.html'):
+def preferenciasEmpresa_View(request, template_name='contabilidad/herramientas/preferencias_empresa.html'):
 	try:
 		informacion_contable = InformacionContable_C.objects.all()[:1]
 		informacion_contable = informacion_contable[0]

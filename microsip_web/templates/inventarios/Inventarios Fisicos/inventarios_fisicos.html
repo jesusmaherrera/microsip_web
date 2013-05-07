@@ -1,0 +1,70 @@
+{% extends "inventarios/base.html" %}
+{% block title %}Inicio{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Inventarios Fisicos {% endblock %}
+{% block content %}
+<div class="form-actions mainmenu">
+  <a class="btn btn-success" href="/inventarios/InventarioFisico/">Nuevo</a>
+</div>
+<table class="table tableCell table-hover">
+    <tr>
+      <th>ID</th>
+      <th>FOLIO</th>
+      <th>FECHA</th>
+      <th>DESCRIPCION</th>
+      <th>APLICADO</th>
+      <th>OPCIONES</th>
+    </tr>
+    {% for inventario_fisico in inventarios_fisicos %}
+    <div id="myModal{{ inventario_fisico.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
+      </div>
+      <div class="modal-body">
+        <h4>Al eliminar el inventario fisico con el folio: {{ inventario_fisico.folio }}</h4>
+        <p style="color:red;">Ya no sera posible recuperar los datos del inventario</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Cancelar</button>
+        <a href="/inventarios/InventarioFisico/Delete/{{ inventario_fisico.id }}/" class="btn btn-primary">Estoy Seguro</a>
+      </div>
+    </div>
+    <tr>
+      <td>
+        <a href="/inventarios/InventarioFisico/{{ inventario_fisico.id }}/">{{ inventario_fisico.id }}</a>
+      </td>
+      <td>{{ inventario_fisico.folio }}</td>
+      <td>{{ inventario_fisico.fecha }}</td>
+      <td>{{ inventario_fisico.descripcion }}</td>
+      <td>{{ inventario_fisico.aplicado }}</td>
+      <td style="text-align:center;">
+        <a href='#myModal{{ inventario_fisico.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
+      </td>
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if inventarios_fisicos.has_previous %}
+        <li><a href="?page={{ inventarios_fisicos.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ inventarios_fisicos.number }} de {{ inventarios_fisicos.paginator.num_pages }}.</a></li>
+        {% if inventarios_fisicos.has_next %}
+        <li><a href="?page={{ inventarios_fisicos.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

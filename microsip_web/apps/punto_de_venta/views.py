@@ -81,7 +81,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 	return documentosGenerados, documentosDataDevoluciones, msg
 
 @login_required(login_url='/login/')
-def generar_polizas_View(request, template_name='herramientas/generar_polizas_pv.html'):
+def generar_polizas_View(request, template_name='punto_de_venta/herramientas/generar_polizas.html'):
 	polizas_ventas	= []
 	error 			= 0
 	msg 	 		= ''
@@ -131,7 +131,7 @@ def generar_polizas_View(request, template_name='herramientas/generar_polizas_pv
 ##########################################
 
 @login_required(login_url='/login/')
-def preferenciasEmpresa_View(request, template_name='herramientas/preferencias_empresa_pv.html'):
+def preferenciasEmpresa_View(request, template_name='punto_de_venta/herramientas/preferencias_empresa.html'):
 	try:
 		informacion_contable = InformacionContable_pv.objects.all()[:1]
 		informacion_contable = informacion_contable[0]
@@ -158,7 +158,7 @@ def preferenciasEmpresa_View(request, template_name='herramientas/preferencias_e
 ##########################################
 
 @login_required(login_url='/login/')
-def plantilla_poliza_manageView(request, id = None, template_name='herramientas/plantilla_poliza_pv.html'):
+def plantilla_poliza_manageView(request, id = None, template_name='punto_de_venta/herramientas/plantilla_poliza.html'):
 	message = ''
 
 	if id:
@@ -201,7 +201,7 @@ def plantilla_poliza_manageView(request, id = None, template_name='herramientas/
 ##########################################
 
 @login_required(login_url='/login/')
-def ventas_de_mostrador_view(request, template_name='documentos/ventas/ventas_de_mostrador.html'):
+def ventas_de_mostrador_view(request, template_name='punto_de_venta/documentos/ventas/ventas_de_mostrador.html'):
 	ventas_list = Docto_PV.objects.filter(tipo='V')
 
 	paginator = Paginator(ventas_list, 15) # Muestra 10 ventas por pagina
@@ -221,7 +221,7 @@ def ventas_de_mostrador_view(request, template_name='documentos/ventas/ventas_de
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def venta_mostrador_manageView(request, id = None, template_name='documentos/ventas/venta_de_mostrador.html'):
+def venta_mostrador_manageView(request, id = None, template_name='punto_de_venta/documentos/ventas/venta_de_mostrador.html'):
 	
 	message = ''
 	hay_repetido = False
@@ -275,7 +275,7 @@ def venta_mostrador_manageView(request, id = None, template_name='documentos/ven
 ##########################################
 
 @login_required(login_url='/login/')
-def devoluciones_de_ventas_view(request, template_name='documentos/devoluciones/devoluciones_de_ventas.html'):
+def devoluciones_de_ventas_view(request, template_name='punto_de_venta/documentos/devoluciones/devoluciones_de_ventas.html'):
 	documentos_list = Docto_PV.objects.filter(tipo='D')
 	
 	paginator = Paginator(documentos_list, 15) # Muestra 10 documentos por pagina

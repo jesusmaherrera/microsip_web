@@ -62,7 +62,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 	return documentosCCData, msg
 
 @login_required(login_url='/login/')
-def generar_polizas_View(request, template_name='herramientas/generar_polizas_CC.html'):
+def generar_polizas_View(request, template_name='cuentas_por_cobrar/herramientas/generar_polizas.html'):
 	
 	documentosData 	= []
 	msg 			= msg_resultados = ''
@@ -97,7 +97,7 @@ def generar_polizas_View(request, template_name='herramientas/generar_polizas_CC
 ##########################################
 
 @login_required(login_url='/login/')
-def preferenciasEmpresa_View(request, template_name='herramientas/preferencias_empresa_CC.html'):
+def preferenciasEmpresa_View(request, template_name='cuentas_por_cobrar/herramientas/preferencias_empresa.html'):
 	try:
 		informacion_contable = InformacionContable_CC.objects.all()[:1]
 		informacion_contable = informacion_contable[0]
@@ -124,7 +124,7 @@ def preferenciasEmpresa_View(request, template_name='herramientas/preferencias_e
 ##########################################
 
 @login_required(login_url='/login/')
-def plantilla_poliza_manageView(request, id = None, template_name='herramientas/plantilla_poliza_CC.html'):
+def plantilla_poliza_manageView(request, id = None, template_name='cuentas_por_cobrar/herramientas/plantilla_poliza.html'):
 	message = ''
 
 	if id:

@@ -68,7 +68,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 	return documentosCPData, msg
 
 @login_required(login_url='/login/')
-def generar_polizas_View(request, template_name='herramientas/generar_polizas_CP.html'):
+def generar_polizas_View(request, template_name='cuentas_por_pagar/herramientas/generar_polizas.html'):
 	
 	documentosData 	= []
 	msg 			= msg_resultados = ''
@@ -103,7 +103,7 @@ def generar_polizas_View(request, template_name='herramientas/generar_polizas_CP
 ##########################################
 
 @login_required(login_url='/login/')
-def preferenciasEmpresa_View(request, template_name='herramientas/preferencias_empresa_CP.html'):
+def preferenciasEmpresa_View(request, template_name='cuentas_por_pagar/herramientas/preferencias_empresa.html'):
 	try:
 		informacion_contable = InformacionContable_CP.objects.all()[:1]
 		informacion_contable = informacion_contable[0]
@@ -130,7 +130,7 @@ def preferenciasEmpresa_View(request, template_name='herramientas/preferencias_e
 ##########################################
 
 @login_required(login_url='/login/')
-def plantilla_poliza_manageView(request, id = None, template_name='herramientas/plantilla_poliza_CP.html'):
+def plantilla_poliza_manageView(request, id = None, template_name='cuentas_por_pagar/herramientas/plantilla_poliza.html'):
 	message = ''
 
 	if id:
@@ -180,7 +180,7 @@ def plantilla_poliza_delete(request, id = None):
 ##########################################
 
 @login_required(login_url='/login/')
-def proveedores_view(request, template_name='catalogos/proveedores/proveedores.html'):
+def proveedores_view(request, template_name='cuentas_por_pagar/catalogos/proveedores/proveedores.html'):
 	provedores_list = Proveedor.objects.all()
 
 	paginator = Paginator(provedores_list, 15) # Muestra 5 inventarios por pagina
@@ -200,7 +200,7 @@ def proveedores_view(request, template_name='catalogos/proveedores/proveedores.h
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def proveedor_manageView(request, id = None, template_name='catalogos/proveedores/proveedor.html'):
+def proveedor_manageView(request, id = None, template_name='cuentas_por_pagar/catalogos/proveedores/proveedor.html'):
 	message = ''
 
 	if id:
@@ -224,7 +224,7 @@ def proveedor_manageView(request, id = None, template_name='catalogos/proveedore
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def tipos_proveedores_view(request, template_name='catalogos/tipos_proveedores/tipos_proveedores.html'):
+def tipos_proveedores_view(request, template_name='cuentas_por_pagar/catalogos/tipos_proveedores/tipos_proveedores.html'):
 	tipos_provedores_list = TipoProveedor.objects.all()
 
 	paginator = Paginator(tipos_provedores_list, 15) # Muestra 5 inventarios por pagina
