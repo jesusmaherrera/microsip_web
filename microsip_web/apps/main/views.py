@@ -188,41 +188,41 @@ def get_descuento_total_pv(documentoId):
 	row = c.fetchone()
 	return int(row[0])
 
-def sum_totales_detalle_docto(documento=[], totales_cuentas=[], **kwargs):
-	error 	= kwargs.get('error', 0)
-	msg 	= kwargs.get('msg', '')
+# def sum_totales_detalle_docto(documento=[], totales_cuentas=[], **kwargs):
+# 	error 	= kwargs.get('error', 0)
+# 	msg 	= kwargs.get('msg', '')
 
-	importe = 0
-	cuenta 	= []
-	clave_cuenta_tipoAsiento = []
-	depto_co = get_object_or_404(DeptoCo,clave='GRAL')
+# 	importe = 0
+# 	cuenta 	= []
+# 	clave_cuenta_tipoAsiento = []
+# 	depto_co = get_object_or_404(DeptoCo,clave='GRAL')
 
-	detalles_documento = Docto_pv_det.objects.filter(documento_pv=documento)
+# 	detalles_documento = Docto_pv_det.objects.filter(documento_pv=documento)
 
-	for detalle_documento in detalles_documento:
-		cuenta_articulo = detalles_documento.articulo.cuenta_ventas
-		cuenta_linea 	= detalles_documento.articulo.linea.cuenta_ventas
-		cuenta_grupo 	= detalles_documento.articulo.linea.grupo.cuenta_ventas
+# 	for detalle_documento in detalles_documento:
+# 		cuenta_articulo = detalles_documento.articulo.cuenta_ventas
+# 		cuenta_linea 	= detalles_documento.articulo.linea.cuenta_ventas
+# 		cuenta_grupo 	= detalles_documento.articulo.linea.grupo.cuenta_ventas
 
-		if not cuenta_articulo == null:
-			cuenta = cuenta_articulo
-		else:
-			if not cuenta_linea == null:
-				cuenta = cuenta_linea
-			else:
-				if not cuenta_grupo == null:
-					cuenta = cuenta_grupo
+# 		if not cuenta_articulo == null:
+# 			cuenta = cuenta_articulo
+# 		else:
+# 			if not cuenta_linea == null:
+# 				cuenta = cuenta_linea
+# 			else:
+# 				if not cuenta_grupo == null:
+# 					cuenta = cuenta_grupo
 
-		clave_cuenta_tipoAsiento = "%s/%s:%s"% (cuenta, depto, 'C')
-		importe = detalle_documento.precio_total_neto
+# 		clave_cuenta_tipoAsiento = "%s/%s:%s"% (cuenta, depto, 'C')
+# 		importe = detalle_documento.precio_total_neto
 		
-		if not clave_cuenta_tipoAsiento == [] and importe > 0:
-			if clave_cuenta_tipoAsiento in totales_cuentas:
-				totales_cuentas[clave_cuenta_tipoAsiento] = [totales_cuentas[clave_cuenta_tipoAsiento][0] + Decimal(importe),0]
-			else:
-				totales_cuentas[clave_cuenta_tpoAsiento]  = [Decimal(importe),0]
+# 		if not clave_cuenta_tipoAsiento == [] and importe > 0:
+# 			if clave_cuenta_tipoAsiento in totales_cuentas:
+# 				totales_cuentas[clave_cuenta_tipoAsiento] = [totales_cuentas[clave_cuenta_tipoAsiento][0] + Decimal(importe),0]
+# 			else:
+# 				totales_cuentas[clave_cuenta_tpoAsiento]  = [Decimal(importe),0]
 
-	return totales_cuentas, error, msg
+# 	return totales_cuentas, error, msg
 
 def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=None, concepto_tipo=None, error=0, msg='', documento_folio='', asiento_ingora=0):
 	importe = 0
@@ -262,14 +262,14 @@ def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=Non
 				msg = 'Cantidad incorrecta en un segmento en el documento [%s], Corrigelo para continuar'% documento_folio
 
 			if error == 0:
-				clave_cuenta_tipoAsiento = "%s/%s:%s"% (cuenta, depto, concepto_tipo)
+				posicion_cuenta_depto_tipoAsiento = "%s+%s/%s:%s"% (asiento_ingora, cuenta, depto_co, concepto_tipo)
 				importe = importe
 
-				if not clave_cuenta_tipoAsiento == [] and importe > 0:
-					if clave_cuenta_tipoAsiento in totales_cuentas:
-						totales_cuentas[clave_cuenta_tipoAsiento] = [totales_cuentas[clave_cuenta_tipoAsiento][0] + Decimal(importe),int(asiento_ingora)]
+				if not posicion_cuenta_depto_tipoAsiento == [] and importe > 0:
+					if posicion_cuenta_depto_tipoAsiento in totales_cuentas:
+						totales_cuentas[posicion_cuenta_depto_tipoAsiento] = [totales_cuentas[posicion_cuenta_depto_tipoAsiento][0] + Decimal(importe),int(asiento_ingora)]
 					else:
-						totales_cuentas[clave_cuenta_tipoAsiento]  = [Decimal(importe),int(asiento_ingora)]
+						totales_cuentas[posicion_cuenta_depto_tipoAsiento]  = [Decimal(importe),int(asiento_ingora)]
 
 	return totales_cuentas, error, msg
 
@@ -773,18 +773,18 @@ def agregarTotales(totales_cuentas, **kwargs):
 			importe = descuento
 			cuenta = concepto.cuenta_co.cuenta
 
-		clave_cuenta_tipoAsiento = "%s/%s:%s"% (cuenta, depto_co, concepto.tipo)
+		posicion_cuenta_depto_tipoAsiento = "%s+%s/%s:%s"% (concepto.posicion, cuenta, depto_co, concepto.tipo)
 		importe = importe
 
 		#Se es tipo segmento pone variables en cero para que no se calculen otra ves valores por ya estan calculados
 		if concepto.valor_tipo == 'Segmento_1' or concepto.valor_tipo == 'Segmento_2' or concepto.valor_tipo == 'Segmento_3' or concepto.valor_tipo == 'Segmento_4' or concepto.valor_tipo == 'Segmento_5':
 			importe = 0
 
-		if not clave_cuenta_tipoAsiento == [] and importe > 0:
-			if clave_cuenta_tipoAsiento in totales_cuentas:
-				totales_cuentas[clave_cuenta_tipoAsiento] = [totales_cuentas[clave_cuenta_tipoAsiento][0] + Decimal(importe),int(concepto.posicion)]
+		if not posicion_cuenta_depto_tipoAsiento == [] and importe > 0:
+			if posicion_cuenta_depto_tipoAsiento in totales_cuentas:
+				totales_cuentas[posicion_cuenta_depto_tipoAsiento] = [totales_cuentas[posicion_cuenta_depto_tipoAsiento][0] + Decimal(importe),int(concepto.posicion)]
 			else:
-				totales_cuentas[clave_cuenta_tipoAsiento]  = [Decimal(importe),int(concepto.posicion)]
+				totales_cuentas[posicion_cuenta_depto_tipoAsiento]  = [Decimal(importe),int(concepto.posicion)]
 
 	return totales_cuentas, error, msg
 
@@ -895,9 +895,10 @@ def crear_polizas_contables(origen_documentos, documentos, depto_co, informacion
 				posicion = 1
 				totales_cuentas = totales_cuentas.items()
 
+				totales_cuentas.sort()
 
-				for cuenta_depto_tipoAsiento, importe in totales_cuentas:
-					cuenta_deptotipoAsiento = cuenta_depto_tipoAsiento.split('/')
+				for posicion_cuenta_depto_tipoAsiento, importe in totales_cuentas:
+					cuenta_deptotipoAsiento = posicion_cuenta_depto_tipoAsiento.split('+')[1].split('/')
 					cuenta_co = CuentaCo.objects.get(cuenta=cuenta_deptotipoAsiento[0])
 					depto_tipoAsiento = cuenta_deptotipoAsiento[1].split(':')
 					depto_co = DeptoCo.objects.get(clave=depto_tipoAsiento[0])
