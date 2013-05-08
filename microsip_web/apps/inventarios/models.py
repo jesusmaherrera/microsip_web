@@ -68,6 +68,7 @@ class GrupoLineas(models.Model):
     id              = models.AutoField(primary_key=True, db_column='GRUPO_LINEA_ID')
     nombre          = models.CharField(max_length=50, db_column='NOMBRE')
     cuenta_ventas   = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
+    puntos          = models.IntegerField()
     
     class Meta:
         db_table = u'grupos_lineas'
@@ -77,6 +78,7 @@ class LineaArticulos(models.Model):
     nombre          = models.CharField(max_length=50, db_column='NOMBRE')
     cuenta_ventas   = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
     grupo           = models.ForeignKey(GrupoLineas, db_column='GRUPO_LINEA_ID')
+    puntos          = models.IntegerField()
 
     class Meta:
         db_table = u'lineas_articulos'

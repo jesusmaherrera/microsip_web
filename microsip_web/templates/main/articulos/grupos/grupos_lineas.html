@@ -16,6 +16,7 @@
     <tr>
       <th>Nombre</th>
       <th>Opciones</th>
+      <th>Puntos</th>
     </tr>
     {% for grupo_lineas in grupos_lineas%}
     <div id="myModal{{ grupo_lineas.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -34,6 +35,7 @@
     </div>
     <tr>
       <td><a href="/main/grupo_lineas/{{ grupo_lineas.id }}/">{{ grupo_lineas.nombre }}</a></td>
+      <td>{{ grupo_lineas.puntos }}</td>
       <td style="text-align:center;">
         <!-- <a href='#myModal{{ grupo_lineas.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a> -->
       </td>

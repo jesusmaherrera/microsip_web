@@ -10,24 +10,10 @@ class LineaArticulosManageForm(forms.ModelForm):
 			'grupo',
 			'cuenta_ventas',
 		}
-
-class Libres_LineaArticulosManageForm(forms.ModelForm):
-	class Meta:
-		model = Libres_linea_articulos
-		exclude={
-			'linea',
-		}
-
+		
 class GrupoLineasManageForm(forms.ModelForm):
 	class Meta:
 		model = GrupoLineas
 		exclude= {
 			'cuenta_ventas',
-		}
-
-class Libres_GrupoLineasManageForm(forms.ModelForm):
-	class Meta:
-		model = Libres_grupo_lineas
-		exclude={
-			'grupo',
 		}

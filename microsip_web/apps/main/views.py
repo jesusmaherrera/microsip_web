@@ -67,24 +67,15 @@ def linea_articulos_manageView(request, id = None, template_name='main/articulos
 	else:
 		linea_articulos =  LineaArticulos()
 	
-	try:
-		libres_linea_articulos = Libres_linea_articulos.objects.get(linea =linea_articulos)
-	except ObjectDoesNotExist:
-		libres_linea_articulos = Libres_linea_articulos()
-		
 	if request.method == 'POST':
 		form = LineaArticulosManageForm(request.POST, instance=  linea_articulos)
-		form_libres = Libres_LineaArticulosManageForm(request.POST, instance= libres_linea_articulos)
-		if form.is_valid() and form_libres.is_valid():
+		#form_libres = Libres_LineaArticulosManageForm(request.POST, instance= libres_linea_articulos)
+		if form.is_valid():
 			linea = form.save()
-			libres = form_libres.save(commit=False)
-			libres.linea = linea
-			libres.save()
 	else:
 		form = LineaArticulosManageForm(instance= linea_articulos)
-		form_libres = Libres_LineaArticulosManageForm(instance= libres_linea_articulos)
 
-	c = {'form':form, 'form_libres':form_libres,}
+	c = {'form':form,}
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
@@ -115,31 +106,21 @@ def grupo_lineas_manageView(request, id = None, template_name='main/articulos/gr
 		grupo_lineas = get_object_or_404( GrupoLineas, pk=id)
 	else:
 		grupo_lineas =  GrupoLineas()
-	
-	try:
-		libres_grupo_lineas = Libres_grupo_lineas.objects.get(grupo=grupo_lineas)
-	except ObjectDoesNotExist:
-		libres_grupo_lineas = Libres_grupo_lineas()
 		
 	if request.method == 'POST':
 		form = GrupoLineasManageForm(request.POST, instance=  grupo_lineas)
-		form_libres = Libres_GrupoLineasManageForm(request.POST, instance= libres_grupo_lineas)
-		if form.is_valid() and form_libres.is_valid():
+		if form.is_valid():
 			grupo = form.save()
-			libres = form_libres.save(commit=False)
-			libres.grupo = grupo
-			libres.save()
 	else:
 		form = GrupoLineasManageForm(instance= grupo_lineas)
-		form_libres = Libres_GrupoLineasManageForm(instance= libres_grupo_lineas)
 
-	c = {'form':form, 'form_libres':form_libres,}
+	c = {'form':form,}
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
 def index(request):
-  	return render_to_response('main/index.html', {}, context_instance=RequestContext(request))# Create your views here.
-
+  	return render_to_response('main/index.html', {}, context_instance=RequestContext(request))
+  	
 def get_folio_poliza(tipo_poliza, fecha=None):
 	""" folio de una poliza """
 	try:
