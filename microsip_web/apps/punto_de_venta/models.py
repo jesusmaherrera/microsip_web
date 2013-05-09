@@ -215,14 +215,6 @@ class Impuestos_grav_docto_pv(models.Model):
 ####                                                        ####
 ################################################################
 
-class puntos_docto_pv(models.Model):
-    docto_pv            = models.ForeignKey(Docto_PV)
-    puntos              = models.IntegerField()
-    fechahora_ult_modif = models.DateTimeField(auto_now=False)
-
-    def __unicode__(self):
-        return u'%s'% self.id
-
 class InformacionContable_pv(models.Model):
     tipo_poliza_ve_m          = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_ve_m')
     tipo_poliza_dev_m         = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_dev_m')

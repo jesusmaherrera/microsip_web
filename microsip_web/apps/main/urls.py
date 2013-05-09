@@ -3,6 +3,18 @@ from django.views import generic
 from microsip_web.apps.main import views
 
 urlpatterns = patterns('',
+    #Puntos
+    (r'^inicializar_puntos_clientes/$', views.inicializar_puntos_clientes),
+    
+
+    #Articulos
+    (r'^articulos/$', views.articulos_view),
+    (r'^articulo/(?P<id>\d+)/', views.articulo_manageView),
+
+	#Clientes
+	(r'^clientes/$', views.clientes_view),
+	(r'^cliente/(?P<id>\d+)/', views.cliente_manageView),
+
     (r'^lineas_articulos/$', views.lineas_articulos_view),
 	# (r'^linea_articulos/$', views.linea_articulos_manageView),
     (r'^linea_articulos/(?P<id>\d+)/', views.linea_articulos_manageView),

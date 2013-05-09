@@ -1,0 +1,64 @@
+{% extends "main/base.html" %}
+{% block title %}clientes{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} clientes {% endblock %}
+{% block content %}
+<div class="form-actions mainmenu">
+  <!-- <a class="btn btn-success" href="/main/cliente/">Nuevo</a> -->
+</div>
+<table class="table tableCell table-hover">
+    <tr>
+      <th>Nombre</th>
+      <th>Puntos</th>
+      <th>Dinero Electronico</th>
+      <th>Opciones</th>
+    </tr>
+    {% for cliente in clientes%}
+    <div id="myModal{{ cliente.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
+      </div>
+      <div class="modal-body">
+        <h4>Al eliminar el cliente</h4>
+        <p style="color:red;">Ya no sera posible recuperar los datos del cliente</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Cancelar</button>
+        <a href="#" class="btn btn-primary">Estoy Seguro</a>
+      </div>
+    </div>
+    <tr>
+      <td><a href="/main/cliente/{{ cliente.id }}/">{{ cliente.nombre }}</a></td>
+      <td>{{cliente.puntos_acomulados }}</td>
+      <td>{{cliente.dinero_electronico_acomulado }}</td>
+      <td style="text-align:center;">
+        <!-- <a href='#myModal{{ cliente.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a> -->
+      </td>
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if clientes.has_previous %}
+        <li><a href="?page={{ clientes.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ clientes.number }} de {{ clientes.paginator.num_pages }}.</a></li>
+        {% if clientes.has_next %}
+        <li><a href="?page={{ clientes.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

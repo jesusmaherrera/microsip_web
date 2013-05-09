@@ -37,6 +37,108 @@ from django.utils.encoding import smart_str, smart_unicode
 
 #Paginacion
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+##########################################
+## 										##
+##           	Articulos               ##
+##										##
+##########################################
+
+
+@login_required(login_url='/login/')
+def inicializar_puntos_clientes(request):
+	Cliente.objects.update(puntos=0)
+	return HttpResponseRedirect('/main/clientes/')
+
+@login_required(login_url='/login/')
+def articulos_view(request, template_name='main/articulos/articulos/articulos.html'):
+	articulos_list = Articulos.objects.all()
+
+	paginator = Paginator(articulos_list, 20) # Muestra 10 ventas por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		articulos = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    articulos = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    articulos = paginator.page(paginator.num_pages)
+
+	c = {'articulos':articulos}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def articulo_manageView(request, id = None, template_name='main/articulos/articulos/articulo.html'):
+	message = ''
+
+	if id:
+		articulo = get_object_or_404(Articulos, pk=id)
+	else:
+		articulo =  Articulos()
+	
+	if request.method == 'POST':
+		form = ArticuloManageForm(request.POST, instance=  articulo)
+		if form.is_valid():
+			form.save()
+			return HttpResponseRedirect('/main/articulos/')
+	else:
+		form = ArticuloManageForm(instance= articulo)
+
+	c = {'form':form,}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+##########################################
+## 										##
+##           Clientes                   ##
+##										##
+##########################################
+
+@login_required(login_url='/login/')
+def clientes_view(request, template_name='main/clientes/clientes/clientes.html'):
+	clientes_list = Cliente.objects.all()
+
+	paginator = Paginator(clientes_list, 20) # Muestra 10 ventas por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		clientes = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    clientes = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    clientes = paginator.page(paginator.num_pages)
+
+	c = {'clientes':clientes}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def cliente_manageView(request, id = None, template_name='main/clientes/clientes/cliente.html'):
+	message = ''
+
+	if id:
+		cliente = get_object_or_404(Cliente, pk=id)
+	else:
+		cliente =  Cliente()
+	
+	if request.method == 'POST':
+		form = ClienteManageForm(request.POST, instance=  cliente)
+		if form.is_valid():
+			form.save()
+			return HttpResponseRedirect('/main/clientes/')
+	else:
+		form = ClienteManageForm(instance= cliente)
+
+	c = {'form':form,}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+##########################################
+## 										##
+##           Lineas articulos           ##
+##										##
+##########################################
 
 @login_required(login_url='/login/')
 def lineas_articulos_view(request, template_name='main/articulos/lineas/lineas_articulos.html'):
@@ -69,14 +171,20 @@ def linea_articulos_manageView(request, id = None, template_name='main/articulos
 	
 	if request.method == 'POST':
 		form = LineaArticulosManageForm(request.POST, instance=  linea_articulos)
-		#form_libres = Libres_LineaArticulosManageForm(request.POST, instance= libres_linea_articulos)
 		if form.is_valid():
-			linea = form.save()
+			form.save()
+			return HttpResponseRedirect('/main/lineas_articulos')
 	else:
 		form = LineaArticulosManageForm(instance= linea_articulos)
 
 	c = {'form':form,}
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+##########################################
+## 										##
+##            Grupos lineas             ##
+##										##
+##########################################
 
 @login_required(login_url='/login/')
 def grupos_lineas_view(request, template_name='main/articulos/grupos/grupos_lineas.html'):
@@ -111,6 +219,7 @@ def grupo_lineas_manageView(request, id = None, template_name='main/articulos/gr
 		form = GrupoLineasManageForm(request.POST, instance=  grupo_lineas)
 		if form.is_valid():
 			grupo = form.save()
+			return HttpResponseRedirect('/main/grupos_lineas')
 	else:
 		form = GrupoLineasManageForm(instance= grupo_lineas)
 

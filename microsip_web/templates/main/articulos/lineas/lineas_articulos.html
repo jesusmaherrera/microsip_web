@@ -44,14 +44,14 @@
 
     <div class="pagination pagination-mini mainmenu">
       <ul>
-        {% if linea_articulos.has_previous %}
-        <li><a href="?page={{ linea_articuloss.previous_page_number }}">Anterior</a></li>
+        {% if lineas_articulos.has_previous %}
+        <li><a href="?page={{ lineas_articuloss.previous_page_number }}">Anterior</a></li>
         {% else %}
         <li class="disabled"><a href="#">Anterior</a></li>
         {% endif %}
-        <li class="disabled"><a href="#">Pagina {{ linea_articulos.number }} de {{ linea_articulos.paginator.num_pages }}.</a></li>
-        {% if linea_articulos.has_next %}
-        <li><a href="?page={{ linea_articuloss.next_page_number }}">Siguiente</a></li>
+        <li class="disabled"><a href="#">Pagina {{ lineas_articulos.number }} de {{ lineas_articulos.paginator.num_pages }}.</a></li>
+        {% if lineas_articulos.has_next %}
+        <li><a href="?page={{ lineas_articulos.next_page_number }}">Siguiente</a></li>
         {% else %}
         <li class="disabled"><a href="#">Siguiente</a></li>
         {% endif %} 

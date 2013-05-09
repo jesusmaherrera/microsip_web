@@ -275,7 +275,7 @@ copiar carpeta de firebird de instaladores a C:\Python27\Lib\site-packages y C:\
 Cada ves que se agrege un detalla a una venta se agreggran sus puntos:
 
 Instalacion:
-    1:Agregar en las tablas libres_articulos, lineas_articulos, grupos_lineas, libres_clientes un campo entergo con nombre "PUNTOS"
+    1:Agregar en las tablas articulos, lineas_articulos, grupos_lineas, clientes un campo entergo con nombre "PUNTOS"
     2:Agregar trigers
         a) /setup/triggers/DOCTOS_PV_DET_AI_PUNTOS a tabla doctos_pv_det como "AFTER INSERT"
         b) /setup/triggers/DOCTOS_PV_COBROS_BI_PUNTOS a tabla doctos_pv_det como "BEFOR INSERT" 

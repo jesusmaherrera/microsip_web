@@ -1,0 +1,87 @@
+{% extends "main/base.html" %}
+{% block title %}Cliente{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+<script>
+  $(document).ready(function() {
+      ajustarFormulario($('#id_tipo_tarjeta').val());
+      $('#id_tipo_tarjeta').change(function(event){
+        ajustarFormulario($('#id_tipo_tarjeta').val());
+      });
+  });
+
+  function ajustarFormulario(selecion) 
+  {
+    if (selecion == 'N')
+    {  
+      $('#span_dinero_elecronico').hide();
+      $('#id_dinero_elecronico').val(0);
+    }
+    else if (selecion == 'P')
+    {
+      $('#span_dinero_elecronico').hide();
+      $('#id_dinero_elecronico').val(0);
+    }
+    else if (selecion == 'D')
+    {
+      $('#span_dinero_elecronico').show();
+    }
+  }
+</script>
+{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} <a href="/main/clientes/">Clientes</a> > Cliente{% endblock %}
+{% block content %}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
+  {% csrf_token %}
+    {{ form.errors }}
+  <div class="span4" >
+    <label>Nombre</label>
+    <div class="input-prepend input-append">
+      {{ form.nombre }}
+    </div>
+  </div>
+  <div id='span_puntos' class="span4" >
+    <label>Puntos Acomulados</label>
+    <div class="input-prepend input-append">
+      {{ form.puntos_acomulados }}
+    </div>
+  </div>
+  <div id='span_puntos' class="span4" >
+    <label>Dinero Elecronico Acomulado</label>
+    <div class="input-prepend input-append">
+      {{ form.dinero_electronico_acomulado }}
+    </div>
+  </div>
+  <div class="span4" style='clear:both;'>
+    <label>Tipo de Tarjeta</label>
+    <div class="input-prepend input-append">
+      {{ form.tipo_tarjeta }}
+    </div>
+  </div>
+  
+  <div id='span_dinero_elecronico' class="span4" >
+    <label>Dinero Elecronico a (% de compras)</label>
+    <div class="input-prepend input-append">
+      {{ form.dinero_electronico }}
+    </div>
+  </div>
+  
+  {% if message %}
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
+    <p>{{ message }}</p>
+  </div>
+  {% endif %}
+  <br style='clear:both;'>
+  <br>
+  <div class="form-actions mainmenu" >
+    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+  </div>
+</form>
+{% endblock %}
