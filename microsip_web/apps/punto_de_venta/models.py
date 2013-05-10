@@ -102,7 +102,7 @@ class Docto_pv_det(models.Model):
     precio_unitario         = models.DecimalField(max_digits=18, decimal_places=6, db_column='PRECIO_UNITARIO')
     precio_unitario_impto   = models.DecimalField(max_digits=18, decimal_places=6, db_column='PRECIO_UNITARIO_IMPTO')
     fpgc_unitario           = models.DecimalField(max_digits=18, decimal_places=6, db_column='FPGC_UNITARIO')
-    porcentaje_descuento     = models.DecimalField(max_digits=9, decimal_places=6, db_column='PCTJE_DSCTO')
+    porcentaje_descuento    = models.DecimalField(max_digits=9, decimal_places=6, db_column='PCTJE_DSCTO')
     precio_total_neto       = models.DecimalField(max_digits=15, decimal_places=2, db_column='PRECIO_TOTAL_NETO')
     precio_modificado       = models.CharField(default='N', max_length=1, db_column='PRECIO_MODIFICADO')
     vendedor                = models.ForeignKey(Vendedor, db_column='VENDEDOR_ID')
@@ -112,6 +112,8 @@ class Docto_pv_det(models.Model):
     es_tran_elect           = models.CharField(default='N', max_length=1, db_column='ES_TRAN_ELECT')
     estatus_tran_elect      = models.CharField(max_length=1, db_column='ESTATUS_TRAN_ELECT')
     posicion                =  models.IntegerField(db_column='POSICION')
+    puntos                  = models.IntegerField(db_column='PUNTOS')
+    dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
 
     def __unicode__(self):
         return u'%s'% self.id 
