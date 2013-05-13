@@ -12,6 +12,7 @@ class ConceptoCc(models.Model):
     cuenta_contable     = models.CharField(max_length=30, db_column='CUENTA_CONTABLE')
     clave_tipo_poliza   = models.CharField(max_length=1, db_column='TIPO_POLIZA')
     descripcion_poliza  = models.CharField(max_length=200, db_column='DESCRIPCION_POLIZA')
+    tipo                = models.CharField(max_length=1, db_column='TIPO')
 
     def __unicode__(self):
         return self.nombre_abrev

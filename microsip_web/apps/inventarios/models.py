@@ -68,8 +68,8 @@ class GrupoLineas(models.Model):
     id                  = models.AutoField(primary_key=True, db_column='GRUPO_LINEA_ID')
     nombre              = models.CharField(max_length=50, db_column='NOMBRE')
     cuenta_ventas       = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
-    puntos              = models.IntegerField(db_column='PUNTOS')
-    dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
+    #puntos              = models.IntegerField(db_column='PUNTOS')
+    #dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
     
     def __unicode__(self):
         return u'%s' % self.nombre
@@ -82,8 +82,8 @@ class LineaArticulos(models.Model):
     nombre              = models.CharField(max_length=50, db_column='NOMBRE')
     cuenta_ventas       = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
     grupo               = models.ForeignKey(GrupoLineas, db_column='GRUPO_LINEA_ID')
-    puntos              = models.IntegerField(db_column='PUNTOS')
-    dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
+    #puntos              = models.IntegerField(db_column='PUNTOS')
+    #dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
     
     def __unicode__(self):
         return u'%s' % self.nombre
@@ -97,9 +97,9 @@ class Articulos(models.Model):
     es_almacenable      = models.CharField(default='S', max_length=1, db_column='ES_ALMACENABLE')
     cuenta_ventas       = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
     linea               = models.ForeignKey(LineaArticulos, db_column='LINEA_ARTICULO_ID')
-    puntos              = models.IntegerField(db_column='PUNTOS')
-    dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
-    maneja_puntos       = models.BooleanField( db_column='MANEJA_PUNTOS')
+    #puntos              = models.IntegerField(db_column='PUNTOS')
+    #dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
+    #maneja_puntos       = models.BooleanField( db_column='MANEJA_PUNTOS')
 
     def __unicode__(self):
         return u'%s' % self.nombre
@@ -529,10 +529,10 @@ class Cliente(models.Model):
     id                          = models.AutoField(primary_key=True, db_column='CLIENTE_ID')
     nombre                      = models.CharField(max_length=100, db_column='NOMBRE')
     cuenta_xcobrar              = models.CharField(max_length=9, db_column='CUENTA_CXC')
-    TIPOS = (('N', 'No Aplica'),('P', 'Puntos'),('D', 'Dinero Electronico'),)
-    puntos_acomulados           = models.IntegerField(db_column='PUNTOS_ACOMULADOS')
-    dinero_electronico_acomulado = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO_ACOMULADO')
-    tipo_tarjeta                = models.CharField(default='N', max_length=1, choices=TIPOS, db_column='TIPO_TARJETA')
+    #TIPOS = (('N', 'No Aplica'),('P', 'Puntos'),('D', 'Dinero Electronico'),)
+    #puntos_acomulados           = models.IntegerField(db_column='PUNTOS_ACOMULADOS')
+    #dinero_electronico_acomulado = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO_ACOMULADO')
+    #tipo_tarjeta                = models.CharField(default='N', max_length=1, choices=TIPOS, db_column='TIPO_TARJETA')
     
     def __unicode__(self):
         return self.nombre

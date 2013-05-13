@@ -380,7 +380,7 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
 			campos_particulares =[]
 
 	elif documento.naturaleza_concepto == 'R':
-		es_contado = False
+		es_contado = True
 		try:
 			campos_particulares = LibresCreditosCC.objects.get(pk=documento.id)
 		except ObjectDoesNotExist:
@@ -389,11 +389,19 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
 	if not campos_particulares == []:
 		campos_particulares = campos_particulares
 
-	importesDocto 		= ImportesDoctosCC.objects.filter(docto_cc=documento)[0]
-	
-	impuestos 			= importesDocto.total_impuestos * documento.tipo_cambio
-	importe_neto 		= importesDocto.importe_neto * documento.tipo_cambio
-	total 				= impuestos + importe_neto
+	importesDocto 		= ImportesDoctosCC.objects.filter(docto_cc=documento)
+
+	impuestos 		= 0
+	importe_neto 	= 0
+	total 			= 0
+	iva_retenido 	= 0
+
+	for importeDocumento in importesDocto:
+		impuestos 			= impuestos + (importeDocumento.total_impuestos * documento.tipo_cambio)
+		importe_neto 		= importe_neto + (importeDocumento.importe_neto * documento.tipo_cambio)
+		iva_retenido		= iva_retenido +importeDocumento.iva_retenido
+
+	total 				= total + impuestos + importe_neto
 	descuento 			= 0
 	clientes 			= 0
 	bancos 				= 0
@@ -405,7 +413,6 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
 	ventas_0_contado	= 0
 	iva_efec_cobrado	= 0
 	iva_pend_cobrar 	= 0
-	iva_retenido		= importesDocto.iva_retenido
 
 	if impuestos <= 0:
 		ventas_0 = importe_neto
@@ -433,7 +440,7 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
 		ventas_0_contado	= ventas_0
 		iva_efec_cobrado 	= impuestos
 		bancos 				= total - descuento
-
+	
 	totales_cuentas, error, msg = agregarTotales(
 		conceptos_poliza 	= conceptos_poliza,
 		totales_cuentas 	= totales_cuentas, 
@@ -472,9 +479,17 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
 
 	importesDocto 		= ImportesDoctosCP.objects.filter(docto_cp=documento)[0]
 	
-	impuestos 			= importesDocto.total_impuestos * documento.tipo_cambio
-	importe_neto 		= importesDocto.importe_neto * documento.tipo_cambio
-	total 				= impuestos + importe_neto
+	impuestos 		= 0
+	importe_neto 	= 0
+	total 			= 0
+	iva_retenido	= 0
+
+	for importeDocumento in importesDocto:
+		impuestos 			= impuestos + (importeDocumento.total_impuestos * documento.tipo_cambio)
+		importe_neto 		= importe_neto + (importeDocumento.importe_neto * documento.tipo_cambio)
+		iva_retenido		= iva_retenido +importeDocumento.iva_retenido
+
+	total 				= total + impuestos + importe_neto
 	descuento 			= 0
 	proveedores 		= 0
 	bancos 				= 0
@@ -486,7 +501,6 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
 	compras_0_contado	= 0
 	iva_pend_pagar 		= 0
 	iva_efec_pagado 	= 0
-	iva_retenido		= importesDocto.iva_retenido
 
 	if impuestos <= 0:
 		compras_0 = importe_neto
@@ -911,7 +925,6 @@ def crear_polizas_contables(origen_documentos, documentos, depto_co, informacion
 		
 		siguente_documento = documentos[(documento_no +1)%len(documentos)]
 		documento_numero = documento_no
-		
 		if origen_documentos == 'cuentas_por_cobrar':
 			totales_cuentas, error, msg = get_totales_documento_cc(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co)
 		elif origen_documentos == 'cuentas_por_pagar':
@@ -993,7 +1006,7 @@ def crear_polizas_contables(origen_documentos, documentos, depto_co, informacion
 					depto_tipoAsiento = cuenta_deptotipoAsiento[1].split(':')
 					depto_co = DeptoCo.objects.get(clave=depto_tipoAsiento[0])
 					tipo_asiento = depto_tipoAsiento[1]
-
+					
 					detalle_poliza = DoctosCoDet(
 						id				= -1,
 						docto_co		= poliza,
