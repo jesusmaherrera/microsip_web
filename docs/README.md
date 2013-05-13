@@ -4,109 +4,104 @@ microsip_web
 INSTALACION DE APLICACION
 
 /////////////RESPALDAR/////////////////
- 1) Respaldar microsip app
-
- 2) Respaldar microsip bases de datos
-
- 3) Respaldar firebird de archivos de programa
+1:Respaldar microsip app
+2:Respaldar microsip bases de datos
+3:Respaldar firebird de archivos de programa
 
 /////////////REINSTALAR FIREBIRD/////////////////
- 4) Reinstalar firbird Server **poner no nada borrar archivos** (EN INSTALCION INDICAR Copiar la libreria cliente de firebird al directorio<system>)
+4:detener firebird en services o servicios
+5:Desinstalar Firebird poner no nada borrar archivos
+6:Reinstalar firbird Server **poner no nada borrar archivos** (EN INSTALCION INDICAR Copiar la libreria cliente de firebird al directorio<system>)
 
-/////////////INTALAR PYTHON, SETUPTOOLS Y PIP ////////////////////
- 5) Instalar python y Agregar en variables de entorno
-	a) Instalar 2.7.3 de la pagina http://www.python.org/download/
-	b) Agregar en variables de entorno de python con "SET PATH=%PATH%;C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;"
-
- 6) Instalar setuptools-0.6c11.win32-py2.7 de la pagina https://pypi.python.org/pypi/setuptools
-
- 7) Copiar carpeta de pip-1.3 a escritorio e instalar pip de carpeta pip-1.3 con python setup.py install porar carpeta pip  de escritorio
+/////////////INTALAR PYTHON ////////////////////
+7:Instalar python 2.7.3
+8:Instalar setuptools-0.6c11.win32-py2.7
+9: Agregar en variables de entorno en path ";C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;" o con "SET PATH=%PATH%;C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;"
+10:copiar carpeta de pip-1.3 a escritorio e instalar pip de carpeta pip-1.3 con python setup.py install porar carpeta pip  de escritorio
 
 /////////////INTALAR APLICACION Y LIBRERIAS NESESARIAS////////////////////
-
- 8) Instalar requerimentos de aplicacion con "pip install -r requirements.txt"
-	copiar carpeta de firebird de instaladores a C:\Python27\Lib\site-packages y C:\Python27\Lib\site-packages\django\db\backends
+11:Instalar requerimentos de aplicacion con "pip install -r requirements.txt"
+copiar carpeta de firebird de instaladores a C:\Python27\Lib\site-packages y C:\Python27\Lib\site-packages\django\db\backends
 
 /////////////SYNCRONISAR BASE DE DATOS PYTHON ////////////////////
- 9) Sincronizar base de datos con python manage.py syncdb
-10) CONFIGURAR INICIADOR DE SERVIDOR CON IP Y RUTAS
+14:sincronizar base de datos con python manage.py syncdb
+15:CONFIGURAR INICIADOR DE SERVIDOR CON IP Y RUTAS
 
-11) 
+
 ////////////////////DEFINIR CAMPOS PARTICULARES PARA TABLAS//////////////////////////////
+16:Definir campos particulares
 
-///////////////////PARA CUENTAS POR COBRAR/////////////////////////////////////////
+PARA CUENTAS POR COBRAR
 
-class LibresCargosCC(models.Model):
-    id            = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')
-    segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
-    segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
-    segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
-    segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
-    segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
-    def __unicode__(self):
-        return u'%s' % self.id
-    class Meta:
-        db_table = u'libres_cargos_cc'
+    class LibresCargosCC(models.Model):
+        id            = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')
+        segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
+        segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
+        segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
+        segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
+        segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
+        def __unicode__(self):
+            return u'%s' % self.id
+        class Meta:
+            db_table = u'libres_cargos_cc'
 
-class LibresCreditosCC(models.Model):
-    id            = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')
-    segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
-    segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
-    segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
-    segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
-    segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
-    def __unicode__(self):
-        return u'%s' % self.id
-    class Meta:
-        db_table = u'libres_creditos_cc'
+    class LibresCreditosCC(models.Model):
+        id            = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')
+        segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
+        segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
+        segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
+        segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
+        segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
+        def __unicode__(self):
+            return u'%s' % self.id
+        class Meta:
+            db_table = u'libres_creditos_cc'
 
-///////////////////PARA CUENTAS POR PAGAR/////////////////////////////////////////
+PARA CUENTAS POR PAGAR
 
-class LibresCargosCP(models.Model):
-    id                      = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')
-    segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
-    segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
-    segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
-    segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
-    segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
- 	
- 	def __unicode__(self):
-        return u'%s' % self.id
-    class Meta:
-        db_table = u'libres_cargos_cp'
+    class LibresCargosCP(models.Model):
+        id                      = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')
+        segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
+        segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
+        segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
+        segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
+        segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
+     	
+     	def __unicode__(self):
+            return u'%s' % self.id
+        class Meta:
+            db_table = u'libres_cargos_cp'
 
-/////////////////PARA VENTAS//////////////////////
+PARA VENTAS
 
-class LibresFacturasV(models.Model):
-    id            = models.AutoField(primary_key=True, db_column='DOCTO_VE_ID')
-    segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
-    segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
-    segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
-    segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
-    segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
-	
-	def __unicode__(self):
-        return u'%s' % self.id
-    class Meta:
-        db_table = u'libres_fac_ve'
+    class LibresFacturasV(models.Model):
+        id            = models.AutoField(primary_key=True, db_column='DOCTO_VE_ID')
+        segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
+        segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
+        segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
+        segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
+        segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
+    	
+    	def __unicode__(self):
+            return u'%s' % self.id
+        class Meta:
+            db_table = u'libres_fac_ve'
 
-class LibresDevFacV(models.Model):
-    id            = models.AutoField(primary_key=True, db_column='DOCTO_VE_ID')
-    segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
-    segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
-    segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
-    segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
-    segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
-    
-    def __unicode__(self):
-        return u'%s' % self.id
-    class Meta:
-        db_table = u'libres_devfac_ve'
+    class LibresDevFacV(models.Model):
+        id            = models.AutoField(primary_key=True, db_column='DOCTO_VE_ID')
+        segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
+        segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
+        segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
+        segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
+        segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
+        
+        def __unicode__(self):
+            return u'%s' % self.id
+        class Meta:
+            db_table = u'libres_devfac_ve'
 
-12) LISTO
+17) LISTO
 
-
-	
 
 CONFIGURACION EN APACHE
 
@@ -164,6 +159,7 @@ Run syncdb
 Reload your data from the fixture using the loaddata management command
 
 
+PLANTILLAS
 
 //////////////////////////////// PLANTILLAS DE VENTAS, CUENTAS POR COBRAR, Y PUNTO DE VENTA /////////////////////////////////////
 
@@ -218,60 +214,13 @@ SEGMENTOS (Fletes, etc...)                         C-A
 
 
 //////PUNTO DE VENTA////////////////////
-TIPOS DE PLIZAS 
+TIPOS DE POLIZAS 
 ventas                      :Ingresos
 devoluciones                :Diario
 Cobros cuentas por cobrar   :Ingresos
 
 
-
-/////////////RESPALDAR/////////////////
-1:Respaldar microsip app
-2:Respaldar microsip bases de datos
-3:Respaldar firebird de archivos de programa
-/////////////REINSTALAR FIREBIRD/////////////////
-4:detener firebird en services o servicios
-5:Desinstalar Firebird poner no nada borrar archivos
-6:Reinstalar firbird Server (EN INSTALCION INDICAR Copiar la libreria cliente de firebird al directorio<system>)
-/////////////INTALAR PYTHON ////////////////////
-7:Instalar python 2.7.3
-8:Instalar setuptools-0.6c11.win32-py2.7
-9: Agregar en variables de entorno en path ";C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;"
-10:copiar carpeta de pip-1.3 a escritorio e instalar pip de carpeta pip-1.3 con python setup.py install porar carpeta pip  de escritorio
-/////////////INTALAR APLICACION Y LIBRERIAS NESESARIAS////////////////////
-11:Instalar requerimentos de aplicacion con "pip install -r requirements.txt"
-12:Si solo se installa django instalar las demas con pip install fdb 
-copiar carpeta de firebird de instaladores a C:\Python27\Lib\site-packages y C:\Python27\Lib\site-packages\django\db\backends
-13:instalar django-dajaxice con "pip install django-dajaxice" 
-14:instalar xlrd  con pip install xlrd
-14:sincronizar base de datos con python manage.py syncdb
-15:CONFIGURAR INICIADOR DE SERVIDOR CON IP Y RUTAS
-
-
-INSTALACION DE APLICACION
-
-/////////////RESPALDAR/////////////////
-1:Respaldar microsip app
-2:Respaldar microsip bases de datos
-3:Respaldar firebird de archivos de programa
-/////////////REINSTALAR FIREBIRD/////////////////
-4:detener firebird en services o servicios
-5:Desinstalar Firebird poner no nada borrar archivos
-6:Reinstalar firbird Server (EN INSTALCION INDICAR Copiar la libreria cliente de firebird al directorio<system>)
-/////////////INTALAR PYTHON ////////////////////
-7:Instalar python 2.7.3
-8:Instalar setuptools-0.6c11.win32-py2.7
-9: Agregar en variables de entorno en path ";C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;"
-10:copiar carpeta de pip-1.3 a escritorio e instalar pip de carpeta pip-1.3 con python setup.py install porar carpeta pip  de escritorio
-/////////////INTALAR APLICACION Y LIBRERIAS NESESARIAS////////////////////
-11:Instalar requerimentos de aplicacion con "pip install -r requirements.txt"
-copiar carpeta de firebird de instaladores a C:\Python27\Lib\site-packages y C:\Python27\Lib\site-packages\django\db\backends
-/////////////SYNCRONISAR BASE DE DATOS PYTHON ////////////////////
-14:sincronizar base de datos con python manage.py syncdb
-15:CONFIGURAR INICIADOR DE SERVIDOR CON IP Y RUTAS
-
-
-#############APLICACION DE PUNTOS###############################
+############# APLICACION DE PUNTOS###############################
 Cada ves que se agrege un detalla a una venta se agreggran sus puntos:
 
 Instalacion:

@@ -88,9 +88,10 @@ class DoctosCp(models.Model):
 class ImportesDoctosCP(models.Model):
     id              = models.AutoField(primary_key=True, db_column='IMPTE_DOCTO_CP_ID')
     docto_cp        = models.ForeignKey(DoctosCp, db_column='DOCTO_CP_ID')
-    importe_neto    = models.DecimalField(max_digits=15, decimal_places=2, db_column='IMPORTE')
+    importe         = models.DecimalField(max_digits=15, decimal_places=2, db_column='IMPORTE')
     total_impuestos = models.DecimalField(max_digits=15, decimal_places=2, db_column='IMPUESTO')
     iva_retenido    = models.DecimalField(max_digits=15, decimal_places=2, db_column='IVA_RETENIDO')
+    cancelado       = models.CharField(default='N', max_length=1, db_column='CANCELADO')
     
     class Meta:
         db_table = u'importes_doctos_cp'

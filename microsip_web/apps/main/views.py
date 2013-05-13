@@ -389,19 +389,19 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
 	if not campos_particulares == []:
 		campos_particulares = campos_particulares
 
-	importesDocto 		= ImportesDoctosCC.objects.filter(docto_cc=documento)
+	importesDocto 		= ImportesDoctosCC.objects.filter(docto_cc=documento, cancelado='N')
 
 	impuestos 		= 0
-	importe_neto 	= 0
+	importe 	= 0
 	total 			= 0
 	iva_retenido 	= 0
 
 	for importeDocumento in importesDocto:
 		impuestos 			= impuestos + (importeDocumento.total_impuestos * documento.tipo_cambio)
-		importe_neto 		= importe_neto + (importeDocumento.importe_neto * documento.tipo_cambio)
+		importe 		= importe + (importeDocumento.importe * documento.tipo_cambio)
 		iva_retenido		= iva_retenido +importeDocumento.iva_retenido
 
-	total 				= total + impuestos + importe_neto
+	total 				= total + impuestos + importe
 	descuento 			= 0
 	clientes 			= 0
 	bancos 				= 0
@@ -415,9 +415,9 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
 	iva_pend_cobrar 	= 0
 
 	if impuestos <= 0:
-		ventas_0 = importe_neto
+		ventas_0 = importe
 	else:
-		ventas_16 = importe_neto
+		ventas_16 = importe
 
 	#si llega a  haber un proveedor que no tenga cargar impuestos
 	if ventas_16 < 0:
@@ -477,19 +477,19 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
 	else:
 		es_contado = False
 
-	importesDocto 		= ImportesDoctosCP.objects.filter(docto_cp=documento)[0]
+	importesDocto 		= ImportesDoctosCP.objects.filter(docto_cp=documento, cancelado='N')
 	
 	impuestos 		= 0
-	importe_neto 	= 0
+	importe 		= 0
 	total 			= 0
 	iva_retenido	= 0
 
 	for importeDocumento in importesDocto:
 		impuestos 			= impuestos + (importeDocumento.total_impuestos * documento.tipo_cambio)
-		importe_neto 		= importe_neto + (importeDocumento.importe_neto * documento.tipo_cambio)
+		importe 			= importe + (importeDocumento.importe * documento.tipo_cambio)
 		iva_retenido		= iva_retenido +importeDocumento.iva_retenido
 
-	total 				= total + impuestos + importe_neto
+	total 				= total + impuestos + importe
 	descuento 			= 0
 	proveedores 		= 0
 	bancos 				= 0
@@ -503,9 +503,9 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
 	iva_efec_pagado 	= 0
 
 	if impuestos <= 0:
-		compras_0 = importe_neto
+		compras_0 = importe
 	else:
-		compras_16 = importe_neto
+		compras_16 = importe
 
 	#si llega a  haber un proveedor que no tenga cargar impuestos
 	if compras_16 < 0:

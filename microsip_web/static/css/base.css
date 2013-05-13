@@ -151,6 +151,7 @@ background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAA
 
 .labelMenu {
     display:inline-block;
+    vertical-align: bottom;
 }
 
 
