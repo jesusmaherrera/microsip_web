@@ -46,12 +46,12 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required(login_url='/login/')
 def inicializar_puntos_clientes(request):
-	Cliente.objects.update(puntos=0)
+	Cliente.objects.update(puntos_acomulados=0, dinero_electronico_acomulado=0)
 	return HttpResponseRedirect('/main/clientes/')
 
 @login_required(login_url='/login/')
 def articulos_view(request, template_name='main/articulos/articulos/articulos.html'):
-	articulos_list = Articulos.objects.all()
+	articulos_list = Articulos.objects.all().order_by('nombre')
 
 	paginator = Paginator(articulos_list, 20) # Muestra 10 ventas por pagina
 	page = request.GET.get('page')

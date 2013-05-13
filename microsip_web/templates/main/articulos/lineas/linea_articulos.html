@@ -7,7 +7,7 @@
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
 
-{% block breadcrumb %}{{ block.super }} <a href="/main/lineas_articulos/">Lineas Articulos</a> > Linea Articulo{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/main/lineas_articulos/">Lineas Articulos</a> <i class=" icon-play"></i> Linea Articulo{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
   {% csrf_token %}
@@ -16,6 +16,12 @@
     <label>Nombre</label>
     <div class="input-prepend input-append">
       {{ form.nombre }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Grupo <a href="/main/grupo_lineas/{{form.grupo.value}}">Ir a Grupo</a></label>
+    <div class="input-prepend input-append">
+      {{ form.grupo }}
     </div>
   </div>
   <div class="span4" >

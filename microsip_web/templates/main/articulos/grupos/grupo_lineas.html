@@ -7,7 +7,7 @@
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
 
-{% block breadcrumb %}{{ block.super }} <a href="/main/grupos_lineas/">Grupos lineas</a> > Grupo Linea{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/main/grupos_lineas/">Grupos lineas</a> <i class=" icon-play"></i> Grupo Linea{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
   {% csrf_token %}

@@ -7,7 +7,7 @@
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
 
-{% block breadcrumb %}{{ block.super }} linea_articulos {% endblock %}
+{% block breadcrumb %}{{ block.super }}  Lineas Articulos {% endblock %}
 {% block content %}
 <div class="form-actions mainmenu">
   <!-- <a class="btn btn-success" href="/main/linea_articulos/">Nuevo</a> -->
@@ -16,6 +16,7 @@
     <tr>
       <th>Nombre</th>
       <th>Puntos</th>
+      <th>Dinero Electronico</th>
       <th>Opciones</th>
     </tr>
     {% for linea_articulos in lineas_articulos%}
@@ -35,7 +36,8 @@
     </div>
     <tr>
       <td><a href="/main/linea_articulos/{{ linea_articulos.id }}/">{{ linea_articulos.nombre }}</a></td>
-      <td>{{linea_articulos.puntos }}</td>
+      <td>{{ linea_articulos.puntos }}</td>
+      <td>{{ linea_articulos.dinero_electronico }}</td>
       <td style="text-align:center;">
         <!-- <a href='#myModal{{ linea_articulos.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a> -->
       </td>
