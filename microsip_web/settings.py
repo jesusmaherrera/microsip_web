@@ -176,12 +176,12 @@ DJANGO_APPS = (
 MICROSIP_MODULES = (
     # Modules created for microsip and installed by default. You can add
     'microsip_web.apps.main',
-    'microsip_web.apps.inventarios',
-    'microsip_web.apps.ventas',
+    #'microsip_web.apps.inventarios',
+    #'microsip_web.apps.ventas',
     'microsip_web.apps.cuentas_por_pagar',
     'microsip_web.apps.cuentas_por_cobrar',
-    'microsip_web.apps.contabilidad',
-    'microsip_web.apps.punto_de_venta',    
+    #'microsip_web.apps.contabilidad',
+    #'microsip_web.apps.punto_de_venta',    
 )
 
 # A sample logging configuration. The only tangible logging
