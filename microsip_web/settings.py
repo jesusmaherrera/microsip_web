@@ -28,9 +28,9 @@ DATABASES = {
     'default': {
        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
        #D2007(POLISAS)0_9
-        'NAME': 'C:\Microsip datos\AD2007(POLISAS)0_9.fdb', # Or path to database file if using sqlite3.
+        #'NAME': 'C:\Microsip datos\AD2007(POLISAS)0_9.fdb', # Or path to database file if using sqlite3.
         #RAFISA
-        #'NAME': 'C:\Microsip datos\RAFISA.fdb', # Or path to database file if using sqlite3.
+        'NAME': 'C:\Microsip datos\RAFISA.fdb', # Or path to database file if using sqlite3.
         #ESSEX
         #'NAME': 'C:\Microsip datos\ESSEX.fdb', # Or path to database file if using sqlite3.
         'USER': 'SYSDBA',                      # Not used with sqlite3.
@@ -176,11 +176,11 @@ DJANGO_APPS = (
 MICROSIP_MODULES = (
     # Modules created for microsip and installed by default. You can add
     'microsip_web.apps.main',
-    #'microsip_web.apps.inventarios',
-    #'microsip_web.apps.ventas',
+    'microsip_web.apps.inventarios',
+    'microsip_web.apps.ventas',
     'microsip_web.apps.cuentas_por_pagar',
     'microsip_web.apps.cuentas_por_cobrar',
-    #'microsip_web.apps.contabilidad',
+    'microsip_web.apps.contabilidad',
     #'microsip_web.apps.punto_de_venta',    
 )
 

@@ -17,8 +17,8 @@
       {
         $('#id_plantilla_2').show();
         $('#id_plantilla').show(); 
-        Dajaxice.ventas.obtener_plantillas(cargar_plantillas_1, {'tipo_plantilla': 'F'});
-        Dajaxice.ventas.obtener_plantillas(cargar_plantillas_2, {'tipo_plantilla': 'D'});
+        Dajaxice.microsip_web.apps.ventas.obtener_plantillas(cargar_plantillas_1, {'tipo_plantilla': 'F'});
+        Dajaxice.microsip_web.apps.ventas.obtener_plantillas(cargar_plantillas_2, {'tipo_plantilla': 'D'});
       }
       else if ($('#id_crear_polizas_de').val() == 'D')
       {
@@ -29,7 +29,7 @@
       {
         $('#id_plantilla_2').hide(); 
         $('#id_plantilla').show(); 
-        Dajaxice.ventas.obtener_plantillas(cargar_plantillas_1, {'tipo_plantilla': $('#id_crear_polizas_de').val()});
+        Dajaxice.microsip_web.apps.ventas.obtener_plantillas(cargar_plantillas_1, {'tipo_plantilla': $('#id_crear_polizas_de').val()});
       }
         
       $('#id_crear_polizas_de').change(function(event){
@@ -37,8 +37,8 @@
         {
           $('#id_plantilla_2').show();
           $('#id_plantilla').show(); 
-          Dajaxice.ventas.obtener_plantillas(cargar_plantillas_1, {'tipo_plantilla': 'F'});
-          Dajaxice.ventas.obtener_plantillas(cargar_plantillas_2, {'tipo_plantilla': 'D'});
+          Dajaxice.microsip_web.apps.ventas.obtener_plantillas(cargar_plantillas_1, {'tipo_plantilla': 'F'});
+          Dajaxice.microsip_web.apps.ventas.obtener_plantillas(cargar_plantillas_2, {'tipo_plantilla': 'D'});
         }
         else if ($('#id_crear_polizas_de').val() == 'D')
         {
@@ -49,7 +49,7 @@
         {
           $('#id_plantilla_2').hide(); 
           $('#id_plantilla').show(); 
-          Dajaxice.ventas.obtener_plantillas(cargar_plantillas_1, {'tipo_plantilla': $('#id_crear_polizas_de').val()});
+          Dajaxice.microsip_web.apps.ventas.obtener_plantillas(cargar_plantillas_1, {'tipo_plantilla': $('#id_crear_polizas_de').val()});
         }
 
         
