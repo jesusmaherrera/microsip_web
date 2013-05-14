@@ -64,6 +64,10 @@ footer
   background-image: url("../img/iconos-microsip.png");
 }
 
+.msicon-logout 
+{
+  background-position: -4px -299px;
+}
 
 .msicon-inventarios 
 {

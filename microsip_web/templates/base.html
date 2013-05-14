@@ -72,9 +72,9 @@
           <div id=" span breadcrumbs" style="margin-left: 35px;">
             <div class ='span'style="text-align:right; height:2em; margin-right: 2em; margin-top: 6px; vertical-align:bottom;">
               {% if not user.is_anonymous %}
-              {{ user.username }} <a class="btn btn-small btn-danger" href="/logout/">  Cerrar Sesión</a>
+              {{ user.username }} <a href="/logout/"><i class="msicon-logout"></i></a>
               {% else %}
-              <a class="btn btn-small btn-success" href="/inventarios/login/">Iniciar Sesión</a>
+              <a class="btn btn-small btn-success" href="/login/">Iniciar Sesión</a>
               {% endif %}
             </div>
           </div>
