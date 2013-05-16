@@ -87,6 +87,14 @@
 
 </div>
 {% endif %}
+
+{% if msg_informacion %}
+<div class="alert alert-success fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Bien hecho!! </strong> {{ msg_informacion }}
+</div>
+{% endif %}
+
 {{ form.errors }}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
   {% csrf_token %}
@@ -150,7 +158,7 @@ Se generaron las siguientes polizas
 <hr >
 <table class="table tableCell table-hover">
     <tr>
-      	<th>FOLIO</th>
+      	<th>Folios de polizas generadas</th>
     </tr>
 	{% for documento in documentos %}
 	<tr>
@@ -165,7 +173,7 @@ Se generaron las siguientes polizas
 
 <table class="table tableCell table-hover">
     <tr>
-        <th>FOLIO</th>
+        <th>Folios de polizas generadas</th>
     </tr>
   {% for documento in polizas_de_devoluciones %}
   <tr>

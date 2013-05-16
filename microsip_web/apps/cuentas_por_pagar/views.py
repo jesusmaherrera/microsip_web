@@ -71,7 +71,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 def generar_polizas_View(request, template_name='cuentas_por_pagar/herramientas/generar_polizas.html'):
 	
 	documentosData 	= []
-	msg 			= msg_resultados = ''
+	msg 			= msg_resultados = msg_informacion = ''
 
 	if request.method == 'POST':
 		
@@ -90,10 +90,14 @@ def generar_polizas_View(request, template_name='cuentas_por_pagar/herramientas/
 			documentosData, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla, descripcion)
 			if documentosData == []:
 				msg_resultados = 'Lo siento, no se encontraron resultados para este filtro'
+			else:
+				form = GenerarPolizasManageForm()		
+				msg_informacion = 'Polizas generadas satisfactoriamente, *Ahora revisa las polizas pendientes generadas en el modulo de contabilidad'
+
 	else:
 		form = GenerarPolizasManageForm()
 
-	c = {'documentos':documentosData,'msg':msg,'form':form, 'msg_resultados':msg_resultados,}
+	c = {'documentos':documentosData,'msg':msg,'form':form, 'msg_resultados':msg_resultados,'msg_informacion':msg_informacion,}
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################

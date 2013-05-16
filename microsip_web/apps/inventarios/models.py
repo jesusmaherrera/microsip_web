@@ -325,9 +325,11 @@ class CuentasBancarias(models.Model):
         db_table = u'cuentas_bancarias'
 
 class CuentaCo(models.Model):
-    id = models.AutoField(primary_key=True, db_column='CUENTA_ID')
-    nombre = models.CharField(max_length=50, db_column='NOMBRE')
-    cuenta = models.CharField(max_length=50, db_column='CUENTA_PT')
+    id              = models.AutoField(primary_key=True, db_column='CUENTA_ID')
+    nombre          = models.CharField(max_length=50, db_column='NOMBRE')
+    cuenta          = models.CharField(max_length=50, db_column='CUENTA_PT')
+    tipo            = models.CharField(max_length=1, db_column='TIPO')
+    cuenta_padre    = models.IntegerField(db_column='CUENTA_PADRE_ID')
     
     def __unicode__(self):
         return u'%s (%s)' % (self.cuenta, self.nombre)
@@ -440,7 +442,7 @@ class DoctosIn(models.Model):
     descripcion         = models.CharField(blank=True, null=True, max_length=200, db_column='DESCRIPCION')
     concepto            = models.ForeignKey(ConceptosIn, db_column='CONCEPTO_IN_ID')
     naturaleza_concepto = models.CharField(default='S', max_length=1, db_column='NATURALEZA_CONCEPTO')
-    fecha               = models.DateField(auto_now=True, db_column='FECHA') 
+    fecha               = models.DateField(db_column='FECHA') 
     cancelado           = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='CANCELADO')
     aplicado            = models.CharField(default='S',blank=True, null=True, max_length=1, db_column='APLICADO')
     forma_emitida       = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='FORMA_EMITIDA')
@@ -458,7 +460,7 @@ class DoctosInvfis(models.Model):
     id                  = models.AutoField(primary_key=True, db_column='DOCTO_INVFIS_ID')
     almacen             = models.ForeignKey(Almacenes, db_column='ALMACEN_ID')
     folio               = models.CharField(max_length=9, db_column='FOLIO')
-    fecha               = models.DateField(auto_now=True, db_column='FECHA') 
+    fecha               = models.DateField(db_column='FECHA') 
     cancelado           = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='CANCELADO')
     aplicado            = models.CharField(default='N',blank=True, null=True, max_length=1, db_column='APLICADO')
     descripcion         = models.CharField(blank=True, null=True, max_length=200, db_column='DESCRIPCION')
@@ -499,7 +501,7 @@ class DoctosInDet(models.Model):
     costeo_pend     = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='COSTEO_PEND')
     pedimento_pend  = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='PEDIMENTO_PEND')
     rol             = models.CharField(default='N', max_length=1, db_column='ROL')
-    fecha           = models.DateField(auto_now=True, blank=True, null=True, db_column='FECHA') 
+    fecha           = models.DateField(blank=True, null=True, db_column='FECHA') 
     #centros_costo = models.ForeignKey(CentrosCosto, db_column='CENTRO_COSTO_ID', blank=True, null=True,)
 
     class Meta:

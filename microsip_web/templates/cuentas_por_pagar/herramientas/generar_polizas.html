@@ -51,6 +51,13 @@
 </div>
 {% endif %}
 
+{% if msg_informacion %}
+<div class="alert alert-success fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Bien hecho!! </strong> {{ msg_informacion }}
+</div>
+{% endif %}
+
 {{ form.errors }}
 <form method="post" id='formulario'class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
   {% csrf_token %}
@@ -110,11 +117,11 @@
   <br style='clear:both;'>
   <hr >
 </form>
-
 <table class="table tableCell table-hover">
+
   {%if documentos %}
     <tr>
-      	<th>FOLIO</th>
+      	<th>Folios de polizas generadas</th>
       	<th></th><!-- 
       	<th>VENTAS_0</th>
       	<th>VENTAS_16</th> -->

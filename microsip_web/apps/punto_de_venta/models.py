@@ -30,7 +30,7 @@ class Docto_PV(models.Model):
     caja                    = models.ForeignKey(Caja, db_column='CAJA_ID')
     tipo                    = models.CharField(max_length=1, db_column='TIPO_DOCTO')
     folio                   = models.CharField(max_length=9, db_column='FOLIO')
-    fecha                   = models.DateField(auto_now=True,db_column='FECHA')
+    fecha                   = models.DateField(db_column='FECHA')
     hora                    = models.TimeField(auto_now=True, db_column='HORA')
     cajero                  = models.ForeignKey(Cajero, db_column='CAJERO_ID')
     clave_cliente           = models.CharField(max_length=20, db_column='CLAVE_CLIENTE')

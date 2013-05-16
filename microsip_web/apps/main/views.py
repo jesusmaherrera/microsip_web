@@ -1034,8 +1034,8 @@ def crear_polizas_contables(origen_documentos, documentos, depto_co, informacion
 					'folio'		:poliza.poliza,
 					})
 
- 			DoctosCc.objects.filter(id=documento.id).update(contabilizado = 'S')
- 	
+			documento.contabilizado ='S'
+			documento.save()
  	if error == 0:
 		DoctoCo.objects.bulk_create(polizas)
 		DoctosCoDet.objects.bulk_create(detalles_polizas)

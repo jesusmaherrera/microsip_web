@@ -100,7 +100,8 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 def facturas_View(request, template_name='ventas/herramientas/generar_polizas.html'):
 	documentosData = []
 	polizas_de_devoluciones = []
-	msg 			= ''
+	msg 			= msg_informacion =''
+	error = 0
 
 	if request.method == 'POST':
 		form = GenerarPolizasManageForm(request.POST)
@@ -129,10 +130,13 @@ def facturas_View(request, template_name='ventas/herramientas/generar_polizas.ht
 			if crear_polizas_de == 'FD' and documentosData == [] and polizas_de_devoluciones == []:
 				msg = 'Lo siento, no se encontraron facturas ni devoluciones para este filtro'
 			
+			if (not documentosData == [] or not polizas_de_devoluciones == []) and error == 0:
+				form = GenerarPolizasManageForm()		
+				msg_informacion = 'Polizas generadas satisfactoriamente, *Ahora revisa las polizas pendientes generadas en el modulo de contabilidad'
 	else:
 		form = GenerarPolizasManageForm()
 	
-	c = {'documentos':documentosData, 'polizas_de_devoluciones':polizas_de_devoluciones,'msg':msg,'form':form,}
+	c = {'documentos':documentosData, 'polizas_de_devoluciones':polizas_de_devoluciones,'msg':msg,'form':form,'msg_informacion':msg_informacion,}
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################

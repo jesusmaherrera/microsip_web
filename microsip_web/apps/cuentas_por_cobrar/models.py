@@ -25,7 +25,7 @@ class DoctosCc(models.Model):
     concepto            = models.ForeignKey(ConceptoCc, db_column='CONCEPTO_CC_ID')
     folio               = models.CharField(max_length=9, db_column='FOLIO')
     naturaleza_concepto = models.CharField(max_length=1, db_column='NATURALEZA_CONCEPTO')
-    fecha               = models.DateField(auto_now=True, db_column='FECHA') 
+    fecha               = models.DateField(db_column='FECHA') 
     cliente           	= models.ForeignKey(Cliente, db_column='CLIENTE_ID')
     cancelado           = models.CharField(default='N', max_length=1, db_column='CANCELADO')
     aplicado            = models.CharField(default='S', max_length=1, db_column='APLICADO')

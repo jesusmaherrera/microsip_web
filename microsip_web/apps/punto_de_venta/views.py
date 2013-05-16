@@ -84,7 +84,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 def generar_polizas_View(request, template_name='punto_de_venta/herramientas/generar_polizas.html'):
 	polizas_ventas	= []
 	error 			= 0
-	msg 	 		= ''
+	msg 	 		= msg_informacion =''
 
 	if request.method == 'POST':
 		form = GenerarPolizasManageForm(request.POST)
@@ -116,12 +116,15 @@ def generar_polizas_View(request, template_name='punto_de_venta/herramientas/gen
 				error =1
 				msg = 'Seleciona una plantilla'
 
-			if polizas_ventas== [] and not error == 1:
+			if polizas_ventas == [] and not error == 1:
 				msg = 'Lo siento, no se encontraron documentos para ralizar polizas con este filtro'
+			elif not polizas_ventas == [] and not error == 1:
+				form = GenerarPolizasManageForm()		
+				msg_informacion = 'Polizas generadas satisfactoriamente, *Ahora revisa las polizas pendientes generadas en el modulo de contabilidad'
 	else:
 		form = GenerarPolizasManageForm()
 	
-	c = {'documentos':polizas_ventas,'msg':msg,'form':form,}
+	c = {'documentos':polizas_ventas,'msg':msg,'form':form,'msg_informacion':msg_informacion,}
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################

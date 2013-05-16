@@ -69,10 +69,17 @@ class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
 	posicion  		=  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
 	asiento_ingora 	= forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
 
-
 	class Meta:
 		widgets = autocomplete_light.get_widgets_dict(DetallePlantillaPolizas_CP)
 		model = DetallePlantillaPolizas_CP
+
+	def clean_cuenta_co(self):
+	    cuenta_co = self.cleaned_data['cuenta_co']
+	   
+	    if CuentaCo.objects.filter(cuenta_padre=cuenta_co.id).count() > 0:
+	    	raise forms.ValidationError(u'la cuenta contable (%s) no es de ultimo nivel, por favor seleciona una cuenta de ultimo nivel' % cuenta_co )
+
+	    return cuenta_co
 
 def PlantillaPoliza_items_formset(form, formset = BaseInlineFormSet, **kwargs):
 	return inlineformset_factory(PlantillaPolizas_CP, DetallePlantillaPolizas_CP, form, formset, **kwargs)

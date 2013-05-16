@@ -23,4 +23,10 @@ function ajustarFormulario(selecion) {
     $(selecion).parent().parent().find("select[name*='valor_iva']").show();
     $(selecion).parent().parent().find("input[name*='asiento_ingora']").hide(); 
   }
+  else if($(selecion).val() == "" )
+  {
+    $(selecion).parent().parent().find("select[name*='valor_contado_credito']").hide();
+    $(selecion).parent().parent().find("select[name*='valor_iva']").hide();
+    $(selecion).parent().parent().find("input[name*='asiento_ingora']").hide(); 
+  }
 }

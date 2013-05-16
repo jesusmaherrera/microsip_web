@@ -70,7 +70,7 @@ class DoctosCp(models.Model):
     concepto            = models.ForeignKey(ConceptoCp, db_column='CONCEPTO_CP_ID')
     folio               = models.CharField(max_length=9, db_column='FOLIO')
     naturaleza_concepto = models.CharField(max_length=1, db_column='NATURALEZA_CONCEPTO')
-    fecha               = models.DateField(auto_now=True, db_column='FECHA') 
+    fecha               = models.DateField(db_column='FECHA') 
     proveedor           = models.ForeignKey(Proveedor, db_column='PROVEEDOR_ID')
     cancelado           = models.CharField(default='N', max_length=1, db_column='CANCELADO')
     aplicado            = models.CharField(default='S', max_length=1, db_column='APLICADO')
