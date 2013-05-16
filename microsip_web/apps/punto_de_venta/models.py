@@ -31,7 +31,7 @@ class Docto_PV(models.Model):
     tipo                    = models.CharField(max_length=1, db_column='TIPO_DOCTO')
     folio                   = models.CharField(max_length=9, db_column='FOLIO')
     fecha                   = models.DateField(db_column='FECHA')
-    hora                    = models.TimeField(auto_now=True, db_column='HORA')
+    hora                    = models.TimeField(db_column='HORA')
     cajero                  = models.ForeignKey(Cajero, db_column='CAJERO_ID')
     clave_cliente           = models.CharField(max_length=20, db_column='CLAVE_CLIENTE')
     cliente                 = models.ForeignKey(Cliente, db_column='CLIENTE_ID', related_name='cliente')
@@ -73,7 +73,7 @@ class Docto_PV(models.Model):
     modalidad_facturacion   = models.CharField(max_length=10, db_column='MODALIDAD_FACTURACION')
     enviado                 = models.CharField(default='N', max_length=1, db_column='ENVIADO')
     email_envio             = models.EmailField(db_column='EMAIL_ENVIO')
-    fecha_envio             = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='FECHA_HORA_ENVIO')
+    fecha_envio             = models.DateTimeField(blank=True, null=True, db_column='FECHA_HORA_ENVIO')
 
     usuario_creador         = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_CREADOR')
     fechahora_creacion      = models.DateTimeField(blank=True, null=True, db_column='FECHA_HORA_CREACION')
@@ -83,7 +83,7 @@ class Docto_PV(models.Model):
     usuario_aut_modif       = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_AUT_MODIF')
 
     usuario_cancelacion     = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_CANCELACION')
-    fechahora_cancelacion   = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='FECHA_HORA_CANCELACION')
+    fechahora_cancelacion   = models.DateTimeField(blank=True, null=True, db_column='FECHA_HORA_CANCELACION')
     usuario_aut_cancelacion = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_AUT_CANCELACION')
     
     def __unicode__(self):
