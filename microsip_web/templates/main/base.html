@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Principal{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+{% block modulestyle_css %}
+{% endblock %}
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+{% block breadcrumb %}{{ block.super }} {% endblock %}
+{% block tools-module %}
+<div class="navbar navbar-static">
+  <!-- <ul class="nav" role="navigation">
+  <li class="dropdown">
+    <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> 
+      Catalogos <b class="caret"></b></a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+      <li><a tabindex="-1" href="/main/articulos/">Articulos</a></li>
+      <li><a tabindex="-1" href="/main/lineas_articulos/">Lineas</a></li>
+      <li><a tabindex="-1" href="/main/grupos_lineas/">Grupos</a></li>
+      <li role="presentation" class="divider"></li>
+      <li><a tabindex="-1" href="/main/clientes/">Clientes</a></li>
+    </ul>
+  </li>
+  </ul>
+  <ul class="nav pull-right">
+    <li class="dropdown">
+      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i> Herramientas <b class="caret"></b></a>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+        <li><a tabindex="-1" href="#myModal" data-toggle="modal">Inicializar puntos de clientes</a></li>
+        <li role="presentation" class="divider"></li>
+      </ul>
+    </li>
+  </ul> -->
+</div>
+
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="myModalLabel">Seguro que Deseas inicializar los puntos de los clientes</h3>
+      </div>
+      <div class="modal-body">
+        <h4>Al Inicializar los puntos de los cliente</h4>
+        <p style="color:red;">Se eliminaran puntos y dinero elecronico de "TODOS" los clientes</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Cancelar</button>
+        <a href="/main/inicializar_puntos_clientes" class="btn btn-primary">Estoy Seguro</a>
+      </div>
+</div>
+
+{% endblock %}
+{% block content %}
+
+{% endblock %}

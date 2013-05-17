@@ -1,0 +1,71 @@
+{% extends "inventarios/base.html" %}
+{% block title %}Inicio{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} salidas {% endblock %}
+{% block content %}
+<div class="form-actions mainmenu">
+  <a class="btn btn-success" href="/inventarios/Salida/">Nueva</a>
+</div>
+<table class="table tableCell table-hover">
+    <tr>
+      <th>ID</th>
+      <th>FOLIO</th>
+      <th>FECHA</th>
+      <th>DESCRIPCION</th>
+      <th>APLICADO</th>
+      <th>OPCIONES</th>
+    </tr>
+    {% for salida in salidas%}
+    <div id="myModal{{ salida.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
+      </div>
+      <div class="modal-body">
+        <h4>Al eliminar la salida con el folio: {{ salida.folio }}</h4>
+        <p style="color:red;">Ya no sera posible recuperar los datos del inventario</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Cancelar</button>
+        <a href="/inventarios/Salida/Delete/{{ salida.id }}/" class="btn btn-primary">Estoy Seguro</a>
+      </div>
+    </div>
+    <tr>
+      <td>
+        <a href="/inventarios/Salida/{{ salida.id }}/">{{ salida.id }}</a>
+      </td>
+      <td>{{ salida.folio }}</td>
+      <td>{{ salida.fecha }}</td>
+      <td>{{ salida.descripcion }}</td>
+      <td>{{ salida.aplicado }}</td>
+      <td style="text-align:center;">
+        <a href='#myModal{{ salida.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
+      </td>
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if salidas.has_previous %}
+        <li><a href="?page={{ salidas.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ salidas.number }} de {{ salidas.paginator.num_pages }}.</a></li>
+        {% if salidas.has_next %}
+        <li><a href="?page={{ salidas.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

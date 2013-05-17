@@ -1,0 +1,81 @@
+{% extends "cuentas_por_pagar/base.html" %}
+{% block title %}Proveedor{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} <a href="/cuentas_por_pagar/proveedores/">Proveedores</a> > Proveedor{% endblock %}
+{% block content %}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
+  {% csrf_token %}
+  <div class="form-actions mainmenu">
+    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+  </div>
+    {{ form.errors }}
+  
+  <div class="span4" >
+    <label>Nombre</label>
+    <div class="input-prepend input-append">
+      {{ form.nombre }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Moneda</label>
+    <div class="input-prepend input-append">
+      {{ form.moneda }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Ciudad</label>
+    <div class="input-prepend input-append">
+      {{ form.ciudad }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Cuenta por pagar</label>
+    <div class="input-prepend input-append">
+      {{ form.cuenta_xpagar }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Tipo</label>
+    <div class="input-prepend input-append">
+      {{ form.tipo }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Actividad principal</label>
+    <div class="input-prepend input-append">
+      {{ form.actividad_principal }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Condicion de pago</label>
+    <div class="input-prepend input-append">
+      {{ form.condicion_de_pago}}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>RFC</label>
+    <div class="input-prepend input-append">
+      {{ form.rfc_curp }}
+    </div>
+  </div>
+  {% if message %}
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
+    <p>{{ message }}</p>
+  </div>
+  {% endif %}
+  <br style='clear:both;'>
+  <br>
+  <div class="form-actions mainmenu" >
+    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+  </div>
+</form>
+{% include 'autocomplete_light/static.html' %}
+{% endblock %}

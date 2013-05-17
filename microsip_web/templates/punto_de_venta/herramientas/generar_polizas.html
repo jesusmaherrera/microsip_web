@@ -1,0 +1,162 @@
+{% extends "punto_de_venta/base.html" %}
+{% block title %}Inicio{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}
+{% endblock %}
+<!-- JavaScript Code -->
+{% block js_code %}
+<script>
+  $(function() {
+    $( "#id_fecha_ini" ).datepicker({dateFormat:'dd/mm/yy',});
+    $( "#id_fecha_fin" ).datepicker({dateFormat:'dd/mm/yy',});
+  });
+
+  $(document).ready(function() {
+      $('#id_plantilla_ventas').hide();
+      $('#id_plantilla_devoluciones').hide();
+      $('#id_plantilla_cobros_cc').hide();
+
+      if ($('#id_crear_polizas_de').val()=='V')
+      {
+        $('#id_plantilla_ventas').show();
+        $('#id_plantilla_devoluciones').hide();
+        $('#id_plantilla_cobros_cc').hide();
+      }
+      else if($('#id_crear_polizas_de').val()=='D')
+      {
+        $('#id_plantilla_ventas').hide();
+        $('#id_plantilla_devoluciones').show();
+        $('#id_plantilla_cobros_cc').hide();
+      }
+      else if($('#id_crear_polizas_de').val()=='P')
+      {
+        $('#id_plantilla_ventas').hide();
+        $('#id_plantilla_devoluciones').hide();
+        $('#id_plantilla_cobros_cc').show();
+      }
+
+      $('#id_crear_polizas_de').change(function(event){
+        $('#id_plantilla_ventas').hide();
+        $('#id_plantilla_devoluciones').hide();
+        $('#id_plantilla_cobros_cc').hide();
+
+        if ($('#id_crear_polizas_de').val()=='V')
+        {
+          $('#id_plantilla_ventas').show();
+          $('#id_plantilla_devoluciones').hide();
+          $('#id_plantilla_cobros_cc').hide();
+        }
+        else if($('#id_crear_polizas_de').val()=='D')
+        {
+          $('#id_plantilla_ventas').hide();
+          $('#id_plantilla_devoluciones').show();
+          $('#id_plantilla_cobros_cc').hide();
+        }
+        else if($('#id_crear_polizas_de').val()=='P')
+        {
+          $('#id_plantilla_ventas').hide();
+          $('#id_plantilla_devoluciones').hide();
+          $('#id_plantilla_cobros_cc').show();
+        }
+
+      });
+  });
+</script>
+{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Generar Pólizas Contables {% endblock %}
+{% block content %}
+
+{% if msg %}
+<div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Ocurio un Problema!</strong> {{ msg }}
+</div>
+{% endif %}
+{% if msg_informacion %}
+<div class="alert alert-success fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Bien hecho!! </strong> {{ msg_informacion }}
+</div>
+{% endif %}
+{{ form.errors }}
+<form method="post" id='formulario'class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
+  {% csrf_token %}
+  <div class="form-actions">
+    <div class="span4" style='clear:both;'>
+      <label>Crear polizas por</label>
+      <div class="input-prepend input-append">
+        {{ form.crear_polizas_por }}
+      </div>
+    </div>
+    <div class="span4" >
+      <label>Crear polizas de</label>
+      <div class="input-prepend input-append">
+        {{ form.crear_polizas_de }}
+      </div>
+    </div>
+    <div class="span4">
+      <label>Plantilla</label>
+      <div class="input-prepend input-append">
+        {{ form.plantilla_ventas }} {{ form.plantilla_devoluciones }} {{ form.plantilla_cobros_cc }}
+      </div>
+    </div> 
+    <div class="span4" style='clear:both;'>
+      <label>Fecha de Inicio</label>
+      <div class="input-prepend input-append">
+        <span class="add-on"><i class='icon-calendar '></i></span>
+        {{ form.fecha_ini }}
+      </div>
+    </div>
+    <div class="span4">
+      <label>Fecha Limite</label>
+      <div class="input-prepend input-append">
+        <span class="add-on"><i class='icon-calendar'></i></span>
+        {{ form.fecha_fin }}
+      </div>
+    </div>
+    <div class="span4">
+      <label>Ignorar Documentos Contabilizados</label>
+      <div class="input-prepend input-append">
+        {{ form.ignorar_documentos_cont }}
+      </div>
+    </div>
+     <div class="span4" style='clear:both;'>
+      <label>Descripcion</label>
+      <div class="input-prepend input-append">
+        {{ form.descripcion }}
+      </div>
+    </div>
+    <div class="span2">
+      <label>.</label>
+      <div class="btn-group">
+        <input type="submit" class="btn btn-primary" value="Generar Plizas" />
+        <!-- <a class='btn' href="#" id='submit_ajax' >Enviar por ajax</a> -->
+      </div>
+    </div>
+  </div>
+  <br style='clear:both;'>
+  <hr >
+</form>
+
+<table class="table tableCell table-hover">
+  {%if documentos %}
+    <tr>
+      	<th>Folios de polizas generadas/th>
+    </tr>
+  {%endif %}
+	{% for documento in documentos %}
+	<tr>
+	  	<td>{{ documento.folio }}</td>
+	</tr>
+  {% empty %}
+    <tr   ><td id='info' class="text-error" style="
+    text-align: center;" colspan='5'>{{ msg_resultados }}</td></tr>
+    
+	{% endfor %}
+
+</table>
+
+
+{% endblock %}

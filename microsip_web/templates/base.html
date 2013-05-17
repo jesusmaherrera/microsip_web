@@ -1,0 +1,131 @@
+{% load dajaxice_templatetags %}
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+  <meta charset='utf-8'>
+  <title>Micosip</title>
+
+  <!-- Estilos -->
+  <link rel='stylesheet' href='{{STATIC_URL}}css/bootstrap.css'/>
+  <link rel='stylesheet' href='{{STATIC_URL}}css/base.css'/>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css">
+  <link href='http://fonts.googleapis.com/css?family=Marcellus+SC' rel='stylesheet' type='text/css'>
+
+  {% block style_css %}{% endblock %}
+  {% block modulestyle_css %}{% endblock %}
+
+  <link rel='shortcut icon' href='{{STATIC_URL}}img/logo.png'>
+
+  <script src="{{STATIC_URL}}js/jquery.min.js" ></script>
+  <script src='{{STATIC_URL}}js/bootstrap.js' ></script>
+  <script src='{{STATIC_URL}}js/jquery-ui-1.8.23.custom.min.js'></script>
+  <script src='{{STATIC_URL}}js/jquery-ui-timepicker.js'></script>
+  <script src='{{STATIC_URL}}js/jquery.tablesorter.js'></script>
+  {% block js_code %}
+    
+  {% endblock %}
+  {% dajaxice_js_import %}
+</head>
+<body>
+  <div id="navbar-example" class="navbar navbar-static">
+    <div class="navbar-inner inventarios_btn" >
+      <div class="container" style="width: auto;">
+        <!-- <a class="brand" href="#"><i class="icon-home"></i></a> -->
+        <ul class="nav" role="navigation">
+         <!--  <li class="dropdown">
+            <a id="drop1" href="/" role="button" > <i class="msicon-home"></i><label class='labelMenu'> Home</label></a>
+          </li> -->
+          {% block btn_modulo_cuentas_por_cobrar %}
+          <!-- /cuentas_por_cobrar/GenerarPolizas/ -->
+          <li><a href="/cuentas_por_cobrar/GenerarPolizas/"> <i class="msicon-cuentas_por_cobrar"></i><label class='labelMenu'> Cuentas por cobrar</label></a></li>
+          {% endblock %}
+          
+          {% block btn_modulo_inventarios%}
+          <!-- <li><a href="/inventarios/Entradas/"> <i class="msicon-inventarios"></i><label class='labelMenu'> Inventarios</label></a></li> -->
+          {% endblock %}
+
+          {% block btn_modulo_ventas%}
+          <!-- <li><a href="/ventas/Facturas/"> <i class="msicon-ventas"></i><label class='labelMenu'> Ventas</label></a></li> -->
+          
+          {% endblock %}
+
+          {% block btn_modulo_cuentas_por_pagar %}
+          <li>
+            <a  href="/cuentas_por_pagar/GenerarPolizas/"> <i class="msicon-cuentas_por_pagar"></i><label class='labelMenu'> Cuentas por pagar</label></a>
+          </li>
+          {% endblock %}
+
+          <!-- <li><a href="#"> <i class="msicon-compras"></i><label class='labelMenu'> Compras</label></a></li> -->
+          
+          {% block btn_modulo_punto_venta %}
+           <!--  <li><a href="/punto_de_venta/ventas/"> <i class="msicon-punto_de_venta"></i><label class='labelMenu'> Punto de venta</label></a></li> -->
+          {% endblock %}
+
+          {% block btn_modulo_contabilidad %}
+          <!-- <li>
+            <a href="/contabilidad/polizas_pendientes/"> <i class="msicon-contabilidad"></i><label class='labelMenu'> Contabilidad</label></a>
+          </li> -->
+          {% endblock %}
+          
+        </ul>
+        <ul class="nav pull-right">
+          <div id=" span breadcrumbs" style="margin-left: 35px;">
+            <div class ='span'style="text-align:right; height:2em; margin-right: 2em; margin-top: 6px; vertical-align:bottom;">
+              {% if not user.is_anonymous %}
+              {{ user.username }} <a href="/logout/"><i class="msicon-logout"></i></a>
+              {% else %}
+              <a class="btn btn-small btn-success" href="/login/">Iniciar Sesión</a>
+              {% endif %}
+            </div>
+          </div>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="navbar-inner navbar-inner_min">
+    {% block tools-module %}
+    {% endblock %}
+  </div>
+  <div id="span breadcrumbs" style="clear:both; margin-left: 35px;">
+    <div id='breadcrumb' class='span6'>
+    {% block breadcrumb %}<a href="/"><i class="icon-home"></i></a>{% endblock %}
+    </div>
+  </div>
+  <section class='content' style='clear:both;'>
+    <div class="pagecontent">
+      {% block content %}{% endblock %}
+    </div>
+  </section>
+  <footer>
+    SIC &copy; 2013
+  </footer>
+
+  <div id="IrArriba" style="display: block;">
+    <a href="#Arriba"><span></span></a>
+  </div>
+  <script type="text/javascript">
+  //<![CDATA[
+  // Botón para Ir Arriba
+  $(document).ready(function() {
+    $("#IrArriba").hide();
+    $(function () {
+      $(window).scroll(function () {
+        if ($(this).scrollTop() > 200) {
+          $('#IrArriba').fadeIn();
+        } else {
+          $('#IrArriba').fadeOut();
+        }
+      });
+      $('#IrArriba a').click(function () {
+        $('body,html').animate({
+          scrollTop: 0
+        }, 800);
+        return false;
+      });
+    });
+
+  });
+  //]]>
+  </script>
+</body>
+</html>

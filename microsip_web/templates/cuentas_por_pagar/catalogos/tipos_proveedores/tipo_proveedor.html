@@ -1,0 +1,48 @@
+{% extends "cuentas_por_pagar/base.html" %}
+{% block title %}Proveedor{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} <a href="/cuentas_por_pagar/proveedores/">Proveedores</a> > Proveedor{% endblock %}
+{% block content %}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
+  {% csrf_token %}
+  <div class="form-actions mainmenu">
+    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+  </div>
+    {{ form.errors }}
+  
+   <div class="control-group">
+    <label class="control-label" for="id_cuenta_xpagar">Cuenta por pagar</label>
+    <div class="controls">
+      {{ form.cuenta_xpagar }} 
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="id_tipo">Tipo</label>
+    <div class="controls">
+      {{ form.tipo }}
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="id_rfc_curp">RFC</label>
+    <div class="controls">
+      {{ form.rfc_curp }}
+    </div>
+  </div>
+  {% if message %}
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
+    <p>{{ message }}</p>
+  </div>
+  {% endif %}
+  <div class="form-actions mainmenu">
+    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+  </div>
+</form>
+{% endblock %}

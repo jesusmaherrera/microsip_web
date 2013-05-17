@@ -1,0 +1,113 @@
+{% extends "contabilidad/base.html" %}
+{% block title %}Generacion de DIOT{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}
+<style type="text/css">
+  .delete-row {
+    margin-left:5px;
+  }
+</style>
+
+<link rel='stylesheet' href='{{STATIC_URL}}css/redmond/jquery-ui-1.8.23.custom.css'/>
+
+{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+<script type="text/javascript">
+    // Define this so we don't have to bother with the admin jsi18n stuff:
+    function gettext(msgid) { return msgid; }
+</script>
+<script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script type="text/javascript">
+$(function() {
+  $('#id_detalles_data tbody tr').formset({
+    prefix: '{{ formset.prefix }}',
+    addCssClass:'btn btn-success',
+    addText:'Nuevo Concepto',
+    deleteText:'',
+  });
+});
+
+  $(function() {
+    $( "#id_generarDIOT-fecha_ini" ).datepicker({dateFormat:'dd/mm/yy',});
+    $( "#id_generarDIOT-fecha_fin" ).datepicker({dateFormat:'dd/mm/yy',});
+  });
+</script>
+
+
+{% endblock %}
+{% block breadcrumb %}{{ block.super }}  > Generacion de DIOT{% endblock %}
+{% block content %}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
+  {% csrf_token %}
+  {% if msg %}
+  <div class="alert alert-block fade in">
+      <button type="button" class="close" data-dismiss="alert">×</button>
+      <strong>{{ msg }}</strong> 
+  </div>
+  {% endif %}
+  <div class="form-actions mainmenu">
+    <div class="span4" style='clear:both;'>
+      <label>Fecha de Inicio</label>
+      <div class="input-prepend input-append">
+        <span class="add-on"><i class='icon-calendar '></i></span>
+        {{ generarDIOT_form.fecha_ini }}
+      </div>
+    </div>
+    <div class="span4">
+      <label>Fecha Limite</label>
+      <div class="input-prepend input-append">
+        <span class="add-on"><i class='icon-calendar'></i></span>
+        {{ generarDIOT_form.fecha_fin }}
+      </div>
+    </div>
+    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+  </div>
+  <div style='clear:both;'>
+    {{ formset.total_form_count }} Cuentas
+  <div>
+  
+  <hr>
+  <div>
+    <fieldset style='clear:both;'>
+      <table class="table tableCell table-hover" id="id_detalles_data" border="0" cellpadding="0" cellspacing="5">
+        <thead>
+          <tr>
+            <th>Cuenta</th>
+            <th>Tipo Proveedor</th>
+            <th>Tipo Operacion</th>
+            <th>RFC</th>
+            <th>Opciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for form in formset.forms %}
+          <tr id="{{ form.prefix }}-row" class="form-container">
+            {{ form.errors }}
+            <td>{{ form.cuenta }}</td>
+            <td>{{ form.tipo_proveedor }}</td>
+            <td>{{ form.tipo_operacion }}{% for fld in form.hidden_fields %}{{ fld }}{% endfor %}</td>
+            <td>{{ form.rfc }}</td>
+            <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </fieldset>
+    {{ formset.management_form }}
+  </div>
+  {% if message %}
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
+    <p>{{ message }}</p>
+  </div>
+  {% endif %}
+  <div class="form-actions mainmenu">
+    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+  </div>
+</form>
+{% include 'autocomplete_light/static.html' %}
+{% endblock %}
