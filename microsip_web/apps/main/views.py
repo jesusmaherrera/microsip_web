@@ -473,7 +473,7 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
 		cuenta_proveedor =  CuentaCo.objects.get(cuenta=documento.proveedor.cuenta_xpagar).cuenta
 	except ObjectDoesNotExist:
 		cuenta_proveedor = None
-		
+
 	#Para saber si es contado o es credito
 	if documento.naturaleza_concepto == 'C':
 		es_contado = documento.condicion_pago == cuenta_contado
@@ -497,7 +497,7 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
 		descuento 			= descuento + importeDocumento.dscto_ppag
 
 	total 				= total + impuestos + importe - iva_retenido - isr_retenido
-	
+
 	proveedores 		= 0
 	bancos 				= 0
 	compras_0 			= 0
@@ -746,7 +746,6 @@ def agregarTotales(totales_cuentas, **kwargs):
 	iva_credito			= kwargs.get('iva_credito', 0)
 	iva_retenido 		= kwargs.get('iva_retenido', 0)
 	isr_retenido 		= kwargs.get('isr_retenido', 0)
-	
 	proveedores 		= kwargs.get('proveedores', 0)
 	cuenta_proveedor    = kwargs.get('cuenta_proveedor', None)
 	
@@ -857,7 +856,7 @@ def agregarTotales(totales_cuentas, **kwargs):
 		elif concepto.valor_tipo == 'IVA Retenido' and not concepto.posicion in asientos_a_ingorar:
 			importe = iva_retenido
 			cuenta = concepto.cuenta_co.cuenta
-
+			
 		elif concepto.valor_tipo == 'ISR Retenido' and not concepto.posicion in asientos_a_ingorar:
 			importe = isr_retenido
 			cuenta = concepto.cuenta_co.cuenta

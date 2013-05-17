@@ -93,8 +93,6 @@ class ImportesDoctosCP(models.Model):
     iva_retenido    = models.DecimalField(max_digits=15, decimal_places=2, db_column='IVA_RETENIDO')
     isr_retenido    = models.DecimalField(max_digits=15, decimal_places=2, db_column='ISR_RETENIDO')
     dscto_ppag      = models.DecimalField(max_digits=15, decimal_places=2, db_column='DSCTO_PPAG')
-    
-    
     cancelado       = models.CharField(default='N', max_length=1, db_column='CANCELADO')
     
     class Meta:
