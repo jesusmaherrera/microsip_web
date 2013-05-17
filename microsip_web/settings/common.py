@@ -6,8 +6,6 @@ import os
 RUTA_PROYECTO =os.path.dirname(os.path.realpath(__file__)).strip('settings')
 DIR = os.path.abspath(os.path.dirname(__file__))
 
-
-
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )

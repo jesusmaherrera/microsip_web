@@ -141,7 +141,7 @@ def plantilla_poliza_manageView(request, id = None, template_name='cuentas_por_c
 		plantilla_items 		= PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
 		plantilla_items_formset = plantilla_items(request.POST, request.FILES, instance=plantilla)
 		
-		if plantilla_form.is_valid() and plantilla_items_formset .is_valid():
+		if plantilla_form.is_valid() and plantilla_items_formset.is_valid():
 			plantilla = plantilla_form.save(commit = False)
 			plantilla.save()
 
