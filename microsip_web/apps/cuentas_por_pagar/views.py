@@ -96,7 +96,7 @@ def generar_polizas_View(request, template_name='cuentas_por_pagar/herramientas/
 
 	else:
 		form = GenerarPolizasManageForm()
-
+	msg='hola produccion'
 	c = {'documentos':documentosData,'msg':msg,'form':form, 'msg_resultados':msg_resultados,'msg_informacion':msg_informacion,}
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
