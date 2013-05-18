@@ -132,7 +132,7 @@ Desktop.ini
 #############
 
 #*.py[co]
-microsip_web/apps/*.py
+microsip_web/apps/**/*.py
 
 # Packages
 *.egg
