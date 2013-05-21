@@ -30,75 +30,8 @@ copiar carpeta de firebird de instaladores a C:\Python27\Lib\site-packages y C:\
 
 ////////////////////DEFINIR CAMPOS PARTICULARES PARA TABLAS//////////////////////////////
 16:Definir campos particulares
-
-PARA CUENTAS POR COBRAR
-
-    class LibresCargosCC(models.Model):
-        id            = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')
-        segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
-        segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
-        segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
-        segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
-        segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
-        def __unicode__(self):
-            return u'%s' % self.id
-        class Meta:
-            db_table = u'libres_cargos_cc'
-
-    class LibresCreditosCC(models.Model):
-        id            = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')
-        segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
-        segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
-        segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
-        segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
-        segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
-        def __unicode__(self):
-            return u'%s' % self.id
-        class Meta:
-            db_table = u'libres_creditos_cc'
-
-PARA CUENTAS POR PAGAR
-
-    class LibresCargosCP(models.Model):
-        id                      = models.AutoField(primary_key=True, db_column='DOCTO_CP_ID')
-        segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
-        segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
-        segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
-        segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
-        segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
-     	
-     	def __unicode__(self):
-            return u'%s' % self.id
-        class Meta:
-            db_table = u'libres_cargos_cp'
-
-PARA VENTAS
-
-    class LibresFacturasV(models.Model):
-        id            = models.AutoField(primary_key=True, db_column='DOCTO_VE_ID')
-        segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
-        segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
-        segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
-        segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
-        segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
-    	
-    	def __unicode__(self):
-            return u'%s' % self.id
-        class Meta:
-            db_table = u'libres_fac_ve'
-
-    class LibresDevFacV(models.Model):
-        id            = models.AutoField(primary_key=True, db_column='DOCTO_VE_ID')
-        segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
-        segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
-        segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
-        segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
-        segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
-        
-        def __unicode__(self):
-            return u'%s' % self.id
-        class Meta:
-            db_table = u'libres_devfac_ve'
+CON PROCEDIMIENTOS PARA INICIALIZAR TABLAS
+PV, CP, CC, Y VE
 
 17) LISTO
 
@@ -224,7 +157,7 @@ Cobros cuentas por cobrar   :Ingresos
 Cada ves que se agrege un detalla a una venta se agreggran sus puntos:
 
 Instalacion:
-    1:Agregar en las tablas (articulos, lineas_articulos, grupos_lineas, clientes, doctos_pv_det(*smallint)) un campo entergo con nombre "PUNTOS" Y "DINERO_ELECTRONICO"
+    1:inicializar tablas con procedimiento almacenado iniciar_tablas
     2:Agregar trigers
         a) /setup/triggers/DOCTOS_PV_DET_AI_PUNTOS a tabla doctos_pv_det como "AFTER INSERT"
         b) /setup/triggers/DOCTOS_PV_COBROS_BI_PUNTOS a tabla doctos_pv_det como "BEFOR INSERT" 

@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     #Articulos
     (r'^articulos/$', views.articulos_view),
     (r'^articulo/(?P<id>\d+)/', views.articulo_manageView),
+    (r'^inicializar_tablas/$', views.inicializar_tablas),
 
 	#Clientes
 	(r'^clientes/$', views.clientes_view),

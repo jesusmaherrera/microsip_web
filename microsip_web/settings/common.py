@@ -105,8 +105,6 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'microsip_web.urls'
-
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'microsip_web.wsgi.application'
 
