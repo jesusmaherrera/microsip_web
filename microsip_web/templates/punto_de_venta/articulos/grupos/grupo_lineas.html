@@ -5,7 +5,37 @@
 {% block style_css %}{% endblock %}
 
 <!-- JavaScript Code -->
-{% block js_code %}{% endblock %}
+{% block js_code %}
+<script>
+  $(function() {
+    
+    if ($('#id_maneja_puntos').is(':checked'))
+      $('#div_puntos, #div_dinero_electronico').show();
+    else
+    {
+      $('#div_puntos, #div_dinero_electronico').hide();
+      if ($('#id_puntos').val() == '') 
+        $('#id_puntos').val(0);
+      if ($('#id_dinero_electronico').val() == '') 
+        $('#id_dinero_electronico').val(0);
+    }
+        
+
+    $('#id_maneja_puntos').click(function() {
+        if ($(this).is(':checked')) 
+          $('#div_puntos, #div_dinero_electronico').show();
+        else
+        {
+          $('#div_puntos, #div_dinero_electronico').hide();
+          if ($('#id_puntos').val() == '') 
+            $('#id_puntos').val(0);
+          if ($('#id_dinero_electronico').val() == '') 
+            $('#id_dinero_electronico').val(0);
+        }
+    });
+  });
+</script>
+{% endblock %}
 
 {% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/grupos_lineas/">Grupos lineas</a> <i class=" icon-play"></i> Grupo Linea{% endblock %}
 {% block content %}
@@ -18,13 +48,19 @@
       {{ form.nombre }}
     </div>
   </div>
-  <div class="span4" >
+  <div class="span4"  style='clear:both;'>
+    <label>Maneja Puntos</label>
+    <div class="input-prepend input-append">
+      {{ form.maneja_puntos }}
+    </div>
+  </div>
+  <div id="div_puntos" class="span4" >
     <label>Puntos</label>
     <div class="input-prepend input-append">
       {{ form.puntos }}
     </div>
   </div>
-  <div class="span4" >
+  <div id="div_dinero_electronico" class="span4" >
     <label>Dinero Elecronico (% de costo)</label>
     <div class="input-prepend input-append">
       {{ form.dinero_electronico }}

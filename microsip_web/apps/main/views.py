@@ -198,37 +198,6 @@ def punto_de_venta_agregar_trigers():
 
  	c.execute(
  		'''
- 		CREATE OR ALTER TRIGGER DOCTOS_PV_COBROS_BI_PUNTOS FOR DOCTOS_PV_COBROS
-		ACTIVE BEFORE INSERT POSITION 0
-		as
-		declare variable nombre_forma_cobro char(100);
-		declare variable dinero_electronico_cliente double PRECISION;
-		declare variable total_dinero_electronico double PRECISION;
-		declare variable cliente_id integer;
-		begin
-		    select formas_cobro.nombre from formas_cobro where formas_cobro.forma_cobro_id = new.forma_cobro_id
-		    into nombre_forma_cobro;
-
-		    if (nombre_forma_cobro = 'Dinero Electronico') then
-		    begin
-		        select clientes.dinero_electronico_acomulado, clientes.cliente_id
-		        from clientes, doctos_pv
-		        where
-		            doctos_pv.cliente_id = clientes.cliente_id and
-		            doctos_pv.docto_pv_id = new.docto_pv_id
-		        into dinero_electronico_cliente, cliente_id;
-
-		        total_dinero_electronico = dinero_electronico_cliente - new.importe;
-		        IF (total_dinero_electronico >= 0) then
-		            UPDATE clientes SET dinero_electronico_acomulado = :total_dinero_electronico WHERE cliente_id = :cliente_id;
-		        ELSE
-		            EXCEPTION EX_CLIENTE_SIN_SALDO 'EL CLIENTE NO TIENE SUFICIENTE DINERO ELECTRONICO, EL CLIENTE SOLO TIENE (' || dinero_electronico_cliente || ')';
-		    end
-		end
- 		'''
- 		)
- 	c.execute(
- 		'''
  		CREATE OR ALTER TRIGGER DOCTOS_PV_COBROS_BU_PUNTOS FOR DOCTOS_PV_COBROS
 		ACTIVE BEFORE UPDATE POSITION 0
 		as
@@ -249,7 +218,7 @@ def punto_de_venta_agregar_trigers():
 		            doctos_pv.docto_pv_id = new.docto_pv_id
 		        into dinero_electronico_cliente, cliente_id;
 
-		        total_dinero_electronico = dinero_electronico_cliente - new.importe;
+		        total_dinero_electronico = dinero_electronico_cliente - (new.importe- old.importe);
 		        IF (total_dinero_electronico >= 0) then
 		            UPDATE clientes SET dinero_electronico_acomulado = :total_dinero_electronico WHERE cliente_id = :cliente_id;
 		        ELSE
@@ -346,6 +315,7 @@ def punto_de_venta_inicializar_tablas():
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'ARTICULOS' and rf.RDB$FIELD_NAME = 'MANEJA_PUNTOS')) then
 			    execute statement 'ALTER TABLE ARTICULOS ADD MANEJA_PUNTOS SMALLINT';
+
 			/*Lineas */
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
@@ -356,6 +326,11 @@ def punto_de_venta_inicializar_tablas():
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
 			    execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD PUNTOS ENTERO DEFAULT 0';
+
+			if (not exists(
+			select 1 from RDB$RELATION_FIELDS rf
+			where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'MANEJA_PUNTOS')) then
+			    execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD MANEJA_PUNTOS SMALLINT';
 
 			/*Grupos */
 			if (not exists(
@@ -368,6 +343,11 @@ def punto_de_venta_inicializar_tablas():
 			where rf.RDB$RELATION_NAME = 'GRUPOS_LINEAS' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
 			    execute statement 'ALTER TABLE GRUPOS_LINEAS ADD PUNTOS ENTERO DEFAULT 0';
 
+			if (not exists(
+			select 1 from RDB$RELATION_FIELDS rf
+			where rf.RDB$RELATION_NAME = 'GRUPOS_LINEAS' and rf.RDB$FIELD_NAME = 'MANEJA_PUNTOS')) then
+			    execute statement 'ALTER TABLE GRUPOS_LINEAS ADD MANEJA_PUNTOS SMALLINT';
+			    
 			/*Clientes */
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
@@ -394,6 +374,16 @@ def punto_de_venta_inicializar_tablas():
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'DOCTOS_PV_DET' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
 			    execute statement 'ALTER TABLE DOCTOS_PV_DET ADD PUNTOS ENTERO DEFAULT 0';
+			/*Doctos pv*/
+			if (not exists(
+			select 1 from RDB$RELATION_FIELDS rf
+			where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'DINERO_ELECTRONICO')) then
+			    execute statement 'ALTER TABLE DOCTOS_PV ADD DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+
+			if (not exists(
+			select 1 from RDB$RELATION_FIELDS rf
+			where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
+			    execute statement 'ALTER TABLE DOCTOS_PV ADD PUNTOS ENTERO DEFAULT 0';
 		END
 		''')
  	c.execute('EXECUTE PROCEDURE punto_de_venta_inicializar;')
