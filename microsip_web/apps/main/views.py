@@ -44,7 +44,221 @@ def inicializar_tablas(request):
 	punto_de_venta_inicializar_tablas()
 	cuentas_por_pagar_inicializar_tablas()
 	cuentas_por_cobrar_inicializar_tablas()
- 	return HttpResponseRedirect('/main/clientes/')
+
+
+	punto_de_venta_agregar_trigers()
+
+ 	return HttpResponseRedirect('/')
+
+def punto_de_venta_agregar_trigers():
+	c = connection.cursor()
+	#VENTAS
+	c.execute(
+		'''
+		CREATE OR ALTER TRIGGER DOCTOS_PV_DET_BU_PUNTOS FOR DOCTOS_PV_DET
+		ACTIVE BEFORE UPDATE POSITION 0
+		AS
+		declare variable cliente_id integer;
+		declare variable tipo_tarjeta char(1);
+		/* PUNTOS */
+		declare variable puntos_articulo integer;
+		declare variable puntos_grupo integer;
+		declare variable puntos_linea integer;
+
+		declare variable puntos integer;
+		declare variable total_puntos integer;
+		/* DINERO ELECRONICO */
+		declare variable pct_dinero_electronico_articulo double PRECISION;
+		declare variable pct_dinero_electronico_linea double PRECISION;
+		declare variable pct_dinero_electronico_grupo double PRECISION;
+		declare variable pct_dinero_electronico double PRECISION;
+
+		declare variable dinero_electronico double PRECISION;
+		declare variable dinero_electronico_acomulado double PRECISION;
+
+		BEGIN
+		    /*Datos del cliente*/
+		    SELECT clientes.puntos_acomulados, clientes.cliente_id, clientes.tipo_tarjeta, clientes.dinero_electronico_acomulado
+		    FROM clientes, doctos_pv
+		    WHERE
+		        doctos_pv.docto_pv_id = new.docto_pv_id and
+		        doctos_pv.cliente_id = clientes.cliente_id
+		    INTO total_puntos, cliente_id, tipo_tarjeta, dinero_electronico_acomulado;
+		    
+		    IF (dinero_electronico_acomulado IS NULL) then
+		            dinero_electronico_acomulado = 0;
+		    /*Datos del articulo*/
+		    SELECT articulos.puntos, articulos.dinero_electronico, lineas_articulos.puntos, lineas_articulos.dinero_electronico,  grupos_lineas.puntos, grupos_lineas.dinero_electronico
+		    FROM articulos, lineas_articulos, grupos_lineas
+		    WHERE
+		        lineas_articulos.linea_articulo_id = articulos.linea_articulo_id AND
+		        grupos_lineas.grupo_linea_id = lineas_articulos.grupo_linea_id AND
+		        articulos.articulo_id = new.articulo_id
+		    INTO puntos_articulo, pct_dinero_electronico_articulo, puntos_linea, pct_dinero_electronico_linea, puntos_grupo, pct_dinero_electronico_grupo;
+		    
+		    if (total_puntos is null) then
+		        total_puntos = 0;
+
+		    total_puntos = total_puntos - old.puntos;
+		    dinero_electronico_acomulado = dinero_electronico_acomulado - old.dinero_electronico;
+
+		    update clientes set puntos_acomulados=:total_puntos, dinero_electronico_acomulado=:dinero_electronico_acomulado where cliente_id = :cliente_id;
+
+		    if(tipo_tarjeta = 'P') then
+		    begin
+		        IF (total_puntos IS NULL) then
+		            total_puntos = 0;
+		        /*Si el articulos no tiene puntos busca en lineas*/
+		        IF ((puntos_articulo IS NULL) or (puntos_articulo = 0) ) then
+		        BEGIN
+		            /*Si la linea no tiene puntos busca grupos */
+		            IF ((puntos_linea IS NULL) or (puntos_linea = 0) ) then
+		               puntos = puntos_grupo;
+		            ELSE
+		                puntos = puntos_linea;
+		        END
+		        ELSE
+		            puntos = puntos_articulo;
+
+		        total_puntos = total_puntos + (new.unidades * puntos);
+		        new.puntos = new.unidades * puntos;
+		/*        update doctos_pv_det set puntos=:puntos where doctos_pv_det.docto_pv_det_id = new.docto_pv_det_id;*/
+		        update clientes set puntos_acomulados =:total_puntos where cliente_id = :cliente_id;
+
+		    end
+		    else if(tipo_tarjeta = 'D') then
+		    begin
+
+		        IF (dinero_electronico_acomulado IS NULL) then
+		            dinero_electronico_acomulado = 0;
+
+		        /*Si el articulos no tiene dinero electronico busca en lineas*/
+		        IF ((pct_dinero_electronico_articulo IS NULL) or (pct_dinero_electronico_articulo = 0)) then
+		        BEGIN
+		            /*Si la linea no tiene puntos busca grupos */
+		            IF ((pct_dinero_electronico_articulo is null)or (pct_dinero_electronico_linea = 0)) then
+		                pct_dinero_electronico = pct_dinero_electronico_grupo;
+		            ELSE
+		                pct_dinero_electronico = pct_dinero_electronico_linea;
+		        END
+		        ELSE
+		            pct_dinero_electronico = pct_dinero_electronico_articulo;
+
+		        IF (pct_dinero_electronico IS NULL) then
+		            pct_dinero_electronico = 0;
+
+		        dinero_electronico = (new.unidades * new.precio_unitario) * (pct_dinero_electronico /100);
+		        dinero_electronico_acomulado = dinero_electronico_acomulado - old.dinero_electronico + dinero_electronico;
+
+		        new.dinero_electronico = dinero_electronico;
+		/*        update doctos_pv_det set dinero_electronico=dinero_electronico where doctos_pv_det.docto_pv_det_id = new.docto_pv_det_id;*/
+		        update clientes set dinero_electronico_acomulado =:dinero_electronico_acomulado where cliente_id = :cliente_id;
+		    end
+		END
+		''')
+ 	c.execute(
+ 		'''
+ 		CREATE OR ALTER TRIGGER DOCTOS_PV_DET_AD_PUNTOS FOR DOCTOS_PV_DET
+		ACTIVE AFTER DELETE POSITION 0
+		AS
+		declare variable cliente_id integer;
+		/* PUNTOS */
+		declare variable total_puntos integer;
+		declare variable dinero_electronico_acomulado double PRECISION;
+		BEGIN
+		    /*Datos del cliente*/
+		    SELECT clientes.puntos_acomulados, clientes.cliente_id, clientes.dinero_electronico_acomulado
+		    FROM clientes, doctos_pv
+		    WHERE
+		        doctos_pv.docto_pv_id = old.docto_pv_id and
+		        doctos_pv.cliente_id = clientes.cliente_id
+		    INTO total_puntos, cliente_id, dinero_electronico_acomulado;
+		    
+		    IF (dinero_electronico_acomulado IS NULL) then
+		            dinero_electronico_acomulado = 0;
+
+		    if (total_puntos is null) then
+		        total_puntos = 0;
+
+		    total_puntos = total_puntos - old.puntos;
+		    dinero_electronico_acomulado = dinero_electronico_acomulado - old.dinero_electronico;
+
+		    update clientes set puntos_acomulados=:total_puntos, dinero_electronico_acomulado=:dinero_electronico_acomulado where cliente_id = :cliente_id;
+		end
+ 		''')
+
+ 	#COBROS
+ 	try:
+	  	c.execute(
+	 		'''
+	 		CREATE EXCEPTION EX_CLIENTE_SIN_SALDO 'El cliente no tiene suficiente saldo';	
+	 		''')
+ 	except Exception, e:
+		print "Oops!  No pudo agregarse la excepción EX_CLIENTE_SIN_SALDO por que esta ya existe. "
+
+ 	c.execute(
+ 		'''
+ 		CREATE OR ALTER TRIGGER DOCTOS_PV_COBROS_BI_PUNTOS FOR DOCTOS_PV_COBROS
+		ACTIVE BEFORE INSERT POSITION 0
+		as
+		declare variable nombre_forma_cobro char(100);
+		declare variable dinero_electronico_cliente double PRECISION;
+		declare variable total_dinero_electronico double PRECISION;
+		declare variable cliente_id integer;
+		begin
+		    select formas_cobro.nombre from formas_cobro where formas_cobro.forma_cobro_id = new.forma_cobro_id
+		    into nombre_forma_cobro;
+
+		    if (nombre_forma_cobro = 'Dinero Electronico') then
+		    begin
+		        select clientes.dinero_electronico_acomulado, clientes.cliente_id
+		        from clientes, doctos_pv
+		        where
+		            doctos_pv.cliente_id = clientes.cliente_id and
+		            doctos_pv.docto_pv_id = new.docto_pv_id
+		        into dinero_electronico_cliente, cliente_id;
+
+		        total_dinero_electronico = dinero_electronico_cliente - new.importe;
+		        IF (total_dinero_electronico >= 0) then
+		            UPDATE clientes SET dinero_electronico_acomulado = :total_dinero_electronico WHERE cliente_id = :cliente_id;
+		        ELSE
+		            EXCEPTION EX_CLIENTE_SIN_SALDO 'EL CLIENTE NO TIENE SUFICIENTE DINERO ELECTRONICO, EL CLIENTE SOLO TIENE (' || dinero_electronico_cliente || ')';
+		    end
+		end
+ 		'''
+ 		)
+ 	c.execute(
+ 		'''
+ 		CREATE OR ALTER TRIGGER DOCTOS_PV_COBROS_BU_PUNTOS FOR DOCTOS_PV_COBROS
+		ACTIVE BEFORE UPDATE POSITION 0
+		as
+		declare variable nombre_forma_cobro char(100);
+		declare variable dinero_electronico_cliente double PRECISION;
+		declare variable total_dinero_electronico double PRECISION;
+		declare variable cliente_id integer;
+		begin
+		    select formas_cobro.nombre from formas_cobro where formas_cobro.forma_cobro_id = new.forma_cobro_id
+		    into nombre_forma_cobro;
+
+		    if (nombre_forma_cobro = 'Dinero Electronico') then
+		    begin
+		        select clientes.dinero_electronico_acomulado, clientes.cliente_id
+		        from clientes, doctos_pv
+		        where
+		            doctos_pv.cliente_id = clientes.cliente_id and
+		            doctos_pv.docto_pv_id = new.docto_pv_id
+		        into dinero_electronico_cliente, cliente_id;
+
+		        total_dinero_electronico = dinero_electronico_cliente - new.importe;
+		        IF (total_dinero_electronico >= 0) then
+		            UPDATE clientes SET dinero_electronico_acomulado = :total_dinero_electronico WHERE cliente_id = :cliente_id;
+		        ELSE
+		            EXCEPTION EX_CLIENTE_SIN_SALDO 'EL CLIENTE NO TIENE SUFICIENTE DINERO ELECTRONICO, EL CLIENTE SOLO TIENE (' || dinero_electronico_cliente || ')';
+		    end
+		end
+ 		'''
+ 		)
+ 	transaction.commit_unless_managed()
 
 def ventas_inicializar_tablas():
 	c = connection.cursor()
@@ -52,7 +266,7 @@ def ventas_inicializar_tablas():
 		'''
 		CREATE OR ALTER PROCEDURE ventas_inicializar
 		as
-		BEGIN
+		begin
 		    if (not exists(
 		    select 1 from RDB$RELATION_FIELDS rf
 		    where rf.RDB$RELATION_NAME = 'LIBRES_FAC_VE' and rf.RDB$FIELD_NAME = 'SEGMENTO_1')) then
@@ -104,7 +318,10 @@ def ventas_inicializar_tablas():
 		    select 1 from RDB$RELATION_FIELDS rf
 		    where rf.RDB$RELATION_NAME = 'LIBRES_DEVFAC_VE' and rf.RDB$FIELD_NAME = 'SEGMENTO_5')) then
 		        execute statement 'ALTER TABLE LIBRES_DEVFAC_VE ADD SEGMENTO_5 INTEGER';
-		END''')
+		end
+		'''
+		)
+ 	c.execute("EXECUTE PROCEDURE ventas_inicializar;")
 	transaction.commit_unless_managed()
 
 def punto_de_venta_inicializar_tablas():
@@ -138,7 +355,7 @@ def punto_de_venta_inicializar_tablas():
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
-			    execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD PUNTOS INTEGER';
+			    execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD PUNTOS ENTERO DEFAULT 0';
 
 			/*Grupos */
 			if (not exists(
@@ -149,7 +366,7 @@ def punto_de_venta_inicializar_tablas():
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'GRUPOS_LINEAS' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
-			    execute statement 'ALTER TABLE GRUPOS_LINEAS ADD PUNTOS INTEGER';
+			    execute statement 'ALTER TABLE GRUPOS_LINEAS ADD PUNTOS ENTERO DEFAULT 0';
 
 			/*Clientes */
 			if (not exists(
@@ -160,12 +377,12 @@ def punto_de_venta_inicializar_tablas():
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'PUNTOS_ACOMULADOS')) then
-			    execute statement 'ALTER TABLE CLIENTES ADD PUNTOS_ACOMULADOS INTEGER';
+			    execute statement 'ALTER TABLE CLIENTES ADD PUNTOS_ACOMULADOS ENTERO DEFAULT 0';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'TIPO_TARJETA')) then
-			    execute statement 'ALTER TABLE CLIENTES ADD TIPO_TARJETA CHAR(1) default "N"';
+                execute statement 'ALTER TABLE CLIENTES ADD TIPO_TARJETA CHAR(1)';
 
 			/*Doctos pv det */
 			if (not exists(
@@ -176,9 +393,10 @@ def punto_de_venta_inicializar_tablas():
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'DOCTOS_PV_DET' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
-			    execute statement 'ALTER TABLE DOCTOS_PV_DET ADD PUNTOS INTEGER';
+			    execute statement 'ALTER TABLE DOCTOS_PV_DET ADD PUNTOS ENTERO DEFAULT 0';
 		END
 		''')
+ 	c.execute('EXECUTE PROCEDURE punto_de_venta_inicializar;')
 	transaction.commit_unless_managed()
 
 def cuentas_por_pagar_inicializar_tablas():
@@ -216,6 +434,7 @@ def cuentas_por_pagar_inicializar_tablas():
 			    execute statement 'ALTER TABLE LIBRES_CARGOS_CP ADD SEGMENTO_5 INTEGER';
 		END
 		''')
+ 	c.execute('EXECUTE PROCEDURE cuentas_por_pagar_inicializar;')
 	transaction.commit_unless_managed()
 
 def cuentas_por_cobrar_inicializar_tablas():
@@ -281,6 +500,7 @@ def cuentas_por_cobrar_inicializar_tablas():
 			    execute statement 'ALTER TABLE LIBRES_CREDITOS_CC ADD SEGMENTO_5 INTEGER';
 		END
 		''')
+ 	c.execute("EXECUTE PROCEDURE cuentas_por_cobrar_inicializar;")
 	transaction.commit_unless_managed()
 
 ##########################################

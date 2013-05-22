@@ -13,27 +13,22 @@ INSTALACION DE APLICACION
 5:Desinstalar Firebird poner no nada borrar archivos
 6:Reinstalar firbird Server **poner no nada borrar archivos** (EN INSTALCION INDICAR Copiar la libreria cliente de firebird al directorio<system>)
 
-/////////////INTALAR PYTHON ////////////////////
-7:Instalar python 2.7.3
-8:Instalar setuptools-0.6c11.win32-py2.7
-9: Agregar en variables de entorno en path ";C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;" o con "SET PATH=%PATH%;C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;"
-10:copiar carpeta de pip-1.3 a escritorio e instalar pip de carpeta pip-1.3 con python setup.py install porar carpeta pip  de escritorio
+/////////////INTALAR APLICACION////////////////////
+7:Agregar en variables de entorno en path ";C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;" o con "SET PATH=%PATH%;C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;"
+8:Descromprimir archivo instaladores_microsip_web en c:/instaladores_microsip_web
+9:En carpeta descomprimida ejecutar instaladores segun estan numerados ejemplo "1)Nombre de instaldor" asta el cuatro
+10: Configurar conexion a base de datos "C:\microsip_web_compilado\microsip_web\settings\prod.py
 
-/////////////INTALAR APLICACION Y LIBRERIAS NESESARIAS////////////////////
-11:Instalar requerimentos de aplicacion con "pip install -r requirements.txt"
-copiar carpeta de firebird de instaladores a C:\Python27\Lib\site-packages y C:\Python27\Lib\site-packages\django\db\backends
+/////////////CONFIGURAR Y SYNCRONISAR BASE DE DATOS////////////////////
+11:sincronizar base de datos con python manage.py syncdb
+12:configurar ip de servidor en archivo "C:\microsip_web_compilado\extras\scripts\Iniciar microsip app.cmd"
+13:Ejecutar aplicacion con ip:puerto indicados anteriormente
+14: ejecutar <ip:puerto>/main/inicializar_tablas para inicializar tablas
+15:listo
 
-/////////////SYNCRONISAR BASE DE DATOS PYTHON ////////////////////
-14:sincronizar base de datos con python manage.py syncdb
-15:CONFIGURAR INICIADOR DE SERVIDOR CON IP Y RUTAS
+ACTUALIZACION DE APLICACION
 
-
-////////////////////DEFINIR CAMPOS PARTICULARES PARA TABLAS//////////////////////////////
-16:Definir campos particulares
-CON PROCEDIMIENTOS PARA INICIALIZAR TABLAS
-PV, CP, CC, Y VE
-
-17) LISTO
+1: Ejecutar archivo "C:\microsip_web_compilado\actualizar.lnk
 
 
 CONFIGURACION EN APACHE
@@ -151,13 +146,3 @@ TIPOS DE POLIZAS
 ventas                      :Ingresos
 devoluciones                :Diario
 Cobros cuentas por cobrar   :Ingresos
-
-
-############# APLICACION DE PUNTOS###############################
-Cada ves que se agrege un detalla a una venta se agreggran sus puntos:
-
-Instalacion:
-    1:inicializar tablas con procedimiento almacenado iniciar_tablas
-    2:Agregar trigers
-        a) /setup/triggers/DOCTOS_PV_DET_AI_PUNTOS a tabla doctos_pv_det como "AFTER INSERT"
-        b) /setup/triggers/DOCTOS_PV_COBROS_BI_PUNTOS a tabla doctos_pv_det como "BEFOR INSERT" 
