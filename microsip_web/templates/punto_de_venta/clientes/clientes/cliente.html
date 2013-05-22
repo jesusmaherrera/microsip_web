@@ -1,4 +1,4 @@
-{% extends "main/base.html" %}
+{% extends "punto_de_venta/base.html" %}
 {% block title %}Cliente{% endblock %}
 
 <!-- CSS Code -->
@@ -7,7 +7,7 @@
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
 
-{% block breadcrumb %}{{ block.super }} <a href="/main/clientes/">Clientes</a> <i class=" icon-play"></i> Cliente{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/clientes/">Clientes</a> <i class=" icon-play"></i> Cliente{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
   {% csrf_token %}

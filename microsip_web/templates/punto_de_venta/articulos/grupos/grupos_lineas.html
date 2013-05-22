@@ -1,4 +1,4 @@
-{% extends "main/base.html" %}
+{% extends "punto_de_venta/base.html" %}
 {% block title %}Grupos Lineas{% endblock %}
 
 <!-- CSS Code -->
@@ -10,7 +10,7 @@
 {% block breadcrumb %}{{ block.super }} Grupos_lineas {% endblock %}
 {% block content %}
 <div class="form-actions mainmenu">
-  <!-- <a class="btn btn-success" href="/main/grupo_lineas/">Nuevo</a> -->
+  <!-- <a class="btn btn-success" href="/punto_de_venta/grupo_lineas/">Nuevo</a> -->
 </div>
 <table class="table tableCell table-hover">
     <tr>
@@ -35,7 +35,7 @@
       </div>
     </div>
     <tr>
-      <td><a href="/main/grupo_lineas/{{ grupo_lineas.id }}/">{{ grupo_lineas.nombre }}</a></td>
+      <td><a href="/punto_de_venta/grupo_lineas/{{ grupo_lineas.id }}/">{{ grupo_lineas.nombre }}</a></td>
       <td>{{ grupo_lineas.puntos }}</td>
       <td>{{ grupo.dinero_electronico }}</td>
       <td style="text-align:center;">

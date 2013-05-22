@@ -1,4 +1,4 @@
-{% extends "main/base.html" %}
+{% extends "punto_de_venta/base.html" %}
 {% block title %}Articulo{% endblock %}
 
 <!-- CSS Code -->
@@ -7,7 +7,7 @@
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
 
-{% block breadcrumb %}{{ block.super }} <a href="/main/articulos/">Articulos</a> <i class=" icon-play"></i> Articulo {% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/articulos/">Articulos</a> <i class=" icon-play"></i> Articulo {% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
   {% csrf_token %}
@@ -19,7 +19,7 @@
     </div>
   </div>
   <div class="span4" >
-    <label>Linea <a href="/main/linea_articulos/{{ form.linea.value }}/">Ir a linea</a></label>
+    <label>Linea <a href="/punto_de_venta/linea_articulos/{{ form.linea.value }}/">Ir a linea</a></label>
     <div class="input-prepend input-append">
       {{ form.linea }}
     </div>

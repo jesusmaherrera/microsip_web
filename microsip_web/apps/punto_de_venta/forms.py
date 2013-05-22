@@ -2,11 +2,41 @@
 from django import forms
 
 import autocomplete_light
-
+from microsip_web.apps.inventarios.models import *
 from microsip_web.apps.ventas.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from models import *
+
+class ArticuloManageForm(forms.ModelForm):
+	
+	class Meta:
+		model = Articulos
+		exclude= {
+			'cuenta_ventas',
+			'es_almacenable',
+		}
+
+class ClienteManageForm(forms.ModelForm):
+	class Meta:
+		model = Cliente
+		exclude= {
+			'cuenta_xcobrar',
+		}
+
+class LineaArticulosManageForm(forms.ModelForm):
+	class Meta:
+		model = LineaArticulos
+		exclude= {
+			'cuenta_ventas',
+		}
+		
+class GrupoLineasManageForm(forms.ModelForm):
+	class Meta:
+		model = GrupoLineas
+		exclude= {
+			'cuenta_ventas',
+		}
 
 class InformacionContableManageForm(forms.ModelForm):
 	condicion_pago_contado 	= forms.ModelChoiceField(queryset= CondicionPago.objects.all(), required=True)

@@ -22,6 +22,22 @@
       <li><a tabindex="-1" href="/punto_de_venta/devoluciones/">Devoluciones de ventas</a></li>
     </ul>
   </li>
+  <li class="dropdown">
+    <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> 
+      Articulos <b class="caret"></b></a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+      <li><a tabindex="-1" href="/punto_de_venta/articulos/">Articulos</a></li>
+      <li><a tabindex="-1" href="/punto_de_venta/lineas_articulos/">Lineas</a></li>
+      <li><a tabindex="-1" href="/punto_de_venta/grupos_lineas/">Grupos</a></li>
+    </ul>
+  </li>
+  <li class="dropdown">
+    <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> 
+      Clientes <b class="caret"></b></a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+      <li><a tabindex="-1" href="/punto_de_venta/clientes/">Clientes</a></li>
+    </ul>
+  </li>
   </ul>
   <ul class="nav pull-right">
     <li class="dropdown">
@@ -30,9 +46,26 @@
         <li><a tabindex="-1" href="/punto_de_venta/GenerarPolizas/">Generar Polizas Contables</a></li>
         <li role="presentation" class="divider"></li>
         <li><a tabindex="-1" href="/punto_de_venta/PreferenciasEmpresa/">Preferencias de la empresa</a></li>
+        <li role="presentation" class="divider"></li>
+        <li><a tabindex="-1" href="#myModal" data-toggle="modal">Inicializar puntos de clientes</a></li>
       </ul>
     </li>
   </ul>
+</div>
+
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="myModalLabel">Seguro que Deseas inicializar los puntos de los clientes</h3>
+      </div>
+      <div class="modal-body">
+        <h4>Al Inicializar los puntos de los cliente</h4>
+        <p style="color:red;">Se eliminaran puntos y dinero elecronico de "TODOS" los clientes</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Cancelar</button>
+        <a href="/punto_de_venta/inicializar_puntos_clientes" class="btn btn-primary">Estoy Seguro</a>
+      </div>
 </div>
 {% endblock %}
 {% block content %}

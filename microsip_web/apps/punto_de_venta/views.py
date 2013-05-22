@@ -12,6 +12,196 @@ from django.core.exceptions import ObjectDoesNotExist
 #Paginacion
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+##########################################
+## 										##
+##           	Articulos               ##
+##										##
+##########################################
+
+
+@login_required(login_url='/login/')
+def inicializar_puntos_clientes(request):
+	Cliente.objects.update(puntos_acomulados=0, dinero_electronico_acomulado=0)
+	return HttpResponseRedirect('/punto_de_venta/clientes/')
+
+@login_required(login_url='/login/')
+def articulos_view(request, template_name='punto_de_venta/articulos/articulos/articulos.html'):
+	articulos_list = Articulos.objects.all().order_by('nombre')
+
+	paginator = Paginator(articulos_list, 20) # Muestra 10 ventas por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		articulos = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    articulos = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    articulos = paginator.page(paginator.num_pages)
+
+	c = {'articulos':articulos}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def articulo_manageView(request, id = None, template_name='punto_de_venta/articulos/articulos/articulo.html'):
+	message = ''
+
+	if id:
+		articulo = get_object_or_404(Articulos, pk=id)
+	else:
+		articulo =  Articulos()
+	
+	if request.method == 'POST':
+		form = ArticuloManageForm(request.POST, instance=  articulo)
+		if form.is_valid():
+			form.save()
+			return HttpResponseRedirect('/punto_de_venta/articulos/')
+	else:
+		form = ArticuloManageForm(instance= articulo)
+
+	c = {'form':form,}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+##########################################
+## 										##
+##           Clientes                   ##
+##										##
+##########################################
+
+@login_required(login_url='/login/')
+def clientes_view(request, template_name='punto_de_venta/clientes/clientes/clientes.html'):
+	clientes_list = Cliente.objects.all()
+
+	paginator = Paginator(clientes_list, 20) # Muestra 10 ventas por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		clientes = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    clientes = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    clientes = paginator.page(paginator.num_pages)
+
+	c = {'clientes':clientes}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def cliente_manageView(request, id = None, template_name='punto_de_venta/clientes/clientes/cliente.html'):
+	message = ''
+
+	if id:
+		cliente = get_object_or_404(Cliente, pk=id)
+	else:
+		cliente =  Cliente()
+	
+	if request.method == 'POST':
+		form = ClienteManageForm(request.POST, instance=  cliente)
+		if form.is_valid():
+			form.save()
+			return HttpResponseRedirect('/punto_de_venta/clientes/')
+	else:
+		form = ClienteManageForm(instance= cliente)
+
+	c = {'form':form,}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+##########################################
+## 										##
+##           Lineas articulos           ##
+##										##
+##########################################
+
+@login_required(login_url='/login/')
+def lineas_articulos_view(request, template_name='punto_de_venta/articulos/lineas/lineas_articulos.html'):
+	linea_articulos_list = LineaArticulos.objects.all()
+
+	paginator = Paginator(linea_articulos_list, 15) # Muestra 10 ventas por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		lineas_articulos = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    lineas_articulos = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    lineas_articulos = paginator.page(paginator.num_pages)
+
+	c = {'lineas_articulos':lineas_articulos}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def linea_articulos_manageView(request, id = None, template_name='punto_de_venta/articulos/lineas/linea_articulos.html'):
+	message = ''
+
+	if id:
+		linea_articulos = get_object_or_404( LineaArticulos, pk=id)
+	else:
+		linea_articulos =  LineaArticulos()
+	
+	if request.method == 'POST':
+		form = LineaArticulosManageForm(request.POST, instance=  linea_articulos)
+		if form.is_valid():
+			form.save()
+			return HttpResponseRedirect('/punto_de_venta/lineas_articulos')
+	else:
+		form = LineaArticulosManageForm(instance= linea_articulos)
+
+	c = {'form':form,}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+##########################################
+## 										##
+##            Grupos lineas             ##
+##										##
+##########################################
+
+@login_required(login_url='/login/')
+def grupos_lineas_view(request, template_name='punto_de_venta/articulos/grupos/grupos_lineas.html'):
+	grupos_lineas_list = GrupoLineas.objects.all()
+
+	paginator = Paginator(grupos_lineas_list, 15) # Muestra 10 ventas por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		grupos_lineas = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    grupos_lineas = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    grupos_lineas = paginator.page(paginator.num_pages)
+
+	c = {'grupos_lineas':grupos_lineas}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def grupo_lineas_manageView(request, id = None, template_name='punto_de_venta/articulos/grupos/grupo_lineas.html'):
+	message = ''
+
+	if id:
+		grupo_lineas = get_object_or_404( GrupoLineas, pk=id)
+	else:
+		grupo_lineas =  GrupoLineas()
+		
+	if request.method == 'POST':
+		form = GrupoLineasManageForm(request.POST, instance=  grupo_lineas)
+		if form.is_valid():
+			grupo = form.save()
+			return HttpResponseRedirect('/punto_de_venta/grupos_lineas')
+	else:
+		form = GrupoLineasManageForm(instance= grupo_lineas)
+
+	c = {'form':form,}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
 ##########################################
 ## 										##
 ##        Generacion de polizas         ##

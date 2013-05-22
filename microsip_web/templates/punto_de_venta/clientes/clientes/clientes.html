@@ -1,4 +1,4 @@
-{% extends "main/base.html" %}
+{% extends "punto_de_venta/base.html" %}
 {% block title %}clientes{% endblock %}
 
 <!-- CSS Code -->
@@ -10,7 +10,7 @@
 {% block breadcrumb %}{{ block.super }} clientes {% endblock %}
 {% block content %}
 <div class="form-actions mainmenu">
-  <!-- <a class="btn btn-success" href="/main/cliente/">Nuevo</a> -->
+  <!-- <a class="btn btn-success" href="/punto_de_venta/cliente/">Nuevo</a> -->
 </div>
 <table class="table tableCell table-hover">
     <tr>
@@ -35,7 +35,7 @@
       </div>
     </div>
     <tr>
-      <td><a href="/main/cliente/{{ cliente.id }}/">{{ cliente.nombre }}</a></td>
+      <td><a href="/punto_de_venta/cliente/{{ cliente.id }}/">{{ cliente.nombre }}</a></td>
       <td>{{cliente.puntos_acomulados }}</td>
       <td>{{cliente.dinero_electronico_acomulado }}</td>
       <td style="text-align:center;">
