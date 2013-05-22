@@ -16,6 +16,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(dajaxice_config.dajaxice_url, include('dajaxice.urls')),
 	(r'^$', 'microsip_web.apps.main.views.index'),
+    url(r'^inicializar_tablas/$', views.inicializar_tablas),
     #url(r'^main/', include('microsip_web.apps.main.urls', namespace='main')),
     #Descomentar esta linea para habilitar inventarios
     #url(r'^inventarios/', include('microsip_web.apps.inventarios.urls', namespace='Inventarios')),
