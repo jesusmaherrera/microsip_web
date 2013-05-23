@@ -395,7 +395,7 @@ def plantilla_poliza_manageView(request, id = None, template_name='punto_de_vent
 
 @login_required(login_url='/login/')
 def ventas_de_mostrador_view(request, template_name='punto_de_venta/documentos/ventas/ventas_de_mostrador.html'):
-	ventas_list = Docto_PV.objects.filter(tipo='V')
+	ventas_list = Docto_PV.objects.filter(tipo='V').order_by('-id')
 
 	paginator = Paginator(ventas_list, 15) # Muestra 10 ventas por pagina
 	page = request.GET.get('page')

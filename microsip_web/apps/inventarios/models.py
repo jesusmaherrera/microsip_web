@@ -70,7 +70,6 @@ class GrupoLineas(models.Model):
     cuenta_ventas       = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
     puntos              = models.IntegerField(db_column='PUNTOS')
     dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
-    maneja_puntos       = models.BooleanField( db_column='MANEJA_PUNTOS')
     
     def __unicode__(self):
         return u'%s' % self.nombre
@@ -85,7 +84,7 @@ class LineaArticulos(models.Model):
     grupo               = models.ForeignKey(GrupoLineas, db_column='GRUPO_LINEA_ID')
     puntos              = models.IntegerField(db_column='PUNTOS')
     dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
-    maneja_puntos       = models.BooleanField( db_column='MANEJA_PUNTOS')
+    hereda_puntos       = models.BooleanField( db_column='HEREDA_PUNTOS')
 
     def __unicode__(self):
         return u'%s' % self.nombre
@@ -101,7 +100,7 @@ class Articulos(models.Model):
     linea               = models.ForeignKey(LineaArticulos, db_column='LINEA_ARTICULO_ID')
     puntos              = models.IntegerField(db_column='PUNTOS')
     dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
-    maneja_puntos       = models.BooleanField( db_column='MANEJA_PUNTOS')
+    hereda_puntos       = models.BooleanField( db_column='HEREDA_PUNTOS')
 
     def __unicode__(self):
         return u'%s' % self.nombre

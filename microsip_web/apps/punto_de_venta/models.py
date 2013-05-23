@@ -86,6 +86,8 @@ class Docto_PV(models.Model):
     fechahora_cancelacion   = models.DateTimeField(blank=True, null=True, db_column='FECHA_HORA_CANCELACION')
     usuario_aut_cancelacion = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_AUT_CANCELACION')
     
+    puntos                  = models.IntegerField(db_column='PUNTOS')
+    dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
     def __unicode__(self):
         return u'%s'% self.id 
     class Meta:

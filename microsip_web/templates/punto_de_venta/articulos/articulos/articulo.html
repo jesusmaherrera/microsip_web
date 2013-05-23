@@ -9,11 +9,11 @@
 <script>
   $(function() {
     
-    if ($('#id_maneja_puntos').is(':checked'))
-      $('#div_puntos, #div_dinero_electronico').show();
+    if ($('#id_hereda_puntos').is(':checked'))
+      $('#div_puntos, #div_dinero_electronico').hide();
     else
     {
-      $('#div_puntos, #div_dinero_electronico').hide();
+      $('#div_puntos, #div_dinero_electronico').show();
       if ($('#id_puntos').val() == '') 
         $('#id_puntos').val(0);
       if ($('#id_dinero_electronico').val() == '') 
@@ -21,12 +21,12 @@
     }
         
 
-    $('#id_maneja_puntos').click(function() {
+    $('#id_hereda_puntos').click(function() {
         if ($(this).is(':checked')) 
-          $('#div_puntos, #div_dinero_electronico').show();
+          $('#div_puntos, #div_dinero_electronico').hide();
         else
         {
-          $('#div_puntos, #div_dinero_electronico').hide();
+          $('#div_puntos, #div_dinero_electronico').show();
           if ($('#id_puntos').val() == '') 
             $('#id_puntos').val(0);
           if ($('#id_dinero_electronico').val() == '') 
@@ -55,9 +55,9 @@
     </div>
   </div>
   <div class="span4"  style='clear:both;'>
-    <label>Maneja Puntos</label>
+    <label>Hereda puntos o dinero electronico</label>
     <div class="input-prepend input-append">
-      {{ form.maneja_puntos }}
+      {{ form.hereda_puntos }}
     </div>
   </div>
   <div id="div_puntos" class="span4" >
