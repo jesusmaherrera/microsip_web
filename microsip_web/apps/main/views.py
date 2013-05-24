@@ -1217,14 +1217,18 @@ def crear_polizas_contables(origen_documentos, documentos, depto_co, informacion
 	detalles_polizas 	= []
 	totales_cuentas 	= {}
 	
+
 	for documento_no, documento in enumerate(documentos):
 		#es_contado = documento.condicion_pago == informacion_contable.condicion_pago_contado
-		
+		descripcion_extra   = ''
+
 		siguente_documento = documentos[(documento_no +1)%len(documentos)]
 		documento_numero = documento_no
 		if origen_documentos == 'cuentas_por_cobrar':
 			totales_cuentas, error, msg = get_totales_documento_cc(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co)
 		elif origen_documentos == 'cuentas_por_pagar':
+			descripcion_extra = documento.proveedor.nombre
+
 			totales_cuentas, error, msg = get_totales_documento_cp(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co)
 		elif origen_documentos == 'ventas':
 			totales_cuentas, error, msg = get_totales_documento_ve(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co)
@@ -1255,7 +1259,7 @@ def crear_polizas_contables(origen_documentos, documentos, depto_co, informacion
 					prefijo = ''
 
 				#Si no tiene una descripcion el documento se pone lo que esta indicado en la descripcion general
-				descripcion_doc = documento.descripcion
+				descripcion_doc = "(%s) %s"% (descripcion_extra, documento.descripcion)
 				
 				if documento.descripcion == None or crear_polizas_por=='Dia' or crear_polizas_por == 'Periodo':
 					descripcion_doc = descripcion
