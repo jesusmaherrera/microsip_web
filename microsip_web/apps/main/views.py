@@ -614,22 +614,21 @@ def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=Non
 
 			cuenta_cantidad 	= importe_segmento.split('=')
 			cuenta_depto= cuenta_cantidad[0].split("/")
-
+			
 			try:
 				cuenta 		=  CuentaCo.objects.get(cuenta=cuenta_depto[0]).cuenta
 			except ObjectDoesNotExist:
 				error = 2
 				msg = 'NO EXISTE almenos una [CUENTA CONTABLE] indicada en un segmento en el documento con folio[%s], Corrigelo para continuar'% documento_folio
 			
+			
 			if len(cuenta_depto) == 2:
 				try:
-					depto = DeptoCo.objects.get(clave=cuenta_depto[1]).clave
+					depto_co = DeptoCo.objects.get(clave=cuenta_depto[1]).clave
 				except ObjectDoesNotExist:
 					error = 2
 					msg = 'NO EXISTE almenos un [DEPARTEMENTO CONTABLE] indicado en un segmento en el documento con folio [%s], Corrigelo para continuar'% documento_folio
-			else:
-				depto = depto_co
-
+			
 			try:
 				importe = float(cuenta_cantidad[1])
 			except:
