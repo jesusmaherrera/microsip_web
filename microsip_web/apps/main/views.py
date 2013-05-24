@@ -40,13 +40,12 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def inicializar_tablas(request):
-	ventas_inicializar_tablas()
-	punto_de_venta_inicializar_tablas()
+	#ventas_inicializar_tablas()
+	#punto_de_venta_inicializar_tablas()
 	cuentas_por_pagar_inicializar_tablas()
 	cuentas_por_cobrar_inicializar_tablas()
 
-
-	punto_de_venta_agregar_trigers()
+	#punto_de_venta_agregar_trigers()
 
  	return HttpResponseRedirect('/')
 
