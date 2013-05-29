@@ -40,7 +40,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def inicializar_tablas(request):
-	#ventas_inicializar_tablas()
+	ventas_inicializar_tablas()
 	#punto_de_venta_inicializar_tablas()
 	cuentas_por_pagar_inicializar_tablas()
 	cuentas_por_cobrar_inicializar_tablas()
@@ -56,40 +56,48 @@ def punto_de_venta_agregar_trigers():
 		'''
 		CREATE OR ALTER TRIGGER DOCTOS_PV_DET_BU_PUNTOS FOR DOCTOS_PV_DET
 		ACTIVE BEFORE UPDATE POSITION 0
-		AS
-        declare variable cliente_id integer;
-        declare variable tipo_tarjeta char(1);
-        /* PUNTOS */
-        declare variable puntos_articulo integer;
-        declare variable puntos_grupo integer;
-        declare variable puntos_linea integer;
-
+		as
+        /* Datos de articulos */
         declare variable articulo_hereda_puntos smallint;
+        declare variable articulo_puntos integer;
+        declare variable articulo_pct_dinero_electronico double PRECISION;
+
         declare variable linea_hereda_puntos smallint;
-        declare variable grupo_hereda_puntos smallint;
+        declare variable linea_puntos integer;
+        declare variable linea_pct_dinero_electronico double PRECISION;
 
+        declare variable grupo_puntos integer;
+        declare variable grupo_pct_dinero_electronico double PRECISION;
+
+        /*Documento*/
+        declare variable documento_total_puntos integer;
+        declare variable documento_total_dinero_electronico double PRECISION;
+        
+        /*Documento*/
+        declare variable documentodet_total_puntos integer;
+        declare variable documentodet_total_dinero_electronico double PRECISION;
+
+        /*Cliente*/
+        declare variable cliente_tipo_tarjeta char(1);
+        declare variable cliente_total_puntos integer;
+        declare variable cliente_total_dinero_electronico double PRECISION;
+
+        /*Temporales*/
         declare variable puntos integer;
-        declare variable total_puntos integer;
-        /* DINERO ELECRONICO */
-        declare variable pct_dinero_electronico_articulo double PRECISION;
-        declare variable pct_dinero_electronico_linea double PRECISION;
-        declare variable pct_dinero_electronico_grupo double PRECISION;
         declare variable pct_dinero_electronico double PRECISION;
-
         declare variable dinero_electronico double PRECISION;
-        declare variable dinero_electronico_acomulado double PRECISION;
+
 
         BEGIN
-            /*Datos del cliente*/
-            SELECT clientes.puntos_acomulados, clientes.cliente_id, clientes.tipo_tarjeta, clientes.dinero_electronico_acomulado
-            FROM clientes, doctos_pv
+            /*Datos del documento*/
+            SELECT clientes.tipo_tarjeta, clientes.puntos_acomulados, clientes.dinero_electronico_acomulado, doctos_pv.puntos, doctos_pv.dinero_electronico, doctos_pv_det.puntos
+            FROM clientes, doctos_pv, doctos_pv_det
             WHERE
-                doctos_pv.docto_pv_id = new.docto_pv_id and
-                doctos_pv.cliente_id = clientes.cliente_id
-            INTO total_puntos, cliente_id, tipo_tarjeta, dinero_electronico_acomulado;
+                doctos_pv.docto_pv_id =  doctos_pv_det.docto_pv_id and
+                doctos_pv.cliente_id = clientes.cliente_id and
+                doctos_pv_det.docto_pv_det_id = old.docto_pv_det_id
+            INTO cliente_tipo_tarjeta, cliente_total_puntos, cliente_total_dinero_electronico, documento_total_puntos, documento_total_dinero_electronico, documentodet_total_puntos;
             
-            IF (dinero_electronico_acomulado IS NULL) then
-                    dinero_electronico_acomulado = 0;
             /*Datos del articulo*/
             SELECT articulos.puntos, articulos.dinero_electronico, lineas_articulos.puntos, lineas_articulos.dinero_electronico,  grupos_lineas.puntos, grupos_lineas.dinero_electronico, articulos.hereda_puntos, lineas_articulos.hereda_puntos
             FROM articulos, lineas_articulos, grupos_lineas
@@ -97,81 +105,64 @@ def punto_de_venta_agregar_trigers():
                 lineas_articulos.linea_articulo_id = articulos.linea_articulo_id AND
                 grupos_lineas.grupo_linea_id = lineas_articulos.grupo_linea_id AND
                 articulos.articulo_id = new.articulo_id
-            INTO puntos_articulo, pct_dinero_electronico_articulo, puntos_linea, pct_dinero_electronico_linea, puntos_grupo, pct_dinero_electronico_grupo, articulo_hereda_puntos, linea_hereda_puntos;
-            
-            if (total_puntos is null) then
-                total_puntos = 0;
+            INTO articulo_puntos, articulo_pct_dinero_electronico, linea_puntos, linea_pct_dinero_electronico, grupo_puntos, grupo_pct_dinero_electronico, articulo_hereda_puntos, linea_hereda_puntos;
 
-            total_puntos = total_puntos - old.puntos;
-            dinero_electronico_acomulado = dinero_electronico_acomulado - old.dinero_electronico;
+            if (documento_total_puntos is null) then
+                documento_total_puntos = 0;
+            if (documento_total_dinero_electronico is null) then
+                documento_total_dinero_electronico = 0;
+            if (cliente_total_puntos is null) then
+                cliente_total_puntos = 0;
+            if (cliente_total_dinero_electronico is null) then
+                cliente_total_dinero_electronico = 0;
+            if (documentodet_total_puntos is null) then
+                documentodet_total_puntos = 0;
 
-            update clientes set puntos_acomulados=:total_puntos, dinero_electronico_acomulado=:dinero_electronico_acomulado where cliente_id = :cliente_id;
-
-            if(tipo_tarjeta = 'P') then
+            if(cliente_tipo_tarjeta = 'P') then
             begin
-                IF (total_puntos IS NULL) then
-                    total_puntos = 0;
-                puntos = 0;
-                
                 if (articulo_hereda_puntos = 1) then
                 begin
-                    /*Si el articulos no tiene puntos busca en lineas*/
-                    IF (((puntos_articulo IS NULL) or (puntos_articulo = 0))) then
-                    BEGIN
-
-                        if (linea_hereda_puntos = 1) then
-                        begin
-                            /*Si la linea no tiene puntos busca grupos */
-                            IF (((puntos_linea IS NULL) or (puntos_linea = 0)) and linea_hereda_puntos = 1 ) then
-                                puntos = puntos_grupo;
-                            ELSE
-                                puntos = puntos_linea;
-                        end
-                    END
-                    ELSE
-                        puntos = puntos_articulo;
+                    if (linea_hereda_puntos = 1) then
+                        puntos = grupo_puntos;
+                    else
+                        puntos = linea_puntos;
                 end
-                total_puntos = total_puntos + (new.unidades * puntos);
-                new.puntos = new.unidades * puntos;
-        /*        update doctos_pv_det set puntos=:puntos where doctos_pv_det.docto_pv_det_id = new.docto_pv_det_id;*/
-                update clientes set puntos_acomulados =:total_puntos where cliente_id = :cliente_id;
+                else        
+                    puntos = articulo_puntos;
 
+                if (puntos is null) then
+                    puntos = 0;
+                new.puntos = (new.unidades * puntos)- old.puntos;
             end
-            else if(tipo_tarjeta = 'D') then
+            else if(cliente_tipo_tarjeta = 'D') then
             begin
-
-                IF (dinero_electronico_acomulado IS NULL) then
-                    dinero_electronico_acomulado = 0;
-                pct_dinero_electronico = 0;
                 
                 if (articulo_hereda_puntos = 1) then
                 begin
-                    /*Si el articulos no tiene dinero electronico busca en lineas*/
-                    IF ((pct_dinero_electronico_articulo IS NULL) or (pct_dinero_electronico_articulo = 0)) then
-                    BEGIN
-                        if (linea_hereda_puntos = 1) then
-                        begin
-                            /*Si la linea no tiene puntos busca grupos */
-                            IF ((pct_dinero_electronico_articulo is null)or (pct_dinero_electronico_linea = 0)) then
-                                pct_dinero_electronico = pct_dinero_electronico_grupo;
-                            ELSE
-                                pct_dinero_electronico = pct_dinero_electronico_linea;
-                        end
-                    END
-                    ELSE
-                        pct_dinero_electronico = pct_dinero_electronico_articulo;
+                    if (linea_hereda_puntos = 1) then
+                        pct_dinero_electronico = grupo_pct_dinero_electronico;
+                    else
+                        pct_dinero_electronico = linea_pct_dinero_electronico;
                 end
-
-                IF (pct_dinero_electronico IS NULL) then
+                else        
+                    pct_dinero_electronico = articulo_pct_dinero_electronico;
+                if (pct_dinero_electronico is null) then
                     pct_dinero_electronico = 0;
 
                 dinero_electronico = (new.unidades * new.precio_unitario) * (pct_dinero_electronico /100);
-                dinero_electronico_acomulado = dinero_electronico_acomulado - old.dinero_electronico + dinero_electronico;
-
-                new.dinero_electronico = dinero_electronico;
-        /*        update doctos_pv_det set dinero_electronico=dinero_electronico where doctos_pv_det.docto_pv_det_id = new.docto_pv_det_id;*/
-                update clientes set dinero_electronico_acomulado =:dinero_electronico_acomulado where cliente_id = :cliente_id;
+               new.dinero_electronico = dinero_electronico - old.dinero_electronico;
             end
+
+            if (new.puntos is null) then
+                new.puntos = 0;
+            if (new.dinero_electronico is null) then
+                new.dinero_electronico = 0;
+
+            documento_total_puntos = documento_total_puntos + new.puntos;
+            documento_total_dinero_electronico = documento_total_dinero_electronico + new.dinero_electronico;
+
+            update doctos_pv set puntos=:documento_total_puntos, dinero_electronico=:documento_total_dinero_electronico where docto_pv_id = new.docto_pv_id;
+/*            update clientes set puntos_acomulados=:cliente_total_puntos, dinero_electronico_acomulado=:cliente_total_dinero_electronico where cliente_id = :cliente_id;*/
         END
 		''')
  	c.execute(
@@ -619,7 +610,7 @@ def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=Non
 				cuenta 		=  CuentaCo.objects.get(cuenta=cuenta_depto[0]).cuenta
 			except ObjectDoesNotExist:
 				error = 2
-				msg = 'NO EXISTE almenos una [CUENTA CONTABLE] indicada en un segmento en el documento con folio[%s], Corrigelo para continuar'% documento_folio
+				msg = 'NO EXISTE O ES INCORRECTA almenos una [CUENTA CONTABLE] indicada en un segmento en el documento con folio[%s], Corrigelo para continuar'% documento_folio
 			
 			
 			if len(cuenta_depto) == 2:
@@ -748,6 +739,7 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
 		error 				= error,
 		msg 				= msg,
 	)
+
 
 	return totales_cuentas, error, msg
 
@@ -921,6 +913,7 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
 		ventas_16_contado 	= ventas_16_contado,
 		iva_contado 		= iva_efec_cobrado,
 		iva_credito 		= iva_pend_cobrar,
+		folio_documento 	= documento.folio,
 		descuento 			= descuento,
 		clientes 			= clientes,
 		cuenta_cliente 	    = cuenta_cliente,
@@ -1065,7 +1058,6 @@ def agregarTotales(totales_cuentas, **kwargs):
 			asientos_a_ingorar.append(concepto.asiento_ingora)
 		if concepto.valor_tipo == 'Segmento_5' and not campos_particulares.segmento_5 == None:
 			asientos_a_ingorar.append(concepto.asiento_ingora)
-
 	for concepto in conceptos_poliza:
 		importe = 0
 		cuenta 	= []
@@ -1136,15 +1128,12 @@ def agregarTotales(totales_cuentas, **kwargs):
 				importe = iva_credito + iva_contado
 
 			cuenta = concepto.cuenta_co.cuenta
-
 		elif concepto.valor_tipo == 'IVA Retenido' and not concepto.posicion in asientos_a_ingorar:
 			importe = iva_retenido
 			cuenta = concepto.cuenta_co.cuenta
-			
 		elif concepto.valor_tipo == 'ISR Retenido' and not concepto.posicion in asientos_a_ingorar:
 			importe = isr_retenido
 			cuenta = concepto.cuenta_co.cuenta
-						
 		elif concepto.valor_tipo == 'Proveedores' and not concepto.posicion in asientos_a_ingorar:
 			if concepto.valor_iva == 'A':
 				importe = proveedores
@@ -1153,7 +1142,6 @@ def agregarTotales(totales_cuentas, **kwargs):
 				cuenta = concepto.cuenta_co.cuenta
 			else:
 				cuenta = cuenta_proveedor
-
 		elif concepto.valor_tipo == 'Clientes' and not concepto.posicion in asientos_a_ingorar:
 			if concepto.valor_iva == 'A':
 				importe = clientes
@@ -1162,17 +1150,15 @@ def agregarTotales(totales_cuentas, **kwargs):
 				cuenta = concepto.cuenta_co.cuenta
 			else:
 				cuenta = cuenta_cliente
-			
 		elif concepto.valor_tipo == 'Bancos' and not concepto.posicion in asientos_a_ingorar:
 			if concepto.valor_iva == 'A':
 				importe =	bancos
 
 			cuenta = concepto.cuenta_co.cuenta
-
 		elif concepto.valor_tipo == 'Descuentos' and not concepto.posicion in asientos_a_ingorar:
 			importe = descuento
 			cuenta = concepto.cuenta_co.cuenta
-
+		
 		posicion_cuenta_depto_tipoAsiento = "%s+%s/%s:%s"% (concepto.posicion, cuenta, depto_co, concepto.tipo)
 		importe = importe
 

@@ -116,15 +116,14 @@ def facturas_View(request, template_name='ventas/herramientas/generar_polizas.ht
 			plantilla_devoluciones 	= form.cleaned_data['plantilla_2']
 			descripcion 			= form.cleaned_data['descripcion']
 			if (crear_polizas_de == 'F' and not plantilla_facturas== None) or (crear_polizas_de == 'D' and not plantilla_devoluciones== None) or (crear_polizas_de == 'FD' and not plantilla_facturas== None and not plantilla_devoluciones== None):
-				msg = 'es valido'
 				documentosData, polizas_de_devoluciones, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla_facturas, plantilla_devoluciones, descripcion)
 			else:
 				error =1
 				msg = 'Seleciona una plantilla'
 
-			if (crear_polizas_de == 'F' or crear_polizas_de=='FD') and documentosData == []:
+			if (crear_polizas_de == 'F' or crear_polizas_de=='FD') and documentosData == [] and msg=='':
 				msg = 'Lo siento, no se encontraron facturas para este filtro'
-			elif (crear_polizas_de == 'D' or crear_polizas_de=='FD') and polizas_de_devoluciones == []:
+			elif (crear_polizas_de == 'D' or crear_polizas_de=='FD') and polizas_de_devoluciones == [] and msg=='':
 				msg = 'Lo siento, no se encontraron devoluciones para este filtro'
 			
 			if crear_polizas_de == 'FD' and documentosData == [] and polizas_de_devoluciones == []:
@@ -188,7 +187,7 @@ def plantilla_poliza_manageView(request, id = None, template_name='ventas/herram
 		plantilla_items 		= PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
 		plantilla_items_formset = plantilla_items(request.POST, request.FILES, instance=plantilla)
 		
-		if plantilla_form.is_valid() and plantilla_items_formset .is_valid():
+		if plantilla_form.is_valid() and plantilla_items_formset.is_valid():
 			plantilla = plantilla_form.save(commit = False)
 			plantilla.save()
 
@@ -200,7 +199,7 @@ def plantilla_poliza_manageView(request, id = None, template_name='ventas/herram
 					Detalleplantilla.plantilla_poliza_v = plantilla
 			
 			plantilla_items_formset .save()
-			return HttpResponseRedirect('ventas/PreferenciasEmpresa/')
+			return HttpResponseRedirect('/ventas/PreferenciasEmpresa/')
 	else:
 		plantilla_items = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
 		plantilla_form= PlantillaPolizaManageForm(instance=plantilla)
