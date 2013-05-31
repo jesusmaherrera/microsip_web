@@ -1,0 +1,45 @@
+{% extends "punto_de_venta/base.html" %}
+{% block title %}Tipos  tipos_cliente{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Tipos tipos_cliente {% endblock %}
+{% block content %}
+<div class="form-actions mainmenu">
+  <!-- <a class="btn btn-success" href="/punto_de_venta/tipo_cliente/">Nuevo</a> -->
+</div>
+<table class="table tableCell table-hover">
+    <tr>
+      <th>Nombre</th>
+      <th>Valor de Puntos</th>
+    </tr>
+    {% for tipo_cliente in tipos_cliente %}
+    <tr>
+      <td><a href="/punto_de_venta/tipo_cliente/{{ tipo_cliente.id }}/">{{ tipo_cliente.nombre }}</a></td>
+      <td>$ {{tipo_cliente.valor_puntos }}</td>
+      
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if tipos_cliente.has_previous %}
+        <li><a href="?page={{ tipos_cliente.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ tipos_cliente.number }} de {{ tipos_cliente.paginator.num_pages }}.</a></li>
+        {% if tipos_cliente.has_next %}
+        <li><a href="?page={{ tipos_cliente.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

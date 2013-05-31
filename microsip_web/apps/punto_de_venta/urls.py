@@ -23,6 +23,14 @@ urlpatterns = patterns('',
 	#Clientes
 	(r'^clientes/$', views.clientes_view),
 	(r'^cliente/(?P<id>\d+)/', views.cliente_manageView),
+    
+    #Tipos Cliente
+    (r'^tipos_cliente/$', views.tipos_cliente_view),
+    (r'^tipo_cliente/(?P<id>\d+)/', views.tipo_cliente_manageView),
+
+    (r'^cliente_search/', views.cliente_searchView),
+    (r'^cliente_search/(?P<id>\d+)/', views.cliente_searchView),
+    
 
     (r'^lineas_articulos/$', views.lineas_articulos_view),
 	# (r'^linea_articulos/$', views.linea_articulos_manageView),

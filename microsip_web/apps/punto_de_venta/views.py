@@ -22,7 +22,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required(login_url='/login/')
 def inicializar_puntos_clientes(request):
-	Cliente.objects.update(puntos_acomulados=0, dinero_electronico_acomulado=0)
+	Cliente.objects.update(puntos=0, dinero_electronico=0)
 	return HttpResponseRedirect('/punto_de_venta/clientes/')
 
 @login_required(login_url='/login/')
@@ -92,6 +92,46 @@ def clientes_view(request, template_name='punto_de_venta/clientes/clientes/clien
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
+def tipos_cliente_view(request, template_name='punto_de_venta/clientes/tipos_cliente/tipos_clientes.html'):
+	tipos_cliente_list = TipoCliente.objects.all()
+
+	paginator = Paginator(tipos_cliente_list, 20) # Muestra 10 ventas por pagina
+	page = request.GET.get('page')
+
+	#####PARA PAGINACION##############
+	try:
+		tipos_cliente = paginator.page(page)
+	except PageNotAnInteger:
+	    # If page is not an integer, deliver first page.
+	    tipos_cliente = paginator.page(1)
+	except EmptyPage:
+	    # If page is out of range (e.g. 9999), deliver last page of results.
+	    tipos_cliente = paginator.page(paginator.num_pages)
+
+	c = {'tipos_cliente':tipos_cliente}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def tipo_cliente_manageView(request, id = None, template_name='punto_de_venta/clientes/tipos_cliente/tipo_cliente.html'):
+	message = ''
+
+	if id:
+		tipo_cliente = get_object_or_404(TipoCliente, pk=id)
+	else:
+		tipo_cliente =  TipoCliente()
+	
+	if request.method == 'POST':
+		form = TipoClienteManageForm(request.POST, instance=  tipo_cliente)
+		if form.is_valid():
+			form.save()
+			return HttpResponseRedirect('/punto_de_venta/tipos_cliente/')
+	else:
+		form = TipoClienteManageForm(instance= tipo_cliente)
+
+	c = {'form':form,}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
 def cliente_manageView(request, id = None, template_name='punto_de_venta/clientes/clientes/cliente.html'):
 	message = ''
 
@@ -110,6 +150,25 @@ def cliente_manageView(request, id = None, template_name='punto_de_venta/cliente
 
 	c = {'form':form,}
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+def cliente_searchView(request, template_name='punto_de_venta/clientes/clientes/cliente_search.html'):
+	message = ''
+	cliente =  Cliente()
+	if request.method == 'POST':
+		form = ClienteSearchForm(request.POST)
+		if form.is_valid():
+			try:
+				cliente = ClavesClientes.objects.get(clave=form.cleaned_data['cliente']).cliente
+			except ObjectDoesNotExist:
+				cliente = Cliente();
+				message='No se encontro un cliente con esta clave, intentalo de nuevo.'
+	else:
+		form = ClienteSearchForm()
+		
+
+	c = {'form':form, 'cliente':cliente,'message':message,}
+	return render_to_response(template_name, c, context_instance=RequestContext(request))
+
 ##########################################
 ## 										##
 ##           Lineas articulos           ##

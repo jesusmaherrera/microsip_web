@@ -218,10 +218,6 @@ class ClavesCatSec(models.Model):
     class Meta:
         db_table = u'claves_cat_sec'
 
-class ClavesClientes(models.Model):
-    class Meta:
-        db_table = u'claves_clientes'
-
 class ClavesEmpleados(models.Model):
     class Meta:
         db_table = u'claves_empleados'
@@ -528,20 +524,55 @@ class Vendedor(models.Model):
 ####                                                        ####
 ################################################################
 
+class TipoCliente(models.Model):
+    id              = models.AutoField(primary_key=True, db_column='TIPO_CLIENTE_ID')
+    nombre          = models.CharField(max_length=100, db_column='NOMBRE')
+    valor_puntos    = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='VALOR_PUNTOS')
+
+    def __unicode__(self):
+        return self.nombre
+        
+    class Meta:
+        db_table = u'tipos_clientes'
+
 class Cliente(models.Model):
     id                          = models.AutoField(primary_key=True, db_column='CLIENTE_ID')
     nombre                      = models.CharField(max_length=100, db_column='NOMBRE')
     cuenta_xcobrar              = models.CharField(max_length=9, db_column='CUENTA_CXC')
     TIPOS = (('N', 'No Aplica'),('P', 'Puntos'),('D', 'Dinero Electronico'),)
-    puntos_acomulados           = models.IntegerField(db_column='PUNTOS_ACOMULADOS')
-    dinero_electronico_acomulado = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO_ACOMULADO')
+    puntos                      = models.IntegerField(db_column='PUNTOS')
+    dinero_electronico          = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
     tipo_tarjeta                = models.CharField(default='N', max_length=1, choices=TIPOS, db_column='TIPO_TARJETA')
-    
+    cobrar_puntos               = models.BooleanField(db_column='COBRAR_PUNTOS')
+    tipo_cliente                = models.ForeignKey(TipoCliente, db_column='TIPO_CLIENTE_ID')
+
+
     def __unicode__(self):
         return self.nombre
 
     class Meta:
         db_table = u'clientes'
+
+
+class RolClavesClientes(models.Model):
+    id      = models.AutoField(primary_key=True, db_column='ROL_CLAVE_CLI_ID')
+    nombre  = models.CharField(max_length=50, db_column='NOMBRE')
+    es_ppal = models.CharField(default='N', max_length=1, db_column='ES_PPAL')
+    
+    class Meta:
+        db_table = u'roles_claves_clientes'
+
+class ClavesClientes(models.Model):
+    id      = models.AutoField(primary_key=True, db_column='CLAVE_CLIENTE_ID')
+    clave   = models.CharField(max_length=20, db_column='CLAVE_CLIENTE')
+    cliente = models.ForeignKey(Cliente, db_column='CLIENTE_ID')
+    rol     = models.ForeignKey(RolClavesClientes, db_column='ROL_CLAVE_CLI_ID')
+    
+    def __unicode__(self):
+        return self.clave
+
+    class Meta:
+        db_table = u'claves_clientes'
 
 class DirCliente(models.Model):
     id                  = models.AutoField(primary_key=True, db_column='DIR_CLI_ID')

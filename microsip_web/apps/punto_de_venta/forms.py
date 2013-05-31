@@ -24,6 +24,10 @@ class ClienteManageForm(forms.ModelForm):
 			'cuenta_xcobrar',
 		}
 
+class TipoClienteManageForm(forms.ModelForm):
+	class Meta:
+		model = TipoCliente
+
 class LineaArticulosManageForm(forms.ModelForm):
 	class Meta:
 		model = LineaArticulos
@@ -66,6 +70,8 @@ class GenerarPolizasManageForm(forms.Form):
     )
 	crear_polizas_de 			= forms.ChoiceField(choices=TIPOS, required=True)
 
+class ClienteSearchForm(forms.Form):
+	cliente = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'autofocus':''}),required=True)
 
 class PlantillaPolizaManageForm(forms.ModelForm):
 	class Meta:

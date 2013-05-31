@@ -41,22 +41,22 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def inicializar_tablas(request):
 	ventas_inicializar_tablas()
-	#punto_de_venta_inicializar_tablas()
+	punto_de_venta_inicializar_tablas()
 	cuentas_por_pagar_inicializar_tablas()
 	cuentas_por_cobrar_inicializar_tablas()
 
-	#punto_de_venta_agregar_trigers()
+	punto_de_venta_agregar_trigers()
 
  	return HttpResponseRedirect('/')
 
 def punto_de_venta_agregar_trigers():
-	c = connection.cursor()
-	#VENTAS
-	c.execute(
+    c = connection.cursor()
+	#DETALLE DE VENTAS
+    c.execute(
 		'''
 		CREATE OR ALTER TRIGGER DOCTOS_PV_DET_BU_PUNTOS FOR DOCTOS_PV_DET
-		ACTIVE BEFORE UPDATE POSITION 0
-		as
+        ACTIVE BEFORE UPDATE POSITION 0
+        as
         /* Datos de articulos */
         declare variable articulo_hereda_puntos smallint;
         declare variable articulo_puntos integer;
@@ -72,12 +72,9 @@ def punto_de_venta_agregar_trigers():
         /*Documento*/
         declare variable documento_total_puntos integer;
         declare variable documento_total_dinero_electronico double PRECISION;
-        
-        /*Documento*/
-        declare variable documentodet_total_puntos integer;
-        declare variable documentodet_total_dinero_electronico double PRECISION;
 
         /*Cliente*/
+        declare variable cliente_id integer;
         declare variable cliente_tipo_tarjeta char(1);
         declare variable cliente_total_puntos integer;
         declare variable cliente_total_dinero_electronico double PRECISION;
@@ -87,17 +84,16 @@ def punto_de_venta_agregar_trigers():
         declare variable pct_dinero_electronico double PRECISION;
         declare variable dinero_electronico double PRECISION;
 
-
         BEGIN
             /*Datos del documento*/
-            SELECT clientes.tipo_tarjeta, clientes.puntos_acomulados, clientes.dinero_electronico_acomulado, doctos_pv.puntos, doctos_pv.dinero_electronico, doctos_pv_det.puntos
+            SELECT clientes.cliente_id, clientes.tipo_tarjeta, clientes.puntos, clientes.dinero_electronico, doctos_pv.puntos, doctos_pv.dinero_electronico
             FROM clientes, doctos_pv, doctos_pv_det
             WHERE
                 doctos_pv.docto_pv_id =  doctos_pv_det.docto_pv_id and
                 doctos_pv.cliente_id = clientes.cliente_id and
-                doctos_pv_det.docto_pv_det_id = old.docto_pv_det_id
-            INTO cliente_tipo_tarjeta, cliente_total_puntos, cliente_total_dinero_electronico, documento_total_puntos, documento_total_dinero_electronico, documentodet_total_puntos;
-            
+                doctos_pv_det.docto_pv_det_id = new.docto_pv_det_id
+            INTO :cliente_id, :cliente_tipo_tarjeta, :cliente_total_puntos, :cliente_total_dinero_electronico, :documento_total_puntos, :documento_total_dinero_electronico;
+
             /*Datos del articulo*/
             SELECT articulos.puntos, articulos.dinero_electronico, lineas_articulos.puntos, lineas_articulos.dinero_electronico,  grupos_lineas.puntos, grupos_lineas.dinero_electronico, articulos.hereda_puntos, lineas_articulos.hereda_puntos
             FROM articulos, lineas_articulos, grupos_lineas
@@ -105,7 +101,7 @@ def punto_de_venta_agregar_trigers():
                 lineas_articulos.linea_articulo_id = articulos.linea_articulo_id AND
                 grupos_lineas.grupo_linea_id = lineas_articulos.grupo_linea_id AND
                 articulos.articulo_id = new.articulo_id
-            INTO articulo_puntos, articulo_pct_dinero_electronico, linea_puntos, linea_pct_dinero_electronico, grupo_puntos, grupo_pct_dinero_electronico, articulo_hereda_puntos, linea_hereda_puntos;
+            INTO :articulo_puntos, :articulo_pct_dinero_electronico, :linea_puntos, :linea_pct_dinero_electronico, :grupo_puntos, :grupo_pct_dinero_electronico, :articulo_hereda_puntos, :linea_hereda_puntos;
 
             if (documento_total_puntos is null) then
                 documento_total_puntos = 0;
@@ -115,8 +111,6 @@ def punto_de_venta_agregar_trigers():
                 cliente_total_puntos = 0;
             if (cliente_total_dinero_electronico is null) then
                 cliente_total_dinero_electronico = 0;
-            if (documentodet_total_puntos is null) then
-                documentodet_total_puntos = 0;
 
             if(cliente_tipo_tarjeta = 'P') then
             begin
@@ -132,7 +126,7 @@ def punto_de_venta_agregar_trigers():
 
                 if (puntos is null) then
                     puntos = 0;
-                new.puntos = (new.unidades * puntos)- old.puntos;
+                new.puntos = (new.unidades * puntos);
             end
             else if(cliente_tipo_tarjeta = 'D') then
             begin
@@ -150,7 +144,7 @@ def punto_de_venta_agregar_trigers():
                     pct_dinero_electronico = 0;
 
                 dinero_electronico = (new.unidades * new.precio_unitario) * (pct_dinero_electronico /100);
-               new.dinero_electronico = dinero_electronico - old.dinero_electronico;
+                new.dinero_electronico = dinero_electronico ;
             end
 
             if (new.puntos is null) then
@@ -158,85 +152,190 @@ def punto_de_venta_agregar_trigers():
             if (new.dinero_electronico is null) then
                 new.dinero_electronico = 0;
 
-            documento_total_puntos = documento_total_puntos + new.puntos;
-            documento_total_dinero_electronico = documento_total_dinero_electronico + new.dinero_electronico;
+            documento_total_puntos = documento_total_puntos + new.puntos - old.puntos;
+            documento_total_dinero_electronico = documento_total_dinero_electronico + new.dinero_electronico-old.dinero_electronico;
+
+            cliente_total_puntos = cliente_total_puntos + documento_total_puntos - old.puntos;
+            cliente_total_dinero_electronico = cliente_total_dinero_electronico + documento_total_dinero_electronico - old.dinero_electronico;
 
             update doctos_pv set puntos=:documento_total_puntos, dinero_electronico=:documento_total_dinero_electronico where docto_pv_id = new.docto_pv_id;
-/*            update clientes set puntos_acomulados=:cliente_total_puntos, dinero_electronico_acomulado=:cliente_total_dinero_electronico where cliente_id = :cliente_id;*/
+            update clientes set puntos=:cliente_total_puntos, dinero_electronico=:cliente_total_dinero_electronico where cliente_id = :cliente_id;
         END
 		''')
- 	c.execute(
+
+    c.execute(
  		'''
  		CREATE OR ALTER TRIGGER DOCTOS_PV_DET_AD_PUNTOS FOR DOCTOS_PV_DET
-		ACTIVE AFTER DELETE POSITION 0
-		AS
-		declare variable cliente_id integer;
-		/* PUNTOS */
-		declare variable total_puntos integer;
-		declare variable dinero_electronico_acomulado double PRECISION;
-		BEGIN
-		    /*Datos del cliente*/
-		    SELECT clientes.puntos_acomulados, clientes.cliente_id, clientes.dinero_electronico_acomulado
-		    FROM clientes, doctos_pv
-		    WHERE
-		        doctos_pv.docto_pv_id = old.docto_pv_id and
-		        doctos_pv.cliente_id = clientes.cliente_id
-		    INTO total_puntos, cliente_id, dinero_electronico_acomulado;
-		    
-		    IF (dinero_electronico_acomulado IS NULL) then
-		            dinero_electronico_acomulado = 0;
+        ACTIVE AFTER DELETE POSITION 0
+        AS
+        declare variable cliente_id integer;
+        /* PUNTOS */
+        declare variable total_puntos integer;
+        declare variable dinero_electronico double PRECISION;
+        BEGIN
+            /*Datos del cliente*/
+            SELECT clientes.puntos, clientes.cliente_id, clientes.dinero_electronico
+            FROM clientes, doctos_pv
+            WHERE
+                doctos_pv.docto_pv_id = old.docto_pv_id and
+                doctos_pv.cliente_id = clientes.cliente_id
+            INTO total_puntos, cliente_id, dinero_electronico;
+            
+            IF (dinero_electronico IS NULL) then
+                    dinero_electronico = 0;
 
-		    if (total_puntos is null) then
-		        total_puntos = 0;
+            if (total_puntos is null) then
+                total_puntos = 0;
 
-		    total_puntos = total_puntos - old.puntos;
-		    dinero_electronico_acomulado = dinero_electronico_acomulado - old.dinero_electronico;
+            total_puntos = total_puntos - old.puntos;
+            dinero_electronico = dinero_electronico - old.dinero_electronico;
 
-		    update clientes set puntos_acomulados=:total_puntos, dinero_electronico_acomulado=:dinero_electronico_acomulado where cliente_id = :cliente_id;
-		end
+            update clientes set puntos=:total_puntos, dinero_electronico=:dinero_electronico where cliente_id = :cliente_id;
+        end
  		''')
 
- 	#COBROS
- 	try:
+ 	#VENTAS
+    c.execute(
+	 	'''
+	 	CREATE OR ALTER TRIGGER DOCTOS_PV_BU_PUNTOS FOR DOCTOS_PV
+        ACTIVE BEFORE UPDATE POSITION 0
+        AS
+        declare variable cliente_tipo_tarjeta char(1);
+        declare variable cliente_cobrar_puntos smallint;
+        declare variable cliente_total_puntos integer;
+        declare variable cliente_total_dinero_electronico double PRECISION;
+        declare variable tipo_cliente_valor_puntos double PRECISION;
+
+        declare variable old_cliente_tipo_tarjeta char(1);
+        declare variable old_cliente_cobrar_puntos smallint;
+        declare variable old_cliente_total_puntos integer;
+        declare variable old_cliente_total_dinero_electronico double PRECISION;
+        begin
+            if (not old.cliente_id is null) then
+            begin
+                /*Datos del old_cliente */
+                SELECT clientes.tipo_tarjeta, clientes.puntos, clientes.dinero_electronico, clientes.cobrar_puntos, tipos_clientes.valor_puntos
+                FROM clientes, tipos_clientes
+                WHERE clientes.cliente_id = old.cliente_id and clientes.tipo_cliente_id = tipos_clientes.tipo_cliente_id
+                INTO :old_cliente_tipo_tarjeta, :old_cliente_total_puntos, :old_cliente_total_dinero_electronico, :old_cliente_cobrar_puntos, :tipo_cliente_valor_puntos;
+            end
+
+            /*Datos del cliente nuevo*/
+            SELECT clientes.tipo_tarjeta, clientes.puntos, clientes.dinero_electronico, clientes.cobrar_puntos
+            FROM clientes
+            WHERE clientes.cliente_id = new.cliente_id
+            INTO :cliente_tipo_tarjeta, :cliente_total_puntos, :cliente_total_dinero_electronico, :cliente_cobrar_puntos;
+
+            if(tipo_cliente_valor_puntos is null) then
+                tipo_cliente_valor_puntos = 0;
+            if (cliente_total_dinero_electronico is null) then
+                cliente_total_dinero_electronico = 0;
+            if (cliente_total_puntos is null) then
+                cliente_total_puntos = 0;
+            if (cliente_cobrar_puntos is null) then
+                cliente_cobrar_puntos = 0;
+            if (old_cliente_total_dinero_electronico is null) then
+                old_cliente_total_dinero_electronico = 0;
+            if (old_cliente_total_puntos is null) then
+                old_cliente_total_puntos = 0;
+            if (old_cliente_cobrar_puntos is null) then
+                old_cliente_cobrar_puntos = 0;
+
+            /*if (old.cliente_id <> new.cliente_id and not old.cliente_id is null) then
+            begin
+                if(old_cliente_tipo_tarjeta <> 'N' and old_cliente_cobrar_puntos = 1) then
+                begin
+                     old_cliente_total_dinero_electronico =  old_cliente_total_dinero_electronico - new.dscto_importe;
+                     cliente_total_dinero_electronico =  cliente_total_dinero_electronico + new.dscto_importe;
+                     old_cliente_total_puntos = old_cliente_total_puntos - new.dscto_importe;
+                     cliente_total_puntos = cliente_total_puntos + new.dscto_importe;
+                end
+                update clientes set puntos=:old_cliente_total_puntos, dinero_electronico=:old_cliente_total_dinero_electronico where cliente_id = old.cliente_id;
+                update clientes set puntos=:cliente_total_puntos, dinero_electronico=:cliente_total_dinero_electronico where cliente_id = new.cliente_id;
+           end  */
+            if (new.estatus='C') then
+                begin
+                    cliente_total_dinero_electronico =  cliente_total_dinero_electronico - new.dinero_electronico;
+                    cliente_total_puntos = cliente_total_puntos - new.puntos;
+                    update clientes set puntos=:cliente_total_puntos, dinero_electronico=:cliente_total_dinero_electronico where cliente_id = new.cliente_id;
+                end
+            else
+            begin
+                if(cliente_tipo_tarjeta <> 'N' ) then /*and cliente_cobrar_puntos = 1*/
+                begin
+                    if (cliente_tipo_tarjeta='D') then
+                        cliente_total_dinero_electronico =  cliente_total_dinero_electronico - new.dscto_importe + old.dscto_importe;
+                    else if (cliente_tipo_tarjeta='P') then
+
+                        cliente_total_puntos = cliente_total_puntos - (new.dscto_importe/tipo_cliente_valor_puntos) + (old.dscto_importe/tipo_cliente_valor_puntos);
+
+                    update clientes set puntos=:cliente_total_puntos, dinero_electronico=:cliente_total_dinero_electronico where cliente_id = new.cliente_id;
+                end
+            end
+        end
+	 	''')
+
+    c.execute(
+        '''
+        CREATE OR ALTER TRIGGER DOCTOS_PV_AD_PUNTOS FOR DOCTOS_PV
+        ACTIVE AFTER DELETE POSITION 0
+        AS
+        declare variable cliente_id integer;
+        /* PUNTOS */
+        declare variable total_puntos integer;
+        declare variable dinero_electronico double PRECISION;
+        BEGIN
+            /*Datos del cliente*/
+            SELECT clientes.puntos, clientes.cliente_id, clientes.dinero_electronico
+            FROM clientes, doctos_pv
+            WHERE
+            doctos_pv.docto_pv_id = old.docto_pv_id and
+            doctos_pv.cliente_id = clientes.cliente_id
+            INTO total_puntos, cliente_id, dinero_electronico;
+
+            IF (dinero_electronico IS NULL) then
+                dinero_electronico = 0;
+
+            if (total_puntos is null) then
+                total_puntos = 0;
+
+            total_puntos = total_puntos - old.puntos;
+                dinero_electronico = dinero_electronico - old.dinero_electronico;
+
+            update clientes set puntos=:total_puntos, dinero_electronico=:dinero_electronico where cliente_id = :cliente_id;
+        end
+        '''
+        )
+
+    #CLIENTES
+    c.execute(
+		'''
+		CREATE OR ALTER TRIGGER CLIENTES_BU_PUNTOS FOR CLIENTES
+        ACTIVE BEFORE UPDATE POSITION 0
+        AS
+        begin
+              if (new.puntos <> old.puntos or new.dinero_electronico <> old.dinero_electronico) then
+              begin
+                if (new.puntos < 0 and new.tipo_tarjeta='P') then
+                    exception ex_cliente_sin_saldo 'El cliente no tiene suficientes puntos, solo tiene('||old.puntos||' en Puntos.)';
+                else if (new.dinero_electronico < 0 and new.tipo_tarjeta='D') then
+                    exception ex_cliente_sin_saldo 'El cliente no tiene suficientes Dinero Electronico, solo tiene('||old.dinero_electronico||' en Dinero electronico.)';
+              end
+
+        end
+		'''
+		)
+
+ 	#EXCEPTION
+    try:
 	  	c.execute(
-	 		'''
-	 		CREATE EXCEPTION EX_CLIENTE_SIN_SALDO 'El cliente no tiene suficiente saldo';	
-	 		''')
- 	except Exception, e:
-		print "Oops!  No pudo agregarse la excepción EX_CLIENTE_SIN_SALDO por que esta ya existe. "
-
- 	c.execute(
  		'''
- 		CREATE OR ALTER TRIGGER DOCTOS_PV_COBROS_BU_PUNTOS FOR DOCTOS_PV_COBROS
-		ACTIVE BEFORE UPDATE POSITION 0
-		as
-		declare variable nombre_forma_cobro char(100);
-		declare variable dinero_electronico_cliente double PRECISION;
-		declare variable total_dinero_electronico double PRECISION;
-		declare variable cliente_id integer;
-		begin
-		    select formas_cobro.nombre from formas_cobro where formas_cobro.forma_cobro_id = new.forma_cobro_id
-		    into nombre_forma_cobro;
+ 		CREATE EXCEPTION EX_CLIENTE_SIN_SALDO 'El cliente no tiene suficiente saldo';	
+ 		''')
+    except Exception, e:
+	   print "Oops!  No pudo agregarse la excepción EX_CLIENTE_SIN_SALDO por que esta ya existe. "
 
-		    if (nombre_forma_cobro = 'Dinero Electronico') then
-		    begin
-		        select clientes.dinero_electronico_acomulado, clientes.cliente_id
-		        from clientes, doctos_pv
-		        where
-		            doctos_pv.cliente_id = clientes.cliente_id and
-		            doctos_pv.docto_pv_id = new.docto_pv_id
-		        into dinero_electronico_cliente, cliente_id;
-
-		        total_dinero_electronico = dinero_electronico_cliente - (new.importe- old.importe);
-		        IF (total_dinero_electronico >= 0) then
-		            UPDATE clientes SET dinero_electronico_acomulado = :total_dinero_electronico WHERE cliente_id = :cliente_id;
-		        ELSE
-		            EXCEPTION EX_CLIENTE_SIN_SALDO 'EL CLIENTE NO TIENE SUFICIENTE DINERO ELECTRONICO, EL CLIENTE SOLO TIENE (' || dinero_electronico_cliente || ')';
-		    end
-		end
- 		'''
- 		)
- 	transaction.commit_unless_managed()
+    transaction.commit_unless_managed()
 
 def ventas_inicializar_tablas():
 	c = connection.cursor()
@@ -360,18 +459,29 @@ def punto_de_venta_inicializar_tablas():
 			/*Clientes */
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
-			where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'DINERO_ELECTRONICO_ACOMULADO')) then
-			    execute statement 'ALTER TABLE CLIENTES ADD DINERO_ELECTRONICO_ACOMULADO IMPORTE_MONETARIO DEFAULT 0';
+			where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'DINERO_ELECTRONICO')) then
+			    execute statement 'ALTER TABLE CLIENTES ADD DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
-			where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'PUNTOS_ACOMULADOS')) then
-			    execute statement 'ALTER TABLE CLIENTES ADD PUNTOS_ACOMULADOS ENTERO DEFAULT 0';
+			where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
+			    execute statement 'ALTER TABLE CLIENTES ADD PUNTOS ENTERO DEFAULT 0';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'TIPO_TARJETA')) then
                 execute statement 'ALTER TABLE CLIENTES ADD TIPO_TARJETA CHAR(1)';
+
+            if (not exists(
+			select 1 from RDB$RELATION_FIELDS rf
+			where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'COBRAR_PUNTOS')) then
+			    execute statement 'ALTER TABLE CLIENTES ADD COBRAR_PUNTOS SMALLINT';
+            
+            /*Tipo Cliente */
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'TIPOS_CLIENTES' and rf.RDB$FIELD_NAME = 'VALOR_PUNTOS')) then
+                execute statement 'ALTER TABLE TIPOS_CLIENTES ADD VALOR_PUNTOS IMPORTE_MONETARIO DEFAULT 0';
 
 			/*Doctos pv det */
 			if (not exists(

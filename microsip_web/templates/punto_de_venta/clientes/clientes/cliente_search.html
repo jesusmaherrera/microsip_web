@@ -1,0 +1,55 @@
+{% extends "base_basic.html" %}
+{% block title %}Cliente{% endblock %}
+
+<!-- CSS Code -->ghg
+{% block style_css %}{% endblock %}
+
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/clientes/">Clientes</a> <i class=" icon-play"></i> Consulta de puntos y Dinero Electronico{% endblock %}
+{% block content %}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
+  {% csrf_token %}
+    {{ form.errors }}
+  {% if message %}
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <p>{{ message }}</p>
+  </div>
+  {% endif %}
+  <div class="span4"  style='clear:both;'>
+    <label>Clave Cliente</label>
+    <div class="input-prepend input-append">
+      {{ form.cliente }}
+      <!-- <a href="#" class='btn' id='boton'>Buscar</a> -->
+      <input type="submit" class="btn" value="Buscar" />
+    </div>
+  </div>
+  <div class="span2" >
+    <label>Puntos</label>
+    <div class="input-prepend input-append">
+      <h2 id='h2_puntos'>{{ cliente.puntos }}</h2>
+    </div>
+  </div>
+  <div class="span2" >
+    <label>Dinero Electronico</label>
+    <h1 id='h1_timer'></h1>
+    <div class="input-prepend input-append">
+      <h2 id='h2_dinero_electronico'>$ {{ cliente.dinero_electronico }}</h2>
+    </div>
+  </div>
+  
+  <div class="span4" style="clear:both;">
+  . 
+  </div>
+  <div class="span4">
+    <h4 id='h4_cliente_nombre'>{{ cliente.nombre }}</h4>
+  </div>
+
+  
+
+  
+  <br style='clear:both;'>
+  
+</form>
+{% endblock %}
