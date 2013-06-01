@@ -23,7 +23,7 @@ INSTALACION DE APLICACION
 11:sincronizar base de datos con python manage.py syncdb
 12:configurar ip de servidor en archivo "C:\microsip_web_compilado\extras\scripts\Iniciar microsip app.cmd"
 13:Ejecutar aplicacion con ip:puerto indicados anteriormente
-14: ejecutar <ip:puerto>/main/inicializar_tablas para inicializar tablas
+14: ejecutar <ip:puerto>/inicializar_tablas para inicializar tablas
 15:listo
 
 ACTUALIZACION DE APLICACION
