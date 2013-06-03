@@ -45,7 +45,7 @@ def inicializar_tablas(request):
 	cuentas_por_pagar_inicializar_tablas()
 	cuentas_por_cobrar_inicializar_tablas()
 
-	punto_de_venta_agregar_trigers()
+	#punto_de_venta_agregar_trigers()
 
  	return HttpResponseRedirect('/')
 
@@ -206,18 +206,19 @@ def punto_de_venta_agregar_trigers():
         declare variable cliente_total_dinero_electronico double PRECISION;
         declare variable tipo_cliente_valor_puntos double PRECISION;
 
-        declare variable old_cliente_tipo_tarjeta char(1);
-        declare variable old_cliente_cobrar_puntos smallint;
-        declare variable old_cliente_total_puntos integer;
-        declare variable old_cliente_total_dinero_electronico double PRECISION;
+        /*variables de pagos*/
+        declare variable valor_puntos_pago double PRECISION;
+        declare variable puntos_pago integer;
+        declare variable dinero_electronico_pago double PRECISION;
+
         begin
             if (not old.cliente_id is null) then
             begin
                 /*Datos del old_cliente */
-                SELECT clientes.tipo_tarjeta, clientes.puntos, clientes.dinero_electronico, clientes.cobrar_puntos, tipos_clientes.valor_puntos
+                SELECT tipos_clientes.valor_puntos
                 FROM clientes, tipos_clientes
                 WHERE clientes.cliente_id = old.cliente_id and clientes.tipo_cliente_id = tipos_clientes.tipo_cliente_id
-                INTO :old_cliente_tipo_tarjeta, :old_cliente_total_puntos, :old_cliente_total_dinero_electronico, :old_cliente_cobrar_puntos, :tipo_cliente_valor_puntos;
+                INTO :tipo_cliente_valor_puntos;
             end
 
             /*Datos del cliente nuevo*/
@@ -234,25 +235,7 @@ def punto_de_venta_agregar_trigers():
                 cliente_total_puntos = 0;
             if (cliente_cobrar_puntos is null) then
                 cliente_cobrar_puntos = 0;
-            if (old_cliente_total_dinero_electronico is null) then
-                old_cliente_total_dinero_electronico = 0;
-            if (old_cliente_total_puntos is null) then
-                old_cliente_total_puntos = 0;
-            if (old_cliente_cobrar_puntos is null) then
-                old_cliente_cobrar_puntos = 0;
 
-            /*if (old.cliente_id <> new.cliente_id and not old.cliente_id is null) then
-            begin
-                if(old_cliente_tipo_tarjeta <> 'N' and old_cliente_cobrar_puntos = 1) then
-                begin
-                     old_cliente_total_dinero_electronico =  old_cliente_total_dinero_electronico - new.dscto_importe;
-                     cliente_total_dinero_electronico =  cliente_total_dinero_electronico + new.dscto_importe;
-                     old_cliente_total_puntos = old_cliente_total_puntos - new.dscto_importe;
-                     cliente_total_puntos = cliente_total_puntos + new.dscto_importe;
-                end
-                update clientes set puntos=:old_cliente_total_puntos, dinero_electronico=:old_cliente_total_dinero_electronico where cliente_id = old.cliente_id;
-                update clientes set puntos=:cliente_total_puntos, dinero_electronico=:cliente_total_dinero_electronico where cliente_id = new.cliente_id;
-           end  */
             if (new.estatus='C') then
                 begin
                     cliente_total_dinero_electronico =  cliente_total_dinero_electronico - new.dinero_electronico;
@@ -264,10 +247,23 @@ def punto_de_venta_agregar_trigers():
                 if(cliente_tipo_tarjeta <> 'N' ) then /*and cliente_cobrar_puntos = 1*/
                 begin
                     if (cliente_tipo_tarjeta='D') then
+                    begin
                         cliente_total_dinero_electronico =  cliente_total_dinero_electronico - new.dscto_importe + old.dscto_importe;
+                        valor_puntos_pago =  0;
+                        puntos_pago =  0;
+                        dinero_electronico_pago = new.dscto_importe;
+                    end
                     else if (cliente_tipo_tarjeta='P') then
-
+                    begin
                         cliente_total_puntos = cliente_total_puntos - (new.dscto_importe/tipo_cliente_valor_puntos) + (old.dscto_importe/tipo_cliente_valor_puntos);
+                        valor_puntos_pago =  tipo_cliente_valor_puntos;
+                        puntos_pago =  new.dscto_importe/tipo_cliente_valor_puntos;
+                        dinero_electronico_pago = 0;
+                    end
+
+                    new.dinero_electronico_pago = :dinero_electronico_pago;
+                    new.valor_puntos_pago = :valor_puntos_pago;
+                    new.puntos_pago = :puntos_pago;
 
                     update clientes set puntos=:cliente_total_puntos, dinero_electronico=:cliente_total_dinero_electronico where cliente_id = new.cliente_id;
                 end
@@ -472,11 +468,6 @@ def punto_de_venta_inicializar_tablas():
 			where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'TIPO_TARJETA')) then
                 execute statement 'ALTER TABLE CLIENTES ADD TIPO_TARJETA CHAR(1)';
 
-            if (not exists(
-			select 1 from RDB$RELATION_FIELDS rf
-			where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'COBRAR_PUNTOS')) then
-			    execute statement 'ALTER TABLE CLIENTES ADD COBRAR_PUNTOS SMALLINT';
-            
             /*Tipo Cliente */
             if (not exists(
             select 1 from RDB$RELATION_FIELDS rf
@@ -503,6 +494,21 @@ def punto_de_venta_inicializar_tablas():
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
 			    execute statement 'ALTER TABLE DOCTOS_PV ADD PUNTOS ENTERO DEFAULT 0';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'VALOR_PUNTOS_PAGO')) then
+                execute statement 'ALTER TABLE DOCTOS_PV ADD VALOR_PUNTOS_PAGO IMPORTE_MONETARIO DEFAULT 0';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'PUNTOS_PAGO')) then
+                execute statement 'ALTER TABLE DOCTOS_PV ADD PUNTOS_PAGO ENTERO DEFAULT 0';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'DINERO_ELECTRONICO_PAGO')) then
+                execute statement 'ALTER TABLE DOCTOS_PV ADD DINERO_ELECTRONICO_PAGO IMPORTE_MONETARIO DEFAULT 0';
 		END
 		''')
  	c.execute('EXECUTE PROCEDURE punto_de_venta_inicializar;')

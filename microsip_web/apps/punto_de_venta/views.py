@@ -154,19 +154,21 @@ def cliente_manageView(request, id = None, template_name='punto_de_venta/cliente
 def cliente_searchView(request, template_name='punto_de_venta/clientes/clientes/cliente_search.html'):
 	message = ''
 	cliente =  Cliente()
+	dinero_en_puntos = 0
+
 	if request.method == 'POST':
 		form = ClienteSearchForm(request.POST)
 		if form.is_valid():
 			try:
 				cliente = ClavesClientes.objects.get(clave=form.cleaned_data['cliente']).cliente
+				dinero_en_puntos =  cliente.tipo_cliente.valor_puntos * cliente.puntos
 			except ObjectDoesNotExist:
 				cliente = Cliente();
 				message='No se encontro un cliente con esta clave, intentalo de nuevo.'
 	else:
 		form = ClienteSearchForm()
 		
-
-	c = {'form':form, 'cliente':cliente,'message':message,}
+	c = {'form':form, 'cliente':cliente,'message':message, 'dinero_en_puntos':dinero_en_puntos, }
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################

@@ -6,7 +6,6 @@
 
 {% block js_code %}{% endblock %}
 
-{% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/clientes/">Clientes</a> <i class=" icon-play"></i> Consulta de puntos y Dinero Electronico{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
   {% csrf_token %}
@@ -17,6 +16,7 @@
     <p>{{ message }}</p>
   </div>
   {% endif %}
+
   <div class="span4"  style='clear:both;'>
     <label>Clave Cliente</label>
     <div class="input-prepend input-append">
@@ -26,23 +26,32 @@
     </div>
   </div>
   <div class="span2" >
-    <label>Puntos</label>
+    <label>Cobrar y abonar con</label>
     <div class="input-prepend input-append">
-      <h2 id='h2_puntos'>{{ cliente.puntos }}</h2>
+      <h2 id='h2_puntos'>
+        {% if cliente.tipo_tarjeta = 'P' %}
+          Puntos
+        {% elif cliente.tipo_tarjeta = 'D'%}
+          Dinero Electronico
+        {% elif cliente.tipo_tarjeta = 'N'%}
+          No aplica
+        {% endif %}
+      </h2>
     </div>
   </div>
-  <div class="span2" >
+  <div class="span4" style="clear:both;" >
+    <label>Puntos(Dinero)</label>
+    <div class="input-prepend input-append">
+      <h2 id='h2_puntos' class="money-text">{{ cliente.puntos }}(${{dinero_en_puntos}})</h2>
+    </div>
+  </div>
+  <div class="span4" >
     <label>Dinero Electronico</label>
-    <h1 id='h1_timer'></h1>
     <div class="input-prepend input-append">
-      <h2 id='h2_dinero_electronico'>$ {{ cliente.dinero_electronico }}</h2>
+      <h2 id='h2_dinero_electronico' class="money-text">${{cliente.dinero_electronico }}</h2>
     </div>
   </div>
-  
   <div class="span4" style="clear:both;">
-  . 
-  </div>
-  <div class="span4">
     <h4 id='h4_cliente_nombre'>{{ cliente.nombre }}</h4>
   </div>
 

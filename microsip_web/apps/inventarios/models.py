@@ -543,7 +543,6 @@ class Cliente(models.Model):
     puntos                      = models.IntegerField(db_column='PUNTOS')
     dinero_electronico          = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
     tipo_tarjeta                = models.CharField(default='N', max_length=1, choices=TIPOS, db_column='TIPO_TARJETA')
-    cobrar_puntos               = models.BooleanField(db_column='COBRAR_PUNTOS')
     tipo_cliente                = models.ForeignKey(TipoCliente, db_column='TIPO_CLIENTE_ID')
 
 
