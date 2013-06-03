@@ -343,54 +343,54 @@ def ventas_inicializar_tablas():
 		    if (not exists(
 		    select 1 from RDB$RELATION_FIELDS rf
 		    where rf.RDB$RELATION_NAME = 'LIBRES_FAC_VE' and rf.RDB$FIELD_NAME = 'SEGMENTO_1')) then
-		        execute statement 'ALTER TABLE LIBRES_FAC_VE ADD SEGMENTO_1 INTEGER';
+		        execute statement 'ALTER TABLE LIBRES_FAC_VE ADD SEGMENTO_1 VARCHAR(99)';
 
 		    if (not exists(
 		    select 1 from RDB$RELATION_FIELDS rf
 		    where rf.RDB$RELATION_NAME = 'LIBRES_FAC_VE' and rf.RDB$FIELD_NAME = 'SEGMENTO_2')) then
-		        execute statement 'ALTER TABLE LIBRES_FAC_VE ADD SEGMENTO_2 INTEGER';
+		        execute statement 'ALTER TABLE LIBRES_FAC_VE ADD SEGMENTO_2 VARCHAR(99)';
 
 		    if (not exists(
 		    select 1 from RDB$RELATION_FIELDS rf
 		    where rf.RDB$RELATION_NAME = 'LIBRES_FAC_VE' and rf.RDB$FIELD_NAME = 'SEGMENTO_3')) then
-		        execute statement 'ALTER TABLE LIBRES_FAC_VE ADD SEGMENTO_3 INTEGER';
+		        execute statement 'ALTER TABLE LIBRES_FAC_VE ADD SEGMENTO_3 VARCHAR(99)';
 
 		    if (not exists(
 		    select 1 from RDB$RELATION_FIELDS rf
 		    where rf.RDB$RELATION_NAME = 'LIBRES_FAC_VE' and rf.RDB$FIELD_NAME = 'SEGMENTO_4')) then
-		        execute statement 'ALTER TABLE LIBRES_FAC_VE ADD SEGMENTO_4 INTEGER';
+		        execute statement 'ALTER TABLE LIBRES_FAC_VE ADD SEGMENTO_4 VARCHAR(99)';
 
 		    if (not exists(
 		    select 1 from RDB$RELATION_FIELDS rf
 		    where rf.RDB$RELATION_NAME = 'LIBRES_FAC_VE' and rf.RDB$FIELD_NAME = 'SEGMENTO_5')) then
-		        execute statement 'ALTER TABLE LIBRES_FAC_VE ADD SEGMENTO_5 INTEGER';
+		        execute statement 'ALTER TABLE LIBRES_FAC_VE ADD SEGMENTO_5 VARCHAR(99)';
 
 		    /*Libres CREDITOS */
 
 		    if (not exists(
 		    select 1 from RDB$RELATION_FIELDS rf
 		    where rf.RDB$RELATION_NAME = 'LIBRES_DEVFAC_VE' and rf.RDB$FIELD_NAME = 'SEGMENTO_1')) then
-		        execute statement 'ALTER TABLE LIBRES_DEVFAC_VE ADD SEGMENTO_1 INTEGER';
+		        execute statement 'ALTER TABLE LIBRES_DEVFAC_VE ADD SEGMENTO_1 VARCHAR(99)';
 
 		    if (not exists(
 		    select 1 from RDB$RELATION_FIELDS rf
 		    where rf.RDB$RELATION_NAME = 'LIBRES_DEVFAC_VE' and rf.RDB$FIELD_NAME = 'SEGMENTO_2')) then
-		        execute statement 'ALTER TABLE LIBRES_DEVFAC_VE ADD SEGMENTO_2 INTEGER';
+		        execute statement 'ALTER TABLE LIBRES_DEVFAC_VE ADD SEGMENTO_2 VARCHAR(99)';
 
 		    if (not exists(
 		    select 1 from RDB$RELATION_FIELDS rf
 		    where rf.RDB$RELATION_NAME = 'LIBRES_DEVFAC_VE' and rf.RDB$FIELD_NAME = 'SEGMENTO_3')) then
-		        execute statement 'ALTER TABLE LIBRES_DEVFAC_VE ADD SEGMENTO_3 INTEGER';
+		        execute statement 'ALTER TABLE LIBRES_DEVFAC_VE ADD SEGMENTO_3 VARCHAR(99)';
 
 		    if (not exists(
 		    select 1 from RDB$RELATION_FIELDS rf
 		    where rf.RDB$RELATION_NAME = 'LIBRES_DEVFAC_VE' and rf.RDB$FIELD_NAME = 'SEGMENTO_4')) then
-		        execute statement 'ALTER TABLE LIBRES_DEVFAC_VE ADD SEGMENTO_4 INTEGER';
+		        execute statement 'ALTER TABLE LIBRES_DEVFAC_VE ADD SEGMENTO_4 VARCHAR(99)';
 
 		    if (not exists(
 		    select 1 from RDB$RELATION_FIELDS rf
 		    where rf.RDB$RELATION_NAME = 'LIBRES_DEVFAC_VE' and rf.RDB$FIELD_NAME = 'SEGMENTO_5')) then
-		        execute statement 'ALTER TABLE LIBRES_DEVFAC_VE ADD SEGMENTO_5 INTEGER';
+		        execute statement 'ALTER TABLE LIBRES_DEVFAC_VE ADD SEGMENTO_5 VARCHAR(99)';
 		end
 		'''
 		)
@@ -526,27 +526,27 @@ def cuentas_por_pagar_inicializar_tablas():
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CARGOS_CP' and rf.RDB$FIELD_NAME = 'SEGMENTO_1')) then
-			    execute statement 'ALTER TABLE LIBRES_CARGOS_CP ADD SEGMENTO_1 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CARGOS_CP ADD SEGMENTO_1 VARCHAR(99)';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CARGOS_CP' and rf.RDB$FIELD_NAME = 'SEGMENTO_2')) then
-			    execute statement 'ALTER TABLE LIBRES_CARGOS_CP ADD SEGMENTO_2 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CARGOS_CP ADD SEGMENTO_2 VARCHAR(99)';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CARGOS_CP' and rf.RDB$FIELD_NAME = 'SEGMENTO_3')) then
-			    execute statement 'ALTER TABLE LIBRES_CARGOS_CP ADD SEGMENTO_3 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CARGOS_CP ADD SEGMENTO_3 VARCHAR(99)';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CARGOS_CP' and rf.RDB$FIELD_NAME = 'SEGMENTO_4')) then
-			    execute statement 'ALTER TABLE LIBRES_CARGOS_CP ADD SEGMENTO_4 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CARGOS_CP ADD SEGMENTO_4 VARCHAR(99)';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CARGOS_CP' and rf.RDB$FIELD_NAME = 'SEGMENTO_5')) then
-			    execute statement 'ALTER TABLE LIBRES_CARGOS_CP ADD SEGMENTO_5 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CARGOS_CP ADD SEGMENTO_5 VARCHAR(99)';
 		END
 		''')
  	c.execute('EXECUTE PROCEDURE cuentas_por_pagar_inicializar;')
@@ -564,27 +564,27 @@ def cuentas_por_cobrar_inicializar_tablas():
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CARGOS_CC' and rf.RDB$FIELD_NAME = 'SEGMENTO_1')) then
-			    execute statement 'ALTER TABLE LIBRES_CARGOS_CC ADD SEGMENTO_1 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CARGOS_CC ADD SEGMENTO_1 VARCHAR(99)';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CARGOS_CC' and rf.RDB$FIELD_NAME = 'SEGMENTO_2')) then
-			    execute statement 'ALTER TABLE LIBRES_CARGOS_CC ADD SEGMENTO_2 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CARGOS_CC ADD SEGMENTO_2 VARCHAR(99)';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CARGOS_CC' and rf.RDB$FIELD_NAME = 'SEGMENTO_3')) then
-			    execute statement 'ALTER TABLE LIBRES_CARGOS_CC ADD SEGMENTO_3 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CARGOS_CC ADD SEGMENTO_3 VARCHAR(99)';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CARGOS_CC' and rf.RDB$FIELD_NAME = 'SEGMENTO_4')) then
-			    execute statement 'ALTER TABLE LIBRES_CARGOS_CC ADD SEGMENTO_4 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CARGOS_CC ADD SEGMENTO_4 VARCHAR(99)';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CARGOS_CC' and rf.RDB$FIELD_NAME = 'SEGMENTO_5')) then
-			    execute statement 'ALTER TABLE LIBRES_CARGOS_CC ADD SEGMENTO_5 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CARGOS_CC ADD SEGMENTO_5 VARCHAR(99)';
 
 
 			/*Libres CREDITOS */
@@ -592,27 +592,27 @@ def cuentas_por_cobrar_inicializar_tablas():
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CREDITOS_CC' and rf.RDB$FIELD_NAME = 'SEGMENTO_1')) then
-			    execute statement 'ALTER TABLE LIBRES_CREDITOS_CC ADD SEGMENTO_1 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CREDITOS_CC ADD SEGMENTO_1 VARCHAR(99)';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CREDITOS_CC' and rf.RDB$FIELD_NAME = 'SEGMENTO_2')) then
-			    execute statement 'ALTER TABLE LIBRES_CREDITOS_CC ADD SEGMENTO_2 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CREDITOS_CC ADD SEGMENTO_2 VARCHAR(99)';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CREDITOS_CC' and rf.RDB$FIELD_NAME = 'SEGMENTO_3')) then
-			    execute statement 'ALTER TABLE LIBRES_CREDITOS_CC ADD SEGMENTO_3 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CREDITOS_CC ADD SEGMENTO_3 VARCHAR(99)';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CREDITOS_CC' and rf.RDB$FIELD_NAME = 'SEGMENTO_4')) then
-			    execute statement 'ALTER TABLE LIBRES_CREDITOS_CC ADD SEGMENTO_4 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CREDITOS_CC ADD SEGMENTO_4 VARCHAR(99)';
 
 			if (not exists(
 			select 1 from RDB$RELATION_FIELDS rf
 			where rf.RDB$RELATION_NAME = 'LIBRES_CREDITOS_CC' and rf.RDB$FIELD_NAME = 'SEGMENTO_5')) then
-			    execute statement 'ALTER TABLE LIBRES_CREDITOS_CC ADD SEGMENTO_5 INTEGER';
+			    execute statement 'ALTER TABLE LIBRES_CREDITOS_CC ADD SEGMENTO_5 VARCHAR(99)';
 		END
 		''')
  	c.execute("EXECUTE PROCEDURE cuentas_por_cobrar_inicializar;")
