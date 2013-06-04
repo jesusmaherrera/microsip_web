@@ -73,8 +73,8 @@ class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
 
 	def clean_cuenta_co(self):
 	    cuenta_co = self.cleaned_data['cuenta_co']
-	    if CuentaCo.objects.filter(cuenta_padre=cuenta_co.id).count() > 0:
-	    	raise forms.ValidationError(u'la cuenta contable (%s) no es de ultimo nivel, por favor seleciona una cuenta de ultimo nivel' % cuenta_co )
+	    #if CuentaCo.objects.filter(cuenta_padre=cuenta_co.id).count() > 0:
+	    #	raise forms.ValidationError(u'la cuenta contable (%s) no es de ultimo nivel, por favor seleciona una cuenta de ultimo nivel' % cuenta_co )
 	    return cuenta_co
 
 def PlantillaPoliza_items_formset(form, formset = BaseInlineFormSet, **kwargs):
