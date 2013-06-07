@@ -17,6 +17,8 @@ urlpatterns = patterns('',
 
      #Puntos
     (r'^inicializar_puntos_clientes/$', views.inicializar_puntos_clientes),
+    (r'^inicializar_puntos_articulos/$', views.inicializar_puntos_articulos),
+    
     #Articulos
     (r'^articulos/$', views.articulos_view),
     (r'^articulo/(?P<id>\d+)/', views.articulo_manageView),

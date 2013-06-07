@@ -9,8 +9,6 @@
   }
 </style>
 
-<link rel='stylesheet' href='{{STATIC_URL}}css/redmond/jquery-ui-1.8.23.custom.css'/>
-
 {% endblock %}
 
 <!-- JavaScript Code -->
@@ -20,7 +18,12 @@
     function gettext(msgid) { return msgid; }
 </script>
 <script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+
 <script type="text/javascript">
+  $(function() {
+    $( "#id_fecha" ).datepicker({dateFormat:'dd/mm/yy',});
+  });
+
 $(function() {
   $('#id_doctosIn_table tbody tr').formset({
     prefix: '{{ formset.prefix }}',
@@ -55,17 +58,29 @@ $(function() {
   {% csrf_token %}
   
     {{ InventarioFisico_form.errors }}
-  <div class="span3">
-    <label for="id_folio">Folio</label>
-    {{ InventarioFisico_form.folio }} 
+  
+  <div class="span4" >
+    <label>Folio</label>
+    <div class="input-prepend input-append">
+      {{ InventarioFisico_form.folio }} 
+    </div>
   </div>
+  <div class="span4" >
+    <label>Almacen</label>
+    <div class="input-prepend input-append">
+      {{ InventarioFisico_form.almacen }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Fecha</label>
+    <div class="input-prepend input-append">
+      {{ InventarioFisico_form.fecha }} 
+    </div>
+  </div>
+  
   <div class="span3">
     <label for="id_descripcion">Descripcion</label>
     {{ InventarioFisico_form.descripcion }} 
-  </div>
-  <div class="span3">
-    <label for="id_almacen">Almacen</label>
-    {{ InventarioFisico_form.almacen }}
   </div>
   <div style='clear:both;'>
     <br>

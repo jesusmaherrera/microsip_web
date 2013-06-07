@@ -1,0 +1,105 @@
+{% extends "inventarios/base.html" %}
+{% block title %}Inicio{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+
+<script type="text/javascript">
+  $(function() {
+    $( "#id_fecha" ).datepicker({dateFormat:'dd/mm/yy',});
+  });
+   
+   
+   $(document).ready(function(){
+        $("#id_articulo").change(function(){
+                alert('algo');
+        });
+  });
+
+</script>
+
+
+
+{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/InventariosFisicos/">Inventarios Fisico</a> > Inventario Fisico a apuerta abierta{% endblock %}
+{% block content %}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
+  {% if message %}
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
+    <p>{{ message }}</p>
+  </div>
+  {% endif %}
+  <div class="form-actions mainmenu">
+    
+  </div>
+  {% csrf_token %}
+  
+    {{ InventarioFisico_form.errors }}
+  
+  <div class="span4" >
+    <label>Folio</label>
+    <div class="input-prepend input-append">
+      {{ InventarioFisico_form.folio }} 
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Almacen</label>
+    <div class="input-prepend input-append">
+      {{ InventarioFisico_form.almacen }}
+    </div>
+  </div>
+  <div class="span3">
+    <label for="id_descripcion">Descripcion</label>
+    {{ InventarioFisico_form.descripcion }} 
+  </div>
+
+  <br style='clear:both;'>
+  <hr />
+  {{ detalleInvForm.errors }}
+  <div class="span4" >
+    <label>Articulo</label>
+    <div class="input-prepend input-append">
+      {{ detalleInvForm.articulo }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Unidades</label>
+    <div class="input-prepend input-append">
+      {{ detalleInvForm.unidades }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>.</label>
+    <div class="input-prepend input-append">
+      <button type="submit" class="btn" name='add_button'><i class="icon-plus-sign"></i></button>
+      <button type="submit" class="btn" name='minus_button'><i class="icon-minus-sign"></i></button>
+    </div>
+  </div>
+
+  <div style='clear:both;'>
+    <br>
+    {{ formset.total_form_count }} Articulos
+  </div>
+  <table class="table tableCell table-hover">
+    <tr>
+      <th>Articulo</th>
+      <th>Unidades</th>
+    </tr>
+  {% for detalle in detallesInventario %}
+    <tr>
+      <td> {{ detalle.articulo }} </td>
+      <td> {{ detalle.unidades }} </td>
+    </tr>
+  {% endfor %}
+  </table>
+  
+  
+</form>
+
+{% include 'autocomplete_light/static.html' %}
+{% endblock %}

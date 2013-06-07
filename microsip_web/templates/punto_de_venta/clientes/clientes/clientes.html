@@ -17,7 +17,6 @@
       <th>Nombre</th>
       <th>Puntos</th>
       <th>Dinero Electronico</th>
-      <th>Opciones</th>
     </tr>
     {% for cliente in clientes%}
     <div id="myModal{{ cliente.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -38,9 +37,9 @@
       <td><a href="/punto_de_venta/cliente/{{ cliente.id }}/">{{ cliente.nombre }}</a></td>
       <td>{{cliente.puntos }}</td>
       <td>$ {{cliente.dinero_electronico }}</td>
-      <td style="text-align:center;">
+      <!-- <td style="text-align:center;"> -->
         <!-- <a href='#myModal{{ cliente.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a> -->
-      </td>
+      <!-- </td> -->
     </tr>
     {% endfor %}
 

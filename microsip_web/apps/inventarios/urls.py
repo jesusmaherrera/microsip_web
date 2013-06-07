@@ -7,6 +7,10 @@ urlpatterns = patterns('',
     (r'^InventariosFisicos/$', views.invetariosFisicos_View),
     (r'^InventarioFisico/$', views.invetarioFisico_manageView),
     (r'^InventarioFisico/(?P<id>\d+)/', views.invetarioFisico_manageView),
+
+    (r'^InventarioFisico_pa/$', views.invetarioFisico_pa_manageView),
+    (r'^InventarioFisico_pa/(?P<id>\d+)/', views.invetarioFisico_pa_manageView),
+
     (r'^InventarioFisico/Delete/(?P<id>\d+)/', views.invetarioFisico_delete),
     #ENTRADAS
     (r'^Entradas/$', views.entradas_View),

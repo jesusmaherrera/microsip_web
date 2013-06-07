@@ -6,7 +6,7 @@ import autocomplete_light
 from microsip_web.apps.inventarios.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-     
+
 class DoctosInManageForm(forms.ModelForm):
 	file_inventario = forms.CharField(widget=forms.FileInput, required = False)
 	
@@ -50,6 +50,7 @@ class DoctosInvfisManageForm(forms.ModelForm):
 			'cancelado',
 			'aplicado',
 			'usuario_creador',
+			'fecha',
 			'fechahora_creacion',
 			'usuario_aut_creacion',
 			'usuario_ult_modif',
@@ -63,6 +64,7 @@ class DoctosInvfisDetManageForm(forms.ModelForm):
 		model 	= DoctosInvfisDet
 		exclude = (
 			'claveArticulo',
+			'docto_invfis',
 			)
 
 def doctoIn_items_formset(form, formset = BaseInlineFormSet, **kwargs):

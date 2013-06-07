@@ -5,7 +5,48 @@
 {% block style_css %}{% endblock %}
 
 <!-- JavaScript Code -->
-{% block js_code %}{% endblock %}
+{% block js_code %}
+<script>
+  $(function() {
+    
+    if ($('#id_hereda_valorpuntos').is(':checked'))
+      $('#id_valor_puntos').hide();
+    else
+    {
+      $('#id_valor_puntos').show();
+      if ($('#id_valor_puntos').val() == '') 
+        $('#id_valor_puntos').val(0);
+    }
+        
+
+    $('#id_hereda_valorpuntos').click(function() {
+        if ($('#id_hereda_valorpuntos').is(':checked'))
+          $('#id_valor_puntos').hide();
+        else
+        {
+          $('#id_valor_puntos').show();
+          if ($('#id_valor_puntos').val() == '') 
+            $('#id_valor_puntos').val(0);
+        }
+    });
+
+
+    if ($('#id_tipo_tarjeta').val()=='P')
+      $('#div_valor_puntos').show();
+    else
+      $('#div_valor_puntos').hide();
+
+    $('#id_tipo_tarjeta').change(function(event){
+        if ($('#id_tipo_tarjeta').val()=='P')
+          $('#div_valor_puntos').show();
+        else
+          $('#div_valor_puntos').hide(); 
+      });
+
+  });
+</script>
+
+{% endblock %}
 
 {% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/clientes/">Clientes</a> <i class=" icon-play"></i> Cliente{% endblock %}
 {% block content %}
@@ -30,6 +71,18 @@
     <label>Cobrar y Abonar con</label>
     <div class="input-prepend input-append">
       {{ form.tipo_tarjeta }}
+    </div>
+  </div>
+  <div class="span4">
+    <label>Dar puntos a</label>
+    <div class="input-prepend input-append" >
+      {{ form.hereda_puntos_a }}
+    </div>
+  </div>
+  <div  id='div_valor_puntos'>
+    <label >Hereda valor de puntos  {{ form.hereda_valorpuntos }}</label>
+    <div class="input-prepend input-append" style='clear:both;' >
+      {{ form.valor_puntos }}
     </div>
   </div>
   <div class="span4"style='clear:both;' >
@@ -60,4 +113,5 @@
     <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
   </div>
 </form>
+{% include 'autocomplete_light/static.html' %}
 {% endblock %}

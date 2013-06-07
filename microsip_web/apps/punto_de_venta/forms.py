@@ -18,7 +18,9 @@ class ArticuloManageForm(forms.ModelForm):
 		}
 
 class ClienteManageForm(forms.ModelForm):
+	
 	class Meta:
+		widgets = autocomplete_light.get_widgets_dict(Cliente)
 		model = Cliente
 		exclude= {
 			'cuenta_xcobrar',

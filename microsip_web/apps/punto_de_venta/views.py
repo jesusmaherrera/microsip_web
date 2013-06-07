@@ -22,8 +22,17 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required(login_url='/login/')
 def inicializar_puntos_clientes(request):
-	Cliente.objects.update(puntos=0, dinero_electronico=0)
+	Cliente.objects.update(puntos=0, dinero_electronico=0, hereda_valorpuntos=1, valor_puntos=0)
+	TipoCliente.objects.update(valor_puntos=0)
 	return HttpResponseRedirect('/punto_de_venta/clientes/')
+
+@login_required(login_url='/login/')
+def inicializar_puntos_articulos(request):
+	Articulos.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
+	LineaArticulos.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
+	GrupoLineas.objects.update(puntos=0, dinero_electronico=0)
+	
+	return HttpResponseRedirect('/punto_de_venta/articulos/')
 
 @login_required(login_url='/login/')
 def articulos_view(request, template_name='punto_de_venta/articulos/articulos/articulos.html'):
@@ -161,7 +170,12 @@ def cliente_searchView(request, template_name='punto_de_venta/clientes/clientes/
 		if form.is_valid():
 			try:
 				cliente = ClavesClientes.objects.get(clave=form.cleaned_data['cliente']).cliente
-				dinero_en_puntos =  cliente.tipo_cliente.valor_puntos * cliente.puntos
+				if cliente.hereda_valorpuntos:
+					valor_puntos =  cliente.tipo_cliente.valor_puntos
+				else:
+					valor_puntos = cliente.valor_puntos
+						
+				dinero_en_puntos =  valor_puntos * cliente.puntos
 			except ObjectDoesNotExist:
 				cliente = Cliente();
 				message='No se encontro un cliente con esta clave, intentalo de nuevo.'

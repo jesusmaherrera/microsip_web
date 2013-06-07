@@ -457,7 +457,7 @@ class DoctosInvfis(models.Model):
     id                  = models.AutoField(primary_key=True, db_column='DOCTO_INVFIS_ID')
     almacen             = models.ForeignKey(Almacenes, db_column='ALMACEN_ID')
     folio               = models.CharField(max_length=9, db_column='FOLIO')
-    fecha               = models.DateField(db_column='FECHA') 
+    fecha               = models.DateField(auto_now_add=True, db_column='FECHA') 
     cancelado           = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='CANCELADO')
     aplicado            = models.CharField(default='N',blank=True, null=True, max_length=1, db_column='APLICADO')
     descripcion         = models.CharField(blank=True, null=True, max_length=200, db_column='DESCRIPCION')
@@ -544,7 +544,9 @@ class Cliente(models.Model):
     dinero_electronico          = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
     tipo_tarjeta                = models.CharField(default='N', max_length=1, choices=TIPOS, db_column='TIPO_TARJETA')
     tipo_cliente                = models.ForeignKey(TipoCliente, db_column='TIPO_CLIENTE_ID')
-
+    hereda_valorpuntos          = models.BooleanField(db_column='HEREDA_VALORPUNTOS')
+    valor_puntos                = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='VALOR_PUNTOS')
+    hereda_puntos_a             = models.ForeignKey('self', db_column='HEREDAR_PUNTOS_A', related_name='hereda_puntos_a_cliente',blank=True, null=True)
 
     def __unicode__(self):
         return self.nombre
