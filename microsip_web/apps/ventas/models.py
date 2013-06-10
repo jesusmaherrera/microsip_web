@@ -116,7 +116,7 @@ class DetallePlantillaPolizas_V(models.Model):
     plantilla_poliza_v      = models.ForeignKey(PlantillaPolizas_V)
     cuenta_co               = models.ForeignKey(CuentaCo)
     tipo                    = models.CharField(max_length=2, choices=TIPOS, default='C')
-    asiento_ingora          = models.CharField(max_length=2, blank=True, null=True)
+    asiento_ingora          = models.CharField(max_length=3, blank=True, null=True)
     valor_tipo              = models.CharField(max_length=20, choices=VALOR_TIPOS)
     valor_iva               = models.CharField(max_length=2, choices=VALOR_IVA_TIPOS, default='A')
     valor_contado_credito   = models.CharField(max_length=10, choices=VALOR_CONTADO_CREDITO_TIPOS, default='Ambos')

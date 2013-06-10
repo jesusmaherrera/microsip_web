@@ -1272,6 +1272,8 @@ def agregarTotales(totales_cuentas, **kwargs):
     msg = kwargs.get('msg', '')
 
     asientos_a_ingorar = []
+    valores_extra = {}
+    valor_extra = 0
     for concepto in conceptos_poliza:
         if concepto.valor_tipo == 'Segmento_1' and not campos_particulares.segmento_1 == None:
             asientos_a_ingorar.append(concepto.asiento_ingora)
@@ -1283,11 +1285,90 @@ def agregarTotales(totales_cuentas, **kwargs):
             asientos_a_ingorar.append(concepto.asiento_ingora)
         if concepto.valor_tipo == 'Segmento_5' and not campos_particulares.segmento_5 == None:
             asientos_a_ingorar.append(concepto.asiento_ingora)
+
+        #Para sumar o restar dos asientos
+        if not concepto.asiento_ingora == None and not concepto.asiento_ingora == '' :
+            if not concepto.asiento_ingora[0].isdigit() and (concepto.asiento_ingora[0]=='+' or concepto.asiento_ingora[0]=='-'):
+                if concepto.asiento_ingora[1:].isdigit():
+                    asientos_a_ingorar.append(concepto.posicion)
+
+                    if concepto.valor_tipo == 'Proveedores':
+                        valor_extra  = proveedores
+                    elif concepto.valor_tipo == 'Bancos':
+                        valor_extra  = bancos
+                    elif concepto.valor_tipo == 'Clientes':
+                        valor_extra  = clientes
+                    elif concepto.valor_tipo == 'Descuentos':
+                        valor_extra  = descuento
+                    elif concepto.valor_tipo == 'IVA Retenido':
+                        valor_extra  = iva_retenido
+                    elif concepto.valor_tipo == 'IVA':
+                        if concepto.valor_contado_credito == 'Credito':
+                            valor_extra  = iva_credito
+                        elif concepto.valor_contado_credito == 'Contado':
+                            valor_extra  = iva_contado
+                        elif concepto.valor_contado_credito == 'Ambos':
+                            valor_extra  = iva_credito + iva_contado
+                    elif concepto.valor_tipo == 'ISR Retenido':
+                        valor_extra = isr_retenido
+                    elif concepto.valor_tipo == 'Compras':
+                        if concepto.valor_contado_credito == 'Credito':
+                            if concepto.valor_iva == '0':
+                                valor_extra = compras_0_credito
+                            elif concepto.valor_iva == 'I':
+                                valor_extra = compras_16_credito
+                            elif concepto.valor_iva == 'A':
+                                valor_extra = compras_0_credito + compras_16_credito
+                        elif concepto.valor_contado_credito == 'Contado':
+                            if concepto.valor_iva == '0':
+                                valor_extra = compras_0_contado
+                            elif concepto.valor_iva == 'I':
+                                valor_extra = compras_16_contado
+                            elif concepto.valor_iva == 'A':
+                                valor_extra = compras_0_contado + compras_16_contado
+                        elif concepto.valor_contado_credito == 'Ambos':
+                            if concepto.valor_iva == '0':
+                                valor_extra = compras_0_credito + compras_0_contado
+                            elif concepto.valor_iva == 'I':
+                                valor_extra = compras_16_credito + compras_16_contado
+                            elif concepto.valor_iva == 'A':
+                                valor_extra = compras_0_credito + compras_0_contado + compras_16_credito + compras_16_contado
+                    elif concepto.valor_tipo == 'Ventas':
+                        if concepto.valor_contado_credito == 'Credito':
+                            if concepto.valor_iva == '0':
+                                valor_extra = ventas_0_credito
+                            elif concepto.valor_iva == 'I':
+                                valor_extra = ventas_16_credito
+                            elif concepto.valor_iva == 'A':
+                                valor_extra = ventas_0_credito + ventas_16_credito
+                        elif concepto.valor_contado_credito == 'Contado':
+                            if concepto.valor_iva == '0':
+                                valor_extra = ventas_0_contado
+                            elif concepto.valor_iva == 'I':
+                                valor_extra = ventas_16_contado
+                            elif concepto.valor_iva == 'A':
+                                valor_extra = ventas_0_contado + ventas_16_contado
+                        elif concepto.valor_contado_credito == 'Ambos':
+                            if concepto.valor_iva == '0':
+                                valor_extra = ventas_0_credito + ventas_0_contado
+                            elif concepto.valor_iva == 'I':
+                                valor_extra = ventas_16_credito + ventas_16_contado
+                            elif concepto.valor_iva == 'A':
+                                valor_extra = ventas_0_credito + ventas_0_contado + ventas_16_credito + ventas_16_contado
+
+                if concepto.asiento_ingora[0]=='-':
+                    valor_extra = -valor_extra
+
+                if valores_extra.has_key(concepto.asiento_ingora[1:]):
+                    valores_extra[concepto.asiento_ingora[1:]] = valores_extra[concepto.asiento_ingora[1:]] + valor_extra
+                else:
+                    valores_extra[concepto.asiento_ingora[1:]] = valor_extra
+                
     for concepto in conceptos_poliza:
         importe = 0
         cuenta  = []
         clave_cuenta_tipoAsiento = []
-        
+
         if concepto.valor_tipo == 'Segmento_1' and not campos_particulares.segmento_1 == None:
             totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_1, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora)
         elif concepto.valor_tipo == 'Segmento_2' and not campos_particulares.segmento_2 == None: 
@@ -1384,6 +1465,9 @@ def agregarTotales(totales_cuentas, **kwargs):
             importe = descuento
             cuenta = concepto.cuenta_co.cuenta
         
+        if concepto.posicion in valores_extra:
+            importe = importe + valores_extra[concepto.posicion]
+
         posicion_cuenta_depto_tipoAsiento = "%s+%s/%s:%s"% (concepto.posicion, cuenta, depto_co, concepto.tipo)
         importe = importe
 

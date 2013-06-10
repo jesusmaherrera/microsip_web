@@ -105,7 +105,8 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
     if request.method == 'POST':
         InventarioFisico_form = DoctosInvfisManageForm(request.POST, request.FILES, instance=InventarioFisico)
         detalleInvForm = DoctosInvfisDetManageForm(request.POST)
-        
+        inventario_form = inventario_pa_form(request.POST)
+
         if InventarioFisico_form.is_valid() and detalleInvForm.is_valid():
 
             inventarioFisico = InventarioFisico_form.save(commit = False)
@@ -124,17 +125,17 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
                 else:
                     DoctosInvfisDet.objects.filter(id=doc.id, articulo=detalleInv.articulo).update(unidades=unidades)
 
+                detalleInvForm = DoctosInvfisDetManageForm()
             except ObjectDoesNotExist:
                 detalleInv.id = -1
                 detalleInv.docto_invfis = InventarioFisico;
                 detalleInv.save()
-             
-            return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s'% InventarioFisico.id)
     else:
         detalleInvForm = DoctosInvfisDetManageForm()
+        inventario_form = inventario_pa_form()
         InventarioFisico_form= DoctosInvfisManageForm(instance=InventarioFisico)
     
-    c = {'InventarioFisico_form': InventarioFisico_form, 'message':message, 'detallesInventario':detallesInventario,'detalleInvForm':detalleInvForm, }
+    c = {'InventarioFisico_form': InventarioFisico_form, 'message':message, 'detallesInventario':detallesInventario,'detalleInvForm':detalleInvForm, 'inventario_form':inventario_form,}
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 

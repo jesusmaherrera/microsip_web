@@ -7,6 +7,7 @@ from microsip_web.apps.inventarios.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 
+
 class DoctosInManageForm(forms.ModelForm):
 	file_inventario = forms.CharField(widget=forms.FileInput, required = False)
 	
@@ -57,13 +58,15 @@ class DoctosInvfisManageForm(forms.ModelForm):
 			'fechahora_ult_modif',
 			'usuario_aut_modif',
 			)
+class inventario_pa_form(forms.Form):
+	modo_rapido = forms.BooleanField()
 
 class DoctosInvfisDetManageForm(forms.ModelForm):
+
 	class Meta:
 		widgets = autocomplete_light.get_widgets_dict(DoctosInvfisDet)
 		model 	= DoctosInvfisDet
 		exclude = (
-			'claveArticulo',
 			'docto_invfis',
 			)
 
