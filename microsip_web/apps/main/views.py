@@ -483,7 +483,7 @@ def punto_de_venta_inicializar_tablas():
     c = connection.cursor()
     c.execute(
         '''
-        CREATE OR ALTER PROCEDURE punto_de_venta_inicializar
+        CREATE OR ALTER PROCEDURE punto_de_venta_inicializar_t
         as
         BEGIN
             /*Articulos */
@@ -552,14 +552,19 @@ def punto_de_venta_inicializar_tablas():
             
             if (not exists(
             select 1 from RDB$RELATION_FIELDS rf
-            where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'HEREDA_PUNTOS')) then
+            where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'HEREDA_VALORPUNTOS')) then
                 execute statement 'ALTER TABLE CLIENTES ADD HEREDA_VALORPUNTOS SMALLINT DEFAULT 1';
 
             if (not exists(
             select 1 from RDB$RELATION_FIELDS rf
             where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'VALOR_PUNTOS')) then
                 execute statement 'ALTER TABLE CLIENTES ADD VALOR_PUNTOS IMPORTE_MONETARIO DEFAULT 0';
-                
+            
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'HEREDAR_PUNTOS_A')) then
+                execute statement 'ALTER TABLE CLIENTES ADD HEREDAR_PUNTOS_A ENTERO_ID';
+
             /*Tipo Cliente */
             if (not exists(
             select 1 from RDB$RELATION_FIELDS rf
@@ -603,7 +608,7 @@ def punto_de_venta_inicializar_tablas():
                 execute statement 'ALTER TABLE DOCTOS_PV ADD DINERO_ELECTRONICO_PAGO IMPORTE_MONETARIO DEFAULT 0';
         END
         ''')
-    c.execute('EXECUTE PROCEDURE punto_de_venta_inicializar;')
+    c.execute('EXECUTE PROCEDURE punto_de_venta_inicializar_t;')
     transaction.commit_unless_managed()
 
 def cuentas_por_pagar_inicializar_tablas():
