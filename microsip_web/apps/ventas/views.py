@@ -15,7 +15,6 @@ from decimal import *
 
 from django.core import serializers
 #Paginacion
-
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 #from main.views import agregarTotales, get_folio_poliza
 # user autentication
