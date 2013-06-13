@@ -1,0 +1,150 @@
+{% extends "punto_de_venta/base.html" %}
+{% block title %}Cliente{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+<script>
+
+
+$(function() {
+
+  if ($('#id_hereda_valorpuntos').is(':checked'))
+    $('#id_valor_puntos').hide();
+  else
+  {
+    $('#id_valor_puntos').show();
+    if ($('#id_valor_puntos').val() == '') 
+      $('#id_valor_puntos').val(0);
+  }
+
+
+  $('#id_hereda_valorpuntos').click(function() {
+    if ($('#id_hereda_valorpuntos').is(':checked'))
+      $('#id_valor_puntos').hide();
+    else
+    {
+      $('#id_valor_puntos').show();
+      if ($('#id_valor_puntos').val() == '') 
+        $('#id_valor_puntos').val(0);
+    }
+  });
+
+
+  if ($('#id_tipo_tarjeta').val()=='P')
+    $('#div_valor_puntos').show();
+  else
+    $('#div_valor_puntos').hide();
+
+  $('#id_tipo_tarjeta').change(function(event){
+    if ($('#id_tipo_tarjeta').val()=='P')
+      $('#div_valor_puntos').show();
+    else
+      $('#div_valor_puntos').hide(); 
+  });
+
+});
+</script>
+
+{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/clientes/">Clientes</a> <i class=" icon-play"></i> Cliente{% endblock %}
+{% block content %}
+{{ formset }}
+
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
+  {% csrf_token %}
+  {{ form.errors }}
+  <fieldset style='clear:both;'>
+    <legend>Informacion General</legend>
+    <div class="span4" >
+      <label>Nombre</label>
+      <div class="input-prepend input-append">
+        {{ form.nombre }}
+      </div>
+    </div>
+    <div class="span4" >
+      <label>Tipo Cliente</label>
+      <div class="input-prepend input-append">
+        {{ form.tipo_cliente }}
+      </div>
+    </div>
+  </fieldset>
+  <fieldset style='clear:both;'>
+    <legend>Informacion de Puntos</legend>
+    <div class="span4" style='clear:both;'>
+      <label>Cobrar y Abonar con</label>
+      <div class="input-prepend input-append">
+        {{ form.tipo_tarjeta }}
+      </div>
+    </div>
+    <div class="span4">
+      <label>Dar puntos a</label>
+      <div class="input-prepend input-append" >
+        {{ form.hereda_puntos_a }}
+      </div>
+    </div>
+    <div  id='div_valor_puntos'>
+      <label >Hereda valor de puntos  {{ form.hereda_valorpuntos }}</label>
+      <div class="input-prepend input-append" style='clear:both;' >
+        {{ form.valor_puntos }}
+      </div>
+    </div>
+    <div class="span4"style='clear:both;' >
+      <label>Puntos</label>
+      <div class="input-prepend input-append">
+        {{ form.puntos }}
+      </div>
+    </div>
+    <div class="span4" >
+      <label>Dinero Elecronico</label>
+      <div class="input-prepend input-append">
+        {{ form.dinero_electronico }}
+      </div>
+    </div>
+  </fieldset>
+  <fieldset style='clear:both;'>
+    <legend>Cuentas contables de Ventas</legend>
+    {% for key, value in cuentas.items %}
+    <div class="span4" >
+      <label>{{ value }}</label>
+      <div class="input-prepend input-append">
+        {% if 'cuenta_1' in cuentas and key == 'cuenta_1' %}
+        {{ form.cuenta_1 }}
+        {% endif %}
+        {% if 'cuenta_2' in cuentas and key == 'cuenta_2' %}
+        {{ form.cuenta_2 }}
+        {% endif %}
+        {% if 'cuenta_3' in cuentas and key == 'cuenta_3' %}
+        {{ form.cuenta_3 }}
+        {% endif %}
+        {% if 'cuenta_4' in cuentas and key == 'cuenta_4' %}
+        {{ form.cuenta_4 }}
+        {% endif %}
+        {% if 'cuenta_5' in cuentas and key == 'cuenta_5' %}
+        {{ form.cuenta_5 }}
+        {% endif %}
+      </div>
+    </div>  
+    {% endfor %}
+  </fieldset>
+  {% if message %}
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
+    <p>{{ message }}</p>
+  </div>
+  {% endif %}
+  <br style='clear:both;'>
+  <br>
+  <div class="form-actions mainmenu" >
+    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+  </div>
+</form>
+
+
+
+{% include 'autocomplete_light/static.html' %}
+{% endblock %}

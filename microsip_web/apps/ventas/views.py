@@ -3,6 +3,8 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from microsip_web.apps.inventarios.models import *
+from django.forms.models import modelformset_factory
+from django.forms.formsets import formset_factory
 
 from models import *
 from forms import *
@@ -152,18 +154,24 @@ def preferenciasEmpresa_View(request, template_name='ventas/herramientas/prefere
 	except:
 		informacion_contable = InformacionContable_V()
 
+	cuenta_cliente_formset = modelformset_factory(clientes_config_cuenta, form= clientes_config_cuentaManageForm, can_delete=True,)
+	
 	msg = ''
 	if request.method == 'POST':
+		formset = cuenta_cliente_formset(request.POST, request.FILES)
+
 		form = InformacionContableManageForm(request.POST, instance=informacion_contable)
-		if form.is_valid():
+		if form.is_valid() and formset.is_valid():
 			form.save()
+			formset.save()
+			formset = cuenta_cliente_formset()
 			msg = 'Datos Guardados Exitosamente'
 	else:
 		form = InformacionContableManageForm(instance=informacion_contable)
-
+		formset = cuenta_cliente_formset()
+		
 	plantillas = PlantillaPolizas_V.objects.all()
-
-	c= {'form':form,'msg':msg,'plantillas':plantillas,}
+	c= {'form':form,'msg':msg,'plantillas':plantillas,'formset':formset,}
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################

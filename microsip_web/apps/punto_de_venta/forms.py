@@ -6,6 +6,7 @@ from microsip_web.apps.inventarios.models import *
 from microsip_web.apps.ventas.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
+from sets import Set
 from models import *
 
 class ArticuloManageForm(forms.ModelForm):
@@ -22,6 +23,7 @@ class ClienteManageForm(forms.ModelForm):
 	class Meta:
 		widgets = autocomplete_light.get_widgets_dict(Cliente)
 		model = Cliente
+
 		exclude= {
 			'cuenta_xcobrar',
 		}

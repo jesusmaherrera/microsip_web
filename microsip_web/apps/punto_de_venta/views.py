@@ -6,6 +6,7 @@ from forms import *
 from models import *
 from django.db.models import Q
 from microsip_web.apps.main.views import crear_polizas_contables
+
 # user autentication
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -81,7 +82,7 @@ def articulo_manageView(request, id = None, template_name='punto_de_venta/articu
 ##########################################
 
 @login_required(login_url='/login/')
-def clientes_view(request, template_name='punto_de_venta/clientes/clientes/clientes.html'):
+def clientes_view(request, template_name='main/clientes/clientes/clientes.html'):
 	clientes_list = Cliente.objects.all()
 
 	paginator = Paginator(clientes_list, 20) # Muestra 10 ventas por pagina
@@ -101,7 +102,7 @@ def clientes_view(request, template_name='punto_de_venta/clientes/clientes/clien
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def tipos_cliente_view(request, template_name='punto_de_venta/clientes/tipos_cliente/tipos_clientes.html'):
+def tipos_cliente_view(request, template_name='main/clientes/tipos_cliente/tipos_clientes.html'):
 	tipos_cliente_list = TipoCliente.objects.all()
 
 	paginator = Paginator(tipos_cliente_list, 20) # Muestra 10 ventas por pagina
@@ -121,7 +122,7 @@ def tipos_cliente_view(request, template_name='punto_de_venta/clientes/tipos_cli
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def tipo_cliente_manageView(request, id = None, template_name='punto_de_venta/clientes/tipos_cliente/tipo_cliente.html'):
+def tipo_cliente_manageView(request, id = None, template_name='main/clientes/tipos_cliente/tipo_cliente.html'):
 	message = ''
 
 	if id:
@@ -141,7 +142,7 @@ def tipo_cliente_manageView(request, id = None, template_name='punto_de_venta/cl
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def cliente_manageView(request, id = None, template_name='punto_de_venta/clientes/clientes/cliente.html'):
+def cliente_manageView(request, id = None, template_name='main/clientes/clientes/cliente.html'):
 	message = ''
 
 	if id:
@@ -149,6 +150,19 @@ def cliente_manageView(request, id = None, template_name='punto_de_venta/cliente
 	else:
 		cliente =  Cliente()
 	
+	cuentas_ventas = clientes_config_cuenta.objects.all()
+	cuentas = {}
+	
+	for cuenta in cuentas_ventas:
+		cuentas[cuenta.campo_cliente]= "Cuenta contable ventas"
+		if cuenta.valor_contado_credito != 'Ambos':
+			cuentas[cuenta.campo_cliente] += " a %s "% cuenta.valor_contado_credito
+		
+		if cuenta.valor_iva == 'I':
+			cuentas[cuenta.campo_cliente] += " con IVA"
+		elif cuenta.valor_iva == '0':
+			cuentas[cuenta.campo_cliente] += " sin IVA"
+
 	if request.method == 'POST':
 		form = ClienteManageForm(request.POST, instance=  cliente)
 		if form.is_valid():
@@ -157,10 +171,10 @@ def cliente_manageView(request, id = None, template_name='punto_de_venta/cliente
 	else:
 		form = ClienteManageForm(instance= cliente)
 
-	c = {'form':form,}
+	c = {'form':form, 'cuentas':cuentas,}
 	return render_to_response(template_name, c, context_instance=RequestContext(request))
 
-def cliente_searchView(request, template_name='punto_de_venta/clientes/clientes/cliente_search.html'):
+def cliente_searchView(request, template_name='main/clientes/clientes/cliente_search.html'):
 	message = ''
 	cliente =  Cliente()
 	dinero_en_puntos = 0

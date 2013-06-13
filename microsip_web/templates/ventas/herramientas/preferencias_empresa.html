@@ -2,10 +2,31 @@
 {% block title %}Inicio{% endblock %}
 
 <!-- CSS Code -->
-{% block style_css %}{% endblock %}
+{% block style_css %}
+<style type="text/css">
+  .delete-row {
+    margin-left:5px;
+  }
+</style>
+
+<link rel='stylesheet' href='{{STATIC_URL}}css/redmond/jquery-ui-1.8.23.custom.css'/>
+
+{% endblock %}
 
 <!-- JavaScript Code -->
-{% block js_code %}{% endblock %}
+{% block js_code %}
+<script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script type="text/javascript">
+$(function() {
+  $('#id_cuentas_clientes tbody tr').formset({
+    prefix: '{{ formset.prefix }}',
+    addCssClass:'btn btn-success',
+    addText:'Nuevo Campo',
+    deleteText:'',
+  });
+});
+</script>
+{% endblock %}
 {% block breadcrumb %}{{ block.super }} Preferencias de la Empresa {% endblock %}
 {% block content %}
 {% if msg %}
@@ -16,7 +37,7 @@
 {% endif %}
 <div class="form-actions">
   <ul id="myTab" class="nav nav-tabs ">
-    <li class=""><a href="#general" data-toggle="tab">Genaral</a></li>
+    <li class=""><a href="#general" data-toggle="tab">Clientes</a></li>
     <li class="active"><a href="#informacionContable" data-toggle="tab">Informacion Contable</a></li>
     <li class="dropdown">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown">Mas <b class="caret"></b></a>
@@ -28,7 +49,9 @@
   </ul>
   <div id="myTabContent" class="tab-content">
     <div class="tab-pane fade " id="general">
-      <p>DATOS DE CONFIGURACION GENERAL</p>
+       
+
+
     </div>
     <div class="tab-pane fade active in" id="informacionContable">
       <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
@@ -64,7 +87,7 @@
         <legend>Plantillas Polizas:     
           <a href='/ventas/plantilla_poliza/' class="btn btn-success btn-mini"/><i class="icon-plus-sign"></i> Nueva Plantilla</a>
         </legend>
-        <table class="table tableCell table-hover" border="0" cellpadding="0" cellspacing="2">
+        <table class="table tableCell table-hover" id="id_detalles_data" border="0" cellpadding="0" cellspacing="2">
           <tbody>
             {% for plantilla in plantillas %}
             <div id="myModal{{ plantilla.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -93,13 +116,41 @@
         </table>
         </fieldset>
 
-        <div class="span2">
-          <label>.</label>
-          <div class="btn-group">
-            <input type="submit" class="btn btn-primary"  data-loading-text="Guardando..." value='Guardar'/>
+        <hr/>
+         <fieldset>
+          <legend>Cuentas contables de Ventas en Clientes</legend>
+          
+          <table class="table tableCell table-hover tablesorter" id="id_cuentas_clientes" border="0" cellpadding="0" cellspacing="5">
+            <thead>
+              <tr>
+                <th >Campo Particular</th>
+                <th >Contado/ Credito</th>
+                <th>IVA/0</th>
+                <th>Opciones</th>
+              </tr>
+            </thead>
+            <tbody id="sortable">
+              {% for form in formset.forms %}
+              <tr id="{{ form.prefix }}-row" class="form-container">
+                 {% for hid in form.hidden_fields %} {{hid}}{% endfor %} 
+                {{ form.errors }}
+                <td>{{ form.campo_cliente }}</td>
+                <td>{{ form.valor_contado_credito }}</td>
+                <td>{{ form.valor_iva }}</td>
+                <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+         </fieldset>
+         {{ formset.management_form }}
+          <div class="span2">
+            <label>.</label>
+            <div class="btn-group">
+              <input type="submit" class="btn btn-primary"  data-loading-text="Guardando..." value='Guardar'/>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
     </div>
     <div class="tab-pane fade" id="dropdown1">
       <p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh mi whatever gluten-free, carles pitchfork biodiesel fixie etsy retro mlkshk vice blog. Scenester cred you probably haven't heard of them, vinyl craft beer blog stumptown. Pitchfork sustainable tofu synth chambray yr.</p>

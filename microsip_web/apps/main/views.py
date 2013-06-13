@@ -44,7 +44,7 @@ def inicializar_tablas(request):
     punto_de_venta_inicializar_tablas()
     #cuentas_por_pagar_inicializar_tablas()
     #cuentas_por_cobrar_inicializar_tablas()
-
+    
     #punto_de_venta_agregar_trigers()
 
     return HttpResponseRedirect('/')
@@ -564,6 +564,31 @@ def punto_de_venta_inicializar_tablas():
             select 1 from RDB$RELATION_FIELDS rf
             where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'HEREDAR_PUNTOS_A')) then
                 execute statement 'ALTER TABLE CLIENTES ADD HEREDAR_PUNTOS_A ENTERO_ID';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'CUENTA_1')) then
+                execute statement 'ALTER TABLE CLIENTES ADD CUENTA_1 ENTERO_ID';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'CUENTA_2')) then
+                execute statement 'ALTER TABLE CLIENTES ADD CUENTA_2 ENTERO_ID';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'CUENTA_3')) then
+                execute statement 'ALTER TABLE CLIENTES ADD CUENTA_3 ENTERO_ID';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'CUENTA_4')) then
+                execute statement 'ALTER TABLE CLIENTES ADD CUENTA_4 ENTERO_ID';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'CUENTA_5')) then
+                execute statement 'ALTER TABLE CLIENTES ADD CUENTA_5 ENTERO_ID';
 
             /*Tipo Cliente */
             if (not exists(
@@ -1145,6 +1170,7 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
         iva_credito         = iva_pend_cobrar,
         folio_documento     = documento.folio,
         descuento           = descuento,
+        cliente_id          = documento.cliente.id,
         clientes            = clientes,
         cuenta_cliente      = cuenta_cliente,
         bancos              = bancos,
@@ -1248,12 +1274,12 @@ def agregarTotales(totales_cuentas, **kwargs):
     compras_0_credito   = kwargs.get('compras_0_credito', 0)
     compras_0_contado   = kwargs.get('compras_0_contado', 0)
     compras_16_contado  = kwargs.get('compras_16_contado', 0)
-    folio_documento     = kwargs.get('folio_documento', 0)
-    iva_contado         = kwargs.get('iva_contado', 0)
-    iva_credito         = kwargs.get('iva_credito', 0)
-    iva_retenido        = kwargs.get('iva_retenido', 0)
-    isr_retenido        = kwargs.get('isr_retenido', 0)
-    proveedores         = kwargs.get('proveedores', 0)
+    folio_documento = kwargs.get('folio_documento', 0)
+    iva_contado     = kwargs.get('iva_contado', 0)
+    iva_credito     = kwargs.get('iva_credito', 0)
+    iva_retenido    = kwargs.get('iva_retenido', 0)
+    isr_retenido    = kwargs.get('isr_retenido', 0)
+    proveedores     = kwargs.get('proveedores', 0)
     cuenta_proveedor    = kwargs.get('cuenta_proveedor', None)
     
     #valores ventas
@@ -1261,13 +1287,14 @@ def agregarTotales(totales_cuentas, **kwargs):
     ventas_0_credito    = kwargs.get('ventas_0_credito', 0)
     ventas_0_contado    = kwargs.get('ventas_0_contado', 0)
     ventas_16_contado   = kwargs.get('ventas_16_contado', 0)
-    
-    clientes            = kwargs.get('clientes', 0)
-    cuenta_cliente      = kwargs.get('cuenta_cliente', None)
+
+    cliente_id  = kwargs.get('cliente_id', 0)
+    clientes    = kwargs.get('clientes', 0)
+    cuenta_cliente  = kwargs.get('cuenta_cliente', None)
 
     #Valores generales
-    descuento           = kwargs.get('descuento', 0)
-    bancos              = kwargs.get('bancos', 0)
+    descuento   = kwargs.get('descuento', 0)
+    bancos      = kwargs.get('bancos', 0)
     
     depto_co            = kwargs.get('depto_co', None)
     conceptos_poliza    = kwargs.get('conceptos_poliza', [])
@@ -1429,7 +1456,17 @@ def agregarTotales(totales_cuentas, **kwargs):
                     importe = ventas_16_credito + ventas_16_contado
                 elif concepto.valor_iva == 'A':
                     importe = ventas_0_credito + ventas_0_contado + ventas_16_credito + ventas_16_contado
-            cuenta  = concepto.cuenta_co.cuenta
+
+            campo_cuenta = clientes_config_cuenta.objects.filter(valor_contado_credito= concepto.valor_contado_credito, valor_iva= concepto.valor_iva)
+            if campo_cuenta.count() > 0:
+                cuenta_temp = getattr(libresClientes.objects.get(id=cliente_id), campo_cuenta[0].campo_cliente) 
+                if cuenta_temp != '' and cuenta_temp != 0 and cuenta_temp != None:
+                    cuenta = cuenta_temp
+                else:
+                    cuenta  = concepto.cuenta_co.cuenta    
+            else:
+                cuenta  = concepto.cuenta_co.cuenta
+            
         elif concepto.valor_tipo == 'IVA' and not concepto.posicion in asientos_a_ingorar:
             if concepto.valor_contado_credito == 'Credito':
                 importe = iva_credito

@@ -547,6 +547,12 @@ class Cliente(models.Model):
     hereda_valorpuntos          = models.BooleanField(db_column='HEREDA_VALORPUNTOS')
     valor_puntos                = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='VALOR_PUNTOS')
     hereda_puntos_a             = models.ForeignKey('self', db_column='HEREDAR_PUNTOS_A', related_name='hereda_puntos_a_cliente',blank=True, null=True)
+    cuenta_1 = models.ForeignKey(CuentaCo, db_column='CUENTA_1', blank=True, null=True, related_name='cuenta_1')
+    cuenta_2 = models.ForeignKey(CuentaCo, db_column='CUENTA_2', blank=True, null=True, related_name='cuenta_2')
+    cuenta_3 = models.ForeignKey(CuentaCo, db_column='CUENTA_3', blank=True, null=True, related_name='cuenta_3')
+    cuenta_4 = models.ForeignKey(CuentaCo, db_column='CUENTA_4', blank=True, null=True, related_name='cuenta_4')
+    cuenta_5 = models.ForeignKey(CuentaCo, db_column='CUENTA_5', blank=True, null=True, related_name='cuenta_5')
+
 
     def __unicode__(self):
         return self.nombre
@@ -581,6 +587,15 @@ class DirCliente(models.Model):
 
     class Meta:
         db_table = u'dirs_clientes'
+
+class libresClientes(models.Model):
+    id = models.AutoField(primary_key=True, db_column='CLIENTE_ID')
+    heredar_puntos_a = models.CharField(max_length=99, db_column='HEREDAR_PUNTOS_A')
+    cuenta_1 = models.CharField(max_length=99, db_column='CUENTA_1')
+    cuenta_2 = models.CharField(max_length=99, db_column='CUENTA_2')
+    
+    class Meta:
+        db_table = u'libres_clientes'
 
 class TiposImpuestos(models.Model):
     id      = models.AutoField(primary_key=True, db_column='TIPO_IMPTO_ID')
