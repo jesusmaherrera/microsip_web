@@ -587,6 +587,33 @@ def punto_de_venta_inicializar_tablas():
             where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'CUENTA_5')) then
                 execute statement 'ALTER TABLE CLIENTES ADD CUENTA_5 ENTERO_ID';
 
+            /* libres clientes */
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'LIBRES_CLIENTES' and rf.RDB$FIELD_NAME = 'CUENTA_1')) then
+                execute statement 'ALTER TABLE LIBRES_CLIENTES ADD CUENTA_1 ENTERO_ID';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'LIBRES_CLIENTES' and rf.RDB$FIELD_NAME = 'CUENTA_2')) then
+                execute statement 'ALTER TABLE LIBRES_CLIENTES ADD CUENTA_2 ENTERO_ID';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'LIBRES_CLIENTES' and rf.RDB$FIELD_NAME = 'CUENTA_3')) then
+                execute statement 'ALTER TABLE LIBRES_CLIENTES ADD CUENTA_3 ENTERO_ID';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'LIBRES_CLIENTES' and rf.RDB$FIELD_NAME = 'CUENTA_4')) then
+                execute statement 'ALTER TABLE LIBRES_CLIENTES ADD CUENTA_4 ENTERO_ID';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'LIBRES_CLIENTES' and rf.RDB$FIELD_NAME = 'CUENTA_5')) then
+                execute statement 'ALTER TABLE LIBRES_CLIENTES ADD CUENTA_5 ENTERO_ID';
+
             /*Tipo Cliente */
             if (not exists(
             select 1 from RDB$RELATION_FIELDS rf
@@ -1455,10 +1482,18 @@ def agregarTotales(totales_cuentas, **kwargs):
                     importe = ventas_0_credito + ventas_0_contado + ventas_16_credito + ventas_16_contado
 
             campo_cuenta = clientes_config_cuenta.objects.filter(valor_contado_credito= concepto.valor_contado_credito, valor_iva= concepto.valor_iva)
+
             if campo_cuenta.count() > 0:
+
                 cuenta_temp = getattr(libresClientes.objects.get(id=cliente_id), campo_cuenta[0].campo_cliente) 
                 if cuenta_temp != '' and cuenta_temp != 0 and cuenta_temp != None:
-                    cuenta = cuenta_temp
+                    if CuentaCo.objects.filter(cuenta=cuenta_temp).exists():
+                        cuenta = cuenta_temp
+                    else:
+                        cliente_nombre = Cliente.objects.filter(id=cliente_id)
+                        msg = 'existe almenos una cuenta INVALIDA en el cliente %s. Corrigela para continuar'% cliente_nombre
+                        error = 2
+                        cuenta  = concepto.cuenta_co.cuenta        
                 else:
                     cuenta  = concepto.cuenta_co.cuenta    
             else:

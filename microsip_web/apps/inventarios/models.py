@@ -593,6 +593,9 @@ class libresClientes(models.Model):
     heredar_puntos_a = models.CharField(max_length=99, db_column='HEREDAR_PUNTOS_A')
     cuenta_1 = models.CharField(max_length=99, db_column='CUENTA_1')
     cuenta_2 = models.CharField(max_length=99, db_column='CUENTA_2')
+    cuenta_3 = models.CharField(max_length=99, db_column='CUENTA_3')
+    cuenta_4 = models.CharField(max_length=99, db_column='CUENTA_4')
+    cuenta_5 = models.CharField(max_length=99, db_column='CUENTA_5')
     
     class Meta:
         db_table = u'libres_clientes'
