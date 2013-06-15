@@ -543,7 +543,7 @@ def punto_de_venta_inicializar_tablas():
             if (not exists(
             select 1 from RDB$RELATION_FIELDS rf
             where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'TIPO_TARJETA')) then
-                execute statement 'ALTER TABLE CLIENTES ADD TIPO_TARCOBRAR_PUNTOSJETA CHAR(1)';
+                execute statement 'ALTER TABLE CLIENTES ADD TIPO_TARJETA CHAR(1)';
             
             if (not exists(
             select 1 from RDB$RELATION_FIELDS rf
