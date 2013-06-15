@@ -58,17 +58,18 @@ def inventarios_agregar_trigers():
         declare variable invfis_det_id integer;
         declare variable articulo_id integer;
         declare variable cantidad_articulos integer;
+        declare variable almacen_id integer;
         declare variable docto_in_tipo char(1);
 
         begin
             /*Datos de documento in*/
-            select first 1 doctos_in.naturaleza_concepto
+            select first 1 doctos_in.naturaleza_concepto, doctos_in.almacen_id
             from doctos_in, doctos_in_det
             where doctos_in_det.docto_in_id = doctos_in.docto_in_id and doctos_in_det.docto_in_det_id = new.docto_in_det_id
-            INTO :docto_in_tipo;
+            INTO :docto_in_tipo, :almacen_id;
 
             /*Datos de inventario fisico abierto*/
-            select first 1 doctos_invfis.docto_invfis_id from doctos_invfis where doctos_invfis.aplicado ='N'
+            select first 1 doctos_invfis.docto_invfis_id from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= :almacen_id
             INTO :invfis_id;
 
             if (not invfis_id is null) then
@@ -613,6 +614,11 @@ def punto_de_venta_inicializar_tablas():
             select 1 from RDB$RELATION_FIELDS rf
             where rf.RDB$RELATION_NAME = 'LIBRES_CLIENTES' and rf.RDB$FIELD_NAME = 'CUENTA_5')) then
                 execute statement 'ALTER TABLE LIBRES_CLIENTES ADD CUENTA_5 ENTERO_ID';
+
+            if (not exists(
+            select 1 from RDB$RELATION_FIELDS rf
+            where rf.RDB$RELATION_NAME = 'LIBRES_CLIENTES' and rf.RDB$FIELD_NAME = 'HEREDAR_PUNTOS_A')) then
+                execute statement 'ALTER TABLE LIBRES_CLIENTES ADD HEREDAR_PUNTOS_A ENTERO_ID';
 
             /*Tipo Cliente */
             if (not exists(
@@ -1293,6 +1299,7 @@ def get_totales_documento_pv(cuenta_contado= None, documento= None, conceptos_po
     return totales_cuentas, error, msg
 
 def agregarTotales(totales_cuentas, **kwargs):
+
     #Valores cuentas por pagar
     compras_16_credito  = kwargs.get('compras_16_credito', 0)
     compras_0_credito   = kwargs.get('compras_0_credito', 0)
