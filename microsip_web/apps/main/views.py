@@ -265,7 +265,6 @@ def punto_de_venta_agregar_trigers():
         AS
         declare variable cliente_id integer;
         declare variable cliente_tipo_tarjeta char(1);
-        declare variable cliente_cobrar_puntos smallint;
         declare variable cliente_total_puntos integer;
         declare variable cliente_total_dinero_electronico double PRECISION;
         declare variable cliente_hereda_valorpuntos smallint;
@@ -281,10 +280,10 @@ def punto_de_venta_agregar_trigers():
         begin
             
             /*Datos del cliente*/
-            SELECT clientes.cliente_id, clientes.tipo_tarjeta, clientes.puntos, clientes.dinero_electronico, clientes.cobrar_puntos, clientes.hereda_valorpuntos, clientes.valor_puntos, tipos_clientes.valor_puntos
+            SELECT clientes.cliente_id, clientes.tipo_tarjeta, clientes.puntos, clientes.dinero_electronico, clientes.hereda_valorpuntos, clientes.valor_puntos, tipos_clientes.valor_puntos
             FROM clientes, tipos_clientes
             WHERE clientes.cliente_id = new.cliente_id and clientes.tipo_cliente_id = tipos_clientes.tipo_cliente_id
-            INTO :cliente_id, :cliente_tipo_tarjeta, :cliente_total_puntos, :cliente_total_dinero_electronico, :cliente_cobrar_puntos, :cliente_hereda_valorpuntos, :cliente_valor_puntos, :tipo_cliente_valor_puntos;
+            INTO :cliente_id, :cliente_tipo_tarjeta, :cliente_total_puntos, :cliente_total_dinero_electronico, :cliente_hereda_valorpuntos, :cliente_valor_puntos, :tipo_cliente_valor_puntos;
 
 
             if(tipo_cliente_valor_puntos is null) then
@@ -295,8 +294,6 @@ def punto_de_venta_agregar_trigers():
                 cliente_total_dinero_electronico = 0;
             if (cliente_total_puntos is null) then
                 cliente_total_puntos = 0;
-            if (cliente_cobrar_puntos is null) then
-                cliente_cobrar_puntos = 0;
 
             if (new.estatus='C') then
                 begin
@@ -546,7 +543,7 @@ def punto_de_venta_inicializar_tablas():
             if (not exists(
             select 1 from RDB$RELATION_FIELDS rf
             where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'TIPO_TARJETA')) then
-                execute statement 'ALTER TABLE CLIENTES ADD TIPO_TARJETA CHAR(1)';
+                execute statement 'ALTER TABLE CLIENTES ADD TIPO_TARCOBRAR_PUNTOSJETA CHAR(1)';
             
             if (not exists(
             select 1 from RDB$RELATION_FIELDS rf
