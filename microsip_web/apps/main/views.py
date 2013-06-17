@@ -11,6 +11,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from decimal import *
 from microsip_web.apps.inventarios.views import c_get_next_key
+from microsip_web.libs.custom_db import trigers
 
 #Modelos de modulos 
 from microsip_web.apps.inventarios.models import *
@@ -42,16 +43,19 @@ def inicializar_tablas(request):
     punto_de_venta_inicializar_tablas()
     #cuentas_por_pagar_inicializar_tablas()
     #cuentas_por_cobrar_inicializar_tablas()
-    
+    inventarios_agregar_trigers()
     #punto_de_venta_agregar_trigers()
     return HttpResponseRedirect('/')
 
-# def inventarios_agregar_trigers():
-#     c = connection.cursor()
+def inventarios_agregar_trigers():
+    c = connection.cursor()
     #ENTRADAS Y SALIDAS DE INVENTARIOS
-    #C.execute(   ''' ''')
-    #transaction.commit_unless_managed()
-    
+    c.execute(trigers['DOCTOS_IN_DET_BI_PUERTA_ABIERTA'])
+    c.execute(trigers['DOCTOS_IN_DET_BD_PUERTA_ABIERTA'])
+    c.execute(trigers['DOCTOS_IN_BU_PUERTA_ABIERTA'])
+
+    transaction.commit_unless_managed()
+
 def punto_de_venta_agregar_trigers():
     c = connection.cursor()
     #DETALLE DE VENTAS
