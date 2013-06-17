@@ -6,7 +6,7 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}
-
+<script src="{{ STATIC_URL }}admin/js/admin/RelatedObjectLookups.js"></script>
 <script type="text/javascript">
   $(function() {
     $( "#id_fecha" ).datepicker({dateFormat:'dd/mm/yy',});
@@ -14,20 +14,26 @@
    
    
   $(document).ready(function(){
-    $("#id_clave").focusout(function() {
-      if($("#id_clave").val() != '')
-        Dajaxice.microsip_web.apps.ventas.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
-    });
-        
+    $('#id_clave').live('keydown', function(e) { 
+      var keyCode = e.keyCode || e.which; 
 
-    $("#id_articulo_text").focus();
+      if (keyCode == 9) { 
+        if($("#id_clave").val() != '')
+          Dajaxice.microsip_web.apps.ventas.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
+      } 
+    });
+
+    
+    if ($('#id_modo_rapido').attr('checked'))  
+      $("#id_clave").focus();
+    else
+      $("#id_articulo_text").focus();
+
     $("#id_articulo").change(function(){
       if ($("#id_articulo").children().length > 0)
-        Dajaxice.microsip_web.apps.ventas.get_articulosen_inventario(mostrar_unidades,{'inventario_id': 21674,'articulo_id':$('#id_articulo option:selected').val()});
+        Dajaxice.microsip_web.apps.ventas.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});
       else
         $('#span_alerta_unidades').html('');
-
-      $("#id_articulo_text").focus();
     });
   });
 
@@ -39,8 +45,20 @@
       $('#id_articulo').html('<option selected="selected" value="'+data.articulo_id+'"></option>');
       $('#id_articulo_text').hide();
 
-      Dajaxice.microsip_web.apps.ventas.get_articulosen_inventario(mostrar_unidades,{'inventario_id': 21674,'articulo_id':$('#id_articulo option:selected').val()});
-      $('#id_unidades').focus();
+      Dajaxice.microsip_web.apps.ventas.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});
+      
+    }
+     else
+    {
+
+      $('#id_articulo_text').attr('style','');
+      $('#id_articulo-deck').html('');
+      $('#id_articulo').html('');
+      $('#id_articulo_text').show(); 
+      alert('No existe ningun articulo con la clave ['+ $("#id_clave").val() +']');
+      $("#id_clave").focus();
+      $("#id_clave").select();
+
     }
   }
 
@@ -56,7 +74,7 @@
 
 
 {% endblock %}
-{% block breadcrumb %}{{ block.super }} <a href="/InventariosFisicos/">Inventarios Fisico</a> > Inventario Fisico a apuerta abierta{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/inventarios/InventariosFisicos/">Inventarios Fisico</a> <i class=" icon-play"></i> Inventario Fisico a apuerta abierta{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
   {% if message %}
@@ -66,63 +84,69 @@
     <p>{{ message }}</p>
   </div>
   {% endif %}
-  <div class="form-actions mainmenu">
-    {{ inventario_form.modo_rapido }} Modo Rapido
+
+  <div class="ms-custom-form" style=" height: 5em; ">
+    <div class='span6'>
+      <h3 class='span3'>Inventario Fisico </h3>
+      <div class='span2' style=" padding-top: 1em; ">
+      {{ inventario_form.modo_rapido }} Modo Rapido 
+      </div>
+    </div>
+    
+    <div class=" pull-right ms-form-right-detail">
+      <div class="span2" >
+        <label>Fecha</label>
+        <div class="input-prepend input-append">
+          {{ InventarioFisico.fecha }} 
+        </div>
+      </div> 
+      <div class="span2" >
+        <label>Folio</label>
+        <div class="input-prepend input-append">
+          {{ InventarioFisico.folio }} 
+        </div>
+      </div>  
+      
+    </div>
+
+    
+    
+    <div style='clear:both;' class=" pull-right ">
+      <div class="span4">
+        <strong>Alamacen: </strong> {{ InventarioFisico.almacen }} 
+        </div>
+      </div>  
+    <br>
   </div>
   {% csrf_token %}
-  
-    {{ InventarioFisico_form.errors }}
-  
-  <div class="span4" >
-    <label>Folio</label>
-    <div class="input-prepend input-append">
-      {{ InventarioFisico_form.folio }} 
-    </div>
-  </div>
-  <div class="span4" >
-    <label>Almacen</label>
-    <div class="input-prepend input-append">
-      {{ InventarioFisico_form.almacen }}
-    </div>
-  </div>
-  <div class="span3">
-    <label for="id_descripcion">Descripcion</label>
-    {{ InventarioFisico_form.descripcion }} 
-  </div>
 
-  <br style='clear:both;'>
-  <hr />
   {{ detalleInvForm.errors }}
-  <div class="span4" >
-    <label>Clave</label>
+  <div class="span2" >
+    <!-- <label>Clave</label> -->
     <div class="input-prepend input-append">
       {{ detalleInvForm.clave }}
     </div>
   </div>
-  <div class="span4" >
-    <label>Articulo</label>
+  <div class="span3" ><!-- 
+    <label>Articulo</label> -->
     <div class="input-prepend input-append">
       {{ detalleInvForm.articulo }}
     </div>
   </div>
-  <div class="span4" >
-    <label>Unidades<span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 255, 0); "> </spoan></label>
+  <div class="span2" >
+    <!-- <label>Unidades --><span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 255, 0); "> </span><!-- </label> -->
     <div class="input-prepend input-append">
       {{ detalleInvForm.unidades }}
     </div>
   </div>
   <div class="span4" >
-    <label>.</label>
     <div class="input-prepend input-append">
       <button type="submit" class="btn" name='add_button'><i class="icon-plus-sign"></i></button>
       <button type="submit" class="btn" name='minus_button'><i class="icon-minus-sign"></i></button>
     </div>
   </div>
-
-  <div style='clear:both;'>
-    <br>
-    {{ formset.total_form_count }} Articulos
-  </div>
+  <br style='clear:both;'>
+  <br>
   <table class="table tableCell table-hover">
     <tr>
       <th>Articulo</th>

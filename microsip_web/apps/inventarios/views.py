@@ -98,18 +98,17 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
         InventarioFisico = get_object_or_404(DoctosInvfis, pk=id)
     else:
         InventarioFisico = DoctosInvfis()
+
     detallesInventario=None
 
-    detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico)
+    detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico).order_by('-id')
 
     if request.method == 'POST':
-        InventarioFisico_form = DoctosInvfisManageForm(request.POST, request.FILES, instance=InventarioFisico)
         detalleInvForm = DoctosInvfisDetManageForm(request.POST)
         inventario_form = inventario_pa_form(request.POST)
 
-        if InventarioFisico_form.is_valid() and detalleInvForm.is_valid():
+        if detalleInvForm.is_valid():
 
-            inventarioFisico = InventarioFisico_form.save(commit = False)
             detalleInv = detalleInvForm.save(commit=False)  
 
             try:
@@ -128,14 +127,17 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
                 detalleInvForm = DoctosInvfisDetManageForm()
             except ObjectDoesNotExist:
                 detalleInv.id = -1
-                detalleInv.docto_invfis = InventarioFisico;
+                articulo_clave = get_object_or_404(ClavesArticulos, articulo=detalleInv.articulo)
+                detalleInv.clave = articulo_clave.clave
+                detalleInv.docto_invfis = InventarioFisico
                 detalleInv.save()
+
+            detalleInvForm = DoctosInvfisDetManageForm()
     else:
         detalleInvForm = DoctosInvfisDetManageForm()
         inventario_form = inventario_pa_form()
-        InventarioFisico_form= DoctosInvfisManageForm(instance=InventarioFisico)
     
-    c = {'InventarioFisico_form': InventarioFisico_form, 'message':message, 'detallesInventario':detallesInventario,'detalleInvForm':detalleInvForm, 'inventario_form':inventario_form,}
+    c = {'message':message, 'detallesInventario':detallesInventario,'detalleInvForm':detalleInvForm, 'inventario_form':inventario_form, 'InventarioFisico':InventarioFisico,}
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
@@ -197,7 +199,6 @@ def invetarioFisico_manageView(request, id = None, template_name='inventarios/In
                 #CARGA NUEVO ID
                 if not inventarioFisico.id:
                     inventarioFisico.id = c_get_next_key('ID_DOCTOS')
-                    inventarioFisico.fecha = '01/01/2013'
                 
                 inventarioFisico.save()
 
@@ -210,7 +211,7 @@ def invetarioFisico_manageView(request, id = None, template_name='inventarios/In
                         DetalleInventarioFisico.docto_invfis = inventarioFisico
                 
                 InventarioFisicoItems_formset.save()
-                return HttpResponseRedirect('/InventariosFisicos/')
+                return HttpResponseRedirect('/inventarios/InventariosFisicos/')
     else:
         inventarioFisico_items = inventarioFisico_items_formset(DoctosInvfisDetManageForm, extra=1, can_delete=True)
         InventarioFisico_form= DoctosInvfisManageForm(instance=InventarioFisico)
@@ -225,7 +226,7 @@ def invetarioFisico_delete(request, id = None):
     inventario_fisico = get_object_or_404(DoctosInvfis, pk=id)
     inventario_fisico.delete()
 
-    return HttpResponseRedirect('/InventariosFisicos/')
+    return HttpResponseRedirect('/invenatrios/InventariosFisicos/')
 
 ##########################################
 ##                                      ##

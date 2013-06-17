@@ -113,6 +113,12 @@ class ArticulosClientes(models.Model):
         db_table = u'articulos_clientes'
 
 class ArticulosDiscretos(models.Model):
+    id = models.AutoField(primary_key=True, db_column='ART_DISCRETO_ID')
+    clave = models.CharField(max_length=20, db_column='CLAVE')
+    articulo = models.ForeignKey(Articulos, db_column='ARTICULO_ID')
+    tipo = models.CharField(max_length=1, db_column='TIPO')
+    fecha = models.DateField(db_column='FECHA') 
+    
     class Meta:
         db_table = u'articulos_discretos'
 

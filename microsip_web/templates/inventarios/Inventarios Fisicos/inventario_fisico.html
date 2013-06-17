@@ -49,7 +49,7 @@ $(function() {
 
 
 {% endblock %}
-{% block breadcrumb %}{{ block.super }} <a href="/InventariosFisicos/">Inventarios Fisicos</a> > Inventario Fisico{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/inventarios/InventariosFisicos/">Inventarios Fisicos</a> <i class=" icon-play"></i> Inventario Fisico{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
   <div class="form-actions mainmenu">
@@ -71,13 +71,6 @@ $(function() {
       {{ InventarioFisico_form.almacen }}
     </div>
   </div>
-  <div class="span4" >
-    <label>Fecha</label>
-    <div class="input-prepend input-append">
-      {{ InventarioFisico_form.fecha }} 
-    </div>
-  </div>
-  
   <div class="span3">
     <label for="id_descripcion">Descripcion</label>
     {{ InventarioFisico_form.descripcion }} 

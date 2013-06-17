@@ -19,8 +19,9 @@ DATABASES = {
        #D2007(POLISAS)0_9
         #'NAME': 'C:\Microsip datos\AD2007(POLISAS)0_9.fdb', # Or path to database file if using sqlite3.
         #D2007(POLISAS)0_10
-        #'NAME': 'C:\Microsip datos\AD2007(POLISAS)0_10.fdb',
-        'NAME': 'C:\Microsip datos\ESSEX WELD SOLUTIONS.fdb', # Or path to database file if using sqlite3.
+        #'NAME': 'C:\Microsip datos\PRUEBAS.fdb',
+        'NAME': 'C:\Microsip datos\AD2007(POLISAS)0_10.fdb',
+        #'NAME': 'C:\Microsip datos\ESSEX WELD SOLUTIONS.fdb', # Or path to database file if using sqlite3.
         #RAFISA
         #'NAME': 'C:\Microsip datos\RAFISA.fdb', # Or path to database file if using sqlite3.
         #ESSEX

@@ -46,53 +46,11 @@ def inicializar_tablas(request):
     #punto_de_venta_agregar_trigers()
     return HttpResponseRedirect('/')
 
-def inventarios_agregar_trigers():
-    c = connection.cursor()
+# def inventarios_agregar_trigers():
+#     c = connection.cursor()
     #ENTRADAS Y SALIDAS DE INVENTARIOS
-    C.execute(
-        '''
-        CREATE OR ALTER TRIGGER DOCTOS_IN_DET_BU_PUERTA_ABIERTA FOR DOCTOS_IN_DET
-        ACTIVE BEFORE UPDATE POSITION 0
-        AS
-        declare variable invfis_id integer;
-        declare variable invfis_det_id integer;
-        declare variable articulo_id integer;
-        declare variable cantidad_articulos integer;
-        declare variable almacen_id integer;
-        declare variable docto_in_tipo char(1);
-
-        begin
-            /*Datos de documento in*/
-            select first 1 doctos_in.naturaleza_concepto, doctos_in.almacen_id
-            from doctos_in, doctos_in_det
-            where doctos_in_det.docto_in_id = doctos_in.docto_in_id and doctos_in_det.docto_in_det_id = new.docto_in_det_id
-            INTO :docto_in_tipo, :almacen_id;
-
-            /*Datos de inventario fisico abierto*/
-            select first 1 doctos_invfis.docto_invfis_id from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= :almacen_id
-            INTO :invfis_id;
-
-            if (not invfis_id is null) then
-            begin
-                for
-                    select doctos_invfis_det.docto_invfis_det_id, doctos_invfis_det.articulo_id, doctos_invfis_det.unidades
-                    from doctos_invfis, doctos_invfis_det
-                    where doctos_invfis.docto_invfis_id = doctos_invfis_det.docto_invfis_id
-                    into :invfis_det_id, :articulo_id, :cantidad_articulos
-                do
-                begin
-                    if (articulo_id = new.articulo_id and docto_in_tipo='E') then
-                        cantidad_articulos = cantidad_articulos + new.unidades;
-                    else if (articulo_id = new.articulo_id and docto_in_tipo='S') then
-                        cantidad_articulos = cantidad_articulos - new.unidades;
-
-                    update doctos_invfis_det set unidades= :cantidad_articulos where docto_invfis_det_id = :invfis_det_id;
-                end
-            end
-        end
-        '''
-        )
-    transaction.commit_unless_managed()
+    #C.execute(   ''' ''')
+    #transaction.commit_unless_managed()
     
 def punto_de_venta_agregar_trigers():
     c = connection.cursor()
