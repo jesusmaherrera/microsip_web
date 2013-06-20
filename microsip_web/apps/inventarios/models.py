@@ -96,6 +96,7 @@ class Articulos(models.Model):
     id                  = models.AutoField(primary_key=True, db_column='ARTICULO_ID')
     nombre              = models.CharField(max_length=100, db_column='NOMBRE')
     es_almacenable      = models.CharField(default='S', max_length=1, db_column='ES_ALMACENABLE')
+    seguimiento         = models.CharField(default='N', max_length=1, db_column='SEGUIMIENTO')
     cuenta_ventas       = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
     linea               = models.ForeignKey(LineaArticulos, db_column='LINEA_ARTICULO_ID')
     puntos              = models.IntegerField(db_column='PUNTOS')
@@ -118,7 +119,9 @@ class ArticulosDiscretos(models.Model):
     articulo = models.ForeignKey(Articulos, db_column='ARTICULO_ID')
     tipo = models.CharField(max_length=1, db_column='TIPO')
     fecha = models.DateField(db_column='FECHA') 
-    
+     
+    def __unicode__(self):
+        return u'%s' % self.id
     class Meta:
         db_table = u'articulos_discretos'
 
@@ -345,7 +348,7 @@ class CuentasNo(models.Model):
 
 class DeptoCo(models.Model):
     id = models.AutoField(primary_key=True, db_column='DEPTO_CO_ID')
-    clave       = models.CharField(max_length=1, db_column='CLAVE')
+    clave = models.CharField(max_length=1, db_column='CLAVE')
 
     def __unicode__(self):
         return u'%s' % self.clave
@@ -360,30 +363,6 @@ class DeptosNo(models.Model):
 class DescripPolizas(models.Model):
     class Meta:
         db_table = u'descrip_polizas'
-
-class DesgloseEnDiscretos(models.Model):
-    class Meta:
-        db_table = u'desglose_en_discretos'
-
-class DesgloseEnDiscretosCm(models.Model):
-    class Meta:
-        db_table = u'desglose_en_discretos_cm'
-
-class DesgloseEnDiscretosInvfis(models.Model):
-    class Meta:
-        db_table = u'desglose_en_discretos_invfis'
-
-class DesgloseEnDiscretosPv(models.Model):
-    class Meta:
-        db_table = u'desglose_en_discretos_pv'
-
-class DesgloseEnDiscretosVe(models.Model):
-    class Meta:
-        db_table = u'desglose_en_discretos_ve'
-
-class DesgloseEnPedimentos(models.Model):
-    class Meta:
-        db_table = u'desglose_en_pedimentos'
 
 class Dispositivos(models.Model):
     class Meta:
@@ -509,6 +488,47 @@ class DoctosInDet(models.Model):
 
     class Meta:
         db_table = u'doctos_in_det'
+
+class DesgloseEnDiscretos(models.Model):
+    id = models.AutoField(primary_key=True, db_column='DESGLOSE_EN_DISCRETOS')
+    docto_in_det = models.ForeignKey(DoctosInDet, db_column='DOCTO_IN_DET_ID')
+    art_discreto = models.ForeignKey(ArticulosDiscretos, db_column='ART_DISCRETO_ID')
+    unidades = models.IntegerField(default=0, blank=True, null=True, db_column='UNIDADES')
+
+    def __unicode__(self):
+        return u'%s' % self.id
+
+    class Meta:
+        db_table = u'desglose_en_discretos'
+
+class DesgloseEnDiscretosCm(models.Model):
+    class Meta:
+        db_table = u'desglose_en_discretos_cm'
+
+class DesgloseEnDiscretosInvfis(models.Model):
+    id = models.AutoField(primary_key=True, db_column='DESGL_DISCRETO_INVFIS_ID')
+    docto_invfis_det = models.ForeignKey(DoctosInvfisDet, db_column='DOCTO_INVFIS_DET_ID')
+    art_discreto = models.ForeignKey(ArticulosDiscretos, db_column='ART_DISCRETO_ID')
+    unidades = models.IntegerField(default=0, blank=True, null=True, db_column='UNIDADES')
+
+    def __unicode__(self):
+        return u'%s' % self.id
+
+    class Meta:
+        db_table = u'desglose_en_discretos_invfis'
+
+class DesgloseEnDiscretosPv(models.Model):
+    class Meta:
+        db_table = u'desglose_en_discretos_pv'
+
+class DesgloseEnDiscretosVe(models.Model):
+    class Meta:
+        db_table = u'desglose_en_discretos_ve'
+
+class DesgloseEnPedimentos(models.Model):
+    class Meta:
+        db_table = u'desglose_en_pedimentos'
+        
 #######################################################VENTAS###############################################################################################
 ############################################################################################################################################################
 ############################################################################################################################################################

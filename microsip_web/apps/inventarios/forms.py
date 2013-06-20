@@ -94,3 +94,34 @@ def inventarioFisico_items_formset(form, formset = BaseInlineFormSet, **kwargs):
     return inlineformset_factory(DoctosInvfis, DoctosInvfisDet, form, formset, **kwargs)
 
 
+class ArticulosDiscretos_ManageForm(forms.ModelForm):
+    id = forms.IntegerField(required=False)
+    articulo   =  forms.ModelChoiceField(queryset= Articulos.objects.filter(es_almacenable='S'), required=True, widget=forms.HiddenInput())
+    clave = forms.CharField(max_length=100, required=True)
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        clave = cleaned_data.get("clave")
+        articulo = cleaned_data.get("articulo")
+        art_disc = ArticulosDiscretos.objects.filter(articulo=articulo, clave=clave, fecha=None) 
+
+        #if DesgloseEnDiscretosInvfis.objects.filter(art_discreto=art_disc).exists():
+        #     raise forms.ValidationError(u'El articulo con este numero de serie ya se registro en el inventario')
+        if not ArticulosDiscretos.objects.filter(articulo=articulo, clave=clave, fecha=None).exists() and clave != None:
+            raise forms.ValidationError(u'Numero de serie, no registrado en los articulos')
+
+        return cleaned_data
+
+    class Meta:
+        model = ArticulosDiscretos
+        exclude = (
+            'tipo',
+            'fecha',
+            )
+
+# class NumeroSerie_ManageForm(forms.Form):
+#     articulo   =  forms.ModelChoiceField(queryset= Articulos.objects.filter(es_almacenable='S'), required=True, widget=forms.HiddenInput())
+#     clave = forms.CharField(max_length=100, required=True)
+
+#     exclude = ('articulo',)
+    

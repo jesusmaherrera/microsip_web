@@ -1,5 +1,5 @@
  #encoding:utf-8
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from models import *
@@ -7,6 +7,7 @@ from forms import *
 import datetime, time
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+from django.forms.models import formset_factory
 
 from django.forms.formsets import formset_factory, BaseFormSet
 from django.forms.models import inlineformset_factory
@@ -93,54 +94,139 @@ def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisic
 @login_required(login_url='/login/')
 def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa.html'):
     message = ''
-    hay_repetido = False
-    if id:
-        InventarioFisico = get_object_or_404(DoctosInvfis, pk=id)
-    else:
-        InventarioFisico = DoctosInvfis()
-
-    detallesInventario=None
-
+    msg_series=''
+    error = 0
+    inicio_form = False
+    movimiento = ''
+    InventarioFisico = get_object_or_404(DoctosInvfis, pk=id)
     detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico).order_by('-id')
+    articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)
 
+    #POST
     if request.method == 'POST':
         detalleInvForm = DoctosInvfisDetManageForm(request.POST)
         inventario_form = inventario_pa_form(request.POST)
-
+        
         if detalleInvForm.is_valid():
-
+            articulos_discretos_formset = articulos_discretos_formset(request.POST, request.FILES)
             detalleInv = detalleInvForm.save(commit=False)  
+            unidades = abs(detalleInv.unidades)
+            total_forms = abs(articulos_discretos_formset.total_form_count())
 
-            try:
-                doc = DoctosInvfisDet.objects.get(docto_invfis=InventarioFisico, articulo=detalleInv.articulo)
-                
-                if 'add_button' in request.POST:
-                    unidades = doc.unidades + detalleInv.unidades
-                else:
-                    unidades = doc.unidades - detalleInv.unidades
-                
-                if unidades <= 0:
-                    DoctosInvfisDet.objects.filter(id=doc.id).delete()
-                else:
-                    DoctosInvfisDet.objects.filter(id=doc.id, articulo=detalleInv.articulo).update(unidades=unidades)
+            #Para cargar por primera ves el formset de los nuemeros de serie del articulo
+            if detalleInv.articulo.seguimiento == 'S':
+                if total_forms != unidades:
+                    inicio_form = True
+                    data = request.POST
+                    data['form-TOTAL_FORMS']= str(unidades)
+                    for numero in range(unidades):
+                        data['form-%s-articulo'% numero]= str(detalleInv.articulo.id)
+                        data['form-%s-clave'% numero]= ''
 
-                detalleInvForm = DoctosInvfisDetManageForm()
-            except ObjectDoesNotExist:
-                detalleInv.id = -1
-                articulo_clave = get_object_or_404(ClavesArticulos, articulo=detalleInv.articulo)
-                detalleInv.clave = articulo_clave.clave
-                detalleInv.docto_invfis = InventarioFisico
-                detalleInv.save()
+                    articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)
+                    articulos_discretos_formset = articulos_discretos_formset(data)
 
-            detalleInvForm = DoctosInvfisDetManageForm()
+            else:
+                articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)
+                data = {
+                    'form-TOTAL_FORMS': u'0',
+                    'form-INITIAL_FORMS': u'0',
+                    'form-MAX_NUM_FORMS': u'',
+                }
+                articulos_discretos_formset = articulos_discretos_formset(data)
+
+            if total_forms == unidades or detalleInv.articulo.seguimiento == 'N':
+                if articulos_discretos_formset.is_valid() and (articulos_discretos_formset.total_form_count() > 0 or detalleInv.articulo.seguimiento == 'N'):
+                    unidades = 0
+                    try:
+                        doc = DoctosInvfisDet.objects.get(docto_invfis=InventarioFisico, articulo=detalleInv.articulo)
+                        id_detalle = doc.id
+                        if 'add_button' in request.POST:
+                            unidades = doc.unidades + detalleInv.unidades
+                        else:
+                            unidades = doc.unidades - detalleInv.unidades
+                        
+                        if unidades <= 0:
+                            movimiento = 'eliminar'
+                        else:
+                            movimiento = 'actualizar'
+
+                    except ObjectDoesNotExist:
+                        id_detalle = c_get_next_key('ID_DOCTOS')
+                        detalleInv.id = id_detalle
+                        articulos_claves =ClavesArticulos.objects.filter(articulo= detalleInv.articulo)
+                        
+                        if articulos_claves.count() < 1:
+                            articulo_clave = ''
+                        else:
+                            articulo_clave = articulos_claves[0].clave
+
+                        detalleInv.clave = articulo_clave
+                        detalleInv.docto_invfis = InventarioFisico
+                        movimiento = 'crear'
+                    
+                    if detalleInv.articulo.seguimiento == 'S':    
+                        for form in articulos_discretos_formset.forms:
+                            form = form.save(commit=False)
+                            art_discreto = ArticulosDiscretos.objects.filter(articulo=form.articulo, clave=form.clave)[0]
+                            if DesgloseEnDiscretosInvfis.objects.filter(art_discreto=art_discreto).exists() and detalleInv.unidades > 0:
+                                msg_series = 'Ya existe un articulo registrado en inventario con numero de serie [%s]'%form.clave
+                                error = 1                                
+                            if error == 0:
+                                if detalleInv.unidades > 0 :
+                                    if movimiento == 'crear':
+                                        detalleInv.save()
+
+                                    desglose = DesgloseEnDiscretosInvfis(
+                                        id = -1,
+                                        docto_invfis_det = DoctosInvfisDet.objects.get(id=id_detalle),
+                                        art_discreto = art_discreto,
+                                        unidades = 1,
+                                        )
+                                    desglose.save()
+                                else:
+                                    desgloses_a_eliminar = DesgloseEnDiscretosInvfis.objects.filter(art_discreto=art_discreto)
+                                    
+                                    if desgloses_a_eliminar.count() <= 0:
+                                        error = 2
+                                        msg_series = 'No extiste registrado un articulo con este numero de serie en el inventario, no se eliminara'
+                                    else:
+                                        desgloses_a_eliminar.delete()
+
+                        if error == 0:
+                            articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)
+                            data = {
+                                'form-TOTAL_FORMS': u'0',
+                                'form-INITIAL_FORMS': u'0',
+                                'form-MAX_NUM_FORMS': u'',
+                            }
+                            articulos_discretos_formset = articulos_discretos_formset(data)
+                            detalleInvForm = DoctosInvfisDetManageForm()
+
+                    if error == 0:
+                        if movimiento == 'crear':
+                            detalleInv.save()
+                        elif movimiento == 'eliminar':                        
+                            DoctosInvfisDet.objects.filter(id=id_detalle).delete()
+                            detalleInvForm = DoctosInvfisDetManageForm()
+                        elif movimiento == 'actualizar':
+                            DoctosInvfisDet.objects.filter(id=id_detalle, articulo=detalleInv.articulo).update(unidades=unidades)
+                            detalleInvForm = DoctosInvfisDetManageForm()
+    #                            
     else:
         detalleInvForm = DoctosInvfisDetManageForm()
         inventario_form = inventario_pa_form()
-    
-    c = {'message':message, 'detallesInventario':detallesInventario,'detalleInvForm':detalleInvForm, 'inventario_form':inventario_form, 'InventarioFisico':InventarioFisico,}
+        articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)    
+        data = {
+            'form-TOTAL_FORMS': u'0',
+            'form-INITIAL_FORMS': u'0',
+            'form-MAX_NUM_FORMS': u'',
+        }
+        articulos_discretos_formset = articulos_discretos_formset(data)
+
+    c = {'message':message,'inicio_form':inicio_form, 'msg_series':msg_series, 'detallesInventario':detallesInventario,'detalleInvForm':detalleInvForm, 'InventarioFisico':InventarioFisico,'formset':articulos_discretos_formset,'inventario_form':inventario_form,}
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))
-
 
 @login_required(login_url='/login/')
 def invetarioFisico_manageView(request, id = None, template_name='inventarios/Inventarios Fisicos/inventario_fisico.html'):
