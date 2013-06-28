@@ -35,13 +35,15 @@ footer
   border-top: 1px solid #e5e5e5;
   *zoom: 1;
   padding-left: 30px;
+  padding-bottom: 2.5em;
 }
 
 .ms-form-right-detail
 {
+  padding-bottom: 6px;
   background-color: rgb(255, 255, 255);
   padding-left: 12px;
-  margin-bottom: 0px;
+  margin-bottom: 5px;
 }
 
 [class^="msicon-"],[class*="msicon-"] {
@@ -84,7 +86,7 @@ footer
 
 .msicon-logout 
 {
-  background-position: -4px -299px;
+  background-position: -2px -334px;
 }
 
 .msicon-inventarios 

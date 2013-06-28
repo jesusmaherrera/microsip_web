@@ -119,9 +119,7 @@ class ArticulosDiscretos_ManageForm(forms.ModelForm):
             'fecha',
             )
 
-# class NumeroSerie_ManageForm(forms.Form):
-#     articulo   =  forms.ModelChoiceField(queryset= Articulos.objects.filter(es_almacenable='S'), required=True, widget=forms.HiddenInput())
-#     clave = forms.CharField(max_length=100, required=True)
+class LotesArticulo_ManageForm(forms.Form):
+    lote  = forms.ModelChoiceField(queryset= ArticulosDiscretos.objects.filter(tipo='L'))
 
-#     exclude = ('articulo',)
     

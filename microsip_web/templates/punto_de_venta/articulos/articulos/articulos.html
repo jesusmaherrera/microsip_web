@@ -9,9 +9,34 @@
 
 {% block breadcrumb %}{{ block.super }} Articulos {% endblock %}
 {% block content %}
-<div class="form-actions mainmenu">
-  <!-- <a class="btn btn-success" href="/punto_de_venta/articulos/">Nuevo</a> -->
+<div class="ms-custom-form" style=" height: 2em; padding-top:1em; ">
+    <div class='span'>
+      <h3 class='span'>Articulos </h3>
+    </div>
+    <div class=" pull-right">
+      <div class="btn-group">
+          <a href="#" role="button" class="btn dropdown-toggle" data-toggle="dropdown"> <i class="icon-plus-sign"></i> Agregar <b class="caret"></b></a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+            {% if grupo_id %}
+            <li><a tabindex="-1" href="/punto_de_venta/categoria/{{ grupo_id }}"><i class='icon-tag'></i> Categoria</a></li>
+            {% else %}
+            <li><a tabindex="-1" href="/punto_de_venta/categoria/"><i class='icon-tag'></i> Categoria</a></li>
+            {% endif %}
+            <li role="presentation" class="divider"></li>
+            <!-- <li><a tabindex="-1" href="#"><i class="icon-barcode"></i> Articulo</a></li> -->
+          </ul>
+      </div>
+    </div>
 </div>
+{% for categoria in categorias %}
+<div class="btn-group">
+  <a class="btn" href="/punto_de_venta/articulos/{{categoria.id}}/"><i class='icon-tag'></i> {{ categoria }}</a>
+  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+  <ul class="dropdown-menu">
+    <li><a href="/punto_de_venta/categoria/delete/{{ grupo_id }}/{{ categoria.id }}/"><i class="icon-trash"></i> Eliminar</a></li>
+  </ul>
+</div>
+{% endfor %}
 <table class="table tableCell table-hover">
     <tr>
       <th>Nombre</th>
@@ -61,4 +86,5 @@
     </div>
 </table>
 <br>
+{% include 'autocomplete_light/static.html' %}
 {% endblock %}

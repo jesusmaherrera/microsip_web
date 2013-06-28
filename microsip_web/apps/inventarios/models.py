@@ -4,6 +4,19 @@ from datetime import datetime
 from django.db.models.signals import pre_save
 from django.core import urlresolvers
 
+class Grupo(models.Model):
+    nombre  = models.CharField(max_length=30)
+    
+    def __unicode__(self):
+        return u'%s'%self.nombre
+
+class GruposGrupo(models.Model):
+    grupo = models.ForeignKey(Grupo, related_name="grupo")
+    grupo_padre = models.ForeignKey(Grupo, blank=True, null=True, related_name="grupo_padre")
+
+    def __unicode__(self):
+        return u'%s'% self.grupo
+
 class Moneda(models.Model):
     id = models.AutoField(primary_key=True, db_column='MONEDA_ID')
     es_moneda_local = models.CharField(default='N', max_length=1, db_column='ES_MONEDA_LOCAL')
@@ -93,15 +106,17 @@ class LineaArticulos(models.Model):
         db_table = u'lineas_articulos'
 
 class Articulos(models.Model):
-    id                  = models.AutoField(primary_key=True, db_column='ARTICULO_ID')
-    nombre              = models.CharField(max_length=100, db_column='NOMBRE')
-    es_almacenable      = models.CharField(default='S', max_length=1, db_column='ES_ALMACENABLE')
-    seguimiento         = models.CharField(default='N', max_length=1, db_column='SEGUIMIENTO')
-    cuenta_ventas       = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
-    linea               = models.ForeignKey(LineaArticulos, db_column='LINEA_ARTICULO_ID')
-    puntos              = models.IntegerField(db_column='PUNTOS')
+    id = models.AutoField(primary_key=True, db_column='ARTICULO_ID')
+    nombre = models.CharField(max_length=100, db_column='NOMBRE')
+    es_almacenable = models.CharField(default='S', max_length=1, db_column='ES_ALMACENABLE')
+    seguimiento = models.CharField(default='N', max_length=1, db_column='SEGUIMIENTO')
+    cuenta_ventas = models.CharField(max_length=30, blank=True, null=True, db_column='CUENTA_VENTAS')
+    linea = models.ForeignKey(LineaArticulos, db_column='LINEA_ARTICULO_ID')
+    puntos = models.IntegerField(db_column='PUNTOS')
+    nota_ventas = models.TextField(db_column='NOTAS_VENTAS', blank=True, null=True)
     dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
-    hereda_puntos       = models.BooleanField( db_column='HEREDA_PUNTOS')
+    hereda_puntos = models.BooleanField( db_column='HEREDA_PUNTOS')
+    grupo_padre = models.ForeignKey(GruposGrupo, blank=True, null=True,)
 
     def __unicode__(self):
         return u'%s' % self.nombre
@@ -121,7 +136,7 @@ class ArticulosDiscretos(models.Model):
     fecha = models.DateField(db_column='FECHA') 
      
     def __unicode__(self):
-        return u'%s' % self.id
+        return u'%s' % self.clave
     class Meta:
         db_table = u'articulos_discretos'
 
@@ -651,5 +666,33 @@ class ImpuestosArticulo(models.Model):
     class Meta:
         db_table = u'impuestos_articulos'
 
+########################################################################################################
 
 
+class ArticuloCompatibleArticulo(models.Model):
+    articulo = models.ForeignKey(Articulos, related_name="articuloaa", blank=True, null=True)
+    compatible_articulo = models.ForeignKey(Articulos, related_name="compatible_articuloaa", blank=True, null=True)
+
+    def __unicode__(self):
+        return u'%s'% self.compatible_articulo
+
+class ClasificacionCompatibleArticulo(models.Model):
+    clasificacion = models.ForeignKey(GruposGrupo, related_name="clasificacionca", blank=True, null=True)
+    compatible_articulo = models.ForeignKey(Articulos, related_name="compatible_articuloca", blank=True, null=True)
+
+    def __unicode__(self):
+        return u'%s'% self.compatible_articulo
+
+class ArticuloCompatibleClasificacion(models.Model):
+    articulo = models.ForeignKey(Articulos, related_name="articuloac", blank=True, null=True)
+    compatible_clasificacion = models.ForeignKey(GruposGrupo, related_name="compatible_clasificacionac", blank=True, null=True)
+
+    def __unicode__(self):
+        return u'%s'% self.compatible_clasificacion
+
+class ClasificacionCompatibleClasificacion(models.Model):
+    clasificacion = models.ForeignKey(GruposGrupo, related_name="clasificacioncc", blank=True, null=True)
+    compatible_clasificacion = models.ForeignKey(GruposGrupo, related_name="compatible_clasificacioncc", blank=True, null=True)
+
+    def __unicode__(self):
+        return u'%s'% self.compatible_clasificacion

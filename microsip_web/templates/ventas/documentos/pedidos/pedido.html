@@ -1,0 +1,202 @@
+{% extends "ventas/base.html" %}
+{% block title %}Inicio{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}
+<link rel='stylesheet' href='{{STATIC_URL}}css/redmond/jquery-ui-1.8.23.custom.css'/>
+{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+<script type="text/javascript">
+  $(function() {
+    $( "#id_fecha" ).datepicker({dateFormat:'dd/mm/yy',});
+  });
+</script>
+<script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script type="text/javascript">
+
+
+
+$(document).ready(function() {
+  $('#id_doctosIn_table tbody tr').formset({
+    prefix: '{{ formset.prefix }}',
+    addCssClass:'btn btn-success',
+    addText:'Nuevo Articulo',
+    deleteText:'',
+  });
+
+  $('#id_add_articulo, #id_infoarticulo').hide();
+
+  
+  $('#id_infoarticulo').click(function(event){
+    Dajaxice.microsip_web.apps.ventas.get_infoarticulo(cargar_infoarticulo, {'articulo_id': $('#id_articulos').val()});  
+  });
+
+  $('#id_articulos').change(function(event){
+    if ($('#id_articulos').val() == '')
+      $('#id_add_articulo, #id_infoarticulo').hide();
+    else
+    { 
+      $('#id_add_articulo, #id_infoarticulo').show();
+    }
+  });
+
+  $('#id_form-0-grupo').change(function(event){
+    if ($('#id_form-0-grupo').val() == '')
+      $('#id_articulos').hide();
+    else
+    { 
+      Dajaxice.microsip_web.apps.ventas.get_articulosby_grupopadre(cargar_articulos, {'grupopadre_id': $('#id_form-0-grupo').val()});
+      $('#id_articulos').show();
+    }
+      
+  });
+  $('#id_filtro').change(function(event){
+    if ($('#id_filtro').val()== '')
+      $('#id_form-0-grupo').hide();
+    else
+    { 
+      Dajaxice.microsip_web.apps.ventas.get_gruposby_grupopadre(cargar_formset, {'grupopadre_id': $('#id_filtro').val()});
+      $('#id_form-0-grupo').show();
+    }
+  });
+  
+});
+
+function cargar_infoarticulo(data)
+{
+  $('#id_infoModal > .modal-header > #myModalLabel').html($('#id_articulos option:selected').text());
+  $('#id_infoModal > .modal-body').html(data.detalles);
+  $('#id_infoModal > .modal-footer').html(data.compatibilidades);
+  
+}
+
+function cargar_articulos(data)
+{
+  var options = '<option value="">-----------</option>';
+  for (var i = 0; i < data.length; i++){
+    options += '<option value="'+data[i]["pk"]+'">' + data[i]["fields"]["nombre"] +'</option>';
+  }
+  $('#id_articulos').html(options)
+  $("#id_articulos option:first").attr('selected', 'selected');
+}
+
+ function cargar_formset(data)
+ {
+    var options = '<option value="">-----------</option>';
+    for (var i = 0; i < data.length; i++){
+      grupo = data[i]["fields"]["grupo"];
+      options += '<option value="'+data[i]["pk"]+'">' + grupo["fields"]["nombre"] +'</option>';
+    }
+    $('#id_form-0-grupo').html(options)
+    $("#id_form-0-grupo option:first").attr('selected', 'selected');
+  }
+
+  
+</script>
+
+{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/ventas/pedidos/">Pedidos</a> <i class=" icon-play"></i> Pedido{% endblock %}
+{% block content %}
+
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+  {% if message %}
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
+    <p>{{ message }}</p>
+  </div>
+  {% endif %}
+  <div class="ms-custom-form" style=" height: 5em; ">
+    <div class='span'>
+      <h3 class='span'>Pedido </h3>
+    </div>
+    
+    <div class=" pull-right ms-form-right-detail">
+      <div class="span2" >
+        <label>Fecha</label>
+        <div class="input-prepend input-append">
+          {{ pedidoForm.fecha }} 
+        </div>
+      </div> 
+      <div class="span2" >
+        <label>Folio</label>
+        <div class="input-prepend input-append">
+          {{ pedidoForm.folio }} 
+        </div>
+      </div>  
+    </div>
+    <div style='clear:both;'>
+      <div class='span'>
+        <strong>Cliente</strong> {{ pedidoForm.cliente }}
+      </div>
+      <div  class=" pull-right ">
+        <div class="span">
+          <strong>Alamacen: </strong> {{ pedidoForm.almacen }} 
+        </div>
+      </div>  
+    </div>
+    <br style='clear:both;'>
+  </div>
+  
+  <div class='span'>
+  {{ gruposgrupomain_form.filtro }}
+  </div>
+  {% for form in grupos_formset %}
+    {{ form.grupo }}
+  {% endfor %}
+  {{ grupos_formset.management_form }}
+  <select id="id_articulos"></select>
+  <a href="#id_infoModal" id='id_infoarticulo' data-toggle="modal" ><i class=' icon-info-sign'></i></a>
+  <a class='btn' id='id_add_articulo' href="#">Agregar</a>
+  <div id="id_infoModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="infoModal" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3 id="myModalLabel">encabezado</h3>
+    </div>
+    <div class="modal-body">
+      contenido
+    </div>
+    <div class="modal-footer">
+      footer
+    </div>
+  </div>
+
+ <br style='clear:both;'>
+ <br>
+  <table class="table tableCell table-hover" id="id_doctosIn_table" border="0" cellpadding="0" cellspacing="5">
+    <thead>
+      <tr>
+        <th>Articulo</th>
+        <th>Unidades</th>
+        <th>Costo Unitario</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for form in formset.forms %}
+      <tr id="{{ form.prefix }}-row" class="form-container">
+        {{ form.errors }}
+        <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+          {{ form.articulo }}
+        </td>
+        <td>{{ form.unidades }}
+          {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+        </td>
+        <td>{{ form.precio_unitario }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {{ formset.management_form }} 
+
+  <div class="form-actions mainmenu" style='clear:both;'>
+    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+  </div>
+  <br style='clear:both;'>
+  <br>
+  
+</form>
+
+{% include 'autocomplete_light/static.html' %}
+{% endblock %}

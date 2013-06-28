@@ -72,6 +72,85 @@
       {{ form.dinero_electronico }}
     </div>
   </div>
+  {{ form.seguimiento }}
+  <div class='span'>
+    Grupo padre<br>
+    {{ form.grupo_padre }}
+  </div>
+  <div style='clear:both;'>
+  <fieldset>
+    <legend>Compatibilidades 
+      <div class="btn-group">
+          <a href="#" role="button" class="btn dropdown-toggle" data-toggle="dropdown"> <i class="icon-plus-sign"></i> Compatibilidad <b class="caret"></b></a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+            <li><a tabindex="-1" href="#id_clasificacionModal" data-toggle="modal"><i class='icon-tag'></i> Categoria</a></li>
+            <li role="presentation" class="divider"></li>
+            <li><a tabindex="-1" href="#id_articuloModal" data-toggle="modal"><i class="icon-barcode"></i> Articulo</a></li> 
+          </ul>
+      </div>
+      
+  <br style='clear:both;'>   
+  {% for articulo_compatible in articulos_compatibles %}
+    <div class="btn-group">
+      <a class="btn" href="#"><i class="icon-barcode"></i> {{ articulo_compatible }}</a>
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        <li><a href="/punto_de_venta/compatibilidadesArticulos/delete/{{ articulo_id }}/{{ articulo_compatible.id }}"><i class="icon-trash"></i> Eliminar</a></li>
+      </ul>
+    </div>
+  {% endfor %}
+  {% for clasificaciones_compatible in clasificaciones_compatibles %}
+    <div class="btn-group">
+      <a class="btn" href="#"><i class='icon-tag'></i> {{ clasificaciones_compatible }}</a>
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        <li><a href="/punto_de_venta/compatibilidadesClasificaciones/delete/{{ articulo_id }}/{{ clasificaciones_compatible.id }}"><i class="icon-trash"></i> Eliminar</a></li>
+      </ul>
+    </div>
+  {% endfor %}
+  
+  </fieldset>
+  </div>
+  <div id="id_articuloModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="infoModal" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3 id="myModalLabel">Nueva compatibilidad de {{ form.nombre.value }}</h3>
+    </div>
+    <div class="modal-body">
+      Articulo Compatible<br>
+      {{ form_articuloCompatible.compatible_articulo }}
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+    </div>
+    <div class="modal-footer">
+      <input type="submit" class="btn" name='btnAgregarCompArticulo' value="Agregar" />
+    </div>
+  </div>
+
+  <div id="id_clasificacionModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="infoModal" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3 id="myModalLabel">Nueva compatibilidad de {{ form.nombre.value }}</h3>
+    </div>
+    <div class="modal-body">
+      Clasificacion Compatible<br>
+      {{ form_clasificacionCompatible.compatible_clasificacion }}
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+    </div>
+    <div class="modal-footer">
+      <input type="submit" class="btn" name='btnAgregarCompClasificacion' value="Agregar" />
+    </div>
+  </div>
+
   {% if message %}
   <div class="alert alert-block alert-error fade in">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -82,7 +161,8 @@
   <br style='clear:both;'>
   <br>
   <div class="form-actions mainmenu" >
-    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+     <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
   </div>
 </form>
+{% include 'autocomplete_light/static.html' %}
 {% endblock %}

@@ -7,3 +7,4 @@ autocomplete_light.register(ClavesArticulos, search_fields=('clave',),
 
 autocomplete_light.register(Articulos, search_fields=('nombre',),
     autocomplete_js_attributes={'placeholder': 'nombre ..'})
+

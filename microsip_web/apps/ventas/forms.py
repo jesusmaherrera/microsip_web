@@ -10,6 +10,28 @@ from microsip_web.apps.inventarios.models import *
 
 from django.forms.models import modelformset_factory
 
+class GruposGrupo_ManageForm(forms.Form):
+    grupo   = forms.ModelChoiceField(queryset= GruposGrupo.objects.all().exclude(grupo_padre=None))
+
+class GruposGrupoMain_ManageForm(forms.Form):
+    filtro   = forms.ModelChoiceField(queryset= GruposGrupo.objects.filter(grupo_padre=None))
+
+class DoctoVe_ManageForm(forms.ModelForm): 
+    fecha = forms.DateField(widget=forms.TextInput(attrs={'class':'input-small'}), required= False)
+    folio = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class':'input-small'}))
+    class Meta:
+        model = DoctoVe
+
+class DoctoVeDet_ManageForm(forms.ModelForm): 
+    unidades = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'input-small'}))
+    precio_unitario = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'input-small'}))
+    class Meta:
+        widgets = autocomplete_light.get_widgets_dict(DoctoVeDet)
+        model = DoctoVeDet
+
+def DoctoVeDet_inlineformset(form, formset = BaseInlineFormSet, **kwargs):
+    return inlineformset_factory(DoctoVe, DoctoVeDet, form, formset, **kwargs)
+
 class clientes_config_cuentaManageForm(forms.ModelForm):
     class Meta:
         model = clientes_config_cuenta

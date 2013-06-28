@@ -9,6 +9,7 @@ class DoctoVe(models.Model):
     id              = models.AutoField(primary_key=True, db_column='DOCTO_VE_ID')
     folio           = models.CharField(max_length=9, db_column='FOLIO')
     fecha           = models.DateField(db_column='FECHA')
+    almacen         = models.ForeignKey(Almacenes, db_column='ALMACEN_ID')
     contabilizado   = models.CharField(default='N', max_length=1, db_column='CONTABILIZADO')
     cliente         = models.ForeignKey(Cliente, db_column='CLIENTE_ID')
     descripcion         = models.CharField(blank=True, null=True, max_length=200, db_column='DESCRIPCION')
@@ -133,3 +134,13 @@ class DetallePlantillaPolizas_V(models.Model):
     def __unicode__(self):
         return u'%s'%self.id
 
+# class CompatibilidadesArticulos(models.Model):
+#     articulo = models.ForeignKey(Articulos, related_name="articulo")
+#     articulos_compatibles = models.ManyToManyField(Articulos, blank=True, null=True, related_name="articulos_compatibles")
+    
+#     YEAR_CHOICES = []
+#     for r in range(1980, (datetime.now().year+1)):
+#         YEAR_CHOICES.append((r,r))
+
+#     ano_ini = models.IntegerField(max_length=4, choices=YEAR_CHOICES, default=datetime.now().year)
+#     ano_fin = models.IntegerField(max_length=4, choices=YEAR_CHOICES, default=datetime.now().year)

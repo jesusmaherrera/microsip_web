@@ -21,10 +21,22 @@ urlpatterns = patterns('',
     
     #Articulos
     (r'^articulos/$', views.articulos_view),
+    (r'^articulos/(?P<grupo_id>\d+)/$', views.articulos_view),
+
     (r'^articulo/(?P<id>\d+)/', views.articulo_manageView),
 	#Clientes
 	(r'^clientes/$', views.clientes_view),
 	(r'^cliente/(?P<id>\d+)/', views.cliente_manageView),
+    
+    #Categorias
+    # (r'^categorias/$', views.categorias_view),
+    # (r'^categorias/(?P<grupo_id>\d+)/$', views.categorias_view),
+    (r'^categoria/$', views.gruposgrupo_manageView),
+    (r'^categoria/(?P<categoria_id>\d+)/$', views.gruposgrupo_manageView),
+    (r'^categoria/delete/None/(?P<categoria_id>\d+)/$', views.gruposgrupo_delete),
+    (r'^categoria/delete/(?P<categoria_padre>\d+)/(?P<categoria_id>\d+)/$', views.gruposgrupo_delete),
+    (r'^compatibilidadesArticulos/delete/(?P<articulo_id>\d+)/(?P<articuloCompatibleId>\d+)/$', views.ArticuloCompatibleArticulo_delete),
+    (r'^compatibilidadesClasificaciones/delete/(?P<articulo_id>\d+)/(?P<articuloCompatibleId>\d+)/$', views.ArticuloCompatibleClasificacion_delete),
     
     #Tipos Cliente
     (r'^tipos_cliente/$', views.tipos_cliente_view),
