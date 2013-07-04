@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from sets import Set
 from models import *
+from microsip_web.apps.main.models import *
 
 class ArticuloCompatibleClasificacion_ManageForm(forms.ModelForm):
 	class Meta:
@@ -18,15 +19,13 @@ class ArticuloCompatibleArticulo_ManageForm(forms.Form):
 	compatible_articulo = forms.ModelChoiceField(queryset=Articulos.objects.all(),
 		widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
 
-class Grupo_ManageForm(forms.ModelForm):
-	#nombre = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'clasificacion...'}),required=False)
-	class Meta:
-		widgets = autocomplete_light.get_widgets_dict(Grupo)
-		model = Grupo
+# class Grupo_ManageForm(forms.ModelForm):
+# 	#nombre = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'clasificacion...'}),required=False)
+# 	class Meta:
+# 		model = Grupo
 
 class GruposGrupo_bypadre_ManageForm(forms.Form):
 	newgrupo = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'clasificacion...'}),required=False)
-	grupo = forms.ModelChoiceField(queryset= Grupo.objects.all(), required=False)
 
 class ArticuloManageForm(forms.ModelForm):
 	class Meta:

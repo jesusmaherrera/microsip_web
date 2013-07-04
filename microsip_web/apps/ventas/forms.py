@@ -2,7 +2,7 @@
 from django import forms
 
 import autocomplete_light
-
+from microsip_web.apps.main.models import *
 from microsip_web.apps.ventas.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
@@ -11,10 +11,10 @@ from microsip_web.apps.inventarios.models import *
 from django.forms.models import modelformset_factory
 
 class GruposGrupo_ManageForm(forms.Form):
-    grupo   = forms.ModelChoiceField(queryset= GruposGrupo.objects.all().exclude(grupo_padre=None))
+    grupo   = forms.ModelChoiceField(queryset= SeccionArticulos.objects.all().exclude(seccion_padre=None))
 
 class GruposGrupoMain_ManageForm(forms.Form):
-    filtro   = forms.ModelChoiceField(queryset= GruposGrupo.objects.filter(grupo_padre=None))
+    filtro   = forms.ModelChoiceField(queryset= SeccionArticulos.objects.filter(seccion_padre=None))
 
 class DoctoVe_ManageForm(forms.ModelForm): 
     fecha = forms.DateField(widget=forms.TextInput(attrs={'class':'input-small'}), required= False)

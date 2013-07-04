@@ -6,7 +6,7 @@ from forms import *
 from models import *
 from django.db.models import Q
 from microsip_web.apps.main.views import crear_polizas_contables
-from microsip_web.apps.ventas.models import GruposGrupo, Grupo
+from microsip_web.apps.ventas.models import SeccionArticulos
 
 # user autentication
 from django.contrib.auth.decorators import login_required, permission_required
@@ -37,7 +37,7 @@ def inicializar_puntos_articulos(request):
 
 @login_required(login_url='/login/')
 def articulos_view(request, grupo_id=None, template_name='punto_de_venta/articulos/articulos/articulos.html'):
-    categorias_list = GruposGrupo.objects.filter(grupo_padre=grupo_id)
+    categorias_list = SeccionArticulos.objects.filter(seccion_padre=grupo_id)
     articulos_list = Articulos.objects.filter(grupo_padre__id=grupo_id).order_by('nombre')
 
     paginator = Paginator(articulos_list, 20) # Muestra 10 ventas por pagina
@@ -121,7 +121,7 @@ def ArticuloCompatibleClasificacion_delete(request, articulo_id=None, articuloCo
         
 @login_required(login_url='/login/')
 def gruposgrupo_delete(request, categoria_padre=None, categoria_id=None, template_name='punto_de_venta/articulos/categorias/categoria.html'):
-    GruposGrupo.objects.filter(id=categoria_id).delete()
+    SeccionArticulos.objects.filter(id=categoria_id).delete()
     if categoria_padre:
         return HttpResponseRedirect('/punto_de_venta/articulos/%s'% categoria_padre)
     else:
@@ -135,27 +135,17 @@ def gruposgrupo_manageView(request, categoria_id=None, template_name='punto_de_v
 
         if grupo_form.is_valid():
             newgrupo = grupo_form.cleaned_data['newgrupo']
-            grupo = grupo_form.cleaned_data['grupo']
-
             if categoria_id:
-                grupo_padre = get_object_or_404(GruposGrupo, pk=categoria_id).grupo
+                grupo_padre = get_object_or_404(SeccionArticulos, pk=categoria_id)
             else:
                 grupo_padre = None
 
             if newgrupo != '':
-                clasificacionObjeto = Grupo(
+                clasificacionObjeto = SeccionArticulos(
                     nombre = newgrupo,
+                    seccion_padre = grupo_padre,
                     )
                 clasificacionObjeto.save()
-            else:
-                clasificacionObjeto = grupo
-
-            clasificacion = GruposGrupo(
-                grupo = clasificacionObjeto,
-                grupo_padre = grupo_padre,
-                )
-
-            clasificacion.save()
             
             if categoria_id:
                 return HttpResponseRedirect('/punto_de_venta/articulos/%s'% categoria_id)

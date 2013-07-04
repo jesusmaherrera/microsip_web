@@ -1,6 +1,6 @@
 import autocomplete_light
 
-from microsip_web.apps.inventarios.models import CuentaCo, Articulos
+from microsip_web.apps.main.models import CuentaCo, Articulos
 
 autocomplete_light.register(CuentaCo, search_fields=('cuenta',),
     autocomplete_js_attributes={'placeholder': 'cuenta ..'},
