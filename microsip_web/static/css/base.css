@@ -138,6 +138,7 @@ footer
 	background-color: rgba(255, 255, 255, 1);
 	text-align: left;
 	padding: 1em;
+  height: auto;
 	padding-top: 0em;
 	padding-bottom: 2em;
 	margin-left: 1em;
