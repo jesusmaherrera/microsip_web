@@ -10,6 +10,7 @@ from microsip_web.apps.inventarios.models import *
 
 from django.forms.models import modelformset_factory
 
+<<<<<<< HEAD
 class GruposGrupo_ManageForm(forms.Form):
     grupo   = forms.ModelChoiceField(queryset= SeccionArticulos.objects.all().exclude(seccion_padre=None))
 
@@ -32,6 +33,8 @@ class DoctoVeDet_ManageForm(forms.ModelForm):
 def DoctoVeDet_inlineformset(form, formset = BaseInlineFormSet, **kwargs):
     return inlineformset_factory(DoctoVe, DoctoVeDet, form, formset, **kwargs)
 
+=======
+>>>>>>> parent of ec0d228... se inicio con app filtros y compatibilidades
 class clientes_config_cuentaManageForm(forms.ModelForm):
     class Meta:
         model = clientes_config_cuenta

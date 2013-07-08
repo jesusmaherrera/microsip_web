@@ -2,8 +2,6 @@
 from django.db import models
 from microsip_web.apps.main.models import *
 from microsip_web.apps.contabilidad.models import *
-import datetime
-
 
 ################################################################
 ####                                                        ####
@@ -56,22 +54,3 @@ class DetallePlantillaPolizas_pv(models.Model):
 
     def __unicode__(self):
         return u'%s'%self.id
-
-# class CompatiblidadArticulo(models.Model):
-#     articulo = models.ForeignKey(Articulos, blank=True, null=True, on_delete= models.SET_NULL)
-#     linea = models.ForeignKey(LineaArticulos, blank=True, null=True)
-#     grupo = models.ForeignKey(GrupoLineas, blank=True, null=True)
-
-#     VALOR_TIPOS =(
-#         ('A', 'Articulo'),
-#         ('L', 'Linea'),
-#         ('G', 'Grupo'),
-#     )
-#     tipo = models.CharField(max_length=1, choices=VALOR_TIPOS)
-    
-#     YEAR_CHOICES = []
-#     for r in range(1980, (datetime.datetime.now().year+1)):
-#         YEAR_CHOICES.append((r,r))
-
-#     ano_ini = models.IntegerField(max_length=4, choices=YEAR_CHOICES, default=datetime.datetime.now().year)
-#     ano_fin = models.IntegerField(max_length=4, choices=YEAR_CHOICES, default=datetime.datetime.now().year)

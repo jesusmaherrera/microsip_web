@@ -6,7 +6,10 @@ from django.http import HttpResponse
 from models import *
 from microsip_web.apps.cuentas_por_cobrar.models import PlantillaPolizas_CC
 from microsip_web.apps.cuentas_por_pagar.models import PlantillaPolizas_CP
+<<<<<<< HEAD
 from microsip_web.apps.ventas.models import SeccionArticulos
+=======
+>>>>>>> parent of ec0d228... se inicio con app filtros y compatibilidades
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from microsip_web.apps.main.views import next_id_seccion_articulos
@@ -40,6 +43,7 @@ def crear_nodo(request, nombre, padre):
     return simplejson.dumps({'id':id})
 
 @dajaxice_register(method='GET')
+<<<<<<< HEAD
 def get_infoarticulo(request, articulo_id):
     articulo = get_object_or_404(Articulos, pk=articulo_id) 
     articulos_compatibles = ArticuloCompatibleArticulo.objects.filter(articulo=articulo)
@@ -100,6 +104,8 @@ def get_articulosby_seccion(request, seccion_id):
     return HttpResponse(data, mimetype="application/javascript")
 
 @dajaxice_register(method='GET')
+=======
+>>>>>>> parent of ec0d228... se inicio con app filtros y compatibilidades
 def obtener_plantillas(request, tipo_plantilla):
     #se obtiene la provincia
     plantillas = []
@@ -133,10 +139,11 @@ def get_articulosen_inventario(request, inventario_id, articulo_id):
         unidades = doc.unidades
     except ObjectDoesNotExist:
         unidades = 0
+
     #se devuelven las ciudades en formato json, solo nos interesa obtener como json
     #el id y el nombre de las ciudades.
 
-    return simplejson.dumps({'unidades':unidades, })
+    return simplejson.dumps({'unidades':unidades,})
 
 @dajaxice_register(method='GET')
 def get_articulo_by_clave(request, clave):
@@ -145,7 +152,6 @@ def get_articulo_by_clave(request, clave):
         clave_articulo = ClavesArticulos.objects.get(clave=clave)
         articulo_id = clave_articulo.articulo.id
         articulo_nombre = clave_articulo.articulo.nombre
-        
     except ObjectDoesNotExist:
         articulo_id = 0
         articulo_nombre =''

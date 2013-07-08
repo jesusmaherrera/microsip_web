@@ -10,6 +10,7 @@ from sets import Set
 from models import *
 from microsip_web.apps.main.models import *
 
+<<<<<<< HEAD
 class ArticuloCompatibleClasificacion_ManageForm(forms.ModelForm):
 	class Meta:
 		model = ArticuloCompatibleClasificacion
@@ -31,6 +32,8 @@ class ArticuloManageForm(forms.ModelForm):
 	class Meta:
 		model = Articulos
 
+=======
+>>>>>>> parent of ec0d228... se inicio con app filtros y compatibilidades
 class ArticuloManageForm(forms.ModelForm):
 	
 	class Meta:

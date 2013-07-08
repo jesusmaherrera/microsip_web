@@ -61,8 +61,7 @@ def inventarios_agregar_trigers():
     c.execute(triggers['DOCTOS_IN_DET_BI_PUERTA_ABIERTA'])
     c.execute(triggers['DOCTOS_IN_DET_BD_PUERTA_ABIERTA'])
     c.execute(triggers['DOCTOS_IN_BU_PUERTA_ABIERTA'])
-    c.execute(triggers['DESGLOSE_EN_DISCRETOS_AI_PUERTA'])
-    
+
     transaction.commit_unless_managed()
 
 def punto_de_venta_agregar_trigers():
@@ -915,6 +914,7 @@ def crear_polizas_contables(origen_documentos, documentos, depto_co, informacion
     detalles_polizas    = []
     totales_cuentas     = {}
     
+
     for documento_no, documento in enumerate(documentos):
         #es_contado = documento.condicion_pago == informacion_contable.condicion_pago_contado
         descripcion_extra   = ''
