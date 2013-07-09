@@ -1,14 +1,11 @@
 #encoding:utf-8
 from django import forms
-
-import autocomplete_light
-
-from microsip_web.apps.ventas.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-from microsip_web.apps.inventarios.models import *
-
 from django.forms.models import modelformset_factory
+import autocomplete_light
+
+from models import *
 
 class GruposGrupo_ManageForm(forms.Form):
     grupo   = forms.ModelChoiceField(queryset= GruposGrupo.objects.all().exclude(grupo_padre=None))

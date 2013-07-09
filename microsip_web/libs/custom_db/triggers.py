@@ -1,5 +1,32 @@
 triggers = {}
 
+#############################
+#                           #
+#   DESGLOSE EN DISCRETOS   #
+#                           #
+#############################
+
+triggers['DESGLOSE_EN_DISCRETOS_AI_PUERTA'] = '''
+    CREATE OR ALTER TRIGGER DESGLOSE_EN_DISCRETOS_AI_PUERTA FOR DESGLOSE_EN_DISCRETOS
+    ACTIVE AFTER INSERT POSITION 0
+    AS
+    declare variable articulo_id integer;
+    declare variable docto_invfis_det_id integer;
+    begin
+        select first 1 articulo_id
+        from articulos_discretos
+        where art_discreto_id = new.art_discreto_id
+        into :articulo_id;
+
+        select docto_invfis_det_id
+        from doctos_invfis_det
+        where articulo_id = :articulo_id
+        into :docto_invfis_det_id;
+
+        insert into desglose_en_discretos_invfis values(-1, :docto_invfis_det_id, new.art_discreto_id, new.unidades);
+    end
+    '''
+
 #####################
 #                   #
 #   DOCTOS_IN_DET   #

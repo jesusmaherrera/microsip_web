@@ -190,19 +190,17 @@
 
   {{ detalleInvForm.errors }}
   <div class="span" >
-    <!-- <label>Clave</label> -->
     <div class="input-prepend input-append">
       {{ detalleInvForm.clave }}
     </div>
   </div>
-  <div class="span" ><!-- 
-    <label>Articulo</label> -->
+  <div class="span3" >
     <div class="input-prepend input-append">
       {{ detalleInvForm.articulo }}
+      <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 255, 0); "> </span>
     </div>
   </div>
   <div class="span1" >
-    <!-- <label>Unidades --><span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 255, 0); "> </span><!-- </label> -->
     <div class="input-prepend input-append">
       {{ detalleInvForm.unidades }}
     </div>
