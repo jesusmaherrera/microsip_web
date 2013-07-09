@@ -126,45 +126,45 @@ def gruposgrupo_delete(request, categoria_padre=None, categoria_id=None, templat
     else:
         return HttpResponseRedirect('/punto_de_venta/articulos/')
         
-@login_required(login_url='/login/')
-def gruposgrupo_manageView(request, categoria_id=None, template_name='punto_de_venta/articulos/categorias/categoria.html'):
+# @login_required(login_url='/login/')
+# def gruposgrupo_manageView(request, categoria_id=None, template_name='punto_de_venta/articulos/categorias/categoria.html'):
     
-    if request.method == 'POST':
-        grupo_form = GruposGrupo_bypadre_ManageForm(request.POST)
+#     if request.method == 'POST':
+#         grupo_form = GruposGrupo_bypadre_ManageForm(request.POST)
 
-        if grupo_form.is_valid():
-            newgrupo = grupo_form.cleaned_data['newgrupo']
-            grupo = grupo_form.cleaned_data['grupo']
+#         if grupo_form.is_valid():
+#             newgrupo = grupo_form.cleaned_data['newgrupo']
+#             grupo = grupo_form.cleaned_data['grupo']
 
-            if categoria_id:
-                grupo_padre = get_object_or_404(GruposGrupo, pk=categoria_id).grupo
-            else:
-                grupo_padre = None
+#             if categoria_id:
+#                 grupo_padre = get_object_or_404(GruposGrupo, pk=categoria_id).grupo
+#             else:
+#                 grupo_padre = None
 
-            if newgrupo != '':
-                clasificacionObjeto = Grupo(
-                    nombre = newgrupo,
-                    )
-                clasificacionObjeto.save()
-            else:
-                clasificacionObjeto = grupo
+#             if newgrupo != '':
+#                 clasificacionObjeto = Grupo(
+#                     nombre = newgrupo,
+#                     )
+#                 clasificacionObjeto.save()
+#             else:
+#                 clasificacionObjeto = grupo
 
-            clasificacion = GruposGrupo(
-                grupo = clasificacionObjeto,
-                grupo_padre = grupo_padre,
-                )
+#             clasificacion = GruposGrupo(
+#                 grupo = clasificacionObjeto,
+#                 grupo_padre = grupo_padre,
+#                 )
 
-            clasificacion.save()
+#             clasificacion.save()
             
-            if categoria_id:
-                return HttpResponseRedirect('/punto_de_venta/articulos/%s'% categoria_id)
-            else:
-                return HttpResponseRedirect('/punto_de_venta/articulos/')                
-    else:
-        grupo_form = GruposGrupo_bypadre_ManageForm()   
+#             if categoria_id:
+#                 return HttpResponseRedirect('/punto_de_venta/articulos/%s'% categoria_id)
+#             else:
+#                 return HttpResponseRedirect('/punto_de_venta/articulos/')                
+#     else:
+#         grupo_form = GruposGrupo_bypadre_ManageForm()   
 
-    c = {'form':grupo_form, }
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
+#     c = {'form':grupo_form, }
+#     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################
 ##                                      ##

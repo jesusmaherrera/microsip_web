@@ -4,13 +4,10 @@ from datetime import datetime
 
 class Carpeta(models.Model):
     nombre  = models.CharField(max_length=30)
-    carpeta_padre = models.ForeignKey('self', related_name='carpeta_padre_id', blank=True, null=True)
+    carpeta_padre = models.ForeignKey('self', related_name='carpeta_padre_a', blank=True, null=True)
 
     def __unicode__(self):
         return u'%s'% self.nombre
-
-    class Meta:
-        db_table = u'sic_filtros_carpeta'
 
 ########################################################################################################
 
