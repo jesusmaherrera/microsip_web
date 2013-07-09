@@ -2,18 +2,15 @@
 from django.db import models
 from datetime import datetime
 
-class Grupo(models.Model):
+class Carpeta(models.Model):
     nombre  = models.CharField(max_length=30)
-    
-    def __unicode__(self):
-        return u'%s'%self.nombre
-
-class GruposGrupo(models.Model):
-    grupo = models.ForeignKey(Grupo, related_name="grupo")
-    grupo_padre = models.ForeignKey(Grupo, blank=True, null=True, related_name="grupo_padre")
+    carpeta_padre = models.ForeignKey('self', related_name='carpeta_padre_id', blank=True, null=True)
 
     def __unicode__(self):
-        return u'%s'% self.grupo
+        return u'%s'% self.nombre
+
+    class Meta:
+        db_table = u'sic_filtros_carpeta'
 
 ########################################################################################################
 
@@ -116,13 +113,14 @@ class Articulos(models.Model):
     nota_ventas = models.TextField(db_column='NOTAS_VENTAS', blank=True, null=True)
     dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
     hereda_puntos = models.BooleanField( db_column='HEREDA_PUNTOS')
-    grupo_padre = models.ForeignKey(GruposGrupo, blank=True, null=True,)
+    sic_carpeta = models.ForeignKey(Carpeta, blank=True, null=True,db_column='SIC_CARPETA_ID')
 
     def __unicode__(self):
         return u'%s' % self.nombre
 
     class Meta:
         db_table = u'articulos'
+
 
 class ArticulosClientes(models.Model):
     class Meta:

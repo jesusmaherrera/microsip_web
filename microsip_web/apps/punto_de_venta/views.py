@@ -11,6 +11,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from forms import *
 from models import *
+from microsip_web.apps.main.filtros.models import *
 from microsip_web.apps.main.views import crear_polizas_contables
 
 ##########################################
@@ -34,9 +35,9 @@ def inicializar_puntos_articulos(request):
     return HttpResponseRedirect('/punto_de_venta/articulos/')
 
 @login_required(login_url='/login/')
-def articulos_view(request, grupo_id=None, template_name='punto_de_venta/articulos/articulos/articulos.html'):
-    categorias_list = GruposGrupo.objects.filter(grupo_padre=grupo_id)
-    articulos_list = Articulos.objects.filter(grupo_padre__id=grupo_id).order_by('nombre')
+def articulos_view(request, carpeta_id=None, template_name='punto_de_venta/articulos/articulos/articulos.html'):
+    categorias_list = Carpeta.objects.filter(carpeta_padre=carpeta_id)
+    articulos_list = Articulos.objects.filter(sic_carpeta__id=carpeta_id).order_by('nombre')
 
     paginator = Paginator(articulos_list, 20) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -51,7 +52,7 @@ def articulos_view(request, grupo_id=None, template_name='punto_de_venta/articul
         # If page is out of range (e.g. 9999), deliver last page of results.
         articulos = paginator.page(paginator.num_pages)
 
-    c = {'articulos':articulos,'categorias':categorias_list, 'grupo_id':grupo_id,}
+    c = {'articulos':articulos,'categorias':categorias_list, 'grupo_id':carpeta_id,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
@@ -64,12 +65,12 @@ def articulo_manageView(request, id = None, template_name='punto_de_venta/articu
         articulo =  Articulos()
     
     articulos_compatibles = ArticuloCompatibleArticulo.objects.filter(articulo=articulo)
-    clasificaciones_compatibles = ArticuloCompatibleClasificacion.objects.filter(articulo=articulo)
+    clasificaciones_compatibles = ArticuloCompatibleCarpeta.objects.filter(articulo=articulo)
 
     if request.method == 'POST':
         form = ArticuloManageForm(request.POST, instance=  articulo)
-        form_articuloCompatible = ArticuloCompatibleArticulo_ManageForm(request.POST)
-        form_clasificacionCompatible = ArticuloCompatibleClasificacion_ManageForm(request.POST)
+        #form_articuloCompatible = ArticuloCompatibleArticulo_ManageForm(request.POST)
+        #form_clasificacionCompatible = ArticuloCompatibleClasificacion_ManageForm(request.POST)
         
         if form.is_valid():
             articulo = form.save()
@@ -92,15 +93,15 @@ def articulo_manageView(request, id = None, template_name='punto_de_venta/articu
             return HttpResponseRedirect('/punto_de_venta/articulos/')
     else:
         form = ArticuloManageForm(instance= articulo)
-        form_articuloCompatible = ArticuloCompatibleArticulo_ManageForm()
-        form_clasificacionCompatible = ArticuloCompatibleClasificacion_ManageForm()
+        #form_articuloCompatible = ArticuloCompatibleArticulo_ManageForm()
+        #form_clasificacionCompatible = ArticuloCompatibleClasificacion_ManageForm()
 
     c = {
     'form':form,
     'articulos_compatibles':articulos_compatibles,
     'clasificaciones_compatibles':clasificaciones_compatibles,
-    'form_articuloCompatible':form_articuloCompatible,
-    'form_clasificacionCompatible':form_clasificacionCompatible,
+    #'form_articuloCompatible':form_articuloCompatible,
+    #'form_clasificacionCompatible':form_clasificacionCompatible,
     'articulo_id':id,
     }
     return render_to_response(template_name, c, context_instance=RequestContext(request))
@@ -113,7 +114,7 @@ def ArticuloCompatibleArticulo_delete(request, articulo_id=None, articuloCompati
 
 @login_required(login_url='/login/')
 def ArticuloCompatibleClasificacion_delete(request, articulo_id=None, articuloCompatibleId= None):
-    ArticuloCompatibleClasificacion.objects.filter(id=articuloCompatibleId).delete()
+    ArticuloCompatibleCarpeta.objects.filter(id=articuloCompatibleId).delete()
     if articulo_id:
         return HttpResponseRedirect('/punto_de_venta/articulo/%s'% articulo_id)
         

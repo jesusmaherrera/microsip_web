@@ -7,12 +7,6 @@ import autocomplete_light
 
 from models import *
 
-class GruposGrupo_ManageForm(forms.Form):
-    grupo   = forms.ModelChoiceField(queryset= GruposGrupo.objects.all().exclude(grupo_padre=None))
-
-class GruposGrupoMain_ManageForm(forms.Form):
-    filtro   = forms.ModelChoiceField(queryset= GruposGrupo.objects.filter(grupo_padre=None))
-
 class DoctoVe_ManageForm(forms.ModelForm): 
     fecha = forms.DateField(widget=forms.TextInput(attrs={'class':'input-small'}), required= False)
     folio = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class':'input-small'}))
