@@ -2,7 +2,7 @@
 from django import forms
 
 import autocomplete_light
-from microsip_web.apps.main.models import *
+
 from microsip_web.apps.ventas.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
@@ -10,12 +10,11 @@ from microsip_web.apps.inventarios.models import *
 
 from django.forms.models import modelformset_factory
 
-<<<<<<< HEAD
 class GruposGrupo_ManageForm(forms.Form):
-    grupo   = forms.ModelChoiceField(queryset= SeccionArticulos.objects.all().exclude(seccion_padre=None))
+    grupo   = forms.ModelChoiceField(queryset= GruposGrupo.objects.all().exclude(grupo_padre=None))
 
 class GruposGrupoMain_ManageForm(forms.Form):
-    filtro   = forms.ModelChoiceField(queryset= SeccionArticulos.objects.filter(seccion_padre=None))
+    filtro   = forms.ModelChoiceField(queryset= GruposGrupo.objects.filter(grupo_padre=None))
 
 class DoctoVe_ManageForm(forms.ModelForm): 
     fecha = forms.DateField(widget=forms.TextInput(attrs={'class':'input-small'}), required= False)
@@ -33,8 +32,6 @@ class DoctoVeDet_ManageForm(forms.ModelForm):
 def DoctoVeDet_inlineformset(form, formset = BaseInlineFormSet, **kwargs):
     return inlineformset_factory(DoctoVe, DoctoVeDet, form, formset, **kwargs)
 
-=======
->>>>>>> parent of ec0d228... se inicio con app filtros y compatibilidades
 class clientes_config_cuentaManageForm(forms.ModelForm):
     class Meta:
         model = clientes_config_cuenta

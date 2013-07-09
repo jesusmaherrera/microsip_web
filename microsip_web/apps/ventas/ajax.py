@@ -6,44 +6,15 @@ from django.http import HttpResponse
 from models import *
 from microsip_web.apps.cuentas_por_cobrar.models import PlantillaPolizas_CC
 from microsip_web.apps.cuentas_por_pagar.models import PlantillaPolizas_CP
-<<<<<<< HEAD
-from microsip_web.apps.ventas.models import SeccionArticulos
-=======
->>>>>>> parent of ec0d228... se inicio con app filtros y compatibilidades
+from microsip_web.apps.ventas.models import GruposGrupo
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
-from microsip_web.apps.main.views import next_id_seccion_articulos
-import json
 
 @dajaxice_register(method='GET')
 def args_example(request, text):
     return simplejson.dumps({'message':'Your message is %s!' % text})
 
-
 @dajaxice_register(method='GET')
-def update_node(request, id, padre_id):
-    SeccionArticulos.objects.filter(id=id).update(seccion_padre = get_object_or_404(SeccionArticulos, pk=padre_id))
-    return ''
-
-@dajaxice_register(method='GET')
-def rename_node(request, id, nombre):
-    SeccionArticulos.objects.filter(id=id).update(nombre = nombre)
-    return ''
-
-@dajaxice_register(method='GET')
-def remove_node(request, id):
-    SeccionArticulos.objects.get(id = id).delete()
-    return ''
-
-
-@dajaxice_register(method='GET')
-def crear_nodo(request, nombre, padre):
-    id = next_id_seccion_articulos()
-    SeccionArticulos.objects.create(id = id, nombre=nombre, seccion_padre =get_object_or_404(SeccionArticulos, pk=padre))
-    return simplejson.dumps({'id':id})
-
-@dajaxice_register(method='GET')
-<<<<<<< HEAD
 def get_infoarticulo(request, articulo_id):
     articulo = get_object_or_404(Articulos, pk=articulo_id) 
     articulos_compatibles = ArticuloCompatibleArticulo.objects.filter(articulo=articulo)
@@ -65,47 +36,12 @@ def get_articulosby_grupopadre(request, grupopadre_id):
 
 @dajaxice_register(method='GET')
 def get_gruposby_grupopadre(request, grupopadre_id):
-    grupos = SeccionArticulos.objects.filter(seccion_padre = get_object_or_404(SeccionArticulos, pk=grupopadre_id) )
+    grupos = GruposGrupo.objects.filter(grupo_padre__id = get_object_or_404(GruposGrupo, pk=grupopadre_id).grupo.id )
     
-    data = serializers.serialize("json", grupos)
-    return HttpResponse(data, mimetype="application/javascript")
-
-def buscar_hijos(data=[]):
-    if data != None:
-        hijos = SeccionArticulos.objects.filter(seccion_padre= get_object_or_404(SeccionArticulos, pk=data['attr']['id']))
-    else:
-        hijos = SeccionArticulos.objects.filter(seccion_padre= None)
-    
-    datoshijos = []
-    for hijo in hijos:
-        datahijo = {}
-        datahijo['data'] = hijo.nombre
-        datahijo['attr'] = {'id':hijo.id}
-        datahijo = buscar_hijos(datahijo)
-        datoshijos.append(datahijo)
-    
-    if data != None:
-        data['children'] = datoshijos
-    else:
-        data = datoshijos
-
-    return data
-
-@dajaxice_register(method='GET')
-def get_gruposby_grupopadre2(request):
-    datos = buscar_hijos(None)
-    return HttpResponse(json.dumps(datos), mimetype="application/javascript")
-
-@dajaxice_register(method='GET')
-def get_articulosby_seccion(request, seccion_id):
-    articulos = Articulos.objects.filter(grupo_padre = get_object_or_404(SeccionArticulos, pk=seccion_id) )
-    
-    data = serializers.serialize("json", articulos)
+    data = serializers.serialize("json", grupos, indent=4, relations=('grupo',))
     return HttpResponse(data, mimetype="application/javascript")
 
 @dajaxice_register(method='GET')
-=======
->>>>>>> parent of ec0d228... se inicio con app filtros y compatibilidades
 def obtener_plantillas(request, tipo_plantilla):
     #se obtiene la provincia
     plantillas = []
@@ -139,11 +75,10 @@ def get_articulosen_inventario(request, inventario_id, articulo_id):
         unidades = doc.unidades
     except ObjectDoesNotExist:
         unidades = 0
-
     #se devuelven las ciudades en formato json, solo nos interesa obtener como json
     #el id y el nombre de las ciudades.
 
-    return simplejson.dumps({'unidades':unidades,})
+    return simplejson.dumps({'unidades':unidades, })
 
 @dajaxice_register(method='GET')
 def get_articulo_by_clave(request, clave):
@@ -152,6 +87,7 @@ def get_articulo_by_clave(request, clave):
         clave_articulo = ClavesArticulos.objects.get(clave=clave)
         articulo_id = clave_articulo.articulo.id
         articulo_nombre = clave_articulo.articulo.nombre
+        
     except ObjectDoesNotExist:
         articulo_id = 0
         articulo_nombre =''

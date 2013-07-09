@@ -1,4 +1,5 @@
 from django.contrib import admin
 from models import *
 
-admin.site.register(SeccionArticulos)
+admin.site.register(GruposGrupo)
+admin.site.register(Grupo)

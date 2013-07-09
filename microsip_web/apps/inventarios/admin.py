@@ -1,5 +1,5 @@
 import autocomplete_light
-from microsip_web.apps.main.models import Articulos, DoctosInvfisDet
+from microsip_web.apps.inventarios.models import Articulos, DoctosInvfisDet
 from django.contrib import admin
 
 class DoctosInvfisDetAdmin(admin.ModelAdmin):
