@@ -1,14 +1,13 @@
 from django.utils import simplejson
 from dajaxice.decorators import dajaxice_register
-from microsip_web.apps.inventarios.models import *
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
 from django.core import serializers
 from django.http import HttpResponse
+
 from models import *
 from microsip_web.apps.cuentas_por_cobrar.models import PlantillaPolizas_CC
 from microsip_web.apps.cuentas_por_pagar.models import PlantillaPolizas_CP
-from microsip_web.apps.ventas.models import GruposGrupo
-from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404
 
 @dajaxice_register(method='GET')
 def args_example(request, text):

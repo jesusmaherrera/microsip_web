@@ -213,10 +213,8 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
                         elif movimiento == 'eliminar':                        
                             DoctosInvfisDet.objects.filter(id=id_detalle).delete()
                             detalleInvForm = DoctosInvfisDetManageForm()
-                            detalleInvForm = DoctosInvfisDetManageForm()
                         elif movimiento == 'actualizar':
                             DoctosInvfisDet.objects.filter(id=id_detalle, articulo=detalleInv.articulo).update(unidades=unidades)
-                            detalleInvForm = DoctosInvfisDetManageForm()
                             detalleInvForm = DoctosInvfisDetManageForm()
     #                            
     else:

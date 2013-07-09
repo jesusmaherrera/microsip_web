@@ -2,25 +2,23 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from microsip_web.apps.inventarios.models import *
 from django.forms.models import modelformset_factory
 from django.forms.formsets import formset_factory
-
-from models import *
-from forms import *
-import datetime, time
 from django.db.models import Q
 from datetime import timedelta
 from decimal import *
-
 from django.core import serializers
 #Paginacion
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-#from main.views import agregarTotales, get_folio_poliza
 # user autentication
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum, Max
+
+import datetime, time
+
+from models import *
+from forms import *
 from microsip_web.apps.inventarios.views import c_get_next_key
 from microsip_web.apps.main.views import crear_polizas_contables
 

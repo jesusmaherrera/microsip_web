@@ -137,6 +137,7 @@ class ArticulosDiscretos(models.Model):
      
     def __unicode__(self):
         return u'%s' % self.clave
+        
     class Meta:
         db_table = u'articulos_discretos'
 

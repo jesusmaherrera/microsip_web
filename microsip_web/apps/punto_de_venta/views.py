@@ -2,18 +2,16 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from forms import *
-from models import *
 from django.db.models import Q
-from microsip_web.apps.main.views import crear_polizas_contables
-from microsip_web.apps.ventas.models import GruposGrupo, Grupo
-
 # user autentication
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
 #Paginacion
-
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+from forms import *
+from models import *
+from microsip_web.apps.main.views import crear_polizas_contables
 
 ##########################################
 ##                                      ##
@@ -447,7 +445,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
             )
             
     elif error == 1 and msg=='':
-        msg = 'No se han derfinido las preferencias de la empresa para generar polizas [Por favor definelas primero en Configuracion > Preferencias de la empresa]'
+        msg = 'No se han definido las preferencias de la empresa para generar polizas [Por favor definelas primero en Configuracion > Preferencias de la empresa]'
     
     return documentosGenerados, documentosDataDevoluciones, msg
 
@@ -546,7 +544,7 @@ def plantilla_poliza_manageView(request, id = None, template_name='punto_de_vent
         plantilla_items         = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
         plantilla_items_formset = plantilla_items(request.POST, request.FILES, instance=plantilla)
         
-        if plantilla_form.is_valid() and plantilla_items_formset .is_valid():
+        if plantilla_form.is_valid() and plantilla_items_formset.is_valid():
             plantilla = plantilla_form.save(commit = False)
             plantilla.save()
 
