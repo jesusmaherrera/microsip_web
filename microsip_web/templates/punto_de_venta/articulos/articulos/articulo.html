@@ -7,6 +7,23 @@
 <!-- JavaScript Code -->
 {% block js_code %}
 <script>
+function cargar_arbol(datos){
+
+   $("#demo1").jstree({ 
+    "json_data" : {
+      "data" : datos
+    },
+    "plugins" : [ "themes", "json_data", "ui" ]
+  })
+  .bind("select_node.jstree", function (event, data) { 
+    $('#id_carpeta_seleccionada').val(data.rslt.obj.attr("id"));
+  })
+}
+
+$(document).ready(function() {
+  Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
+});
+
   $(function() {
     
     if ($('#id_hereda_puntos').is(':checked'))
@@ -19,7 +36,12 @@
       if ($('#id_dinero_electronico').val() == '') 
         $('#id_dinero_electronico').val(0);
     }
-        
+    
+    $('#btn_create_articulocompatiblecarpeta').click(function() {    
+      Dajaxice.microsip_web.apps.main.filtros.create_articulocompatiblecarpeta(cargar_arbol,{ 'articulo_id': {{ articulo_id }}, 'carpeta_id': $('#id_carpeta_seleccionada').val()});
+      window.location.reload(true);
+    });
+    
 
     $('#id_hereda_puntos').click(function() {
         if ($(this).is(':checked')) 
@@ -74,7 +96,7 @@
   </div>
   {{ form.seguimiento }}
   <div class='span'>
-    Grupo padre<br>
+    Carpeta<br>
     {{ form.sic_carpeta }}
   </div>
   <div style='clear:both;'>
@@ -138,7 +160,7 @@
     </div>
     <div class="modal-body">
       Clasificacion Compatible<br>
-      {{ form_clasificacionCompatible.compatible_clasificacion }}
+      <div id="demo1" class="demo span" style="height:100px;"></div>
       <br>
       <br>
       <br>
@@ -147,9 +169,11 @@
       <br>
     </div>
     <div class="modal-footer">
-      <input type="submit" class="btn" name='btnAgregarCompClasificacion' value="Agregar" />
+      <input type="hidden" id='id_carpeta_seleccionada' name="" value=""/>
+      <a href="#" id='btn_create_articulocompatiblecarpeta' class="btn">Agregar</a>
     </div>
   </div>
+
 
   {% if message %}
   <div class="alert alert-block alert-error fade in">

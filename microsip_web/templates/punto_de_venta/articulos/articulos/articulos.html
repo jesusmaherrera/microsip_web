@@ -56,24 +56,23 @@ function cargar_arbol(datos){
     .delegate("a", "click", function (event, data) { event.preventDefault(); })
     .bind("create.jstree", function (e, data) {
      
-     Dajaxice.microsip_web.apps.ventas.crear_nodo(function (r) { 
+     Dajaxice.microsip_web.apps.main.filtros.crear_nodo(function (r) { 
         $(data.rslt.obj).attr("id", "node_" + r.id);
       },{'nombre':data.rslt.name,'padre':data.rslt.parent.attr("id").replace("node_","")});
   })
   .bind("remove.jstree", function (e, data) {
-      Dajaxice.microsip_web.apps.ventas.remove_node(function (r) { 
+      Dajaxice.microsip_web.apps.main.filtros.remove_node(function (r) { 
         data.inst.refresh();
       },{'id':data.rslt.obj.attr("id")});
   })
   .bind("rename.jstree", function (e, data) {
-    Dajaxice.microsip_web.apps.ventas.rename_node(function (r) { 
+    Dajaxice.microsip_web.apps.main.filtros.rename_node(function (r) { 
         
       },{'id':data.rslt.obj.attr("id"),'nombre':data.rslt.new_name,});
   })
   .bind("move_node.jstree", function (e, data) {
     data.rslt.o.each(function (i) {
-      alert('se movio');
-      Dajaxice.microsip_web.apps.ventas.update_node(function (r) { 
+      Dajaxice.microsip_web.apps.main.filtros.update_node(function (r) { 
       },{'id':$(this).attr("id"),'padre_id':data.rslt.np.attr("id"),});
     });
   });

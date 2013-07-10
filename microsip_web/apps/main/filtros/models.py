@@ -2,7 +2,7 @@
 from django.db import models
 from datetime import datetime
 
-from microsip_web.apps.main.models import Articulos
+from microsip_web.apps.main.models import Articulos, Carpeta
 
 class ArticuloCompatibleArticulo(models.Model):
     articulo = models.ForeignKey(Articulos, related_name="articulo_id_ca", blank=True, null=True)
@@ -13,10 +13,10 @@ class ArticuloCompatibleArticulo(models.Model):
 
 class ArticuloCompatibleCarpeta(models.Model):
     articulo = models.ForeignKey(Articulos, related_name="articulo_id_cc", blank=True, null=True)
-    #carpeta_compatible = models.ForeignKey(Carpeta, related_name="carpeta_compatible_id_cc", blank=True, null=True)
+    carpeta_compatible = models.ForeignKey(Carpeta, related_name="carpeta_compatible_id_cc", blank=True, null=True)
 
     def __unicode__(self):
-        return u'%s'% self.id
+        return u'%s' % self.carpeta_compatible
         
 # class CarpetaCompatibleArticulo(models.Model):
 #     carpeta_articulos = models.ForeignKey(Carpeta, related_name="carpeta_articulos", blank=True, null=True)

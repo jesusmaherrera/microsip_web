@@ -9,6 +9,7 @@ import json
 from models import *
 from microsip_web.apps.cuentas_por_cobrar.models import PlantillaPolizas_CC
 from microsip_web.apps.cuentas_por_pagar.models import PlantillaPolizas_CP
+from microsip_web.apps.main.filtros.models import *
 from microsip_web.apps.main.filtros.views import get_next_id_carpeta
 
 
@@ -17,36 +18,14 @@ def args_example(request, text):
     return simplejson.dumps({'message':'Your message is %s!' % text})
 
 @dajaxice_register(method='GET')
-def update_node(request, id, padre_id):
-    Carpeta.objects.filter(id=id).update(carpeta_padre = get_object_or_404(Carpeta, pk=padre_id))
-    return ''
-
-@dajaxice_register(method='GET')
-def rename_node(request, id, nombre):
-    Carpeta.objects.filter(id=id).update(nombre = nombre)
-    return ''
-
-@dajaxice_register(method='GET')
-def remove_node(request, id):
-    Carpeta.objects.get(id = id).delete()
-    return ''
-
-
-@dajaxice_register(method='GET')
-def crear_nodo(request, nombre, padre):
-    id = get_next_id_carpeta()
-    Carpeta.objects.create(id = id, nombre=nombre, carpeta_padre =get_object_or_404(Carpeta, pk=padre))
-    return simplejson.dumps({'id':id})
-
-@dajaxice_register(method='GET')
 def get_infoarticulo(request, articulo_id):
     articulo = get_object_or_404(Articulos, pk=articulo_id) 
     articulos_compatibles = ArticuloCompatibleArticulo.objects.filter(articulo=articulo)
-    clasificaciones_compatibles = ArticuloCompatibleClasificacion.objects.filter(articulo=articulo)
+    clasificaciones_compatibles = ArticuloCompatibleCarpeta.objects.filter(articulo=articulo)
 
     compatibles = ''
     for clas in clasificaciones_compatibles:
-        compatibles = '%s [%s]'% (compatibles, clas.compatible_clasificacion.grupo.nombre) 
+        compatibles = '%s [%s]'% (compatibles, clas.carpeta_compatible.nombre) 
     for art in articulos_compatibles:
         compatibles = '%s [%s]'% (compatibles, art.compatible_articulo.nombre) 
 
