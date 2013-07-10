@@ -35,7 +35,7 @@ def pedido_ManageView(request, id = None, template_name='ventas/documentos/pedid
     else:
         documento = DoctoVe()
     
-    gruposgrupo_formset = formset_factory(form= GruposGrupo_ManageForm, can_delete=True,)
+    #gruposgrupo_formset = formset_factory(form= GruposGrupo_ManageForm, can_delete=True,)
 
     if request.method == 'POST':
         doctove_items = DoctoVeDet_inlineformset(DoctoVeDet_ManageForm, extra=1, can_delete=True)
@@ -43,12 +43,12 @@ def pedido_ManageView(request, id = None, template_name='ventas/documentos/pedid
     else:
         doctove_items = DoctoVeDet_inlineformset(DoctoVeDet_ManageForm, extra=1, can_delete=True)
         formset = doctove_items(instance=documento)
-        gruposgrupomain_form  = GruposGrupoMain_ManageForm()
-        grupos_formset = gruposgrupo_formset()
+        # gruposgrupomain_form  = GruposGrupoMain_ManageForm()
+        # grupos_formset = gruposgrupo_formset()
         pedidoForm= DoctoVe_ManageForm(instance=documento)
         
-
-    c = {'pedidoForm': pedidoForm,'formset':formset,'gruposgrupomain_form':gruposgrupomain_form,'grupos_formset':grupos_formset,}
+    #'gruposgrupomain_form':gruposgrupomain_form,'grupos_formset':grupos_formset,
+    c = {'pedidoForm': pedidoForm,'formset':formset,}
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 

@@ -18,7 +18,31 @@
 
 
 
+function cargar_articulos(articulos)
+{
+  var options = '<option value="">-----------</option>';
+  for (var i = 0; i < articulos.length; i++){
+    options += '<option value="'+articulos[i]["pk"]+'">' + articulos[i]["fields"]["nombre"] +'</option>';
+  }
+  $('#id_articulos').html(options)
+  $("#id_articulos option:first").attr('selected', 'selected');
+}
+
+function cargar_arbol(datos){
+
+   $("#demo1").jstree({ 
+    "json_data" : {
+      "data" : datos
+    },
+    "plugins" : [ "themes", "json_data", "ui" ]
+  }).bind("select_node.jstree", function (e, data) {
+    Dajaxice.microsip_web.apps.ventas.get_articulosby_seccion(cargar_articulos, {'carpeta_id': data.rslt.obj.attr("id")});
+  });
+}
+
 $(document).ready(function() {
+  Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
+  
   $('#id_doctosIn_table tbody tr').formset({
     prefix: '{{ formset.prefix }}',
     addCssClass:'btn btn-success',
@@ -47,11 +71,29 @@ $(document).ready(function() {
       $('#id_articulos').hide();
     else
     { 
-      Dajaxice.microsip_web.apps.ventas.get_articulosby_grupopadre(cargar_articulos, {'grupopadre_id': $('#id_form-0-grupo').val()});
+      //Dajaxice.microsip_web.apps.ventas.get_articulosby_grupopadre(cargar_articulos, {'grupopadre_id': $('#id_form-0-grupo').val()});
+      //Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_nuevalista, {'grupopadre_id': $('#id_form-0-grupo').val()});
       $('#id_articulos').show();
+    }
+
+
+
+      
+  });
+
+  $("[id*='id_secciones_']").change(function(event){
+    
+    if ($("[id*='id_secciones_']").val() == '')
+      $('#id_articulos').hide();
+    else
+    { 
+      //Dajaxice.microsip_web.apps.ventas.get_articulosby_grupopadre(cargar_articulos, {'grupopadre_id': $('#id_form-0-grupo').val()});
+      Dajaxice.microsip_web.apps.ventas.get_gruposby_grupopadre(cargar_nuevalista, {'grupopadre_id': this.val()});
+      //$('#id_articulos').show();
     }
       
   });
+
   $('#id_filtro').change(function(event){
     if ($('#id_filtro').val()== '')
       $('#id_form-0-grupo').hide();
@@ -64,6 +106,18 @@ $(document).ready(function() {
   
 });
 
+
+function agregar_articulo(){
+
+  var span = $('tr.form-container td span.autocomplete-light-widget input.autocomplete:visible').last().parent();
+
+  span.children('span.deck').attr('style','');
+  span.children('span.deck').html('<span class="div hilight" data-value="'+$('#id_articulos').val()+'"><span style="display: inline;" class="remove div">X</span>'+ $('#id_articulos option:selected').text() +'</span>');
+  span.children('select.value-select').html('<option selected="selected" value="'+$('#id_articulos').val()+'">'+ $('#id_articulos option:selected').text() +'</option>');
+  span.children('input.autocomplete').hide();
+
+}
+
 function cargar_infoarticulo(data)
 {
   $('#id_infoModal > .modal-header > #myModalLabel').html($('#id_articulos option:selected').text());
@@ -72,27 +126,43 @@ function cargar_infoarticulo(data)
   
 }
 
-function cargar_articulos(data)
-{
-  var options = '<option value="">-----------</option>';
-  for (var i = 0; i < data.length; i++){
-    options += '<option value="'+data[i]["pk"]+'">' + data[i]["fields"]["nombre"] +'</option>';
-  }
-  $('#id_articulos').html(options)
-  $("#id_articulos option:first").attr('selected', 'selected');
-}
+// function cargar_articulos(data)
+// {
+//   var options = '<option value="">-----------</option>';
+//   for (var i = 0; i < data.length; i++){
+//     options += '<option value="'+data[i]["pk"]+'">' + data[i]["fields"]["nombre"] +'</option>';
+//   }
+//   $('#id_articulos').html(options)
+//   $("#id_articulos option:first").attr('selected', 'selected');
+// }
 
  function cargar_formset(data)
  {
     var options = '<option value="">-----------</option>';
     for (var i = 0; i < data.length; i++){
-      grupo = data[i]["fields"]["grupo"];
-      options += '<option value="'+data[i]["pk"]+'">' + grupo["fields"]["nombre"] +'</option>';
+      // grupo = data[i]["fields"]["grupo"];
+      options += '<option value="'+data[i]["pk"]+'">' + data[i]["fields"]["nombre"] +'</option>';
     }
     $('#id_form-0-grupo').html(options)
     $("#id_form-0-grupo option:first").attr('selected', 'selected');
   }
 
+function cargar_nuevalista(data)
+{
+  var options = '<option value="">-----------</option>';
+  for (var i = 0; i < data.length; i++){
+    // grupo = data[i]["fields"]["grupo"];
+    options += '<option value="'+data[i]["pk"]+'">' + data[i]["fields"]["nombre"] +'</option>';
+  }
+  $('#id_form-0-grupo').html(options)
+  $("#id_form-0-grupo option:first").attr('selected', 'selected');
+
+  if (data.length > 0)
+  {
+    var select = '<select id="id_secciones_'+ data[0]["fields"]["seccion_padre"] +'">'+ options +'</select>';
+    $('#contenedor_listas').html(select)
+  }
+}
   
 </script>
 
@@ -147,8 +217,15 @@ function cargar_articulos(data)
     {{ form.grupo }}
   {% endfor %}
   {{ grupos_formset.management_form }}
+ 
+
+ <div id="demo1" class="demo span" style="height:100px;">
+
+</div>
+
   <select id="id_articulos"></select>
   <a href="#id_infoModal" id='id_infoarticulo' data-toggle="modal" ><i class=' icon-info-sign'></i></a>
+  <div id='contenedor_listas'></div>
   <a class='btn' id='id_add_articulo' href="#">Agregar</a>
   <div id="id_infoModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="infoModal" aria-hidden="true">
     <div class="modal-header">
