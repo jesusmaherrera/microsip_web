@@ -12,7 +12,7 @@ function cargar_articulos(articulos)
   $('#articulos_table').html('<caption>Articulos</caption><tr><th>Nombre</th></tr>');
   for (var i = 0; i < articulos.length; i++){
     var ruta ='/punto_de_venta/articulo/'+ articulos[i]["pk"]+'/';
-    $('#articulos_table').append('<tr><td><a href="'+ruta+'">'+ articulos[i]["fields"]["nombre"]+'</a></td></tr>');
+    $('#articulos_table').append('<tr><td ><a href="'+ruta+'">'+ articulos[i]["fields"]["nombre"]+'</a></td></tr>');
   }
 }
 
@@ -29,6 +29,22 @@ function cargar_arbol(datos){
       // as this is an AJAX enabled tree, both will be downloaded from the server
       "initially_open" : [ "15" , "15" ] 
     },
+     // Configuring the search plugin
+    "search" : {
+        // As this has been a common question - async search
+        // Same as above - the `ajax` config option is actually jQuery's AJAX object
+        "ajax" : {
+            "url" : "/static/v.1.0pre/_demo/server.php",
+            // You get the search string as a parameter
+            "data" : function (str) {
+                return {
+                    "operation" : "search",
+                    "search_str" : str
+                };
+            }
+        }
+    },
+
   }).bind("select_node.jstree", function (event, data) { 
       // `data.rslt.obj` is the jquery extended node that was clicked
 
@@ -56,6 +72,7 @@ function cargar_arbol(datos){
   })
   .bind("move_node.jstree", function (e, data) {
     data.rslt.o.each(function (i) {
+      alert('se movio');
       Dajaxice.microsip_web.apps.ventas.update_node(function (r) { 
       },{'id':$(this).attr("id"),'padre_id':data.rslt.np.attr("id"),});
     });
@@ -63,37 +80,102 @@ function cargar_arbol(datos){
 
 }
 
-$(document).ready(function() {
-  Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
+$(function () { 
+  $("a").click(function () {
+    switch(this.id) {
+      case "search":
+        $("#demo1").jstree("search", document.getElementById("text").value);
+        break;
+      case "text": break;
+      default:
+        $("#demo1").jstree(this.id);
+        break;
+    }
+  });
 });
 
+$(document).ready(function() {
+  Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
+  // Code for the menu buttons
+
+});
 </script>
 {% endblock %}
 
 {% block breadcrumb %}{{ block.super }} Articulos {% endblock %}
 {% block content %}
-<div class="ms-custom-form" style=" height: 2em; padding-top:1em; ">
-    <div class='span'>
-      <!-- <h3 class='span'>Articulos </h3> -->
+<br>
+<!-- {% for categoria in categorias %}
+<div class="btn-group">
+  <a class="btn" href="/punto_de_venta/articulos/{{categoria.id}}/"><i class='icon-tag'></i> {{ categoria }}</a>
+  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+  <ul class="dropdown-menu">
+    <li><a href="/punto_de_venta/categoria/delete/{{ grupo_id }}/{{ categoria.id }}/"><i class="icon-trash"></i> Eliminar</a></li>
+  </ul>
+</div>
+{% endfor %} -->
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span3">
+      <div class="input-append">
+        <input name="nombre" maxlength="100" placeholder="Busca una carpeta aqui..." type="text" id="text">
+        <a class='btn' id="search"  href="#"><i class='icon-search'></i></a>
+        <a class='btn' id="clear_search"  href="#"><i class=' icon-remove'></i></a>
+      </div>
+      <div id="demo1" class="demo span"></div>
     </div>
-    <div class=" pull-right">
-      <div class="btn-group">
-          <a href="#" role="button" class="btn dropdown-toggle" data-toggle="dropdown"> <i class="icon-plus-sign"></i> Agregar <b class="caret"></b></a>
-          <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
-            {% if grupo_id %}
-            <li><a tabindex="-1" href="/punto_de_venta/categoria/{{ grupo_id }}"><i class='icon-tag'></i> Categoria</a></li>
-            {% else %}
-            <li><a tabindex="-1" href="/punto_de_venta/categoria/"><i class='icon-tag'></i> Categoria</a></li>
-            {% endif %}
-            <!-- <li><a tabindex="-1" href="#"><i class="icon-barcode"></i> Articulo</a></li> -->
-          </ul>
+    <div class="span8">
+      <table id='articulos_table'></table>
+    </div>
+  </div>
+</div>
+
+<!-- <table class="table tableCell table-hover">
+    <tr>
+      <th>Nombre</th>
+      <th>Puntos</th>
+      <th>Dinero Electronico</th>
+      <th>Opciones</th>
+    </tr>
+    {% for articulo in articulos%}
+    <div id="myModal{{ articulo.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
+      </div>
+      <div class="modal-body">
+        <h4>Al eliminar el articulo</h4>
+        <p style="color:red;">Ya no sera posible recuperar los datos del articulo</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal">Cancelar</button>
+        <a href="#" class="btn btn-primary">Estoy Seguro</a>
       </div>
     </div>
-</div>
-<div id="demo1" class="demo span" ></div>
+    <tr>
+      <td><a href="/punto_de_venta/articulo/{{ articulo.id }}/">{{ articulo.nombre }}</a></td>
+      <td>{{articulo.puntos }}</td>
+      <td>{{articulo.dinero_electronico }}</td>
+      <td style="text-align:center;">
+      </td>
+    </tr>
+    {% endfor %}
 
-<table id='articulos_table'></table>
-
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if articulos.has_previous %}
+        <li><a href="?page={{ articulos.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ articulos.number }} de {{ articulos.paginator.num_pages }}.</a></li>
+        {% if articulos.has_next %}
+        <li><a href="?page={{ articulos.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table> -->
 <br>
-{% include 'autocomplete_light/static.html' %}
 {% endblock %}

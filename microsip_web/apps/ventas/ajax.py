@@ -94,7 +94,7 @@ def get_estructura_carpetas(request):
 
 @dajaxice_register(method='GET')
 def get_articulosby_seccion(request, carpeta_id):
-    articulos = Articulos.objects.filter(grupo_padre = get_object_or_404(Carpeta, pk=carpeta_id) )
+    articulos = Articulos.objects.filter(sic_carpeta = get_object_or_404(Carpeta, pk=carpeta_id) )
     
     data = serializers.serialize("json", articulos)
     return HttpResponse(data, mimetype="application/javascript")
