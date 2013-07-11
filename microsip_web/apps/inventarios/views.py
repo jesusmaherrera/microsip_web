@@ -170,8 +170,8 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
     #POST
     if request.method == 'POST':
         detalleInvForm = DoctosInvfisDetManageForm(request.POST)
-        inventario_form = inventario_pa_form()
-        if detalleInvForm.is_valid():
+        inventario_form = inventario_pa_form(request.POST)
+        if detalleInvForm.is_valid() and inventario_form.is_valid():
             articulos_discretos_formset = articulos_discretos_formset(request.POST, request.FILES)
             detalleInv = detalleInvForm.save(commit=False)  
             unidades = abs(detalleInv.unidades)

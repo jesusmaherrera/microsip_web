@@ -92,7 +92,7 @@ class DoctosInvfisManageForm(forms.ModelForm):
         return cleaned_data
 
 class inventario_pa_form(forms.Form):
-    modo_rapido = forms.BooleanField()
+    modo_rapido = forms.BooleanField(required=False)
 
 class DoctosInvfisDetManageForm(forms.ModelForm):
     clave = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'clave ...'}),required=False)
