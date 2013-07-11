@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+	<header>
+	<h1>Iniciar Sesión</h1>
+    <br>
+</header>
+<form id='formulario' action="/login/" method="post">{% csrf_token %}
+	<div style="margin: 0 auto 0 auto; display: block; width: 290px;">
+	<span class="span3" style="text-align:left;">
+  		{{ form.non_field_errors }}
+  		{{ form.username.errors }}
+  		Usuario:<br>
+  		{{ form.username }}
+  	</span>
+	<span class="span3" style="clear:both; text-align:left;">
+  		Contraseña:<br>
+  		{{ form.password.errors }}
+  		{{ form.password }}
+  	</span>
+  	<span class="span3" style="clear:both; text-align:left;">
+  		<input class="btn" type="submit" value="Ingresar" />
+
+  	</span>
+  </div>
+</form>
+<p style="color:red;">{{ message }}</p>
+<br><br>
+      <br><br><br><br><br>
+<br><br><br><br><br>	
+{% endblock %}

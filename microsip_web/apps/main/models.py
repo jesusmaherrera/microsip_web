@@ -8,7 +8,8 @@ class Carpeta(models.Model):
 
     def __unicode__(self):
         return u'%s'% self.nombre
-
+    class Meta:
+        db_table = u'sic_carpeta'
 ########################################################################################################
 
 class Registry(models.Model):

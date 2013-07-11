@@ -14,6 +14,9 @@ class InformacionContable_CC(models.Model):
 
     def __unicode__(self):
         return u'%s'% self.id
+    
+    class Meta:
+        db_table = u'sic_cc_informacioncontable'
 
 class PlantillaPolizas_CC(models.Model):
     nombre  = models.CharField(max_length=200)
@@ -21,6 +24,9 @@ class PlantillaPolizas_CC(models.Model):
     
     def __unicode__(self):
         return u'%s'%self.nombre
+
+    class Meta:
+        db_table = u'sic_cc_plantillapoliza'
 
 class DetallePlantillaPolizas_CC(models.Model):
     TIPOS = (('C', 'Cargo'),('A', 'Abono'),)
@@ -52,3 +58,7 @@ class DetallePlantillaPolizas_CC(models.Model):
 
     def __unicode__(self):
         return u'%s'%self.id
+
+    class Meta:
+        db_table = u'sic_cc_plantillapoliza_det'
+

@@ -49,10 +49,10 @@ def ingresar(request):
                 else:
                     return render_to_response('noactivo.html', context_instance=RequestContext(request))
             else:
-                return render_to_response('login.html',{'form':formulario, 'message':'Nombre de usaurio o password no validos',}, context_instance=RequestContext(request))
+                return render_to_response('main/login.html',{'form':formulario, 'message':'Nombre de usaurio o password no validos',}, context_instance=RequestContext(request))
     else:
         formulario = AuthenticationForm()
-    return render_to_response('inventarios/login.html',{'form':formulario, 'message':'',}, context_instance=RequestContext(request))
+    return render_to_response('main/login.html',{'form':formulario, 'message':'',}, context_instance=RequestContext(request))
 
 def logoutUser(request):
     logout(request)

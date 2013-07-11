@@ -9,7 +9,10 @@ class ArticuloCompatibleArticulo(models.Model):
     articulo_compatible = models.ForeignKey(Articulos, related_name="articulo_compatible_id_ca", blank=True, null=True)
 
     def __unicode__(self):
-        return u'%s'% self.id
+        return u'%s'% self.articulo_compatible
+
+	class Meta:
+	 	db_table = u'sic_articulocomp_art'
 
 class ArticuloCompatibleCarpeta(models.Model):
     articulo = models.ForeignKey(Articulos, related_name="articulo_id_cc", blank=True, null=True)
@@ -17,6 +20,9 @@ class ArticuloCompatibleCarpeta(models.Model):
 
     def __unicode__(self):
         return u'%s' % self.carpeta_compatible
+
+    class Meta:
+	 	db_table = u'sic_articulocomp_carp'
         
 # class CarpetaCompatibleArticulo(models.Model):
 #     carpeta_articulos = models.ForeignKey(Carpeta, related_name="carpeta_articulos", blank=True, null=True)
