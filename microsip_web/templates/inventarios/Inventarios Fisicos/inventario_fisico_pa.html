@@ -21,10 +21,13 @@
     $('#id_clave').live('keydown', function(e) { 
       var keyCode = e.keyCode || e.which; 
 
-      if (keyCode == 9) { 
+      if (keyCode == 13 || keyCode == 9) 
+      { 
         if($("#id_clave").val() != '')
           Dajaxice.microsip_web.apps.ventas.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
-      } 
+        return false
+      }
+
     });
 
     
@@ -112,7 +115,16 @@
   {% endif %}
   <div class="ms-custom-form" style=" height: 5em; ">
     <div class='span'>
-      <h3 class='span'>Inventario Fisico </h3>
+      <h3 class='span'>Inventario Fisico 
+        <ul class="nav btn btn-mini" style=" margin: 0px; ">
+          <li class="dropdown">
+            <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i></a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+              <li><a tabindex="-1" href="/inventarios/InventarioFisico_pa/agregar_articulos_nocontabilizados/{{ inventario_id }}"><i class="icon-ok-circle"></i> Agregar articulos no contabilizados</a></li>
+            </ul>
+          </li>
+        <ul>
+      </h3>
     </div>
     
     <div class=" pull-right ms-form-right-detail">
@@ -135,11 +147,10 @@
       </div>
       <div  class=" pull-right ">
         <div class="span4">
-          <strong>Alamacen: </strong> {{ InventarioFisico.almacen }} 
+          <strong>Alamacen: </strong> {{ InventarioFisico_form.almacen }} {{ InventarioFisico.almacen }} 
         </div>
       </div>  
     </div>
-    <br>
   </div>
   {% csrf_token %}
   
@@ -194,7 +205,7 @@
       {{ detalleInvForm.clave }}
     </div>
   </div>
-  <div class="span3" >
+  <div class="span" >
     <div class="input-prepend input-append">
       {{ detalleInvForm.articulo }}
       <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 255, 0); "> </span>
@@ -223,7 +234,6 @@
     </tr>
   {% endfor %}
   </table>
-  
   
 </form>
 

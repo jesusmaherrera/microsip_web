@@ -11,6 +11,19 @@ class Carpeta(models.Model):
 
 ########################################################################################################
 
+class Registry(models.Model):
+    id = models.AutoField(primary_key=True, db_column='ELEMENTO_ID')
+    nombre = models.CharField(max_length=50, db_column='NOMBRE')
+    tipo = models.CharField(max_length=1, db_column='TIPO')
+    padre = models.ForeignKey('self', related_name='padre_a')
+    valor = models.CharField(max_length=100, db_column='VALOR')
+
+    def __unicode__(self):
+        return u'%s' % self.nombre
+    
+    class Meta:
+        db_table = u'registry'
+
 class Moneda(models.Model):
     id = models.AutoField(primary_key=True, db_column='MONEDA_ID')
     es_moneda_local = models.CharField(default='N', max_length=1, db_column='ES_MONEDA_LOCAL')
@@ -453,7 +466,7 @@ class DoctosInvfis(models.Model):
     id                  = models.AutoField(primary_key=True, db_column='DOCTO_INVFIS_ID')
     almacen             = models.ForeignKey(Almacenes, db_column='ALMACEN_ID')
     folio               = models.CharField(max_length=9, db_column='FOLIO')
-    fecha               = models.DateField(auto_now_add=True, db_column='FECHA') 
+    fecha               = models.DateField(db_column='FECHA') 
     cancelado           = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='CANCELADO')
     aplicado            = models.CharField(default='N',blank=True, null=True, max_length=1, db_column='APLICADO')
     descripcion         = models.CharField(blank=True, null=True, max_length=200, db_column='DESCRIPCION')

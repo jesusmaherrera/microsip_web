@@ -7,30 +7,24 @@
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
 
-{% block breadcrumb %}{{ block.super }} Inventarios Fisicos {% endblock %}
+{% block breadcrumb %}{{ block.super }} Inventarios fisicos abiertos {% endblock %}
 {% block content %}
 <div class="form-actions mainmenu">
-  <a class="btn btn-success" href="/inventarios/InventarioFisico/">Nuevo</a>
+  <a class="btn btn-success" href="/inventarios/InventarioFisico_pa/">Nuevo</a>
 </div>
 <table class="table tableCell table-hover">
     <tr>
-      <th>ID</th>
       <th>FOLIO</th>
       <th>FECHA</th>
       <th>DESCRIPCION</th>
       <th>Almacen</th>
-      <th>APLICADO</th>
     </tr>
     {% for inventario_fisico in inventarios_fisicos %}
     <tr>
-      <td>
-        <a href="/inventarios/InventarioFisico_pa/{{ inventario_fisico.id }}/">{{ inventario_fisico.id }}</a>
-      </td>
-      <td>{{ inventario_fisico.folio }}</td>
+      <td><a href="/inventarios/InventarioFisico_pa/{{ inventario_fisico.id }}/">{{ inventario_fisico.folio }}</a></td>
       <td>{{ inventario_fisico.fecha }}</td>
       <td>{{ inventario_fisico.descripcion }}</td>
       <td>{{ inventario_fisico.almacen }}</td>
-      <td>{{ inventario_fisico.aplicado }}</td>
     </tr>
     {% endfor %}
 

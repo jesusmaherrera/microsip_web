@@ -73,7 +73,7 @@ def c_get_next_key(seq_name):
 
 @login_required(login_url='/login/')
 def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisicos/inventarios_fisicos.html'):
-    inventarios_fisicos_list = DoctosInvfis.objects.all().order_by('-fecha') 
+    inventarios_fisicos_list = DoctosInvfis.objects.filter(aplicado='N', cancelado='N').order_by('-fecha') 
 
     paginator = Paginator(inventarios_fisicos_list, 15) # Muestra 5 inventarios por pagina
     page = request.GET.get('page')
@@ -92,12 +92,77 @@ def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisic
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
+def add_articulos_nocontabilizados(request, id = None):
+    inventario_fisico = DoctosInvfis.objects.get(pk=id)
+    detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=inventario_fisico).order_by('-id')
+    articulos_en_inventario = []
+    for detalle_inventario in detallesInventario:
+       articulos_en_inventario.append(detalle_inventario.articulo.id)
+    
+    articulos_enceros = Articulos.objects.exclude(pk__in=articulos_en_inventario).filter(es_almacenable='S')
+
+    detalles_en_ceros = []
+    for articulo in articulos_enceros:
+        clave_articulo = ClavesArticulos.objects.filter(articulo__id=articulo.id)
+        if clave_articulo.count() <= 0:
+            clave_articulo = ''
+        else:
+            clave_articulo = clave_articulo[0]
+
+        detalle_inventario =DoctosInvfisDet(
+            id=-1,
+            docto_invfis= inventario_fisico,
+            clave = clave_articulo,
+            articulo = articulo,
+            unidades = 0)
+        detalles_en_ceros.append(detalle_inventario)
+        
+    DoctosInvfisDet.objects.bulk_create(detalles_en_ceros)
+    return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s'% id)
+
+def inventario_getnew_folio():
+    registro_folioinventario = Registry.objects.get(nombre='SIG_FOLIO_INVFIS')
+    folio = registro_folioinventario.valor 
+    siguiente_folio = "%09d" % (int(folio) +1)
+    registro_folioinventario.valor = siguiente_folio
+    registro_folioinventario.save()
+    return folio
+
+@login_required(login_url='/login/')
+def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inventarios Fisicos/create_inventario_fisico_pa.html'):
+    message = ''
+    if request.method == 'POST':
+        form = DoctoInvfis_CreateForm(request.POST)
+        if form.is_valid():
+            folio = inventario_getnew_folio()
+            inventario = form.save(commit= False)
+            inventario.id =-1
+            inventario.folio = folio
+            inventario.usuario_creador ='SYSDBA'
+            inventario.usuario_aut_creacion ='SYSDBA'
+            inventario.usuario_ult_modif ='SYSDBA'
+            inventario.usuario_aut_modif ='SYSDBA'
+            inventario.save()
+            return HttpResponseRedirect('/inventarios/InventariosFisicos/')
+
+    else:
+        form = DoctoInvfis_CreateForm()
+
+    c = {
+        'message':message,
+        'form':form,
+        }
+
+    return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
 def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa.html'):
     message = ''
     msg_series=''
     error = 0
     inicio_form = False
     movimiento = ''
+
     InventarioFisico = get_object_or_404(DoctosInvfis, pk=id)
     detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico).order_by('-id')
     articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)
@@ -238,6 +303,7 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
         'InventarioFisico':InventarioFisico,
         'formset':articulos_discretos_formset,
         'inventario_form':inventario_form,
+        'inventario_id':id,
         }
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))
