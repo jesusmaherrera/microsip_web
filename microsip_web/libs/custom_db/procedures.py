@@ -230,6 +230,23 @@ procedures['punto_de_venta_inicializar_t'] = '''
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'SIC_PUNTOS')) then
             execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_PUNTOS ENTERO DEFAULT 0';
+
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'SIC_VALOR_PUNTOS_PAGO')) then
+            execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_VALOR_PUNTOS_PAGO IMPORTE_MONETARIO DEFAULT 0';
+
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'SIC_PUNTOS_PAGO')) then
+            execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_PUNTOS_PAGO ENTERO DEFAULT 0';
+
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO_PAGO')) then
+            execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_DINERO_ELECTRONICO_PAGO IMPORTE_MONETARIO DEFAULT 0';
+
+
     END
     '''
 procedures['cuentas_por_pagar_inicializar'] = '''

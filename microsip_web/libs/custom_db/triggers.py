@@ -243,7 +243,7 @@ triggers['DOCTOS_PV_DET_BU_PUNTOS'] = '''
 
     BEGIN
         /*Datos del documento*/
-        SELECT clientes.cliente_id, clientes.tipo_tarjeta, clientes.puntos, clientes.dinero_electronico, doctos_pv.puntos, doctos_pv.dinero_electronico, libres_clientes.heredar_puntos_a
+        SELECT clientes.cliente_id, clientes.sic_tipo_tarjeta, clientes.sic_puntos, clientes.sic_dinero_electronico, doctos_pv.sic_puntos, doctos_pv.sic_dinero_electronico, libres_clientes.heredar_puntos_a
         FROM clientes, doctos_pv, doctos_pv_det, libres_clientes
         WHERE
             doctos_pv.docto_pv_id =  doctos_pv_det.docto_pv_id and
@@ -260,7 +260,7 @@ triggers['DOCTOS_PV_DET_BU_PUNTOS'] = '''
             where clientes.cliente_id = claves_clientes.cliente_id and claves_clientes.clave_cliente = :cliente_heredar_puntos_a
             into :cliente_id;
 
-            SELECT clientes.cliente_id, clientes.tipo_tarjeta, clientes.puntos, clientes.dinero_electronico, libres_clientes.heredar_puntos_a
+            SELECT clientes.cliente_id, clientes.sic_tipo_tarjeta, clientes.sic_puntos, clientes.sic_dinero_electronico, libres_clientes.heredar_puntos_a
             FROM clientes, libres_clientes
             WHERE
                 clientes.cliente_id = libres_clientes.cliente_id and
@@ -269,7 +269,7 @@ triggers['DOCTOS_PV_DET_BU_PUNTOS'] = '''
         end
 
         /*Datos del articulo*/
-        SELECT articulos.puntos, articulos.dinero_electronico, lineas_articulos.puntos, lineas_articulos.dinero_electronico,  grupos_lineas.puntos, grupos_lineas.dinero_electronico, articulos.hereda_puntos, lineas_articulos.hereda_puntos
+        SELECT articulos.sic_puntos, articulos.sic_dinero_electronico, lineas_articulos.sic_puntos, lineas_articulos.sic_dinero_electronico,  grupos_lineas.sic_puntos, grupos_lineas.sic_dinero_electronico, articulos.sic_hereda_puntos, lineas_articulos.sic_hereda_puntos
         FROM articulos, lineas_articulos, grupos_lineas
         WHERE
             lineas_articulos.linea_articulo_id = articulos.linea_articulo_id AND
@@ -300,7 +300,7 @@ triggers['DOCTOS_PV_DET_BU_PUNTOS'] = '''
 
             if (puntos is null) then
                 puntos = 0;
-            new.puntos = (new.unidades * puntos);
+            new.sic_puntos = (new.unidades * puntos);
         end
         else if(cliente_tipo_tarjeta = 'D') then
         begin
@@ -318,23 +318,23 @@ triggers['DOCTOS_PV_DET_BU_PUNTOS'] = '''
                 pct_dinero_electronico = 0;
 
             dinero_electronico = (new.unidades * new.precio_unitario) * (pct_dinero_electronico /100);
-            new.dinero_electronico = dinero_electronico ;
+            new.sic_dinero_electronico = dinero_electronico ;
         end
 
-        if (new.puntos is null) then
-            new.puntos = 0;
-        if (new.dinero_electronico is null) then
-            new.dinero_electronico = 0;
+        if (new.sic_puntos is null) then
+            new.sic_puntos = 0;
+        if (new.sic_dinero_electronico is null) then
+            new.sic_dinero_electronico = 0;
 
-        documento_total_puntos = documento_total_puntos + new.puntos - old.puntos;
-        documento_total_dinero_electronico = documento_total_dinero_electronico + new.dinero_electronico-old.dinero_electronico;
+        documento_total_puntos = documento_total_puntos + new.sic_puntos - old.sic_puntos;
+        documento_total_dinero_electronico = documento_total_dinero_electronico + new.sic_dinero_electronico-old.sic_dinero_electronico;
 
-        cliente_total_puntos = cliente_total_puntos + documento_total_puntos - old.puntos;
-        cliente_total_dinero_electronico = cliente_total_dinero_electronico + documento_total_dinero_electronico - old.dinero_electronico;
+        cliente_total_puntos = cliente_total_puntos + documento_total_puntos - old.sic_puntos;
+        cliente_total_dinero_electronico = cliente_total_dinero_electronico + documento_total_dinero_electronico - old.sic_dinero_electronico;
 
-        update doctos_pv set puntos=:documento_total_puntos, dinero_electronico=:documento_total_dinero_electronico where docto_pv_id = new.docto_pv_id;
-        update clientes set puntos=:cliente_total_puntos, dinero_electronico=:cliente_total_dinero_electronico where cliente_id = :cliente_id;
-    ENDg
+        update doctos_pv set sic_puntos=:documento_total_puntos, sic_dinero_electronico=:documento_total_dinero_electronico where docto_pv_id = new.docto_pv_id;
+        update clientes set sic_puntos=:cliente_total_puntos, sic_dinero_electronico=:cliente_total_dinero_electronico where cliente_id = :cliente_id;
+    END
     '''
 
 triggers['DOCTOS_PV_DET_AD_PUNTOS'] = '''
@@ -347,7 +347,7 @@ triggers['DOCTOS_PV_DET_AD_PUNTOS'] = '''
     declare variable dinero_electronico double PRECISION;
     BEGIN
         /*Datos del cliente*/
-        SELECT clientes.puntos, clientes.cliente_id, clientes.dinero_electronico
+        SELECT clientes.sic_puntos, clientes.cliente_id, clientes.sic_dinero_electronico
         FROM clientes, doctos_pv
         WHERE
             doctos_pv.docto_pv_id = old.docto_pv_id and
@@ -360,10 +360,10 @@ triggers['DOCTOS_PV_DET_AD_PUNTOS'] = '''
         if (total_puntos is null) then
             total_puntos = 0;
 
-        total_puntos = total_puntos - old.puntos;
-        dinero_electronico = dinero_electronico - old.dinero_electronico;
+        total_puntos = total_puntos - old.sic_puntos;
+        dinero_electronico = dinero_electronico - old.sic_dinero_electronico;
 
-        update clientes set puntos=:total_puntos, dinero_electronico=:dinero_electronico where cliente_id = :cliente_id;
+        update clientes set sic_puntos=:total_puntos, sic_dinero_electronico=:dinero_electronico where cliente_id = :cliente_id;
     end
     '''
 
@@ -394,7 +394,7 @@ triggers['DOCTOS_PV_BU_PUNTOS'] = '''
     begin
         
         /*Datos del cliente*/
-        SELECT clientes.cliente_id, clientes.tipo_tarjeta, clientes.puntos, clientes.dinero_electronico, clientes.hereda_valorpuntos, clientes.valor_puntos, tipos_clientes.valor_puntos
+        SELECT clientes.cliente_id, clientes.sic_tipo_tarjeta, clientes.sic_puntos, clientes.sic_dinero_electronico, clientes.sic_hereda_valorpuntos, clientes.sic_valor_puntos, tipos_clientes.sic_valor_puntos
         FROM clientes, tipos_clientes
         WHERE clientes.cliente_id = new.cliente_id and clientes.tipo_cliente_id = tipos_clientes.tipo_cliente_id
         INTO :cliente_id, :cliente_tipo_tarjeta, :cliente_total_puntos, :cliente_total_dinero_electronico, :cliente_hereda_valorpuntos, :cliente_valor_puntos, :tipo_cliente_valor_puntos;
@@ -411,9 +411,9 @@ triggers['DOCTOS_PV_BU_PUNTOS'] = '''
 
         if (new.estatus='C') then
             begin
-                cliente_total_dinero_electronico =  cliente_total_dinero_electronico - new.dinero_electronico;
-                cliente_total_puntos = cliente_total_puntos - new.puntos;
-                update clientes set puntos=:cliente_total_puntos, dinero_electronico=:cliente_total_dinero_electronico where cliente_id = :cliente_id;
+                cliente_total_dinero_electronico =  cliente_total_dinero_electronico - new.sic_dinero_electronico;
+                cliente_total_puntos = cliente_total_puntos - new.sic_puntos;
+                update clientes set sic_puntos=:cliente_total_puntos, sic_dinero_electronico=:cliente_total_dinero_electronico where cliente_id = :cliente_id;
             end
         else
         begin
@@ -439,12 +439,12 @@ triggers['DOCTOS_PV_BU_PUNTOS'] = '''
                     dinero_electronico_pago = 0;
                 end
 
-                new.dinero_electronico_pago = :dinero_electronico_pago;
-                new.valor_puntos_pago = :valor_puntos_pago;
-                new.puntos_pago = :puntos_pago;
+                new.sic_dinero_electronico_pago = :dinero_electronico_pago;
+                new.sic_valor_puntos_pago = :valor_puntos_pago;
+                new.sic_puntos_pago = :puntos_pago;
 
                 if (cliente_total_dinero_electronico >= 0 and cliente_total_puntos >=0 and new.dscto_importe <> old.dscto_importe and new.dscto_importe >0) then
-                    update clientes set puntos=:cliente_total_puntos, dinero_electronico=:cliente_total_dinero_electronico where cliente_id = :cliente_id;
+                    update clientes set sic_puntos=:cliente_total_puntos, sic_dinero_electronico=:cliente_total_dinero_electronico where cliente_id = :cliente_id;
 
                 if (cliente_total_dinero_electronico < 0) then
                 begin
@@ -459,7 +459,7 @@ triggers['DOCTOS_PV_BU_PUNTOS'] = '''
                 end
             end
         end
-    endg
+    end
     '''
 
 triggers['DOCTOS_PV_AD_PUNTOS'] = '''
@@ -472,7 +472,7 @@ triggers['DOCTOS_PV_AD_PUNTOS'] = '''
     declare variable dinero_electronico double PRECISION;
     BEGIN
         /*Datos del cliente*/
-        SELECT clientes.puntos, clientes.cliente_id, clientes.dinero_electronico
+        SELECT clientes.sic_puntos, clientes.cliente_id, clientes.sic_dinero_electronico
         FROM clientes, doctos_pv
         WHERE
         doctos_pv.docto_pv_id = old.docto_pv_id and
@@ -485,10 +485,10 @@ triggers['DOCTOS_PV_AD_PUNTOS'] = '''
         if (total_puntos is null) then
             total_puntos = 0;
 
-        total_puntos = total_puntos - old.puntos;
-            dinero_electronico = dinero_electronico - old.dinero_electronico;
+        total_puntos = total_puntos - old.sic_puntos;
+            dinero_electronico = dinero_electronico - old.sic_dinero_electronico;
 
-        update clientes set puntos=:total_puntos, dinero_electronico=:dinero_electronico where cliente_id = :cliente_id;
+        update clientes set sic_puntos=:total_puntos, sic_dinero_electronico=:dinero_electronico where cliente_id = :cliente_id;
     end
     '''
 
@@ -503,12 +503,12 @@ triggers['CLIENTES_BU_PUNTOS'] = '''
     ACTIVE BEFORE UPDATE POSITION 0
     AS
     begin
-          if (new.puntos <> old.puntos or new.dinero_electronico <> old.dinero_electronico) then
+          if (new.sic_puntos <> old.sic_puntos or new.sic_dinero_electronico <> old.sic_dinero_electronico) then
           begin
-            if (new.puntos < 0 and new.tipo_tarjeta='P') then
-                exception ex_cliente_sin_saldo 'El cliente no tiene suficientes puntos, solo tiene('||old.puntos||' en Puntos.)';
-            else if (new.dinero_electronico < 0 and new.tipo_tarjeta='D') then
-                exception ex_cliente_sin_saldo 'El cliente no tiene suficientes Dinero Electronico, solo tiene('||old.dinero_electronico||' en Dinero electronico.)';
+            if (new.sic_puntos < 0 and new.sic_tipo_tarjeta='P') then
+                exception ex_cliente_sin_saldo 'El cliente no tiene suficientes puntos, solo tiene('||old.sic_puntos||' en Puntos.)';
+            else if (new.sic_dinero_electronico < 0 and new.sic_tipo_tarjeta='D') then
+                exception ex_cliente_sin_saldo 'El cliente no tiene suficientes Dinero Electronico, solo tiene('||old.sic_dinero_electronico||' en Dinero electronico.)';
           end
 
     end

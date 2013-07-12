@@ -239,6 +239,7 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
                         for form in articulos_discretos_formset.forms:
                             form = form.save(commit=False)
                             art_discreto = ArticulosDiscretos.objects.filter(articulo = form.articulo, clave = form.clave)
+
                             if art_discreto.count() > 0:
                                 art_discreto = art_discreto[0]
                             else:
