@@ -2,13 +2,6 @@
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from models import *
-from forms import *
-import datetime, time
-from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
-from django.forms.models import formset_factory
-
 from django.forms.formsets import formset_factory, BaseFormSet
 from django.forms.models import inlineformset_factory
 
@@ -21,9 +14,18 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required
 
-from django.db import connection
-import xlrd
 from django.utils.encoding import smart_str, smart_unicode
+
+from django.db import connection
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
+from django.forms.models import formset_factory
+import datetime, time
+import xlrd
+
+from models import *
+from forms import *
+from microsip_web.libs.custom_db.main import next_id
 
 
 ##########################################
@@ -236,8 +238,13 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
                     if detalleInv.articulo.seguimiento == 'S':    
                         for form in articulos_discretos_formset.forms:
                             form = form.save(commit=False)
-                            art_discreto = ArticulosDiscretos.objects.filter(articulo=form.articulo, clave=form.clave)[0]
-                            if DesgloseEnDiscretosInvfis.objects.filter(art_discreto=art_discreto).exists() and detalleInv.unidades > 0:
+                            art_discreto = ArticulosDiscretos.objects.filter(articulo = form.articulo, clave = form.clave)
+                            if art_discreto.count() > 0:
+                                art_discreto = art_discreto[0]
+                            else:
+                                art_discreto = ArticulosDiscretos.objects.create(id=next_id('ID_CATALOGOS'), clave = form.clave, articulo = form.articulo, tipo='S', fecha= None)
+
+                            if DesgloseEnDiscretosInvfis.objects.filter(art_discreto = art_discreto).exists() and detalleInv.unidades > 0:
                                 msg_series = 'Ya existe un articulo registrado en inventario con numero de serie [%s]'%form.clave
                                 error = 1                                
                             if error == 0:

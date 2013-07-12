@@ -20,7 +20,7 @@ import datetime, time
 from models import *
 from forms import *
 from microsip_web.apps.inventarios.views import c_get_next_key
-from microsip_web.apps.main.views import crear_polizas_contables
+from microsip_web.libs import contabilidad
 
 ##########################################
 ##                                      ##
@@ -92,7 +92,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
             prefijo = ''
 
         if crear_polizas_de     == 'F' or crear_polizas_de  == 'FD':
-            msg, documentosData = crear_polizas_contables(
+            msg, documentosData = contabilidad.crear_polizas(
                 origen_documentos   = 'ventas',
                 documentos          = facturas, 
                 depto_co            = depto_co,
@@ -106,7 +106,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
             )
             documentosGenerados = documentosData
         if crear_polizas_de     == 'D' or crear_polizas_de  == 'FD':
-            msg, documentosDataDevoluciones = crear_polizas_contables(
+            msg, documentosDataDevoluciones = contabilidad.crear_polizas(
                 origen_documentos   = 'ventas',
                 documentos          = devoluciones, 
                 depto_co            = depto_co,

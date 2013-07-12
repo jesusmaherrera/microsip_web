@@ -17,7 +17,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum, Max
 from django.db import connection
 from microsip_web.apps.inventarios.views import c_get_next_key
-from microsip_web.apps.main.views import crear_polizas_contables
+from microsip_web.libs import contabilidad
 ##########################################
 ## 										##
 ##        Generacion de polizas         ##
@@ -44,7 +44,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 		else:
 			documentosCC  = DoctosCc.objects.filter(concepto= crear_polizas_de , fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
 
-		msg, documentosCCData = crear_polizas_contables(
+		msg, documentosCCData = contabilidad.crear_polizas(
 			origen_documentos	= 'cuentas_por_cobrar',
 			documentos 			= documentosCC, 
 			depto_co			= depto_co,

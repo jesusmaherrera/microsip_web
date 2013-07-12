@@ -12,7 +12,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from forms import *
 from models import *
 from microsip_web.apps.main.filtros.models import *
-from microsip_web.apps.main.views import crear_polizas_contables
+from microsip_web.libs import contabilidad
 
 ##########################################
 ##                                      ##
@@ -418,7 +418,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
                 devoluciones        = Docto_PV.objects.filter(estado = 'N').filter(tipo = 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
         
         if crear_polizas_de     == 'V':
-            msg, documentosData = crear_polizas_contables(
+            msg, documentosData = contabilidad.crear_polizas(
                 origen_documentos   = 'punto_de_venta',
                 documentos          = ventas, 
                 depto_co            = depto_co,
@@ -432,7 +432,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
             )
             documentosGenerados = documentosData
         if crear_polizas_de     == 'D':
-            msg, documentosDataDevoluciones = crear_polizas_contables(
+            msg, documentosDataDevoluciones = contabilidad.crear_polizas(
                 origen_documentos   = 'punto_de_venta',
                 documentos          = devoluciones, 
                 depto_co            = depto_co,

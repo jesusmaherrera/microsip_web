@@ -89,8 +89,8 @@ class GrupoLineas(models.Model):
     id                  = models.AutoField(primary_key=True, db_column='GRUPO_LINEA_ID')
     nombre              = models.CharField(max_length=50, db_column='NOMBRE')
     cuenta_ventas       = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
-    puntos              = models.IntegerField(db_column='PUNTOS')
-    dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
+    puntos              = models.IntegerField(db_column='SIC_PUNTOS')
+    dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
     
     def __unicode__(self):
         return u'%s' % self.nombre
@@ -103,9 +103,9 @@ class LineaArticulos(models.Model):
     nombre              = models.CharField(max_length=50, db_column='NOMBRE')
     cuenta_ventas       = models.CharField(max_length=30, db_column='CUENTA_VENTAS')
     grupo               = models.ForeignKey(GrupoLineas, db_column='GRUPO_LINEA_ID')
-    puntos              = models.IntegerField(db_column='PUNTOS')
-    dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
-    hereda_puntos       = models.BooleanField( db_column='HEREDA_PUNTOS')
+    puntos              = models.IntegerField(db_column='SIC_PUNTOS')
+    dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
+    hereda_puntos       = models.BooleanField( db_column='SIC_HEREDA_PUNTOS')
 
     def __unicode__(self):
         return u'%s' % self.nombre
@@ -120,10 +120,10 @@ class Articulos(models.Model):
     seguimiento = models.CharField(default='N', max_length=1, db_column='SEGUIMIENTO')
     cuenta_ventas = models.CharField(max_length=30, blank=True, null=True, db_column='CUENTA_VENTAS')
     linea = models.ForeignKey(LineaArticulos, db_column='LINEA_ARTICULO_ID')
-    puntos = models.IntegerField(db_column='PUNTOS')
     nota_ventas = models.TextField(db_column='NOTAS_VENTAS', blank=True, null=True)
-    dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
-    hereda_puntos = models.BooleanField( db_column='HEREDA_PUNTOS')
+    puntos = models.IntegerField(db_column='SIC_PUNTOS')
+    dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
+    hereda_puntos = models.BooleanField( db_column='SIC_HEREDA_PUNTOS')
     sic_carpeta = models.ForeignKey(Carpeta, blank=True, null=True,db_column='SIC_CARPETA_ID')
 
     def __unicode__(self):
@@ -142,8 +142,8 @@ class ArticulosDiscretos(models.Model):
     clave = models.CharField(max_length=20, db_column='CLAVE')
     articulo = models.ForeignKey(Articulos, db_column='ARTICULO_ID')
     tipo = models.CharField(max_length=1, db_column='TIPO')
-    fecha = models.DateField(db_column='FECHA') 
-     
+    fecha = models.DateField(db_column='FECHA', blank=True, null=True)
+    
     def __unicode__(self):
         return u'%s' % self.clave
         
@@ -578,7 +578,7 @@ class Vendedor(models.Model):
 class TipoCliente(models.Model):
     id              = models.AutoField(primary_key=True, db_column='TIPO_CLIENTE_ID')
     nombre          = models.CharField(max_length=100, db_column='NOMBRE')
-    valor_puntos    = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='VALOR_PUNTOS')
+    valor_puntos    = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_VALOR_PUNTOS')
 
     def __unicode__(self):
         return self.nombre
@@ -590,14 +590,14 @@ class Cliente(models.Model):
     id                          = models.AutoField(primary_key=True, db_column='CLIENTE_ID')
     nombre                      = models.CharField(max_length=100, db_column='NOMBRE')
     cuenta_xcobrar              = models.CharField(max_length=9, db_column='CUENTA_CXC')
-    TIPOS = (('N', 'No Aplica'),('P', 'Puntos'),('D', 'Dinero Electronico'),)
-    puntos                      = models.IntegerField(db_column='PUNTOS')
-    dinero_electronico          = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
-    tipo_tarjeta                = models.CharField(default='N', max_length=1, choices=TIPOS, db_column='TIPO_TARJETA')
     tipo_cliente                = models.ForeignKey(TipoCliente, db_column='TIPO_CLIENTE_ID')
-    hereda_valorpuntos          = models.BooleanField(db_column='HEREDA_VALORPUNTOS')
-    valor_puntos                = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='VALOR_PUNTOS')
-    hereda_puntos_a             = models.ForeignKey('self', db_column='HEREDAR_PUNTOS_A', related_name='hereda_puntos_a_cliente',blank=True, null=True)
+    TIPOS = (('N', 'No Aplica'),('P', 'Puntos'),('D', 'Dinero Electronico'),)
+    puntos                      = models.IntegerField(db_column='SIC_PUNTOS')
+    dinero_electronico          = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
+    tipo_tarjeta                = models.CharField(default='N', max_length=1, choices=TIPOS, db_column='SIC_TIPO_TARJETA')
+    hereda_valorpuntos          = models.BooleanField(db_column='SIC_HEREDA_VALORPUNTOS')
+    valor_puntos                = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_VALOR_PUNTOS')
+    hereda_puntos_a             = models.ForeignKey('self', db_column='SIC_HEREDAR_PUNTOS_A', related_name='hereda_puntos_a_cliente',blank=True, null=True)
     cuenta_1 = models.ForeignKey(CuentaCo, db_column='CUENTA_1', blank=True, null=True, related_name='cuenta_1')
     cuenta_2 = models.ForeignKey(CuentaCo, db_column='CUENTA_2', blank=True, null=True, related_name='cuenta_2')
     cuenta_3 = models.ForeignKey(CuentaCo, db_column='CUENTA_3', blank=True, null=True, related_name='cuenta_3')
@@ -1049,8 +1049,8 @@ class Docto_PV(models.Model):
     fechahora_cancelacion   = models.DateTimeField(blank=True, null=True, db_column='FECHA_HORA_CANCELACION')
     usuario_aut_cancelacion = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_AUT_CANCELACION')
     
-    puntos                  = models.IntegerField(db_column='PUNTOS')
-    dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
+    puntos                  = models.IntegerField(db_column='SIC_PUNTOS')
+    dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
     def __unicode__(self):
         return u'%s'% self.id 
     class Meta:
@@ -1077,8 +1077,8 @@ class Docto_pv_det(models.Model):
     es_tran_elect           = models.CharField(default='N', max_length=1, db_column='ES_TRAN_ELECT')
     estatus_tran_elect      = models.CharField(max_length=1, db_column='ESTATUS_TRAN_ELECT')
     posicion                =  models.IntegerField(db_column='POSICION')
-    puntos                  = models.IntegerField(db_column='PUNTOS')
-    dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='DINERO_ELECTRONICO')
+    puntos                  = models.IntegerField(db_column='SIC_PUNTOS')
+    dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
 
     def __unicode__(self):
         return u'%s'% self.id 

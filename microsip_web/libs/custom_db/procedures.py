@@ -65,81 +65,86 @@ procedures['punto_de_venta_inicializar_t'] = '''
         /*Articulos */
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'ARTICULOS' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
-            execute statement 'ALTER TABLE ARTICULOS ADD PUNTOS SMALLINT DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_PUNTOS')) then
+            execute statement 'ALTER TABLE ARTICULOS ADD SIC_PUNTOS SMALLINT DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'ARTICULOS' and rf.RDB$FIELD_NAME = 'DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE ARTICULOS ADD DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
+            execute statement 'ALTER TABLE ARTICULOS ADD SIC_DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'ARTICULOS' and rf.RDB$FIELD_NAME = 'HEREDA_PUNTOS')) then
-            execute statement 'ALTER TABLE ARTICULOS ADD HEREDA_PUNTOS SMALLINT';
+        where rf.RDB$RELATION_NAME = 'ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_HEREDA_PUNTOS')) then
+            execute statement 'ALTER TABLE ARTICULOS ADD SIC_HEREDA_PUNTOS SMALLINT';
+
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_CARPETA_ID')) then
+            execute statement 'ALTER TABLE ARTICULOS ADD SIC_CARPETA_ID ENTERO_ID';
 
         /*Lineas */
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
+            execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD SIC_DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
-            execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD PUNTOS ENTERO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_PUNTOS')) then
+            execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD SIC_PUNTOS ENTERO DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'HEREDA_PUNTOS')) then
-            execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD HEREDA_PUNTOS SMALLINT';
+        where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_HEREDA_PUNTOS')) then
+            execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD SIC_HEREDA_PUNTOS SMALLINT';
 
         /*Grupos */
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'GRUPOS_LINEAS' and rf.RDB$FIELD_NAME = 'DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE GRUPOS_LINEAS ADD DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'GRUPOS_LINEAS' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
+            execute statement 'ALTER TABLE GRUPOS_LINEAS ADD SIC_DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'GRUPOS_LINEAS' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
-            execute statement 'ALTER TABLE GRUPOS_LINEAS ADD PUNTOS ENTERO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'GRUPOS_LINEAS' and rf.RDB$FIELD_NAME = 'SIC_PUNTOS')) then
+            execute statement 'ALTER TABLE GRUPOS_LINEAS ADD SIC_PUNTOS ENTERO DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'GRUPOS_LINEAS' and rf.RDB$FIELD_NAME = 'HEREDA_PUNTOS')) then
-            execute statement 'ALTER TABLE GRUPOS_LINEAS ADD HEREDA_PUNTOS SMALLINT';
+        where rf.RDB$RELATION_NAME = 'GRUPOS_LINEAS' and rf.RDB$FIELD_NAME = 'SIC_HEREDA_PUNTOS')) then
+            execute statement 'ALTER TABLE GRUPOS_LINEAS ADD SIC_HEREDA_PUNTOS SMALLINT';
             
         /*Clientes */
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE CLIENTES ADD DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
+            execute statement 'ALTER TABLE CLIENTES ADD SIC_DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
-            execute statement 'ALTER TABLE CLIENTES ADD PUNTOS ENTERO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_PUNTOS')) then
+            execute statement 'ALTER TABLE CLIENTES ADD SIC_PUNTOS ENTERO DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'TIPO_TARJETA')) then
-            execute statement 'ALTER TABLE CLIENTES ADD TIPO_TARJETA CHAR(1)';
+        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_TIPO_TARJETA')) then
+            execute statement 'ALTER TABLE CLIENTES ADD SIC_TIPO_TARJETA CHAR(1)';
         
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'HEREDA_VALORPUNTOS')) then
-            execute statement 'ALTER TABLE CLIENTES ADD HEREDA_VALORPUNTOS SMALLINT DEFAULT 1';
+        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_HEREDA_VALORPUNTOS')) then
+            execute statement 'ALTER TABLE CLIENTES ADD SIC_HEREDA_VALORPUNTOS SMALLINT DEFAULT 1';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'VALOR_PUNTOS')) then
-            execute statement 'ALTER TABLE CLIENTES ADD VALOR_PUNTOS IMPORTE_MONETARIO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_VALOR_PUNTOS')) then
+            execute statement 'ALTER TABLE CLIENTES ADD SIC_VALOR_PUNTOS IMPORTE_MONETARIO DEFAULT 0';
         
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'HEREDAR_PUNTOS_A')) then
-            execute statement 'ALTER TABLE CLIENTES ADD HEREDAR_PUNTOS_A ENTERO_ID';
+        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_HEREDAR_PUNTOS_A')) then
+            execute statement 'ALTER TABLE CLIENTES ADD SIC_HEREDAR_PUNTOS_A ENTERO_ID';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
@@ -201,44 +206,30 @@ procedures['punto_de_venta_inicializar_t'] = '''
         /*Tipo Cliente */
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'TIPOS_CLIENTES' and rf.RDB$FIELD_NAME = 'VALOR_PUNTOS')) then
-            execute statement 'ALTER TABLE TIPOS_CLIENTES ADD VALOR_PUNTOS IMPORTE_MONETARIO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'TIPOS_CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_VALOR_PUNTOS')) then
+            execute statement 'ALTER TABLE TIPOS_CLIENTES ADD SIC_VALOR_PUNTOS IMPORTE_MONETARIO DEFAULT 0';
 
         /*Doctos pv det */
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'DOCTOS_PV_DET' and rf.RDB$FIELD_NAME = 'DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE DOCTOS_PV_DET ADD DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'DOCTOS_PV_DET' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
+            execute statement 'ALTER TABLE DOCTOS_PV_DET ADD SIC_DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'DOCTOS_PV_DET' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
-            execute statement 'ALTER TABLE DOCTOS_PV_DET ADD PUNTOS ENTERO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'DOCTOS_PV_DET' and rf.RDB$FIELD_NAME = 'SIC_PUNTOS')) then
+            execute statement 'ALTER TABLE DOCTOS_PV_DET ADD SIC_PUNTOS ENTERO DEFAULT 0';
+        
         /*Doctos pv*/
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE DOCTOS_PV ADD DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
+            execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'PUNTOS')) then
-            execute statement 'ALTER TABLE DOCTOS_PV ADD PUNTOS ENTERO DEFAULT 0';
-
-        if (not exists(
-        select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'VALOR_PUNTOS_PAGO')) then
-            execute statement 'ALTER TABLE DOCTOS_PV ADD VALOR_PUNTOS_PAGO IMPORTE_MONETARIO DEFAULT 0';
-
-        if (not exists(
-        select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'PUNTOS_PAGO')) then
-            execute statement 'ALTER TABLE DOCTOS_PV ADD PUNTOS_PAGO ENTERO DEFAULT 0';
-
-        if (not exists(
-        select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'DINERO_ELECTRONICO_PAGO')) then
-            execute statement 'ALTER TABLE DOCTOS_PV ADD DINERO_ELECTRONICO_PAGO IMPORTE_MONETARIO DEFAULT 0';
+        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'SIC_PUNTOS')) then
+            execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_PUNTOS ENTERO DEFAULT 0';
     END
     '''
 procedures['cuentas_por_pagar_inicializar'] = '''
