@@ -32,10 +32,12 @@ def inicializar_tablas(request):
 def inventarios_agregar_trigers():
     c = connection.cursor()
     #ENTRADAS Y SALIDAS DE INVENTARIOS
-    c.execute(triggers['DOCTOS_IN_DET_BI_PUERTA_ABIERTA'])
-    c.execute(triggers['DOCTOS_IN_DET_BD_PUERTA_ABIERTA'])
-    c.execute(triggers['DOCTOS_IN_BU_PUERTA_ABIERTA'])
-    c.execute(triggers['DESGLOSE_EN_DISCRETOS_AI_PUERTA'])
+    c.execute(triggers['SIC_PUERTA_VE_DESGLOSEDIS_AI'])
+    c.execute(triggers['SIC_PUERTA_PV_DESGLOSEDIS_AI'])
+    c.execute(triggers['SIC_PUERTA_C_DESGLOSEDIS_AI'])
+    c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'])
+    c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'])
+    c.execute(triggers['SIC_PUERTA_INV_DOCTOSIN_BU'])
     
     transaction.commit_unless_managed()
 
