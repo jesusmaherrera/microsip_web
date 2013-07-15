@@ -168,7 +168,7 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
     InventarioFisico = get_object_or_404(DoctosInvfis, pk=id)
     detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico).order_by('-id')
     articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)
-    
+    articulos_discretos_actuales= []
     #POST
     if request.method == 'POST':
         detalleInvForm = DoctosInvfisDetManageForm(request.POST)
@@ -185,6 +185,10 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
 
             #Para cargar por primera ves el formset de los nuemeros de serie del articulo
             if detalleInv.articulo.seguimiento == 'S':
+                if detalleInv != '':
+                    articulos_discretos_actuales = DesgloseEnDiscretosInvfis.objects.filter(
+                        docto_invfis_det=DoctosInvfisDet.objects.get(docto_invfis=InventarioFisico, articulo=detalleInv.articulo).id)
+
                 if total_forms != unidades:
                     inicio_form = True
                     data = request.POST
@@ -243,7 +247,7 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
                             if art_discreto.count() > 0:
                                 art_discreto = art_discreto[0]
                             else:
-                                art_discreto = ArticulosDiscretos.objects.create(id=next_id('ID_CATALOGOS'), clave = form.clave, articulo = form.articulo, tipo='S', fecha= None)
+                                art_discreto = ArticulosDiscretos.objects.create(id=next_id('ID_CATALOGOS'), clave = form.clave, articulo = form.articulo, tipo='S', fecha= None)        
 
                             if DesgloseEnDiscretosInvfis.objects.filter(art_discreto = art_discreto).exists() and detalleInv.unidades > 0:
                                 msg_series = 'Ya existe un articulo registrado en inventario con numero de serie [%s]'%form.clave
@@ -282,6 +286,7 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
                     if error == 0:
                         if movimiento == 'crear':
                             detalleInv.save()
+                            
                             detalleInvForm = DoctosInvfisDetManageForm()
                         elif movimiento == 'eliminar':                        
                             DoctosInvfisDet.objects.filter(id=id_detalle).delete()
@@ -312,6 +317,7 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
         'formset':articulos_discretos_formset,
         'inventario_form':inventario_form,
         'inventario_id':id,
+        'articulos_discretos_actuales':articulos_discretos_actuales,
         }
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))

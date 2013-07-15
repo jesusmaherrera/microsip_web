@@ -193,6 +193,13 @@
        </tbody>
      </table>
     </div>
+    <div><h5>Numeros de serie actuales</h5></div>
+    <div>
+
+    {% for articulo_discreto in articulos_discretos_actuales %}
+      {{ articulo_discreto.art_discreto.clave }} /
+    {% endfor %}
+    </div>
     <div class="modal-footer">
       <button class="btn" id='btnCancel' data-dismiss="modal">Cancelar</button>
       <button type="submit" class="btn" name='add_button'>Aceptar</button>
