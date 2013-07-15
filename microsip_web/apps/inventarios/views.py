@@ -186,8 +186,10 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
             #Para cargar por primera ves el formset de los nuemeros de serie del articulo
             if detalleInv.articulo.seguimiento == 'S':
                 if detalleInv != '':
-                    articulos_discretos_actuales = DesgloseEnDiscretosInvfis.objects.filter(
-                        docto_invfis_det=DoctosInvfisDet.objects.get(docto_invfis=InventarioFisico, articulo=detalleInv.articulo).id)
+                    doc_det = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico, articulo=detalleInv.articulo)
+                    if doc_det.count() > 0:
+                        articulos_discretos_actuales = DesgloseEnDiscretosInvfis.objects.filter(
+                        docto_invfis_det=doc_det[0].id)
 
                 if total_forms != unidades:
                     inicio_form = True
