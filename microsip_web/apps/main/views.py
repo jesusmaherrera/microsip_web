@@ -25,21 +25,8 @@ def inicializar_tablas(request):
     punto_de_venta_inicializar_tablas()
     #cuentas_por_pagar_inicializar_tablas()
     #cuentas_por_cobrar_inicializar_tablas()
-    inventarios_agregar_trigers()
     punto_de_venta_agregar_trigers()
     return HttpResponseRedirect('/')
-
-def inventarios_agregar_trigers():
-    c = connection.cursor()
-    #ENTRADAS Y SALIDAS DE INVENTARIOS
-    c.execute(triggers['SIC_PUERTA_VE_DESGLOSEDIS_AI'])
-    c.execute(triggers['SIC_PUERTA_PV_DESGLOSEDIS_AI'])
-    c.execute(triggers['SIC_PUERTA_C_DESGLOSEDIS_AI'])
-    c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'])
-    c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'])
-    c.execute(triggers['SIC_PUERTA_INV_DOCTOSIN_BU'])
-    
-    transaction.commit_unless_managed()
 
 def punto_de_venta_agregar_trigers():
     c = connection.cursor()
@@ -70,8 +57,38 @@ def ventas_inicializar_tablas():
 
 def punto_de_venta_inicializar_tablas():
     c = connection.cursor()
-    c.execute(procedures['punto_de_venta_inicializar_t'])
-    c.execute('EXECUTE PROCEDURE punto_de_venta_inicializar_t;')
+    c.execute(procedures['SIC_PUNTOS_ARTICULOS_AT'])
+    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_ARTICULOS_AT;')
+
+    c.execute(procedures['SIC_PUNTOS_LINEASARTICULOS_AT'])
+    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_LINEASARTICULOS_AT;')
+    
+    c.execute(procedures['SIC_PUNTOS_GRUPOSLINEAS_AT'])
+    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_GRUPOSLINEAS_AT;')
+    
+    #Clientes
+    c.execute(procedures['SIC_PUNTOS_CLIENTES_AT'])
+    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_CLIENTES_AT;')
+
+    c.execute(procedures['SIC_PUNTOS_LIBRESCLIENTES_AT'])
+    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_LIBRESCLIENTES_AT;')
+    
+    c.execute(procedures['SIC_PUNTOS_TIPOSCLIENTES_AT'])
+    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_TIPOSCLIENTES_AT;')
+
+    c.execute(procedures['SIC_PUNTOS_DOCTOSPVDET_AT'])
+    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DOCTOSPVDET_AT;')
+    
+    c.execute(procedures['SIC_PUNTOS_DOCTOS_PV_AT'])
+    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DOCTOS_PV_AT;')
+
+    #lbres clientes
+    c.execute(procedures['SIC_LIBRES_CLIENTES_AT']) 
+    c.execute('EXECUTE PROCEDURE SIC_LIBRES_CLIENTES_AT;')
+
+    c.execute(procedures['SIC_FILTROS_ARTICULOS_AT'])
+    c.execute('EXECUTE PROCEDURE SIC_FILTROS_ARTICULOS_AT;')    
+
     transaction.commit_unless_managed()
 
 def cuentas_por_pagar_inicializar_tablas():

@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 
 from django.utils.encoding import smart_str, smart_unicode
 
-from django.db import connection
+from django.db import connection, transaction
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import formset_factory
@@ -26,13 +26,28 @@ import xlrd
 from models import *
 from forms import *
 from microsip_web.libs.custom_db.main import next_id
-
+from triggers import triggers
 
 ##########################################
 ##                                      ##
 ##               LOGIN                  ##
 ##                                      ##
 ##########################################
+
+def inicializar_tablas(request):
+    c = connection.cursor()
+    #ENTRADAS Y SALIDAS DE INVENTARIOS
+    c.execute(triggers['SIC_PUERTA_VE_DESGLOSEDIS_AI'])
+    c.execute(triggers['SIC_PUERTA_PV_DESGLOSEDIS_AI'])
+    c.execute(triggers['SIC_PUERTA_C_DESGLOSEDIS_AI'])
+    c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'])
+    c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'])
+    c.execute(triggers['SIC_PUERTA_INV_DOCTOSIN_BU'])
+    
+    transaction.commit_unless_managed()
+
+    return HttpResponseRedirect('/inventarios/InventariosFisicos/')
+
 def ingresar(request):
     # if not request.user.is_anonymous():
     #   return HttpResponseRedirect('/')

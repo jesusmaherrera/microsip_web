@@ -13,6 +13,16 @@
 {% endblock %}
 {% block breadcrumb %}{{ block.super }} Inventarios <i class=" icon-play"></i> {% endblock %}
 {% block tools-module %}
+<div class="navbar navbar-static">
+      <ul class="nav pull-right">
+        <li class="dropdown">
+          <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i> <b class="caret"></b></a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+            <li><a tabindex="-1" href="/inventarios/inicializar_tablas/"><i class="icon-refresh"></i> Syncronizar tablas</a></li>
+          </ul>
+        </li>
+      </ul>
+</div>
 {% endblock %}
 
 {% block content %}
