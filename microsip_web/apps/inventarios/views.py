@@ -243,18 +243,19 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
                             movimiento = 'actualizar'
 
                     except ObjectDoesNotExist:
-                        id_detalle = c_get_next_key('ID_DOCTOS')
-                        detalleInv.id = id_detalle
-                        articulos_claves =ClavesArticulos.objects.filter(articulo= detalleInv.articulo)
-                        
-                        if articulos_claves.count() < 1:
-                            articulo_clave = ''
-                        else:
-                            articulo_clave = articulos_claves[0].clave
+                        if detalleInv.unidades >= 0:
+                            id_detalle = c_get_next_key('ID_DOCTOS')
+                            detalleInv.id = id_detalle
+                            articulos_claves =ClavesArticulos.objects.filter(articulo= detalleInv.articulo)
+                            
+                            if articulos_claves.count() < 1:
+                                articulo_clave = ''
+                            else:
+                                articulo_clave = articulos_claves[0].clave
 
-                        detalleInv.clave = articulo_clave
-                        detalleInv.docto_invfis = InventarioFisico
-                        movimiento = 'crear'
+                            detalleInv.clave = articulo_clave
+                            detalleInv.docto_invfis = InventarioFisico
+                            movimiento = 'crear'
                     
                     if detalleInv.articulo.seguimiento == 'S':    
                         for form in articulos_discretos_formset.forms:
@@ -289,29 +290,16 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
                                         msg_series = 'No extiste registrado un articulo con este numero de serie en el inventario, no se eliminara'
                                     else:
                                         desgloses_a_eliminar.delete()
-
-                        if error == 0:
-                            articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)
-                            data = {
-                                'form-TOTAL_FORMS': u'0',
-                                'form-INITIAL_FORMS': u'0',
-                                'form-MAX_NUM_FORMS': u'',
-                            }
-                            articulos_discretos_formset = articulos_discretos_formset(data)
-                            detalleInvForm = DoctosInvfisDetManageForm()
-
                     if error == 0:
                         if movimiento == 'crear':
                             detalleInv.save()
-                            
-                            detalleInvForm = DoctosInvfisDetManageForm()
                         elif movimiento == 'eliminar':                        
                             DoctosInvfisDet.objects.filter(id=id_detalle).delete()
-                            detalleInvForm = DoctosInvfisDetManageForm()
                         elif movimiento == 'actualizar':
                             DoctosInvfisDet.objects.filter(id=id_detalle, articulo=detalleInv.articulo).update(unidades=unidades)
-                            detalleInvForm = DoctosInvfisDetManageForm()
-    #                            
+
+                    return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s'% id)
+                           
     else:
         detalleInvForm = DoctosInvfisDetManageForm()
         inventario_form = inventario_pa_form()
