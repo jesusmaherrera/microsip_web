@@ -37,9 +37,7 @@ from triggers import triggers
 def inicializar_tablas(request):
     c = connection.cursor()
     #ENTRADAS Y SALIDAS DE INVENTARIOS
-    c.execute(triggers['SIC_PUERTA_VE_DESGLOSEDIS_AI'])
-    c.execute(triggers['SIC_PUERTA_PV_DESGLOSEDIS_AI'])
-    c.execute(triggers['SIC_PUERTA_C_DESGLOSEDIS_AI'])
+    c.execute(triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'])
     c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'])
     c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'])
     c.execute(triggers['SIC_PUERTA_INV_DOCTOSIN_BU'])
