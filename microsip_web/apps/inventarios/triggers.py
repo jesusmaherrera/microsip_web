@@ -85,7 +85,7 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'] = '''
     declare variable cantidad_articulos integer;
     declare variable almacen_id integer;
     declare variable docto_in_tipo char(1);
-
+    declare variable seguimiento char(1);
     begin
         /*Datos de documento in*/
         select first 1 doctos_in.naturaleza_concepto, doctos_in.almacen_id
@@ -117,7 +117,13 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'] = '''
                 if (docto_in_tipo='E') then
                     cantidad_articulos = cantidad_articulos + new.unidades;
                 else if (docto_in_tipo='S') then
-                    cantidad_articulos = cantidad_articulos - new.unidades;
+                begin
+                    select seguimiento from articulos where articulo_id = new.articulo_id
+                    into :seguimiento;
+                    
+                    if (seguimiento <> 'S') then
+                        cantidad_articulos = cantidad_articulos - new.unidades;
+                end
 
                 if (cantidad_articulos < 0 ) then
                     cantidad_articulos = 0;
