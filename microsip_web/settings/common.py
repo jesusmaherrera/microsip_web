@@ -95,11 +95,6 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.eggs.Loader',
 )
 
-
-SERIALIZATION_MODULES = {
-    'json': 'wadofstuff.django.serializers.json'
-}
-
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -130,37 +125,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages'
 )
 
-DJANGO_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.admin',
-    'autocomplete_light',
-    'dajaxice',
-    #'south',
-    #'apps.microsip.ventas',
-    # Uncomment the next line to enable the admin:
-    
-
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
-)
-
-MICROSIP_MODULES = (
-    # Modules created for microsip and installed by default. You can add
-    'microsip_web.apps.main',
-    'microsip_web.apps.main.filtros',
-    'microsip_web.apps.inventarios',
-    'microsip_web.apps.ventas',
-    'microsip_web.apps.cuentas_por_pagar',
-    'microsip_web.apps.cuentas_por_cobrar',
-    'microsip_web.apps.contabilidad',
-    'microsip_web.apps.punto_de_venta',    
-)
-
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
@@ -189,9 +153,6 @@ LOGGING = {
         },
     }
 }
-
-# Combine all the apps in the django variable INSTALLED_APPS
-INSTALLED_APPS = DJANGO_APPS + MICROSIP_MODULES
 
 #Configuraciones para enviar mensajes usando gmail
 EMAIL_USE_TLS = True

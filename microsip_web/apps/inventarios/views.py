@@ -40,7 +40,6 @@ def inicializar_tablas(request):
     c.execute(triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'])
     c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'])
     c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'])
-    c.execute(triggers['SIC_PUERTA_INV_DOCTOSIN_BU'])
     
     transaction.commit_unless_managed()
 

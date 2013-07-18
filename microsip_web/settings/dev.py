@@ -4,7 +4,32 @@ from common import *
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-#DATABASE_ROUTERS = ['inventarios.router.MicrosipRouter']
+DJANGO_APPS = (
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.admin',
+    'autocomplete_light',
+    'dajaxice',
+)
+
+MICROSIP_MODULES = (
+    # Modules created for microsip and installed by default. You can add
+    'microsip_web.apps.main',
+    'microsip_web.apps.main.filtros',
+    'microsip_web.apps.inventarios',
+    'microsip_web.apps.ventas',
+    'microsip_web.apps.cuentas_por_pagar',
+    'microsip_web.apps.cuentas_por_cobrar',
+    'microsip_web.apps.contabilidad',
+    'microsip_web.apps.punto_de_venta',    
+)
+# Combine all the apps in the django variable INSTALLED_APPS
+INSTALLED_APPS = DJANGO_APPS + MICROSIP_MODULES
+
 DATABASES = {
     # 'default': {
     #     'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -46,6 +71,7 @@ DATABASES = {
 }
 
 ROOT_URLCONF = 'microsip_web.urls.dev'
+
 
 # Additional locations of static files
 STATICFILES_DIRS = (

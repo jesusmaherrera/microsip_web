@@ -1,5 +1,5 @@
 from django import template
-from  microsip_web.settings.common import MICROSIP_MODULES
+from  microsip_web.settings.prod import MICROSIP_MODULES
 register = template.Library()
 
 

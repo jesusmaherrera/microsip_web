@@ -5,7 +5,7 @@ from django.conf import settings
 from django.views import generic
 from dajaxice.core import dajaxice_autodiscover, dajaxice_config
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from  microsip_web.settings.common import MICROSIP_MODULES
+from  microsip_web.settings.dev import MICROSIP_MODULES
 dajaxice_autodiscover()
 import autocomplete_light
 autocomplete_light.autodiscover()
