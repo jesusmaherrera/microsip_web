@@ -1,5 +1,82 @@
 triggers = {}
 
+
+triggers['SIC_PUERTA_INV_DOCTOSIN_BU'] = '''
+    CREATE OR ALTER TRIGGER SIC_PUERTA_INV_DOCTOSIN_BU FOR DOCTOS_IN
+    ACTIVE BEFORE UPDATE POSITION 0
+    AS
+    declare variable invfis_id integer;
+
+    declare variable invfis_det_id integer;
+    declare variable invfis_articulo_unidades integer;
+
+    declare variable inv_articulo_id integer;
+    declare variable inv_articulo_unidades integer;
+    declare variable inv_detalle_id integer;
+
+    declare variable art_discreto_id integer;
+    declare variable almacen_id integer;
+    declare variable inv_tipo char(1);
+
+    begin
+        /* Este triger sirve para cuando se cancela un documento */
+        if (new.cancelado='S') then
+        begin
+            /*Datos de documento in*/
+            select first 1 doctos_in.naturaleza_concepto, doctos_in.almacen_id
+            from doctos_in
+            where doctos_in.docto_in_id = new.docto_in_id
+            INTO :inv_tipo, :almacen_id;
+        
+            /*Datos de inventario fisico abierto*/
+            select first 1 doctos_invfis.docto_invfis_id from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= :almacen_id
+            INTO :invfis_id;
+        
+            /*Si existe un inventario fisico [abierto] del almacen del cual es este documento*/
+            if (not invfis_id is null) then
+            begin
+                /*Se recorren todos los detalles del documento[entrada/salida]*/
+                for select articulo_id, unidades, docto_in_det_id
+                from doctos_in_det
+                where docto_in_id = new.docto_in_id
+                into :inv_articulo_id, :inv_articulo_unidades, :inv_detalle_id
+                do
+                begin
+                    select docto_invfis_det_id, unidades
+                    from doctos_invfis_det
+                    where docto_invfis_id = :invfis_id and articulo_id =:inv_articulo_id
+                    into :invfis_det_id, :invfis_articulo_unidades;
+
+
+
+                    if (not invfis_det_id is null) then
+                    begin
+                        if(inv_tipo='E') then
+                        begin
+                            invfis_articulo_unidades = invfis_articulo_unidades - inv_articulo_unidades;
+                           /* for select art_discreto_id from desglose_en_discretos
+                            where docto_in_det_id = :inv_detalle_id
+                            into :art_discreto_id
+                            do
+                            begin
+                                delete from desglose_en_discretos_invfis where docto_invfis_det_id = :invfis_det_id and art_discreto_id = :art_discreto_id;
+                            end */
+                        end
+                        else if (inv_tipo='S') then
+                            invfis_articulo_unidades = invfis_articulo_unidades + inv_articulo_unidades;
+
+                        if (invfis_articulo_unidades < 0 ) then
+                            invfis_articulo_unidades = 0;
+                        update doctos_invfis_det set unidades= :invfis_articulo_unidades where docto_invfis_det_id = :invfis_det_id;
+                    end
+
+                end
+            end
+        end
+    end
+    '''
+
+
 #############################
 #                           #
 #   DESGLOSE EN DISCRETOS   #
