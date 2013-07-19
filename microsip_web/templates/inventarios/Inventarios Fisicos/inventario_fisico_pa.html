@@ -10,13 +10,30 @@
 
 
 <script type="text/javascript">
+
   $(function() {
     $( "#id_fecha" ).datepicker({dateFormat:'dd/mm/yy',});
   });
    
    
   $(document).ready(function(){
+    modo_rapido = localStorage.getItem("modo_rapido");
     
+    if (modo_rapido == null)
+      localStorage.setItem("modo_rapido", 'false');
+    
+    if(localStorage.getItem("modo_rapido") == 'true')
+      $("#id_modo_rapido").attr("checked", true);
+    else
+      $("#id_modo_rapido").attr("checked", false);
+
+
+    $("#id_modo_rapido").change(function() {
+      if(this.checked)
+        localStorage.setItem("modo_rapido", 'true');
+      else
+        localStorage.setItem("modo_rapido", 'false');
+    });
 
     $('#id_clave').live('keydown', function(e) { 
       var keyCode = e.keyCode || e.which; 
@@ -25,6 +42,8 @@
       { 
         if($("#id_clave").val() != '')
           Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
+        else
+          $("#id_articulo_text").focus();
         return false
       }
 
@@ -143,8 +162,7 @@
     </div>
     <div style='clear:both;'>
       <div class='span' style="font-size:.7em; margin-left: 4em; ">
-        {{ inventario_form.errors }}
-        {{ inventario_form.modo_rapido }} Modo Rapido
+        <input type="checkbox" name="modo_rapido" id="id_modo_rapido"> Modo Rapido
       </div>
       <div  class=" pull-right ">
         <div class="span4">

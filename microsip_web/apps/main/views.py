@@ -25,7 +25,7 @@ def inicializar_tablas(request):
     punto_de_venta_inicializar_tablas()
     #cuentas_por_pagar_inicializar_tablas()
     #cuentas_por_cobrar_inicializar_tablas()
-    punto_de_venta_agregar_trigers()
+    #punto_de_venta_agregar_trigers()
     return HttpResponseRedirect('/')
 
 def punto_de_venta_agregar_trigers():

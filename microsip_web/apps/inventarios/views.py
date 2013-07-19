@@ -41,6 +41,9 @@ def inicializar_tablas(request):
     c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'])
     c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'])
     
+    c.execute(triggers['SIC_PUERTA_INV_DOCTOSIN_BU'])
+    
+    
     transaction.commit_unless_managed()
 
     return HttpResponseRedirect('/inventarios/InventariosFisicos/')
@@ -170,7 +173,7 @@ def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inv
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa.html'):
+def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa.html'):
     message = ''
     msg_series=''
     error = 0
@@ -184,13 +187,11 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
     #POST
     if request.method == 'POST':
         detalleInvForm = DoctosInvfisDetManageForm(request.POST)
-        inventario_form = inventario_pa_form(request.POST)
-        if detalleInvForm.is_valid() and inventario_form.is_valid():
+        if detalleInvForm.is_valid():
             articulos_discretos_formset = articulos_discretos_formset(request.POST, request.FILES)
             detalleInv = detalleInvForm.save(commit=False)  
             unidades = abs(detalleInv.unidades)
             total_forms = abs(articulos_discretos_formset.total_form_count())
-            
             if detalleInv.articulo.seguimiento == 'L':
                 message = 'La aplicacion no esta preparada para trabajar con articulos de lotes, porfavor introduce estos articulos directamente en microsip'
                 error = 1
@@ -295,11 +296,10 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
                         elif movimiento == 'actualizar':
                             DoctosInvfisDet.objects.filter(id=id_detalle, articulo=detalleInv.articulo).update(unidades=unidades)
 
-                    return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s'% id)
+                        return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s/'% id)
                            
     else:
         detalleInvForm = DoctosInvfisDetManageForm()
-        inventario_form = inventario_pa_form()
         
         articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)    
         data = {
@@ -308,7 +308,7 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
             'form-MAX_NUM_FORMS': u'',
         }
         articulos_discretos_formset = articulos_discretos_formset(data)
-
+    
     c = {
         'message':message,
         'inicio_form':inicio_form, 
@@ -317,7 +317,6 @@ def invetarioFisico_pa_manageView(request, id = None, template_name='inventarios
         'detalleInvForm':detalleInvForm, 
         'InventarioFisico':InventarioFisico,
         'formset':articulos_discretos_formset,
-        'inventario_form':inventario_form,
         'inventario_id':id,
         'articulos_discretos_actuales':articulos_discretos_actuales,
         }
