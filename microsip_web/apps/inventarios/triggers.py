@@ -17,8 +17,9 @@ triggers['SIC_PUERTA_INV_DOCTOSIN_BU'] = '''
     declare variable art_discreto_id integer;
     declare variable almacen_id integer;
     declare variable inv_tipo char(1);
-
+    declare variable seguimiento char(1);
     begin
+        /*exception ex_saldo_cargo_excedido 'saldo';*/
         /* Este triger sirve para cuando se cancela un documento */
         if (new.cancelado='S') then
         begin
@@ -48,23 +49,19 @@ triggers['SIC_PUERTA_INV_DOCTOSIN_BU'] = '''
                     into :invfis_det_id, :invfis_articulo_unidades;
 
 
-
                     if (not invfis_det_id is null) then
                     begin
-                        if(inv_tipo='E') then
-                        begin
-                            invfis_articulo_unidades = invfis_articulo_unidades - inv_articulo_unidades;
-                           /* for select art_discreto_id from desglose_en_discretos
-                            where docto_in_det_id = :inv_detalle_id
-                            into :art_discreto_id
-                            do
-                            begin
-                                delete from desglose_en_discretos_invfis where docto_invfis_det_id = :invfis_det_id and art_discreto_id = :art_discreto_id;
-                            end */
-                        end
-                        else if (inv_tipo='S') then
-                            invfis_articulo_unidades = invfis_articulo_unidades + inv_articulo_unidades;
 
+                        if(inv_tipo='E') then
+                            invfis_articulo_unidades = invfis_articulo_unidades - inv_articulo_unidades;
+                        else if (inv_tipo='S') then
+                        begin
+                            select seguimiento from articulos where articulo_id = :inv_articulo_id
+                            into :seguimiento;
+                            
+                            if (seguimiento <> 'S') then
+                                invfis_articulo_unidades = invfis_articulo_unidades + inv_articulo_unidades;
+                        end
                         if (invfis_articulo_unidades < 0 ) then
                             invfis_articulo_unidades = 0;
                         update doctos_invfis_det set unidades= :invfis_articulo_unidades where docto_invfis_det_id = :invfis_det_id;
@@ -95,6 +92,8 @@ triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'] = '''
     declare variable desglose_discr_invfis_id integer;
     declare variable articulo_clave char(20);
     declare variable naturaleza_concepto char(1);
+    declare variable cantidad_articulos integer;
+
     begin
         select doctos_in.almacen_id, doctos_in_det.articulo_id, doctos_in.naturaleza_concepto
         from doctos_in_det,doctos_in
@@ -139,7 +138,18 @@ triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'] = '''
                 into :desglose_discr_invfis_id;
 
                 if (not desglose_discr_invfis_id is null) then
+                begin
                     delete from desglose_en_discretos_invfis where desgl_discreto_invfis_id = :desglose_discr_invfis_id;
+
+                    select unidades from doctos_invfis_det
+                    where docto_invfis_det_id = :docto_invfis_det_id
+                    into cantidad_articulos;
+                    cantidad_articulos = cantidad_articulos - 1;
+                    if (cantidad_articulos < 0 ) then
+                        cantidad_articulos = 0;
+    
+                    update doctos_invfis_det set unidades= :cantidad_articulos where docto_invfis_det_id = :docto_invfis_det_id;
+                end
             end
         end
 
@@ -230,6 +240,7 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'] = '''
     declare variable articulo_seguimiento char(1);
 
     begin
+
         /*Datos de documento in*/
         select first 1 doctos_in.naturaleza_concepto
         from doctos_in
@@ -256,9 +267,32 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'] = '''
                 if (articulo_id = old.articulo_id and docto_in_tipo='E') then
                 begin
                     cantidad_articulos = cantidad_articulos - old.unidades;
+
+                    /*Eliminar desgloses de inventario fisico*/
+                    delete from desglose_en_discretos_invfis
+                    where art_discreto_id in (
+                        select desglose_en_discretos.art_discreto_id from desglose_en_discretos, doctos_in_det
+                        where
+                        desglose_en_discretos.docto_in_det_id = doctos_in_det.docto_in_det_id and
+                        doctos_in_det.docto_in_det_id = old.docto_in_det_id
+                        ) and
+                        docto_invfis_det_id = :invfis_det_id;
                 end
                 else if (articulo_id = old.articulo_id and docto_in_tipo='S') then
+                begin
                     cantidad_articulos = cantidad_articulos + old.unidades;
+
+                    for select desglose_en_discretos.art_discreto_id
+                    from desglose_en_discretos, doctos_in_det
+                    where
+                        desglose_en_discretos.docto_in_det_id = doctos_in_det.docto_in_det_id and
+                        doctos_in_det.docto_in_det_id = old.docto_in_det_id
+                    into :articulo_discreto_id
+                    do
+                    begin
+                        insert into desglose_en_discretos_invfis values(-1,:invfis_det_id, :articulo_discreto_id, 1);
+                    end
+                end
                 if (cantidad_articulos <0 ) then
                     cantidad_articulos = 0;
                 update doctos_invfis_det set unidades= :cantidad_articulos where docto_invfis_det_id = :invfis_det_id;
