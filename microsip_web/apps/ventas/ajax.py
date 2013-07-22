@@ -32,6 +32,13 @@ def get_infoarticulo(request, articulo_id):
     return simplejson.dumps({'detalles':articulo.nota_ventas,'compatibilidades':compatibles,})
 
 @dajaxice_register(method='GET')
+def articulos_moveto(request, carpeta_id, articulos_seleccionados):
+    for id in articulos_seleccionados:
+        articulo = Articulos.objects.filter(pk=id).update(carpeta=get_object_or_404(Carpeta, pk=carpeta_id))
+
+    return simplejson.dumps({'message':'Your message is'})
+
+@dajaxice_register(method='GET')
 def get_articulosby_grupopadre(request, carpetapadre_id):
     articulos = Articulos.objects.filter(grupo_padre__id = carpetapadre_id)
     data = serializers.serialize("json", articulos,)
@@ -73,7 +80,7 @@ def get_estructura_carpetas(request):
 
 @dajaxice_register(method='GET')
 def get_articulosby_seccion(request, carpeta_id):
-    articulos = Articulos.objects.filter(sic_carpeta = get_object_or_404(Carpeta, pk=carpeta_id) )
+    articulos = Articulos.objects.filter(carpeta = get_object_or_404(Carpeta, pk=carpeta_id) )
     
     data = serializers.serialize("json", articulos)
     return HttpResponse(data, mimetype="application/javascript")

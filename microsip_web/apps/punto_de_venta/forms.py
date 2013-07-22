@@ -14,9 +14,9 @@ from models import *
 # 		model = ArticuloCompatibleClasificacion
 # 		exclude = ('articulo',)
 
-# class ArticuloCompatibleArticulo_ManageForm(forms.Form):
-# 	compatible_articulo = forms.ModelChoiceField(queryset=Articulos.objects.all(),
-# 		widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
+class ArticuloCompatibleArticulo_ManageForm(forms.Form):
+	compatible_articulo = forms.ModelChoiceField(queryset=Articulos.objects.all(),
+		widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
 
 # class Grupo_ManageForm(forms.ModelForm):
 # 	#nombre = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'clasificacion...'}),required=False)

@@ -1,11 +1,11 @@
 from django import template
-from  microsip_web.settings.prod import MICROSIP_MODULES
-register = template.Library()
+from django.conf import settings
 
+register = template.Library()
 
 def microsip_module_btn(ms_module):
    result = ''
-   if ms_module in MICROSIP_MODULES:
+   if ms_module in settings.MICROSIP_MODULES:
       if ms_module == 'microsip_web.apps.ventas':
          result = '<li><a href="/ventas/Facturas/"> <i class="msicon-ventas"></i><label class="labelMenu"> Ventas</label></a></li>'
       elif ms_module == 'microsip_web.apps.inventarios':

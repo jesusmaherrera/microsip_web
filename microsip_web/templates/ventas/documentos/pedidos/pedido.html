@@ -20,12 +20,25 @@
 
 function cargar_articulos(articulos)
 {
-  var options = '<option value="">-----------</option>';
+  var options = '<option value="">Selecciona un articulo</option>';
   for (var i = 0; i < articulos.length; i++){
     options += '<option value="'+articulos[i]["pk"]+'">' + articulos[i]["fields"]["nombre"] +'</option>';
   }
   $('#id_articulos').html(options)
   $("#id_articulos option:first").attr('selected', 'selected');
+  if ($('#id_articulos option').length > 1 )
+  {
+    $('#id_infoarticulo').show();
+    $('#id_add_articulo').show();
+    $('#id_articulos').show();
+  }
+  else
+  {
+    $('#id_infoarticulo').hide();
+    $('#id_add_articulo').hide();
+    $('#id_articulos').hide();
+  }
+
 }
 
 function cargar_arbol(datos){
@@ -34,13 +47,23 @@ function cargar_arbol(datos){
     "json_data" : {
       "data" : datos
     },
-    "plugins" : [ "themes", "json_data", "ui" ]
+    "plugins" : [ "themes", "json_data", "ui" ],
+    "core" : { 
+      // just open those two nodes up
+      // as this is an AJAX enabled tree, both will be downloaded from the server
+      "initially_open" : [ "1"] 
+    },
+
   }).bind("select_node.jstree", function (e, data) {
     Dajaxice.microsip_web.apps.ventas.get_articulosby_seccion(cargar_articulos, {'carpeta_id': data.rslt.obj.attr("id")});
   });
 }
 
 $(document).ready(function() {
+  $('#id_articulos').hide();
+  $('#id_infoarticulo').hide();
+  $('#id_add_articulo').hide();
+  
   Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
   
   $('#id_doctosIn_table tbody tr').formset({
@@ -55,6 +78,10 @@ $(document).ready(function() {
   
   $('#id_infoarticulo').click(function(event){
     Dajaxice.microsip_web.apps.ventas.get_infoarticulo(cargar_infoarticulo, {'articulo_id': $('#id_articulos').val()});  
+  });
+
+  $('#id_add_articulo').click(function(event){
+      agregar_articulo();
   });
 
   $('#id_articulos').change(function(event){
@@ -115,6 +142,8 @@ function agregar_articulo(){
   span.children('span.deck').html('<span class="div hilight" data-value="'+$('#id_articulos').val()+'"><span style="display: inline;" class="remove div">X</span>'+ $('#id_articulos option:selected').text() +'</span>');
   span.children('select.value-select').html('<option selected="selected" value="'+$('#id_articulos').val()+'">'+ $('#id_articulos option:selected').text() +'</option>');
   span.children('input.autocomplete').hide();
+  $('tr.form-container [id$="-unidades"]').last().focus();
+
 
 }
 
@@ -218,14 +247,13 @@ function cargar_nuevalista(data)
   {{ grupos_formset.management_form }}
  
 
- <div id="demo1" class="demo span" style="height:100px;">
-
+ <div id="demo1" class="demo span">
 </div>
 
-  <select id="id_articulos"></select>
+  <select id="id_articulos" class='span'></select>
   <a href="#id_infoModal" id='id_infoarticulo' data-toggle="modal" ><i class=' icon-info-sign'></i></a>
-  <div id='contenedor_listas'></div>
   <a class='btn' id='id_add_articulo' href="#">Agregar</a>
+  
   <div id="id_infoModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="infoModal" aria-hidden="true">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

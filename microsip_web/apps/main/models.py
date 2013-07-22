@@ -124,7 +124,7 @@ class Articulos(models.Model):
     puntos = models.IntegerField(db_column='SIC_PUNTOS')
     dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
     hereda_puntos = models.BooleanField( db_column='SIC_HEREDA_PUNTOS')
-    sic_carpeta = models.ForeignKey(Carpeta, blank=True, null=True,db_column='SIC_CARPETA_ID')
+    carpeta = models.ForeignKey(Carpeta, blank=True, null=True,db_column='SIC_CARPETA_ID')
 
     def __unicode__(self):
         return u'%s' % self.nombre

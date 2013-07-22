@@ -23,7 +23,6 @@ urlpatterns = patterns('',
     
     #Articulos
     (r'^articulos/$', views.articulos_view),
-    (r'^articulos/(?P<grupo_id>\d+)/$', views.articulos_view),
 
     (r'^articulo/(?P<id>\d+)/', views.articulo_manageView),
 	#Clientes

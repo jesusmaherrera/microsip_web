@@ -63,8 +63,9 @@ def inicializar_puntos_articulos(request):
 @login_required(login_url='/login/')
 def articulos_view(request, carpeta_id=None, template_name='punto_de_venta/articulos/articulos/articulos.html'):
     categorias_list = Carpeta.objects.filter(carpeta_padre=carpeta_id)
-    articulos_list = Articulos.objects.filter(sic_carpeta__id=carpeta_id).order_by('nombre')
+    articulos_list = Articulos.objects.filter(carpeta__id=carpeta_id).order_by('nombre')
 
+    
     paginator = Paginator(articulos_list, 20) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
 
@@ -77,8 +78,14 @@ def articulos_view(request, carpeta_id=None, template_name='punto_de_venta/artic
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
         articulos = paginator.page(paginator.num_pages)
+    
+    PATH = request.path
+    if  '/ventas/articulos/' in PATH:
+        extend = 'ventas/base.html'
+    elif '/punto_de_venta/articulos/' in PATH:
+        extend = 'punto_de_venta/base.html'
 
-    c = {'articulos':articulos,'categorias':categorias_list, 'grupo_id':carpeta_id,}
+    c = {'articulos':articulos,'categorias':categorias_list, 'grupo_id':carpeta_id,'extend':extend,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
@@ -95,7 +102,7 @@ def articulo_manageView(request, id = None, template_name='punto_de_venta/articu
 
     if request.method == 'POST':
         form = ArticuloManageForm(request.POST, instance=  articulo)
-        #form_articuloCompatible = ArticuloCompatibleArticulo_ManageForm(request.POST)
+        form_articuloCompatible = ArticuloCompatibleArticulo_ManageForm(request.POST)
         #form_clasificacionCompatible = ArticuloCompatibleClasificacion_ManageForm(request.POST)
         
         if form.is_valid():
@@ -105,7 +112,7 @@ def articulo_manageView(request, id = None, template_name='punto_de_venta/articu
                     articulo_compatible = form_articuloCompatible.cleaned_data['compatible_articulo']
                     articulo_comp = ArticuloCompatibleArticulo(
                         articulo = articulo,
-                        compatible_articulo = articulo_compatible,
+                        articulo_compatible = articulo_compatible,
                         )
                     articulo_comp.save()
                 return HttpResponseRedirect('/punto_de_venta/articulo/%s'%id)
@@ -119,16 +126,25 @@ def articulo_manageView(request, id = None, template_name='punto_de_venta/articu
             return HttpResponseRedirect('/punto_de_venta/articulos/')
     else:
         form = ArticuloManageForm(instance= articulo)
-        #form_articuloCompatible = ArticuloCompatibleArticulo_ManageForm()
+        form_articuloCompatible = ArticuloCompatibleArticulo_ManageForm()
         #form_clasificacionCompatible = ArticuloCompatibleClasificacion_ManageForm()
+
+    PATH = request.path
+    extend='punto_de_venta/base.html'
+
+    if  '/ventas/articulo/' in PATH:
+        extend = 'ventas/base.html'
+    elif '/punto_de_venta/articulo/' in PATH:
+        extend = 'punto_de_venta/base.html'
 
     c = {
     'form':form,
     'articulos_compatibles':articulos_compatibles,
     'clasificaciones_compatibles':clasificaciones_compatibles,
-    #'form_articuloCompatible':form_articuloCompatible,
+    'form_articuloCompatible':form_articuloCompatible,
     #'form_clasificacionCompatible':form_clasificacionCompatible,
     'articulo_id':id,
+    'extend':extend,
     }
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 

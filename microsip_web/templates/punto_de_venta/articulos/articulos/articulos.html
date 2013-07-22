@@ -1,4 +1,9 @@
-{% extends "punto_de_venta/base.html" %}
+
+
+<!--   if (document.location.href.indexOf('ventas') > -1) -->
+{% extends extend %}
+
+
 {% block title %}Articulos{% endblock %}
 
 <!-- CSS Code -->
@@ -9,13 +14,51 @@
 <script type="text/javascript">
 function cargar_articulos(articulos)
 {
-  $('#articulos_table').html('<caption>Articulos</caption><tr><th>Nombre</th></tr>');
+  $('#articulos_table').html('<caption></caption><tr><th><input id="articulos_select_all" name="your_name"  type="checkbox"></th><th>Nombre</th></tr>');
   for (var i = 0; i < articulos.length; i++){
-    var ruta ='/punto_de_venta/articulo/'+ articulos[i]["pk"]+'/';
-    $('#articulos_table').append('<tr><td ><a href="'+ruta+'">'+ articulos[i]["fields"]["nombre"]+'</a></td></tr>');
+    {% if extend == 'punto_de_venta/base.html' %}
+      var ruta ='/punto_de_venta/articulo/'+ articulos[i]["pk"]+'/';
+    {% else %}
+      var ruta ='/ventas/articulo/'+ articulos[i]["pk"]+'/';
+    {% endif %}
+
+    $('#articulos_table').append('<tr><td><input id="select_article_'+ articulos[i]["pk"] +'" value="your_value" type="checkbox"></td><td ><a href="'+ruta+'">'+ articulos[i]["fields"]["nombre"]+'</a></td></tr>');
   }
+
+  $('#articulos_select_all').change(function(){
+    if(this.checked)
+      $('[id^="select_article_"]').attr('checked',true);    
+    else
+      $('[id^="select_article_"]').attr('checked',false);    
+  });
 }
 
+function cargar_selector_movera(){
+  $('#movera_modal').modal();
+  Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol_mover_a);
+
+}
+function cargar_arbol_mover_a(datos){
+  var articulos_seleccionados = [];
+  $('[id^="select_article_"]:checked').each(function(){
+     articulos_seleccionados.push(this.id.replace("select_article_","")); 
+  });
+  $("#carpetas_movera").jstree({ 
+    "json_data" : {
+      "data" : datos
+    },
+    "plugins" : ["themes","json_data","ui","crrm","cookies","dnd","types","hotkeys",],
+    // the core plugin - not many options here
+    "core" : { 
+      // just open those two nodes up
+      // as this is an AJAX enabled tree, both will be downloaded from the server
+      "initially_open" : [ "15" , "15" ] 
+    },
+    })
+    .bind("select_node.jstree", function (event, data) { 
+      Dajaxice.microsip_web.apps.ventas.articulos_moveto(function(){}, {'carpeta_id': data.rslt.obj.attr("id"),'articulos_seleccionados':articulos_seleccionados,});
+    })
+}
 
 function cargar_arbol(datos){
   $("#demo1").jstree({ 
@@ -27,7 +70,7 @@ function cargar_arbol(datos){
     "core" : { 
       // just open those two nodes up
       // as this is an AJAX enabled tree, both will be downloaded from the server
-      "initially_open" : [ "15" , "15" ] 
+      "initially_open" : [ "1" ] 
     },
      // Configuring the search plugin
     "search" : {
@@ -80,6 +123,7 @@ function cargar_arbol(datos){
 }
 
 $(function () { 
+
   $("a").click(function () {
     switch(this.id) {
       case "search":
@@ -95,15 +139,12 @@ $(function () {
 
 $(document).ready(function() {
   Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
-  // Code for the menu buttons
-
 });
 </script>
 {% endblock %}
 
 {% block breadcrumb %}{{ block.super }} Articulos {% endblock %}
 {% block content %}
-<br>
 <!-- {% for categoria in categorias %}
 <div class="btn-group">
   <a class="btn" href="/punto_de_venta/articulos/{{categoria.id}}/"><i class='icon-tag'></i> {{ categoria }}</a>
@@ -113,22 +154,42 @@ $(document).ready(function() {
   </ul>
 </div>
 {% endfor %} -->
-<div class="container-fluid">
+ <div class="ms-custom-form container-fluid" style=" height: 2em; ">
   <div class="row-fluid">
-    <div class="span3">
+    <div class="span4"><h3>Articulos</h3></div>
+    <div class="span7" style=" margin-top: 15px; ">
+      <a tabindex="-1" class='btn' href='#' onclick='cargar_selector_movera();'><i class="icon-folder-open"></i> Mover a</a>  
+    </div>
+  </div>
+</div>
+<div class="container-fluid" style='clear:both;'>
+  <div class="row-fluid">
+    <div class="span4">
       <div class="input-append">
-        <input name="nombre" maxlength="100" placeholder="Busca una carpeta aqui..." type="text" id="text">
+        <input name="nombre" class='input-medium'  maxlength="100" placeholder="Busca una carpeta aqui..." type="text" id="text">
         <a class='btn' id="search"  href="#"><i class='icon-search'></i></a>
         <a class='btn' id="clear_search"  href="#"><i class=' icon-remove'></i></a>
       </div>
-      <div id="demo1" class="demo span"></div>
+      <div id="demo1" class="span"></div>
     </div>
-    <div class="span8">
+    <div class="span7" style=" margin-left: 4em; ">
       <table id='articulos_table'></table>
     </div>
   </div>
 </div>
-
+<div id="movera_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    Mover a
+  </div>
+  <div class="modal-body">
+    Selecciona lacarpeta a la que deseas mover los articulos seleccionados
+    <div id="carpetas_movera" class="span"></div>
+  </div>
+  <div class="modal-footer">
+    <a class='btn' data-dismiss="modal" href="#">Cancelar</a>
+    <a class='btn' href="">Aceptar</a>
+  </div>
+</div>
 <!-- <table class="table tableCell table-hover">
     <tr>
       <th>Nombre</th>
