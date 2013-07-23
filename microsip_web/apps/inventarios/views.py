@@ -108,33 +108,75 @@ def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisic
     c = {'inventarios_fisicos':inventarios_fisicos}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
+def split_seq(seq, n):
+    """ Yield successive n-sized chunks from l.
+    """
+    lista = []
+    for i in xrange(0, len(seq), n):
+        lista.append(seq[i:i+n])
+    return lista
+
+@login_required(login_url='/login/')
+def add_articulos_nocontabilizados_porlinea(request, inventario_id = None, linea_id= None):
+    inventario_fisico = DoctosInvfis.objects.get(pk=inventario_id)
+    linea = LineaArticulos.objects.get(pk=linea_id)
+    articulos_enInventario = DoctosInvfisDet.objects.filter(docto_invfis=inventario_fisico).order_by('-articulo').values_list('articulo__id', flat=True)
+    articulos_enceros = Articulos.objects.filter(es_almacenable='S',linea=linea).exclude(pk__in=articulos_enInventario).order_by('-id').values_list('id', flat=True)[0:9000]
+    
+    articulos_enceros_list = split_seq(articulos_enceros, 2000)
+    
+    for articulos_enceros in articulos_enceros_list:
+        detalles_en_ceros = []
+        for articulo_id in articulos_enceros:
+            clave_articulo = ClavesArticulos.objects.filter(articulo__id=articulo_id)
+            if clave_articulo.count() <= 0:
+                clave_articulo = ''
+            else:
+                clave_articulo = clave_articulo[0]
+
+            detalle_inventario =DoctosInvfisDet(
+                id=-1,
+                docto_invfis= inventario_fisico,
+                clave = clave_articulo,
+                articulo = Articulos.objects.get(pk=articulo_id),
+                unidades = 0)
+
+
+            detalles_en_ceros.append(detalle_inventario)
+    
+        DoctosInvfisDet.objects.bulk_create(detalles_en_ceros)
+
+    return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s'% inventario_id)
+
 @login_required(login_url='/login/')
 def add_articulos_nocontabilizados(request, id = None):
     inventario_fisico = DoctosInvfis.objects.get(pk=id)
-    detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=inventario_fisico).order_by('-id')
-    articulos_en_inventario = []
-    for detalle_inventario in detallesInventario:
-       articulos_en_inventario.append(detalle_inventario.articulo.id)
+    articulos_enInventario = DoctosInvfisDet.objects.filter(docto_invfis=inventario_fisico).order_by('-articulo').values_list('articulo__id', flat=True)
+    articulos_enceros = Articulos.objects.filter(es_almacenable='S').exclude(pk__in=articulos_enInventario).order_by('-id').values_list('id', flat=True)[0:9000]
     
-    articulos_enceros = Articulos.objects.exclude(pk__in=articulos_en_inventario).filter(es_almacenable='S')
+    articulos_enceros_list = split_seq(articulos_enceros, 2000)
+    
+    for articulos_enceros in articulos_enceros_list:
+        detalles_en_ceros = []
+        for articulo_id in articulos_enceros:
+            clave_articulo = ClavesArticulos.objects.filter(articulo__id=articulo_id)
+            if clave_articulo.count() <= 0:
+                clave_articulo = ''
+            else:
+                clave_articulo = clave_articulo[0]
 
-    detalles_en_ceros = []
-    for articulo in articulos_enceros:
-        clave_articulo = ClavesArticulos.objects.filter(articulo__id=articulo.id)
-        if clave_articulo.count() <= 0:
-            clave_articulo = ''
-        else:
-            clave_articulo = clave_articulo[0]
+            detalle_inventario =DoctosInvfisDet(
+                id=-1,
+                docto_invfis= inventario_fisico,
+                clave = clave_articulo,
+                articulo = Articulos.objects.get(pk=articulo_id),
+                unidades = 0)
 
-        detalle_inventario =DoctosInvfisDet(
-            id=-1,
-            docto_invfis= inventario_fisico,
-            clave = clave_articulo,
-            articulo = articulo,
-            unidades = 0)
-        detalles_en_ceros.append(detalle_inventario)
-        
-    DoctosInvfisDet.objects.bulk_create(detalles_en_ceros)
+
+            detalles_en_ceros.append(detalle_inventario)
+    
+        DoctosInvfisDet.objects.bulk_create(detalles_en_ceros)
+
     return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s'% id)
 
 def inventario_getnew_folio():
@@ -309,8 +351,26 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
         }
         articulos_discretos_formset = articulos_discretos_formset(data)
     
+    articulos_eninventario = detallesInventario.count()
+    paginator = Paginator(detallesInventario, 30) # Muestra 5 inventarios por pagina
+    page = request.GET.get('page')
+
+    #####PARA PAGINACION##############
+    try:
+        detallesInventario = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        detallesInventario = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        detallesInventario = paginator.page(paginator.num_pages)
+
+    lineas_form = linea_articulos_form()
+
+
     c = {
         'message':message,
+        'lineas_form':lineas_form,
         'inicio_form':inicio_form, 
         'msg_series':msg_series, 
         'detallesInventario':detallesInventario,
@@ -318,6 +378,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
         'InventarioFisico':InventarioFisico,
         'formset':articulos_discretos_formset,
         'inventario_id':id,
+        'articulos_eninventario':articulos_eninventario,
         'articulos_discretos_actuales':articulos_discretos_actuales,
         }
 

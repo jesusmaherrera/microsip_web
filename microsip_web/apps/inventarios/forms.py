@@ -7,6 +7,9 @@ from microsip_web.apps.inventarios.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 
+class linea_articulos_form(forms.Form):
+    linea = forms.ModelChoiceField(queryset= LineaArticulos.objects.all())
+
 
 class DoctosInManageForm(forms.ModelForm):
     file_inventario = forms.CharField(widget=forms.FileInput, required = False)

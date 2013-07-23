@@ -10,6 +10,14 @@
 
 
 <script type="text/javascript">
+  function agregar_articulos_porlineafn()
+  {
+    var linea = $("#id_linea").val();
+    if (linea == '') 
+      alert('Por favor seleccione una linea');
+    else
+      $(location).attr('href','/inventarios/InventarioFisico_pa/agregar_articulos_nocontabilizados_porlinea/{{ inventario_id }}/'+linea+'/');  
+  }
 
   $(function() {
     $( "#id_fecha" ).datepicker({dateFormat:'dd/mm/yy',});
@@ -26,7 +34,6 @@
       $("#id_modo_rapido").attr("checked", true);
     else
       $("#id_modo_rapido").attr("checked", false);
-
 
     $("#id_modo_rapido").change(function() {
       if(this.checked)
@@ -139,8 +146,11 @@
           <li class="dropdown">
             <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i></a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
-              <li><a tabindex="-1" href="/inventarios/InventarioFisico_pa/agregar_articulos_nocontabilizados/{{ inventario_id }}"><i class="icon-ok-circle"></i> Agregar articulos no contabilizados</a></li>
+              <li><a tabindex="-1" href="#articulosnocont_porlinea_Modal" role="button" data-toggle="modal"><i class="icon-tasks"></i> Agregar articulos no contabilizados Por linea</a></li>
+              <li><a tabindex="-1" href="/inventarios/InventarioFisico_pa/agregar_articulos_nocontabilizados/{{ inventario_id }}"><i class="icon-align-justify"></i> Agregar todos articulos no contabilizados</a></li>
+               
             </ul>
+
           </li>
         <ul>
       </h3>
@@ -172,7 +182,21 @@
     </div>
   </div>
   {% csrf_token %}
-  
+   <div id="articulosnocont_porlinea_Modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      Agregar articulos no contabilizados por linea <br>
+    </div>
+    <div class="modal-body">
+      Seleciona una linea por favor {{ lineas_form }}
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id='btnCancel' data-dismiss="modal">Cancelar</button>
+      <a class='btn' href="#" onclick="agregar_articulos_porlineafn();" id='id_agregar_articulos_porlinea'>Aceptar</a>
+    </div>
+  </div>
+
   <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     {{ formset.management_form }}
     {{ formset.non_field_errors }}
@@ -248,11 +272,29 @@
   </div>
   <br style='clear:both;'>
   <br>
+   <div class="pagination pagination-mini mainmenu" style=" margin-bottom: 0px; ">
+      <ul>
+        {% if detallesInventario.has_previous %}
+        <li><a href="?page={{ detallesInventario.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ detallesInventario.number }} de {{ detallesInventario.paginator.num_pages }}.</a></li>
+        {% if detallesInventario.has_next %}
+        <li><a href="?page={{ detallesInventario.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+  <p class="text-center">Son {{ articulos_eninventario }} Articulos en total</p>
+  
   <table class="table table-striped table-hover">
     <tr>
-      <th>Articulo</th>
+      <th>Articulos</th>
       <th>Unidades</th>
     </tr>
+
   {% for detalle in detallesInventario %}
     <tr>
       <td> {{ detalle.articulo }} </td>
