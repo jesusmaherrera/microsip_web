@@ -598,11 +598,11 @@ class Cliente(models.Model):
     hereda_valorpuntos          = models.BooleanField(db_column='SIC_HEREDA_VALORPUNTOS')
     valor_puntos                = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_VALOR_PUNTOS')
     hereda_puntos_a             = models.ForeignKey('self', db_column='SIC_HEREDAR_PUNTOS_A', related_name='hereda_puntos_a_cliente',blank=True, null=True)
-    cuenta_1 = models.ForeignKey(CuentaCo, db_column='CUENTA_1', blank=True, null=True, related_name='cuenta_1')
-    cuenta_2 = models.ForeignKey(CuentaCo, db_column='CUENTA_2', blank=True, null=True, related_name='cuenta_2')
-    cuenta_3 = models.ForeignKey(CuentaCo, db_column='CUENTA_3', blank=True, null=True, related_name='cuenta_3')
-    cuenta_4 = models.ForeignKey(CuentaCo, db_column='CUENTA_4', blank=True, null=True, related_name='cuenta_4')
-    cuenta_5 = models.ForeignKey(CuentaCo, db_column='CUENTA_5', blank=True, null=True, related_name='cuenta_5')
+    # cuenta_1 = models.ForeignKey(CuentaCo, db_column='CUENTA_1', blank=True, null=True, related_name='cuenta_1')
+    # cuenta_2 = models.ForeignKey(CuentaCo, db_column='CUENTA_2', blank=True, null=True, related_name='cuenta_2')
+    # cuenta_3 = models.ForeignKey(CuentaCo, db_column='CUENTA_3', blank=True, null=True, related_name='cuenta_3')
+    # cuenta_4 = models.ForeignKey(CuentaCo, db_column='CUENTA_4', blank=True, null=True, related_name='cuenta_4')
+    # cuenta_5 = models.ForeignKey(CuentaCo, db_column='CUENTA_5', blank=True, null=True, related_name='cuenta_5')
 
 
     def __unicode__(self):
