@@ -14,7 +14,7 @@ INSTALACION DE APLICACION
 6:Reinstalar firbird Server **poner no nada borrar archivos** (EN INSTALCION INDICAR Copiar la libreria cliente de firebird al directorio<system>)
 
 /////////////INTALAR APLICACION////////////////////
-7:Agregar en variables de entorno en path ";C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;" o con "SET PATH=%PATH%;C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;"
+7:Agregar en variables de entorno en path ";C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;" o con [setx PATH "%PATH%;C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts"]
 8:Descromprimir archivo instaladores_microsip_web en c:/instaladores_microsip_web
 9:En carpeta descomprimida ejecutar instaladores segun estan numerados ejemplo "1)Nombre de instaldor" asta el cuatro
 10: Configurar conexion a base de datos "C:\microsip_web_compilado\microsip_web\settings\prod.py
