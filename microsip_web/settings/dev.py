@@ -28,6 +28,7 @@ MICROSIP_MODULES = (
     'microsip_web.apps.punto_de_venta',    
 )
 # Combine all the apps in the django variable INSTALLED_APPS
+
 INSTALLED_APPS = DJANGO_APPS + MICROSIP_MODULES
 
 DATABASES = {

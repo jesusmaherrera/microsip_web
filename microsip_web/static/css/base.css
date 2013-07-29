@@ -3,8 +3,9 @@ body{
 	/*background: #fff url(../img/wood-bg.jpg);*/
 	color: #584941;
 	text-shadow: 0 1px 1px rgba(255, 255, 255, .5);
-  background-color: rgb(231, 231, 231);
+  background-color: rgb(231, 231, 231); 
 }
+
 
 .navbar-inner_min {
   min-height: 25px;
@@ -24,6 +25,13 @@ body{
 footer
 {
   text-align: center;
+}
+
+.imagecenter
+{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .ms-custom-form

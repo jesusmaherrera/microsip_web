@@ -7,8 +7,6 @@ urlpatterns = patterns('',
     (r'^InventariosFisicos/$', views.invetariosFisicos_View),
     (r'^InventarioFisico/$', views.invetarioFisico_manageView),
     # (r'^InventarioFisico/(?P<id>\d+)/', views.invetarioFisico_manageView),
-    (r'^InventarioFisico_pa/agregar_articulos_nocontabilizados/(?P<id>\d+)/', views.add_articulos_nocontabilizados),
-    (r'^InventarioFisico_pa/agregar_articulos_nocontabilizados_porlinea/(?P<inventario_id>\d+)/(?P<linea_id>\d+)/', views.add_articulos_nocontabilizados_porlinea),
     
     
     (r'^InventarioFisico_pa/$', views.create_invetarioFisico_pa_createView),

@@ -26,6 +26,7 @@ import xlrd
 from models import *
 from forms import *
 from microsip_web.libs.custom_db.main import next_id
+from microsip_web.libs.tools import split_seq
 from triggers import triggers
 
 ##########################################
@@ -107,77 +108,6 @@ def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisic
 
     c = {'inventarios_fisicos':inventarios_fisicos}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
-
-def split_seq(seq, n):
-    """ Yield successive n-sized chunks from l.
-    """
-    lista = []
-    for i in xrange(0, len(seq), n):
-        lista.append(seq[i:i+n])
-    return lista
-
-@login_required(login_url='/login/')
-def add_articulos_nocontabilizados_porlinea(request, inventario_id = None, linea_id= None):
-    inventario_fisico = DoctosInvfis.objects.get(pk=inventario_id)
-    linea = LineaArticulos.objects.get(pk=linea_id)
-    articulos_enInventario = DoctosInvfisDet.objects.filter(docto_invfis=inventario_fisico).order_by('-articulo').values_list('articulo__id', flat=True)
-    articulos_enceros = Articulos.objects.filter(es_almacenable='S',linea=linea).exclude(pk__in=articulos_enInventario).order_by('-id').values_list('id', flat=True)[0:9000]
-    
-    articulos_enceros_list = split_seq(articulos_enceros, 2000)
-    
-    for articulos_enceros in articulos_enceros_list:
-        detalles_en_ceros = []
-        for articulo_id in articulos_enceros:
-            clave_articulo = ClavesArticulos.objects.filter(articulo__id=articulo_id)
-            if clave_articulo.count() <= 0:
-                clave_articulo = ''
-            else:
-                clave_articulo = clave_articulo[0]
-
-            detalle_inventario =DoctosInvfisDet(
-                id=-1,
-                docto_invfis= inventario_fisico,
-                clave = clave_articulo,
-                articulo = Articulos.objects.get(pk=articulo_id),
-                unidades = 0)
-
-
-            detalles_en_ceros.append(detalle_inventario)
-    
-        DoctosInvfisDet.objects.bulk_create(detalles_en_ceros)
-
-    return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s'% inventario_id)
-
-@login_required(login_url='/login/')
-def add_articulos_nocontabilizados(request, id = None):
-    inventario_fisico = DoctosInvfis.objects.get(pk=id)
-    articulos_enInventario = DoctosInvfisDet.objects.filter(docto_invfis=inventario_fisico).order_by('-articulo').values_list('articulo__id', flat=True)
-    articulos_enceros = Articulos.objects.filter(es_almacenable='S').exclude(pk__in=articulos_enInventario).order_by('-id').values_list('id', flat=True)[0:9000]
-    
-    articulos_enceros_list = split_seq(articulos_enceros, 2000)
-    
-    for articulos_enceros in articulos_enceros_list:
-        detalles_en_ceros = []
-        for articulo_id in articulos_enceros:
-            clave_articulo = ClavesArticulos.objects.filter(articulo__id=articulo_id)
-            if clave_articulo.count() <= 0:
-                clave_articulo = ''
-            else:
-                clave_articulo = clave_articulo[0]
-
-            detalle_inventario =DoctosInvfisDet(
-                id=-1,
-                docto_invfis= inventario_fisico,
-                clave = clave_articulo,
-                articulo = Articulos.objects.get(pk=articulo_id),
-                unidades = 0)
-
-
-            detalles_en_ceros.append(detalle_inventario)
-    
-        DoctosInvfisDet.objects.bulk_create(detalles_en_ceros)
-
-    return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s'% id)
 
 def inventario_getnew_folio():
     registro_folioinventario = Registry.objects.get(nombre='SIG_FOLIO_INVFIS')
