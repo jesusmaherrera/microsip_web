@@ -29,16 +29,14 @@ class ArticuloCompatibleArticulo_ManageForm(forms.Form):
 # 	grupo = forms.ModelChoiceField(queryset= Grupo.objects.all(), required=False)
 
 class ArticuloManageForm(forms.ModelForm):
-	class Meta:
-		model = Articulos
-
-class ArticuloManageForm(forms.ModelForm):
 	
 	class Meta:
 		model = Articulos
 		exclude= {
 			'cuenta_ventas',
 			'es_almacenable',
+			'seguimiento',
+			'carpeta',
 		}
 
 class ClienteManageForm(forms.ModelForm):

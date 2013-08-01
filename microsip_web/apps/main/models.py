@@ -1251,3 +1251,23 @@ class LibresDevFacV(models.Model):
         return u'%s' % self.id
     class Meta:
         db_table = u'libres_devfac_ve'
+
+class ArticuloCompatibleArticulo(models.Model):
+    articulo = models.ForeignKey(Articulos, related_name="articulo_id_ca", blank=True, null=True)
+    articulo_compatible = models.ForeignKey(Articulos, related_name="articulo_compatible_id_ca", blank=True, null=True)
+
+    def __unicode__(self):
+        return u'%s'% self.articulo_compatible
+
+    class Meta:
+        db_table = u'sic_articulocomp_art'
+
+class ArticuloCompatibleCarpeta(models.Model):
+    articulo = models.ForeignKey(Articulos, related_name="articulo_id_cc", blank=True, null=True)
+    carpeta_compatible = models.ForeignKey(Carpeta, related_name="carpeta_compatible_id_cc", blank=True, null=True)
+
+    def __unicode__(self):
+        return u'%s' % self.carpeta_compatible
+
+    class Meta:
+        db_table = u'sic_articulocomp_carp'

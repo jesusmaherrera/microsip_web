@@ -2,6 +2,7 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
+from django.db import connection, transaction
 from django.db.models import Q
 # user autentication
 from django.contrib.auth.decorators import login_required, permission_required
@@ -9,11 +10,34 @@ from django.core.exceptions import ObjectDoesNotExist
 #Paginacion
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import datetime, time
-
+from  microsip_web.settings.dev import MICROSIP_MODULES
 from forms import *
 from models import *
 from microsip_web.apps.main.filtros.models import *
 from microsip_web.libs import contabilidad
+from triggers import triggers
+
+def inicializar_tablas(request):
+    c = connection.cursor()
+    #DETALLE DE VENTAS
+    c.execute(triggers['SIC_PUNTOS_PV_DOCTOSPVDET_BU'])
+    c.execute(triggers['SIC_PUNTOS_PV_DOCTOSPVDET_AD'])
+    #VENTAS
+    c.execute(triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'])
+    c.execute(triggers['SIC_PUNTOS_PV_DOCTOSPV_AD'])
+    #CLIENTES
+    c.execute(triggers['SIC_PUNTOS_PV_CLIENTES_BU'])
+    #EXCEPTION
+    try:
+        c.execute(
+        '''
+        CREATE EXCEPTION EX_CLIENTE_SIN_SALDO 'El cliente no tiene suficiente saldo';   
+        ''')
+    except Exception, e:
+       print "Oops!  No pudo agregarse la excepción EX_CLIENTE_SIN_SALDO por que esta ya existe. "
+
+    transaction.commit_unless_managed()
+    return HttpResponseRedirect('/punto_de_venta/ventas/')
 
 def create_facturageneral_dia(request, cliente_id=None):
     cliente_id = 331

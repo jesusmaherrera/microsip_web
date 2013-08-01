@@ -18,23 +18,28 @@ triggers['SIC_PUERTA_INV_DOCTOSIN_BU'] = '''
     declare variable almacen_id integer;
     declare variable inv_tipo char(1);
     declare variable seguimiento char(1);
+
+    declare variable docto_invfis_fecha date;
+    declare variable docto_in_fecha date;
+
     begin
         /*exception ex_saldo_cargo_excedido 'saldo';*/
         /* Este triger sirve para cuando se cancela un documento */
         if (new.cancelado='S') then
         begin
             /*Datos de documento in*/
-            select first 1 doctos_in.naturaleza_concepto, doctos_in.almacen_id
+            select first 1 doctos_in.naturaleza_concepto, doctos_in.almacen_id, doctos_in.fecha
             from doctos_in
             where doctos_in.docto_in_id = new.docto_in_id
-            INTO :inv_tipo, :almacen_id;
+            INTO :inv_tipo, :almacen_id, :docto_in_fecha;
         
             /*Datos de inventario fisico abierto*/
-            select first 1 doctos_invfis.docto_invfis_id from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= :almacen_id
-            INTO :invfis_id;
+            select first 1 doctos_invfis.docto_invfis_id, doctos_invfis.fecha
+            from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= :almacen_id
+            INTO :invfis_id, :docto_invfis_fecha;
         
             /*Si existe un inventario fisico [abierto] del almacen del cual es este documento*/
-            if (not invfis_id is null) then
+            if (not invfis_id is null and docto_in_fecha >= docto_invfis_fecha) then
             begin
                 /*Se recorren todos los detalles del documento[entrada/salida]*/
                 for select articulo_id, unidades, docto_in_det_id
@@ -93,66 +98,70 @@ triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'] = '''
     declare variable articulo_clave char(20);
     declare variable naturaleza_concepto char(1);
     declare variable cantidad_articulos integer;
-
+    declare variable docto_invfis_fecha date;
+    declare variable docto_in_fecha date;
     begin
-        select doctos_in.almacen_id, doctos_in_det.articulo_id, doctos_in.naturaleza_concepto
+        select doctos_in.almacen_id, doctos_in_det.articulo_id, doctos_in.naturaleza_concepto, doctos_in.fecha
         from doctos_in_det,doctos_in
         where
             doctos_in.docto_in_id = doctos_in_det.docto_in_id and
             doctos_in_det.docto_in_det_id = new.docto_in_det_id
-        into :almacen_id, :articulo_id, :naturaleza_concepto;
+        into :almacen_id, :articulo_id, :naturaleza_concepto, :docto_in_fecha;
 
         /*clave del articulo*/
         select first 1 clave_articulo from claves_articulos where articulo_id = :articulo_id into :articulo_clave;
 
         /*datos de inventario fisico abierto*/
-        select first 1 doctos_invfis.docto_invfis_id from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= :almacen_id
-        INTO :invfis_id;
-
-        select docto_invfis_det_id from doctos_invfis_det where articulo_id = :articulo_id into :docto_invfis_det_id;
-
-        if (not invfis_id is null) then
+        select first 1 doctos_invfis.docto_invfis_id, doctos_invfis.fecha
+        from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= :almacen_id
+        INTO :invfis_id, :docto_invfis_fecha;
+        
+        if (docto_in_fecha >= docto_invfis_fecha) then
         begin
-            /*Si es una entrada*/
-            if (naturaleza_concepto = 'E') then
-            begin
-                /*Si no existe el detalle de inventario fisico se crea este*/
-                if (docto_invfis_det_id is null) then
-                begin
-                    docto_invfis_det_id = GEN_ID(ID_DOCTOS,1);
-                    insert into doctos_invfis_det values(:docto_invfis_det_id, :invfis_id, :articulo_clave, :articulo_id, 0,null, null);
-                end
-
-                select first 1 desgl_discreto_invfis_id from desglose_en_discretos_invfis
-                where docto_invfis_det_id=:docto_invfis_det_id and art_discreto_id = new.art_discreto_id
-                into :desglose_discr_invfis_id;
-
-                if (desglose_discr_invfis_id is null) then
-                    insert into desglose_en_discretos_invfis values(-1, :docto_invfis_det_id, new.art_discreto_id, new.unidades);
-            end
-            /*Si es una salida*/
-            else if  (naturaleza_concepto = 'S')then
-            begin
-                select first 1 desgl_discreto_invfis_id from desglose_en_discretos_invfis
-                where docto_invfis_det_id=:docto_invfis_det_id and art_discreto_id = new.art_discreto_id
-                into :desglose_discr_invfis_id;
-
-                if (not desglose_discr_invfis_id is null) then
-                begin
-                    delete from desglose_en_discretos_invfis where desgl_discreto_invfis_id = :desglose_discr_invfis_id;
-
-                    select unidades from doctos_invfis_det
-                    where docto_invfis_det_id = :docto_invfis_det_id
-                    into cantidad_articulos;
-                    cantidad_articulos = cantidad_articulos - 1;
-                    if (cantidad_articulos < 0 ) then
-                        cantidad_articulos = 0;
+            select docto_invfis_det_id from doctos_invfis_det where articulo_id = :articulo_id into :docto_invfis_det_id;
     
-                    update doctos_invfis_det set unidades= :cantidad_articulos where docto_invfis_det_id = :docto_invfis_det_id;
+            if (not invfis_id is null) then
+            begin
+                /*Si es una entrada*/
+                if (naturaleza_concepto = 'E') then
+                begin
+                    /*Si no existe el detalle de inventario fisico se crea este*/
+                    if (docto_invfis_det_id is null) then
+                    begin
+                        docto_invfis_det_id = GEN_ID(ID_DOCTOS,1);
+                        insert into doctos_invfis_det values(:docto_invfis_det_id, :invfis_id, :articulo_clave, :articulo_id, 0,null, null);
+                    end
+    
+                    select first 1 desgl_discreto_invfis_id from desglose_en_discretos_invfis
+                    where docto_invfis_det_id=:docto_invfis_det_id and art_discreto_id = new.art_discreto_id
+                    into :desglose_discr_invfis_id;
+    
+                    if (desglose_discr_invfis_id is null) then
+                        insert into desglose_en_discretos_invfis values(-1, :docto_invfis_det_id, new.art_discreto_id, new.unidades);
+                end
+                /*Si es una salida*/
+                else if  (naturaleza_concepto = 'S')then
+                begin
+                    select first 1 desgl_discreto_invfis_id from desglose_en_discretos_invfis
+                    where docto_invfis_det_id=:docto_invfis_det_id and art_discreto_id = new.art_discreto_id
+                    into :desglose_discr_invfis_id;
+    
+                    if (not desglose_discr_invfis_id is null) then
+                    begin
+                        delete from desglose_en_discretos_invfis where desgl_discreto_invfis_id = :desglose_discr_invfis_id;
+    
+                        select unidades from doctos_invfis_det
+                        where docto_invfis_det_id = :docto_invfis_det_id
+                        into cantidad_articulos;
+                        cantidad_articulos = cantidad_articulos - 1;
+                        if (cantidad_articulos < 0 ) then
+                            cantidad_articulos = 0;
+        
+                        update doctos_invfis_det set unidades= :cantidad_articulos where docto_invfis_det_id = :docto_invfis_det_id;
+                    end
                 end
             end
         end
-
     end
     '''
 
@@ -162,8 +171,8 @@ triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'] = '''
 #                   #
 #####################
 
-triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'] = '''	
-	CREATE OR ALTER TRIGGER SIC_PUERTA_INV_DOCTOSINDET_BI FOR DOCTOS_IN_DET
+triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'] = ''' 
+    CREATE OR ALTER TRIGGER SIC_PUERTA_INV_DOCTOSINDET_BI FOR DOCTOS_IN_DET
     ACTIVE BEFORE INSERT POSITION 0
     AS
     declare variable invfis_id integer;
@@ -173,18 +182,22 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'] = '''
     declare variable almacen_id integer;
     declare variable docto_in_tipo char(1);
     declare variable seguimiento char(1);
+    declare variable docto_invfis_fecha date;
+    declare variable docto_in_fecha date;
+
     begin
         /*Datos de documento in*/
-        select first 1 doctos_in.naturaleza_concepto, doctos_in.almacen_id
+        select first 1 doctos_in.naturaleza_concepto, doctos_in.almacen_id, doctos_in.fecha
         from doctos_in
         where doctos_in.docto_in_id = new.docto_in_id
-        INTO :docto_in_tipo, :almacen_id;
+        INTO :docto_in_tipo, :almacen_id, :docto_in_fecha;
 
         /*Datos de inventario fisico abierto*/
-        select first 1 doctos_invfis.docto_invfis_id from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= :almacen_id
-        INTO :invfis_id;
+        select first 1 doctos_invfis.docto_invfis_id, doctos_invfis.fecha
+        from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= :almacen_id
+        INTO :invfis_id, :docto_invfis_fecha;
     
-        if (not invfis_id is null) then
+        if (not invfis_id is null and docto_in_fecha >= docto_invfis_fecha) then
         begin
             select doctos_invfis_det.docto_invfis_det_id, doctos_invfis_det.articulo_id, doctos_invfis_det.unidades
             from doctos_invfis, doctos_invfis_det
@@ -225,10 +238,10 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'] = '''
             end
         end
     end
-	'''
+    '''
 
 triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'] = '''
-	CREATE OR ALTER TRIGGER SIC_PUERTA_INV_DOCTOSINDET_BD FOR DOCTOS_IN_DET
+    CREATE OR ALTER TRIGGER SIC_PUERTA_INV_DOCTOSINDET_BD FOR DOCTOS_IN_DET
     ACTIVE BEFORE DELETE POSITION 0
     AS
     declare variable invfis_id integer;
@@ -238,20 +251,23 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'] = '''
     declare variable articulo_discreto_id integer;
     declare variable docto_in_tipo char(1);
     declare variable articulo_seguimiento char(1);
+    declare variable docto_invfis_fecha date;
+    declare variable docto_in_fecha date;
 
     begin
 
         /*Datos de documento in*/
-        select first 1 doctos_in.naturaleza_concepto
+        select first 1 doctos_in.naturaleza_concepto, doctos_in.fecha
         from doctos_in
         where doctos_in.docto_in_id = old.docto_in_id
-        INTO :docto_in_tipo;
+        INTO :docto_in_tipo, :docto_in_fecha;
     
         /*Datos de inventario fisico abierto*/
-        select first 1 doctos_invfis.docto_invfis_id from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= old.almacen_id
-        INTO :invfis_id;
+        select first 1 doctos_invfis.docto_invfis_id, doctos_invfis.fecha
+        from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= old.almacen_id
+        INTO :invfis_id, :docto_invfis_fecha;
 
-        if (not invfis_id is null) then
+        if (not invfis_id is null and docto_in_fecha >= docto_invfis_fecha) then
         begin
 
             for
@@ -300,4 +316,4 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'] = '''
             end
         end
     end
-	'''
+    '''

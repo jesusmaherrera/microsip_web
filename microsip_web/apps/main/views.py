@@ -25,29 +25,7 @@ def inicializar_tablas(request):
     punto_de_venta_inicializar_tablas()
     #cuentas_por_pagar_inicializar_tablas()
     #cuentas_por_cobrar_inicializar_tablas()
-    #punto_de_venta_agregar_trigers()
     return HttpResponseRedirect('/')
-
-def punto_de_venta_agregar_trigers():
-    c = connection.cursor()
-    #DETALLE DE VENTAS
-    c.execute(triggers['DOCTOS_PV_DET_BU_PUNTOS'])
-    c.execute(triggers['DOCTOS_PV_DET_AD_PUNTOS'])
-    #VENTAS
-    c.execute(triggers['DOCTOS_PV_BU_PUNTOS'])
-    c.execute(triggers['DOCTOS_PV_AD_PUNTOS'])
-    #CLIENTES
-    c.execute(triggers['CLIENTES_BU_PUNTOS'])
-    #EXCEPTION
-    try:
-        c.execute(
-        '''
-        CREATE EXCEPTION EX_CLIENTE_SIN_SALDO 'El cliente no tiene suficiente saldo';   
-        ''')
-    except Exception, e:
-       print "Oops!  No pudo agregarse la excepción EX_CLIENTE_SIN_SALDO por que esta ya existe. "
-
-    transaction.commit_unless_managed()
 
 def ventas_inicializar_tablas():
     c = connection.cursor()
