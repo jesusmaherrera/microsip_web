@@ -16,6 +16,7 @@ from models import *
 from microsip_web.apps.main.filtros.models import *
 from microsip_web.libs import contabilidad
 from triggers import triggers
+from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_form
 
 def inicializar_tablas(request):
     c = connection.cursor()
@@ -85,10 +86,29 @@ def inicializar_puntos_articulos(request):
     return HttpResponseRedirect('/punto_de_venta/articulos/')
 
 @login_required(login_url='/login/')
-def articulos_view(request, carpeta_id=None, template_name='punto_de_venta/articulos/articulos/articulos.html'):
-    categorias_list = Carpeta.objects.filter(carpeta_padre=carpeta_id)
-    articulos_list = Articulos.objects.filter(carpeta__id=carpeta_id).order_by('nombre')
+def articulos_view(request, clave='', nombre ='', template_name='punto_de_venta/articulos/articulos/articulos.html'):
+    msg = ''
+    if request.method =='POST':
+        filtro_form = filtroarticulos_form(request.POST)
+        if filtro_form.is_valid():
+            articulo = filtro_form.cleaned_data['articulo']
+            nombre = filtro_form.cleaned_data['nombre']
+            clave = filtro_form.cleaned_data['clave']
 
+            if articulo != None:
+                return HttpResponseRedirect('/punto_de_venta/articulo/%s/'% articulo.id)
+            elif clave != '':
+                clave_articulo = ClavesArticulos.objects.filter(clave=clave)
+                if clave_articulo.count() > 0:
+                    return HttpResponseRedirect('/punto_de_venta/articulo/%s/'% clave_articulo[0].articulo.id)
+                else:
+                    articulos_list = Articulos.objects.filter(nombre__icontains=nombre).order_by('nombre')
+                    msg='No se encontro ningun articulo con esta clave'
+            else:
+                articulos_list = Articulos.objects.filter(nombre__icontains=nombre).order_by('nombre')
+    else:
+        filtro_form = filtroarticulos_form()
+        articulos_list = Articulos.objects.all().order_by('nombre')
     
     paginator = Paginator(articulos_list, 20) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -109,7 +129,12 @@ def articulos_view(request, carpeta_id=None, template_name='punto_de_venta/artic
     elif '/punto_de_venta/articulos/' in PATH:
         extend = 'punto_de_venta/base.html'
 
-    c = {'articulos':articulos,'categorias':categorias_list, 'grupo_id':carpeta_id,'extend':extend,}
+    c = {
+        'articulos':articulos,
+        'extend':extend,
+        'filtro_form':filtro_form,
+    }
+
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
@@ -240,8 +265,29 @@ def gruposgrupo_delete(request, categoria_padre=None, categoria_id=None, templat
 
 @login_required(login_url='/login/')
 def clientes_view(request, template_name='main/clientes/clientes/clientes.html'):
-    clientes_list = Cliente.objects.all()
+    msg = ''
+    if request.method =='POST':
+        filtro_form = filtro_clientes_form(request.POST)
+        if filtro_form.is_valid():
+            cliente = filtro_form.cleaned_data['cliente']
+            nombre = filtro_form.cleaned_data['nombre']
+            clave = filtro_form.cleaned_data['clave']
 
+            if cliente != None:
+                return HttpResponseRedirect('/punto_de_venta/cliente/%s/'% cliente.id)
+            elif clave != '':
+                clave_cliente = ClavesClientes.objects.filter(clave=clave)
+                if clave_cliente.count() > 0:
+                    return HttpResponseRedirect('/punto_de_venta/cliente/%s/'% clave_cliente[0].cliente.id)
+                else:
+                    clientes_list = Cliente.objects.filter(nombre__icontains=nombre).order_by('nombre')
+                    msg='No se encontro ningun cliente con esta clave'
+            else:
+                clientes_list = Cliente.objects.filter(nombre__icontains=nombre).order_by('nombre')
+    else:
+        filtro_form = filtro_clientes_form()
+        clientes_list = Cliente.objects.all().order_by('nombre')
+    
     paginator = Paginator(clientes_list, 20) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
 
@@ -255,7 +301,7 @@ def clientes_view(request, template_name='main/clientes/clientes/clientes.html')
         # If page is out of range (e.g. 9999), deliver last page of results.
         clientes = paginator.page(paginator.num_pages)
 
-    c = {'clientes':clientes}
+    c = {'clientes':clientes, 'filtro_form':filtro_form}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')

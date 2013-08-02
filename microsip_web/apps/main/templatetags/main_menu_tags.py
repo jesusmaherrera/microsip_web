@@ -5,6 +5,9 @@ register = template.Library()
 
 def microsip_module_btn(ms_module):
    result = ''
+   if ms_module == 'admin':
+      result = '<li><a href="/"> <i class="msicon-admin"></i></a></li>'
+
    if ms_module in settings.MICROSIP_MODULES:
       if ms_module == 'microsip_web.apps.ventas':
          result = '<li><a href="/ventas/Facturas/"> <i class="msicon-ventas"></i><label class="labelMenu"> Ventas</label></a></li>'

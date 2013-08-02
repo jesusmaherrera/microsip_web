@@ -1,10 +1,17 @@
 {% extends "base_basic.html" %}
 {% block title %}Cliente{% endblock %}
 
-<!-- CSS Code -->ghg
+<!-- CSS Code -->
 {% block style_css %}{% endblock %}
 
-{% block js_code %}{% endblock %}
+{% block js_code %}
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#id_cliente').focus();
+  });
+
+</script>
+{% endblock %}
 
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>

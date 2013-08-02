@@ -320,12 +320,14 @@
   
   <table class="table table-striped table-hover">
     <tr>
-      <th>Articulos</th>
+      <th>Clave</th>
+      <th>Articulo</th>
       <th>Unidades</th>
     </tr>
 
   {% for detalle in detallesInventario %}
     <tr>
+      <td> {{ detalle.clave }} </td>
       <td> {{ detalle.articulo }} </td>
       <td> {{ detalle.unidades }} </td>
     </tr>

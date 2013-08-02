@@ -6,7 +6,6 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 
 from decimal import *
-from microsip_web.libs.custom_db.triggers import triggers
 from microsip_web.libs.custom_db.procedures import procedures
 
 from models import *

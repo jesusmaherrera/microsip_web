@@ -12,134 +12,9 @@
 <!-- JavaScript Code -->
 {% block js_code %}
 <script type="text/javascript">
-function cargar_articulos(articulos)
-{
-  $('#articulos_table').html('<caption></caption><tr><th><input id="articulos_select_all" name="your_name"  type="checkbox"></th><th>Nombre</th></tr>');
-  for (var i = 0; i < articulos.length; i++){
-    {% if extend == 'punto_de_venta/base.html' %}
-      var ruta ='/punto_de_venta/articulo/'+ articulos[i]["pk"]+'/';
-    {% else %}
-      var ruta ='/ventas/articulo/'+ articulos[i]["pk"]+'/';
-    {% endif %}
-
-    $('#articulos_table').append('<tr><td><input id="select_article_'+ articulos[i]["pk"] +'" value="your_value" type="checkbox"></td><td ><a href="'+ruta+'">'+ articulos[i]["fields"]["nombre"]+'</a></td></tr>');
-  }
-
-  $('#articulos_select_all').change(function(){
-    if(this.checked)
-      $('[id^="select_article_"]').attr('checked',true);    
-    else
-      $('[id^="select_article_"]').attr('checked',false);    
+  $(document).ready(function(){
+    $('#id_articulo_text').focus();
   });
-}
-
-function cargar_selector_movera(){
-  $('#movera_modal').modal();
-  Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol_mover_a);
-
-}
-function cargar_arbol_mover_a(datos){
-  var articulos_seleccionados = [];
-  $('[id^="select_article_"]:checked').each(function(){
-     articulos_seleccionados.push(this.id.replace("select_article_","")); 
-  });
-  $("#carpetas_movera").jstree({ 
-    "json_data" : {
-      "data" : datos
-    },
-    "plugins" : ["themes","json_data","ui","crrm","cookies","dnd","types","hotkeys",],
-    // the core plugin - not many options here
-    "core" : { 
-      // just open those two nodes up
-      // as this is an AJAX enabled tree, both will be downloaded from the server
-      "initially_open" : [ "15" , "15" ] 
-    },
-    })
-    .bind("select_node.jstree", function (event, data) { 
-      Dajaxice.microsip_web.apps.ventas.articulos_moveto(function(){}, {'carpeta_id': data.rslt.obj.attr("id"),'articulos_seleccionados':articulos_seleccionados,});
-    })
-}
-
-function cargar_arbol(datos){
-  $("#demo1").jstree({ 
-    "json_data" : {
-      "data" : datos
-    },
-    "plugins" : ["themes","json_data","ui","crrm","cookies","dnd","search","types","hotkeys","contextmenu"],
-    // the core plugin - not many options here
-    "core" : { 
-      // just open those two nodes up
-      // as this is an AJAX enabled tree, both will be downloaded from the server
-      "initially_open" : [ "1" ] 
-    },
-     // Configuring the search plugin
-    "search" : {
-        // As this has been a common question - async search
-        // Same as above - the `ajax` config option is actually jQuery's AJAX object
-        "ajax" : {
-            "url" : "/static/v.1.0pre/_demo/server.php",
-            // You get the search string as a parameter
-            "data" : function (str) {
-                return {
-                    "operation" : "search",
-                    "search_str" : str
-                };
-            }
-        }
-    },
-
-  }).bind("select_node.jstree", function (event, data) { 
-      // `data.rslt.obj` is the jquery extended node that was clicked
-
-      Dajaxice.microsip_web.apps.ventas.get_articulosby_seccion(cargar_articulos, {'carpeta_id': data.rslt.obj.attr("id")});
-    })
-    // 2) if not using the UI plugin - the Anchor tags work as expected
-    //    so if the anchor has a HREF attirbute - the page will be changed
-    //    you can actually prevent the default, etc (normal jquery usage)
-    .delegate("a", "click", function (event, data) { event.preventDefault(); })
-    .bind("create.jstree", function (e, data) {
-     
-     Dajaxice.microsip_web.apps.main.filtros.crear_nodo(function (r) { 
-        $(data.rslt.obj).attr("id", "node_" + r.id);
-      },{'nombre':data.rslt.name,'padre':data.rslt.parent.attr("id").replace("node_","")});
-  })
-  .bind("remove.jstree", function (e, data) {
-      Dajaxice.microsip_web.apps.main.filtros.remove_node(function (r) { 
-        data.inst.refresh();
-      },{'id':data.rslt.obj.attr("id")});
-  })
-  .bind("rename.jstree", function (e, data) {
-    Dajaxice.microsip_web.apps.main.filtros.rename_node(function (r) { 
-        
-      },{'id':data.rslt.obj.attr("id"),'nombre':data.rslt.new_name,});
-  })
-  .bind("move_node.jstree", function (e, data) {
-    data.rslt.o.each(function (i) {
-      Dajaxice.microsip_web.apps.main.filtros.update_node(function (r) { 
-      },{'id':$(this).attr("id"),'padre_id':data.rslt.np.attr("id"),});
-    });
-  });
-
-}
-
-$(function () { 
-
-  $("a").click(function () {
-    switch(this.id) {
-      case "search":
-        $("#demo1").jstree("search", document.getElementById("text").value);
-        break;
-      case "text": break;
-      default:
-        $("#demo1").jstree(this.id);
-        break;
-    }
-  });
-});
-
-$(document).ready(function() {
-  Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
-});
 </script>
 {% endblock %}
 
@@ -154,88 +29,78 @@ $(document).ready(function() {
   </ul>
 </div>
 {% endfor %} -->
+{% if msg %}
+<div class="alert alert-block fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ msg }}</strong> 
+</div>
+{% endif %}
  <div class="ms-custom-form container-fluid" style=" height: 2em; ">
   <div class="row-fluid">
-    <div class="span4"><h3>Articulos</h3></div>
-    <div class="span7" style=" margin-top: 15px; margin-left: 4em; ">
-      <a tabindex="-1" class='btn' href='#' onclick='cargar_selector_movera();'><i class="icon-folder-open"></i> Mover a</a>  
+      <div class="span3"><h3>Articulos</h3></div>
+    <div class='span9' style=" margin-top: 1em; ">
+      <form method="post" class="form-inline" action="" enctype='multipart/form-data'>
+        {% csrf_token %}  
+        <div class='span3'>
+        {{ filtro_form.articulo }}
+        </div>
+        {{ filtro_form.clave }}{{ filtro_form.nombre }}
+        <button class="btn" type="submit">Ir</button>
+      </form>   
     </div>
   </div>
 </div>
 <div class="container-fluid" style='clear:both;'>
   <div class="row-fluid">
-    <div class="span4">
-      <div class="input-append">
-        <input name="nombre" class='input-medium'  maxlength="100" placeholder="Busca una carpeta aqui..." type="text" id="text">
-        <a class='btn' id="search"  href="#"><i class='icon-search'></i></a>
-        <a class='btn' id="clear_search"  href="#"><i class=' icon-remove'></i></a>
-      </div>
-      <div id="demo1" class="span"></div>
-    </div>
-    <div class="span7" style=" margin-left: 4em; ">
-      <table id='articulos_table'></table>
-    </div>
-  </div>
-</div>
-<div id="movera_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    Mover a
-  </div>
-  <div class="modal-body">
-    Selecciona lacarpeta a la que deseas mover los articulos seleccionados
-    <div id="carpetas_movera" class="span"></div>
-  </div>
-  <div class="modal-footer">
-    <a class='btn' data-dismiss="modal" href="#">Cancelar</a>
-    <a class='btn' href="">Aceptar</a>
-  </div>
-</div>
-<!-- <table class="table tableCell table-hover">
-    <tr>
-      <th>Nombre</th>
-      <th>Puntos</th>
-      <th>Dinero Electronico</th>
-      <th>Opciones</th>
-    </tr>
-    {% for articulo in articulos%}
-    <div id="myModal{{ articulo.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
-      </div>
-      <div class="modal-body">
-        <h4>Al eliminar el articulo</h4>
-        <p style="color:red;">Ya no sera posible recuperar los datos del articulo</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" data-dismiss="modal">Cancelar</button>
-        <a href="#" class="btn btn-primary">Estoy Seguro</a>
-      </div>
-    </div>
-    <tr>
-      <td><a href="/punto_de_venta/articulo/{{ articulo.id }}/">{{ articulo.nombre }}</a></td>
-      <td>{{articulo.puntos }}</td>
-      <td>{{articulo.dinero_electronico }}</td>
-      <td style="text-align:center;">
-      </td>
-    </tr>
-    {% endfor %}
+    <div class="span12">
+      <table class="table tableCell table-hover">
+        <tr>
+          <th>Nombre</th>
+          <th>Puntos</th>
+          <th>Dinero Electronico</th>
+        </tr>
+        {% for articulo in articulos%}
+        <div id="myModal{{ articulo.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
+          </div>
+          <div class="modal-body">
+            <h4>Al eliminar el articulo</h4>
+            <p style="color:red;">Ya no sera posible recuperar los datos del articulo</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" data-dismiss="modal">Cancelar</button>
+            <a href="#" class="btn btn-primary">Estoy Seguro</a>
+          </div>
+        </div>
+        <tr>
+          <td><a href="/punto_de_venta/articulo/{{ articulo.id }}/">{{ articulo.nombre }}</a></td>
+          <td>{{articulo.puntos }}</td>
+          <td>{{articulo.dinero_electronico }}</td>
+        </tr>
+        {% endfor %}
 
-    <div class="pagination pagination-mini mainmenu">
-      <ul>
-        {% if articulos.has_previous %}
-        <li><a href="?page={{ articulos.previous_page_number }}">Anterior</a></li>
-        {% else %}
-        <li class="disabled"><a href="#">Anterior</a></li>
-        {% endif %}
-        <li class="disabled"><a href="#">Pagina {{ articulos.number }} de {{ articulos.paginator.num_pages }}.</a></li>
-        {% if articulos.has_next %}
-        <li><a href="?page={{ articulos.next_page_number }}">Siguiente</a></li>
-        {% else %}
-        <li class="disabled"><a href="#">Siguiente</a></li>
-        {% endif %} 
-      </ul>
+        <div class="pagination pagination-mini mainmenu">
+          <ul>
+            {% if articulos.has_previous %}
+            <li><a href="?page={{ articulos.previous_page_number }}">Anterior</a></li>
+            {% else %}
+            <li class="disabled"><a href="#">Anterior</a></li>
+            {% endif %}
+            <li class="disabled"><a href="#">Pagina {{ articulos.number }} de {{ articulos.paginator.num_pages }}.</a></li>
+            {% if articulos.has_next %}
+            <li><a href="?page={{ articulos.next_page_number }}">Siguiente</a></li>
+            {% else %}
+            <li class="disabled"><a href="#">Siguiente</a></li>
+            {% endif %} 
+          </ul>
+        </div>
+      </table>
     </div>
-</table> -->
+  </div>
+</div>
+
 <br>
+{% include 'autocomplete_light/static.html' %}
 {% endblock %}

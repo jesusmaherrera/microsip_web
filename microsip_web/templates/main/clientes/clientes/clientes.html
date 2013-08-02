@@ -5,12 +5,30 @@
 {% block style_css %}{% endblock %}
 
 <!-- JavaScript Code -->
-{% block js_code %}{% endblock %}
+{% block js_code %}
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#id_cliente_text').focus();
+  });
+</script>
+{% endblock %}
 
 {% block breadcrumb %}{{ block.super }} clientes {% endblock %}
 {% block content %}
-<div class="form-actions mainmenu">
-  <!-- <a class="btn btn-success" href="/punto_de_venta/cliente/">Nuevo</a> -->
+<div class="ms-custom-form container-fluid" style=" height: 2em; ">
+  <div class="row-fluid">
+      <div class="span3"><h3>Clientes</h3></div>
+    <div class='span9' style=" margin-top: 1em; ">
+      <form method="post" class="form-inline" action="" enctype='multipart/form-data'>
+        {% csrf_token %}  
+        <div class='span3'>
+        {{ filtro_form.cliente }}
+        </div>
+        {{ filtro_form.clave }}{{ filtro_form.nombre }}
+        <button class="btn" type="submit">Ir</button>
+      </form>   
+    </div>
+  </div>
 </div>
 <table class="table tableCell table-hover">
     <tr>
@@ -60,4 +78,5 @@
     </div>
 </table>
 <br>
+{% include 'autocomplete_light/static.html' %}
 {% endblock %}

@@ -12,6 +12,11 @@ body{
   font-size: 13px;
 }
 
+.inline_for div
+{
+  display: inline;
+}
+
 .navbar-inner_min > .navbar .nav > li > a
 {
   padding: 2px 10px 0px 10px;
@@ -90,6 +95,11 @@ footer
 .dropdown-submenu:hover > a > [class*=" msicon-"],
 .dropdown-submenu:focus > a > [class*=" msicon-"] {
   background-image: url("../img/iconos-microsip.png");
+}
+
+.msicon-admin 
+{
+  background-position: -3px -367px;
 }
 
 .msicon-logout 
