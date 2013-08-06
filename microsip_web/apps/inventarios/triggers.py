@@ -8,10 +8,10 @@ triggers['SIC_PUERTA_INV_DOCTOSIN_BU'] = '''
     declare variable invfis_id integer;
 
     declare variable invfis_det_id integer;
-    declare variable invfis_articulo_unidades integer;
+    declare variable invfis_articulo_unidades double PRECISION;
 
     declare variable inv_articulo_id integer;
-    declare variable inv_articulo_unidades integer;
+    declare variable inv_articulo_unidades double PRECISION;
     declare variable inv_detalle_id integer;
 
     declare variable art_discreto_id integer;
@@ -97,7 +97,7 @@ triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'] = '''
     declare variable desglose_discr_invfis_id integer;
     declare variable articulo_clave char(20);
     declare variable naturaleza_concepto char(1);
-    declare variable cantidad_articulos integer;
+    declare variable cantidad_articulos double PRECISION;
     declare variable docto_invfis_fecha date;
     declare variable docto_in_fecha date;
     begin
@@ -178,7 +178,7 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'] = '''
     declare variable invfis_id integer;
     declare variable invfis_det_id integer;
     declare variable articulo_id integer;
-    declare variable cantidad_articulos integer;
+    declare variable cantidad_articulos double PRECISION;
     declare variable almacen_id integer;
     declare variable docto_in_tipo char(1);
     declare variable seguimiento char(1);
@@ -247,7 +247,7 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'] = '''
     declare variable invfis_id integer;
     declare variable invfis_det_id integer;
     declare variable articulo_id integer;
-    declare variable cantidad_articulos integer;
+    declare variable cantidad_articulos double PRECISION;
     declare variable articulo_discreto_id integer;
     declare variable docto_in_tipo char(1);
     declare variable articulo_seguimiento char(1);
