@@ -129,7 +129,7 @@ triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'] = '''
                     if (docto_invfis_det_id is null) then
                     begin
                         docto_invfis_det_id = GEN_ID(ID_DOCTOS,1);
-                        insert into doctos_invfis_det values(:docto_invfis_det_id, :invfis_id, :articulo_clave, :articulo_id, 0,null, null);
+                        insert into doctos_invfis_det values(:docto_invfis_det_id, :invfis_id, :articulo_clave, :articulo_id, 0,null, null,null);
                     end
     
                     select first 1 desgl_discreto_invfis_id from desglose_en_discretos_invfis
