@@ -486,7 +486,8 @@ class DoctosInvfisDet(models.Model):
     docto_invfis= models.ForeignKey(DoctosInvfis, db_column='DOCTO_INVFIS_ID')
     clave       = models.CharField(blank=True, null=True, max_length=20, db_column='CLAVE_ARTICULO')
     articulo    = models.ForeignKey(Articulos, db_column='ARTICULO_ID')
-    unidades    = models.IntegerField(default=0, blank=True, null=True, db_column='UNIDADES')
+    unidades    = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='UNIDADES')
+    fecha_hora  = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='SIC_FECHAHORA_U')
     
     class Meta:
         db_table = u'doctos_invfis_det'

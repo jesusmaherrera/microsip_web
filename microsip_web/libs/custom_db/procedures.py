@@ -1,4 +1,20 @@
 procedures = {}
+################################################################
+####                                                        ####
+####              PROCEDIMIENTOS INVENTARIOS                ####
+####                                                        ####
+################################################################
+
+procedures['SIC_DOCTOINVFISDET_AT'] = '''
+    CREATE OR ALTER PROCEDURE SIC_DOCTOINVFISDET_AT
+    as
+    BEGIN
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'DOCTOS_INVFIS_DET' and rf.RDB$FIELD_NAME = 'SIC_FECHAHORA_U')) then
+            execute statement 'ALTER TABLE DOCTOS_INVFIS_DET ADD SIC_FECHAHORA_U FECHA_Y_HORA';
+    END  
+    '''
 
 ################################################################
 ####                                                        ####

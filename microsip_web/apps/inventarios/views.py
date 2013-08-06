@@ -153,7 +153,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
     movimiento = ''
 
     InventarioFisico = get_object_or_404(DoctosInvfis, pk=id)
-    detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico).order_by('-id')
+    detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico).order_by('-fecha_hora')
     articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)
     articulos_discretos_actuales= []
     #POST
@@ -266,7 +266,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                         elif movimiento == 'eliminar':                        
                             DoctosInvfisDet.objects.filter(id=id_detalle).delete()
                         elif movimiento == 'actualizar':
-                            DoctosInvfisDet.objects.filter(id=id_detalle, articulo=detalleInv.articulo).update(unidades=unidades)
+                            DoctosInvfisDet.objects.filter(id=id_detalle, articulo=detalleInv.articulo).update(unidades=unidades, fecha_hora=datetime.now())
 
                         return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s/'% id)
                            

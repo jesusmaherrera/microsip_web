@@ -22,9 +22,16 @@ from django.contrib.auth.decorators import login_required, permission_required
 def inicializar_tablas(request):
     #ventas_inicializar_tablas()
     punto_de_venta_inicializar_tablas()
+    inventario_inicializar_tablas()
     #cuentas_por_pagar_inicializar_tablas()
     #cuentas_por_cobrar_inicializar_tablas()
     return HttpResponseRedirect('/')
+
+def inventario_inicializar_tablas():
+    c = connection.cursor()
+    c.execute(procedures['SIC_DOCTOINVFISDET_AT'])
+    c.execute("EXECUTE PROCEDURE SIC_DOCTOINVFISDET_AT;")
+    transaction.commit_unless_managed()
 
 def ventas_inicializar_tablas():
     c = connection.cursor()

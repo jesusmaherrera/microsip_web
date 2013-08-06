@@ -99,7 +99,7 @@ class inventario_pa_form(forms.Form):
 
 class DoctosInvfisDetManageForm(forms.ModelForm):
     clave = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'clave ...'}),required=False)
-    unidades = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades ...'}),required=True)
+    unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades ...'}),required=True)
 
     class Meta:
         widgets = autocomplete_light.get_widgets_dict(DoctosInvfisDet)

@@ -19,7 +19,7 @@ def get_articulosen_inventario(request, inventario_id, articulo_id):
     #se devuelven las ciudades en formato json, solo nos interesa obtener como json
     #el id y el nombre de las ciudades.
 
-    return simplejson.dumps({'unidades':unidades, })
+    return simplejson.dumps({'unidades':str(unidades), })
 
 @dajaxice_register(method='GET')
 def get_articulo_by_clave(request, clave):

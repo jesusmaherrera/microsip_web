@@ -93,6 +93,9 @@
         $('#span_alerta_unidades').html('');
     });
     
+    $("#id_clave").live('mouseup', function () {
+      $(this).select();
+    });
 
     $('#btnCancel').on('click', function () {
       $("#myModal input").val()='';
@@ -141,10 +144,14 @@
   function mostrar_unidades(data) 
   {
     if (data.unidades > 0 )
+    {
       $('#span_alerta_unidades').html(' Ya existen '+ data.unidades + ' en inventario.');
+      alert(' Ya existen '+ data.unidades + ' en inventario.');
+    }
     else
       $('#span_alerta_unidades').html('');
 
+    $("#id_unidades").val('');
     $("#id_unidades").focus();
   }
 
@@ -287,7 +294,7 @@
   <div class="span" >
     <div class="input-prepend input-append">
       {{ detalleInvForm.articulo }}
-      <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 255, 0); "> </span>
+      <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 0, 0); color: white;"> </span>
     </div>
   </div>
   <div class="span1" >
