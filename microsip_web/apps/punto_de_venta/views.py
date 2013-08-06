@@ -10,7 +10,6 @@ from django.core.exceptions import ObjectDoesNotExist
 #Paginacion
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import datetime, time
-from  microsip_web.settings.dev import MICROSIP_MODULES
 from forms import *
 from models import *
 from microsip_web.apps.main.filtros.models import *
