@@ -202,10 +202,8 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                     try:
                         doc = DoctosInvfisDet.objects.get(docto_invfis=InventarioFisico, articulo=detalleInv.articulo)
                         id_detalle = doc.id
-                        if 'add_button' in request.POST:
-                            unidades = doc.unidades + detalleInv.unidades
-                        else:
-                            unidades = doc.unidades - detalleInv.unidades
+                        
+                        unidades = doc.unidades + detalleInv.unidades
                         
                         if unidades <= 0:
                             movimiento = 'eliminar'
