@@ -4,22 +4,25 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from django.core import serializers
 from django.http import HttpResponse
+from django.contrib.auth.models import User
 import json
 
 from models import *
+
 from microsip_web.libs.tools import split_seq
 
 @dajaxice_register(method='GET')
 def get_articulosen_inventario(request, inventario_id, articulo_id):
+    detalle_modificaciones = ''
     try:
         doc = DoctosInvfisDet.objects.get(docto_invfis__id=inventario_id, articulo_id=articulo_id)
         unidades = doc.unidades
+        detalle_modificaciones = doc.detalle_modificaciones
     except ObjectDoesNotExist:
         unidades = 0
     #se devuelven las ciudades en formato json, solo nos interesa obtener como json
     #el id y el nombre de las ciudades.
-
-    return simplejson.dumps({'unidades':str(unidades), })
+    return simplejson.dumps({'unidades':str(unidades), 'detalle_modificaciones':detalle_modificaciones, })
 
 @dajaxice_register(method='GET')
 def get_articulo_by_clave(request, clave):

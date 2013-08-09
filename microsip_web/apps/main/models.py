@@ -1,6 +1,7 @@
 #encoding:utf-8
 from django.db import models
 from datetime import datetime
+from django.contrib.auth.models import User
 
 class Carpeta(models.Model):
     nombre  = models.CharField(max_length=30)
@@ -121,13 +122,15 @@ class Articulos(models.Model):
     cuenta_ventas = models.CharField(max_length=30, blank=True, null=True, db_column='CUENTA_VENTAS')
     linea = models.ForeignKey(LineaArticulos, db_column='LINEA_ARTICULO_ID')
     nota_ventas = models.TextField(db_column='NOTAS_VENTAS', blank=True, null=True)
+    unidad_venta = models.CharField(max_length=20, blank=True, null=True, db_column='UNIDAD_VENTA')
+    unidad_compra = models.CharField(max_length=20, blank=True, null=True, db_column='UNIDAD_COMPRA')
     puntos = models.IntegerField(db_column='SIC_PUNTOS')
     dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
     hereda_puntos = models.BooleanField( db_column='SIC_HEREDA_PUNTOS')
     carpeta = models.ForeignKey(Carpeta, blank=True, null=True,db_column='SIC_CARPETA_ID')
 
     def __unicode__(self):
-        return u'%s' % self.nombre
+        return u'%s (%s)' % (self.nombre, self.unidad_venta)
 
     class Meta:
         db_table = u'articulos'
@@ -487,8 +490,10 @@ class DoctosInvfisDet(models.Model):
     clave       = models.CharField(blank=True, null=True, max_length=20, db_column='CLAVE_ARTICULO')
     articulo    = models.ForeignKey(Articulos, db_column='ARTICULO_ID')
     unidades    = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='UNIDADES')
-    fecha_hora  = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='SIC_FECHAHORA_U')
-    
+    fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='SIC_FECHAHORA_U')
+    usuario_ult_modif = models.ForeignKey(User, blank=True, null=True, db_column='SIC_USUARIO_ULT_MODIF')
+    detalle_modificaciones = models.CharField(blank=True, null=True, max_length=200, db_column='SIC_DETALLE_MODIFICACIONES')
+
     class Meta:
         db_table = u'doctos_invfis_det'
 
@@ -510,7 +515,7 @@ class DoctosInDet(models.Model):
     pedimento_pend  = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='PEDIMENTO_PEND')
     rol             = models.CharField(default='N', max_length=1, db_column='ROL')
     fecha           = models.DateField(blank=True, null=True, db_column='FECHA') 
-    #centros_costo = models.ForeignKey(CentrosCosto, db_column='CENTRO_COSTO_ID', blank=True, null=True,)
+    
 
     class Meta:
         db_table = u'doctos_in_det'

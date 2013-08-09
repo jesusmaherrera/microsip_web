@@ -50,7 +50,6 @@
    
   $(document).ready(function(){
     modo_rapido = localStorage.getItem("modo_rapido");
-    
     if (modo_rapido == null)
       localStorage.setItem("modo_rapido", 'false');
     
@@ -65,6 +64,16 @@
       else
         localStorage.setItem("modo_rapido", 'false');
     });
+
+    ubicacion = localStorage.getItem("ubicacion");
+    if (ubicacion == null)
+      localStorage.setItem("ubicacion", '');
+    $("#id_ubicacion").val(localStorage.getItem("ubicacion"));
+    $("#id_ubicacion").change(function() {
+      localStorage.setItem("ubicacion",$("#id_ubicacion").val());
+    });
+
+
 
     $('#id_clave').live('keydown', function(e) { 
       var keyCode = e.keyCode || e.which; 
@@ -146,7 +155,7 @@
     if (data.unidades > 0 )
     {
       $('#span_alerta_unidades').html(' Ya existen '+ data.unidades + ' en inventario.');
-      alert(' Ya existen '+ data.unidades + ' en inventario.');
+      alert(' Ya existen '+ data.unidades + ' en inventario.\n Detalles:\n '+ data.detalle_modificaciones );
     }
     else
       $('#span_alerta_unidades').html('');
@@ -208,6 +217,7 @@
     </div>
     <div style='clear:both;'>
       <div class='span' style="font-size:.7em; margin-left: 4em; ">
+        {{ ubicacion_form.ubicacion }}  
         <input type="checkbox" name="modo_rapido" id="id_modo_rapido"> Modo Rapido
       </div>
       <div  class=" pull-right ">
@@ -284,7 +294,7 @@
     </div>
   </div>
   
-
+  {{ ubicacion_form.errors }}  
   {{ detalleInvForm.errors }}
   <div class="span" >
     <div class="input-prepend input-append">

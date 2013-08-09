@@ -10,6 +10,8 @@ from django.forms.models import BaseInlineFormSet, inlineformset_factory
 class linea_articulos_form(forms.Form):
     linea = forms.ModelChoiceField(queryset= LineaArticulos.objects.all())
 
+class UbicacionArticulosForm(forms.Form):
+    ubicacion = forms.CharField(widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'Ubicacion..'}))
 
 class DoctosInManageForm(forms.ModelForm):
     file_inventario = forms.CharField(widget=forms.FileInput, required = False)

@@ -18,6 +18,7 @@ from django.utils.encoding import smart_str, smart_unicode
 
 from django.db import connection, transaction
 from django.db.models import Q
+from django.db.models import F
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import formset_factory
 import datetime, time
@@ -153,12 +154,13 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
     movimiento = ''
 
     InventarioFisico = get_object_or_404(DoctosInvfis, pk=id)
-    detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico).order_by('-fecha_hora')
+    detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico).filter(Q(usuario_ult_modif = request.user) | Q(usuario_ult_modif = None)).order_by('-fechahora_ult_modif')
     articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)
-    articulos_discretos_actuales= []
+    articulos_discretos_actuales = []
     #POST
     if request.method == 'POST':
         detalleInvForm = DoctosInvfisDetManageForm(request.POST)
+        ubicacion_form = UbicacionArticulosForm(request.POST)
         if detalleInvForm.is_valid():
             articulos_discretos_formset = articulos_discretos_formset(request.POST, request.FILES)
             detalleInv = detalleInvForm.save(commit=False)  
@@ -197,7 +199,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                 articulos_discretos_formset = articulos_discretos_formset(data)
 
             if total_forms == unidades or detalleInv.articulo.seguimiento == 'N':
-                if articulos_discretos_formset.is_valid() and (articulos_discretos_formset.total_form_count() > 0 or detalleInv.articulo.seguimiento == 'N'):
+                if articulos_discretos_formset.is_valid()  and ubicacion_form.is_valid() and (articulos_discretos_formset.total_form_count() > 0 or detalleInv.articulo.seguimiento == 'N'):
                     unidades = 0
                     try:
                         doc = DoctosInvfisDet.objects.get(docto_invfis=InventarioFisico, articulo=detalleInv.articulo)
@@ -205,10 +207,10 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                         
                         unidades = doc.unidades + detalleInv.unidades
                         
-                        if unidades <= 0:
-                            movimiento = 'eliminar'
-                        else:
-                            movimiento = 'actualizar'
+                        if unidades < 0:
+                            unidades = 0
+
+                        movimiento = 'actualizar'
 
                     except ObjectDoesNotExist:
                         if detalleInv.unidades >= 0:
@@ -260,17 +262,25 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                                         desgloses_a_eliminar.delete()
                     if error == 0:
                         if movimiento == 'crear':
+                            detalleInv.usuario_ult_modif=request.user
+                            detalleInv.detalle_modificaciones = '[%s/%s=%s], '%(request.user.username, ubicacion_form.cleaned_data['ubicacion'], detalleInvForm.cleaned_data['unidades'])
                             detalleInv.save()
-                        elif movimiento == 'eliminar':                        
-                            DoctosInvfisDet.objects.filter(id=id_detalle).delete()
                         elif movimiento == 'actualizar':
-                            DoctosInvfisDet.objects.filter(id=id_detalle, articulo=detalleInv.articulo).update(unidades=unidades, fecha_hora=datetime.now())
+                            detalleInv = DoctosInvfisDet.objects.get(id=id_detalle)
+                            detalleInv.fechahora_ult_modif = datetime.now()
+                            detalleInv.unidades = unidades
+                            detalleInv.usuario_ult_modif = request.user
+                            if detalleInv.detalle_modificaciones == None:
+                                detalleInv.detalle_modificaciones = ''
+                            detalleInv.detalle_modificaciones += '[%s/%s=%s],'%(request.user.username, ubicacion_form.cleaned_data['ubicacion'], detalleInvForm.cleaned_data['unidades'])
+                            detalleInv.save()
 
                         return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s/'% id)
                            
     else:
         detalleInvForm = DoctosInvfisDetManageForm()
-        
+        ubicacion_form = UbicacionArticulosForm()
+
         articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)    
         data = {
             'form-TOTAL_FORMS': u'0',
@@ -295,7 +305,6 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
 
     lineas_form = linea_articulos_form()
 
-
     c = {
         'message':message,
         'lineas_form':lineas_form,
@@ -304,6 +313,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
         'detallesInventario':detallesInventario,
         'detalleInvForm':detalleInvForm, 
         'InventarioFisico':InventarioFisico,
+        'ubicacion_form':ubicacion_form,
         'formset':articulos_discretos_formset,
         'inventario_id':id,
         'articulos_eninventario':articulos_eninventario,
