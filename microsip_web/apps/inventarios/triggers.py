@@ -127,7 +127,7 @@ triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'] = '''
                     if (docto_invfis_det_id is null) then
                     begin
                         docto_invfis_det_id = GEN_ID(ID_DOCTOS,1);
-                        insert into doctos_invfis_det values(:docto_invfis_det_id, :invfis_id, :articulo_clave, :articulo_id, 0,null, null,null);
+                        insert into doctos_invfis_det (docto_invfis_det_id, docto_invfis_id, clave_articulo, articulo_id, unidades ) values(:docto_invfis_det_id, :invfis_id, :articulo_clave, :articulo_id, 0);
                     end
     
                     select first 1 desgl_discreto_invfis_id from desglose_en_discretos_invfis
@@ -135,7 +135,7 @@ triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'] = '''
                     into :desglose_discr_invfis_id;
     
                     if (desglose_discr_invfis_id is null) then
-                        insert into desglose_en_discretos_invfis values(-1, :docto_invfis_det_id, new.art_discreto_id, new.unidades);
+                        insert into desglose_en_discretos_invfis (desgl_discreto_invfis_id, docto_invfis_det_id, art_discreto_id ,unidades) values(-1, :docto_invfis_det_id, new.art_discreto_id, new.unidades);
                 end
                 /*Si es una salida*/
                 else if  (inv_detalle_tipomovto = 'S')then
