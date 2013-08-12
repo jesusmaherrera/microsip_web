@@ -231,9 +231,18 @@ triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'] = '''
                     else
                         valor_puntos = cliente_valor_puntos;
 
-                    cliente_total_puntos = cliente_total_puntos - (new.dscto_importe/valor_puntos) + (old.dscto_importe/valor_puntos);
+                    if (valor_puntos > 0) then
+                    begin
+                        puntos_pago =  new.dscto_importe/valor_puntos;
+                        cliente_total_puntos = cliente_total_puntos - puntos_pago + (old.dscto_importe/valor_puntos);
+                    end
+                    else
+                    begin
+                        cliente_total_puntos = cliente_total_puntos;
+                        puntos_pago = 0;
+                    end
+
                     valor_puntos_pago =  valor_puntos;
-                    puntos_pago =  new.dscto_importe/valor_puntos;
                     dinero_electronico_pago = 0;
                 end
 
