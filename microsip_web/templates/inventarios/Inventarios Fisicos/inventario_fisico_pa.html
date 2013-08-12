@@ -10,6 +10,7 @@
 
 
 <script type="text/javascript">
+
   function agregar_articulos_porlineafn()
   {
     var linea = $("#id_linea").val();
@@ -19,8 +20,6 @@
     {
       Dajaxice.microsip_web.apps.inventarios.add_articulos_nocontabilizados_porlinea(mostrar_articulos_agregados,{'inventario_id': {{ inventario_id }},'linea_id':linea,});
     }
-
-
   }
 
   function agregar_articulosfn()
@@ -313,8 +312,7 @@
     </div>
   </div>
   <div class="span" >
-      <button type="submit" class="btn" name='add_button'>Enviar</button>
-      <!-- <button type="submit" class="btn" name='minus_button'><i class="icon-minus-sign"></i></button> -->
+      <button type="submit" class="btn" onclick="this.disabled=true,this.form.submit(), this.value='Enviando...';" id='btn_submit_articulos' name='add_button'>Enviar</button>
   </div>
   <br style='clear:both;'>
   <br>
