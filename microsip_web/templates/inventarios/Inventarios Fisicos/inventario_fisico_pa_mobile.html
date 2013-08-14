@@ -1,0 +1,53 @@
+{% extends "base_mobile.html" %}
+{% block title %}Inicio{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+<script type="text/javascript">
+  window.addEventListener("load",function() {
+    setTimeout(function(){
+      window.scrollTo(0, 1);
+    }, 0);
+  });
+
+  $(document).ready(function(){
+
+    
+    $('#slider-1').focus(function() { 
+      setTimeout(function(){
+        window.scrollTo(0, 1);
+      }, 0);  
+    });
+
+  });
+</script>
+{% endblock %}
+
+{% block content %}
+<div data-role="page">
+
+  <div data-role="header">
+  </div><!-- /header -->
+
+  <div data-role="content"> 
+    <input type="text" name="name" id="basic" value="" placeholder="Clave..." data-mini="true" />
+    <label>Bicicleta estacionaria Ariane Kitres</label>
+    <label for="slider-1">Unidades: En inventario(12 piezas)</label>
+    <input type="range" name="slider-1" id="slider-1" value="60" min="0" max="100" />
+  </div><!-- /content -->
+  <div data-role="footer">
+    <fieldset class="ui-grid-a">
+      <div class="ui-block-a">
+        <a href="index.html" data-theme="d" data-role="button" data-icon="back">Cancelar</a>
+      </div>
+      <div class="ui-block-b">
+        <a href="index.html" data-role="button" data-theme="d" data-icon="check">Enviar</a>
+      </div>
+    </fieldset>
+  </div>
+
+</div><!-- /page -->
+{% endblock %}

@@ -85,7 +85,7 @@ def inicializar_puntos_articulos(request):
     return HttpResponseRedirect('/punto_de_venta/articulos/')
 
 @login_required(login_url='/login/')
-def articulos_view(request, clave='', nombre ='', template_name='punto_de_venta/articulos/articulos/articulos.html'):
+def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punto_de_venta/articulos/articulos/articulos.html'):
     msg = ''
     if request.method =='POST':
         filtro_form = filtroarticulos_form(request.POST)
@@ -107,7 +107,7 @@ def articulos_view(request, clave='', nombre ='', template_name='punto_de_venta/
                 articulos_list = Articulos.objects.filter(nombre__icontains=nombre).order_by('nombre')
     else:
         filtro_form = filtroarticulos_form()
-        articulos_list = Articulos.objects.all().order_by('nombre')
+        articulos_list = Articulos.objects.filter(carpeta__id=carpeta).order_by('nombre') #filter(carpeta = carpeta)
     
     paginator = Paginator(articulos_list, 20) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -130,6 +130,7 @@ def articulos_view(request, clave='', nombre ='', template_name='punto_de_venta/
 
     c = {
         'articulos':articulos,
+        'carpeta':carpeta,
         'extend':extend,
         'filtro_form':filtro_form,
     }

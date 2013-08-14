@@ -146,6 +146,11 @@ def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inv
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
+def invetarioFisico_mobile_pa_manageView(request, id = None, rapido=1, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa_mobile.html'):
+
+    return render_to_response(template_name, {}, context_instance=RequestContext(request))    
+
+@login_required(login_url='/login/')
 def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa.html'):
     message = ''
     msg_series=''

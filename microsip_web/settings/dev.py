@@ -19,7 +19,7 @@ DJANGO_APPS = (
 MICROSIP_MODULES = (
     # Modules created for microsip and installed by default. You can add
     'microsip_web.apps.main',
-    #'microsip_web.apps.main.filtros',
+    'microsip_web.apps.main.filtros',
     'microsip_web.apps.inventarios',
     'microsip_web.apps.ventas',
     'microsip_web.apps.cuentas_por_pagar',
@@ -47,7 +47,7 @@ DATABASES = {
         #D2007(POLISAS)0_10
         #'NAME': 'C:\Microsip datos\PRUEBAS.fdb',
         #'NAME': 'C:\Microsip datos\AD2007(POLISAS)0_10.fdb',
-        'NAME': 'C:\Microsip datos\RAFISA 2008.fdb',
+        'NAME': 'C:\Microsip datos\AD2007.fdb',
         #'NAME': 'C:\Microsip datos\REFACCIONARIA.fdb',
         #'NAME': 'C:\Microsip datos\VETERINARIA.FDB',
         #'NAME': 'C:\Microsip datos\ESSEX WELD SOLUTIONS.fdb', # Or path to database file if using sqlite3.

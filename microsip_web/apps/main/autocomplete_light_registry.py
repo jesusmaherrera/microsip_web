@@ -6,7 +6,7 @@ autocomplete_light.register(ClavesArticulos, search_fields=('clave',),
     autocomplete_js_attributes={'placeholder': 'Clave ..'})
 
 autocomplete_light.register(Articulos, search_fields=('nombre',),
-    autocomplete_js_attributes={'placeholder': 'Nombre ..'})
+    autocomplete_js_attributes={'placeholder': 'Articulo..'})
 
 autocomplete_light.register(Ciudad, search_fields=('nombre',),
     autocomplete_js_attributes={'placeholder': 'Ciudad ..'})

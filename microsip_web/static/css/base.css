@@ -6,6 +6,10 @@ body{
   background-color: rgb(231, 231, 231); 
 }
 
+.navbar-inner
+{
+  border-radius: 0px;
+}
 
 .navbar-inner_min {
   min-height: 25px;
