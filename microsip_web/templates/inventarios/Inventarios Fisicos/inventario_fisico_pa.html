@@ -53,14 +53,17 @@
       localStorage.setItem("modo_rapido", 'false');
     
     if(localStorage.getItem("modo_rapido") == 'true')
-      $("#id_modo_rapido").attr("checked", true);
+      $("#id_clave").focus();
     else
-      $("#id_modo_rapido").attr("checked", false);
+      $("#id_articulo_text").focus();
 
-    $("#id_modo_rapido").change(function() {
-      if(this.checked)
+    $('#id_clave').focusin(function(){
+      if (localStorage.getItem("modo_rapido") == 'false')
         localStorage.setItem("modo_rapido", 'true');
-      else
+    });
+
+    $('#id_articulo_text').focusin(function(){
+      if (localStorage.getItem("modo_rapido") == 'true')
         localStorage.setItem("modo_rapido", 'false');
     });
 
@@ -87,12 +90,6 @@
       }
 
     });
-
-    
-    if ($('#id_modo_rapido').attr('checked'))  
-      $("#id_clave").focus();
-    else
-      $("#id_articulo_text").focus();
 
     $("#id_articulo").change(function(){
       if ($("#id_articulo").children().length > 0)
@@ -217,7 +214,6 @@
     <div style='clear:both;'>
       <div class='span' style="font-size:.7em; margin-left: 4em; ">
         {{ ubicacion_form.ubicacion }}  
-        <input type="checkbox" name="modo_rapido" id="id_modo_rapido"> Modo Rapido
       </div>
       <div  class=" pull-right ">
         <div class="span4">

@@ -492,7 +492,7 @@ class DoctosInvfisDet(models.Model):
     unidades    = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='UNIDADES')
     fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='SIC_FECHAHORA_U')
     usuario_ult_modif = models.ForeignKey(User, blank=True, null=True, db_column='SIC_USUARIO_ULT_MODIF')
-    detalle_modificaciones = models.CharField(blank=True, null=True, max_length=200, db_column='SIC_DETALLE_MODIFICACIONES')
+    detalle_modificaciones = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLE_MODIFICACIONES')
 
     class Meta:
         db_table = u'doctos_invfis_det'

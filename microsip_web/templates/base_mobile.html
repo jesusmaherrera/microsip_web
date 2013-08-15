@@ -1,3 +1,4 @@
+{% load dajaxice_templatetags %}
 <!DOCTYPE html> 
 <html> 
 <head> 
@@ -10,6 +11,7 @@
   {% block js_code %}
     
   {% endblock %}
+  {% dajaxice_js_import %}
 </head> 
 <body> 
 {% block content %}

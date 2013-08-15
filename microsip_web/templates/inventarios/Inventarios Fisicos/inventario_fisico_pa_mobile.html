@@ -6,6 +6,7 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}
+<script src="{{ STATIC_URL }}admin/js/admin/RelatedObjectLookups.js"></script>
 <script type="text/javascript">
   window.addEventListener("load",function() {
     setTimeout(function(){
@@ -14,15 +15,66 @@
   });
 
   $(document).ready(function(){
-
+    $('#id_clave').focus();
     
-    $('#slider-1').focus(function() { 
+    $('#id_unidades').focus(function() { 
       setTimeout(function(){
         window.scrollTo(0, 1);
       }, 0);  
     });
 
+
+    $('#id_clave').live('keydown', function(e) { 
+      var keyCode = e.keyCode || e.which; 
+
+      if (keyCode == 13 || keyCode == 9) 
+      { 
+        if($("#id_clave").val() != '')
+          Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
+        return false
+      }
+
+    });
+
+    $('#a_cancelar, #a_enviar').on('click',function(){
+      
+      $("#id_unidades").val('');
+      $('#label_articulo').html('');
+      $("#id_clave").show();
+      $("#id_clave").val('');
+      $("#id_clave").focus();
+    });
+
   });
+
+   function mostrar_articulo(data){
+    if (data.articulo_id != 0)
+    {
+      $("#id_clave").hide();
+      $('#label_articulo').html(data.articulo_nombre);
+      Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': 21132,'articulo_id':319});
+      $("#id_unidades").focus();
+    }
+    else
+      $("#id_clave").show();
+  }
+
+  function mostrar_unidades(data) 
+  {
+    if (data.unidades > 0 )
+    {
+      $('#h2exist').html('Exist '+ data.unidades);
+      alert(' Ya existen '+ data.unidades + ' en inventario.\n Detalles:\n '+ data.detalle_modificaciones );
+    }
+    else
+      $('#h2exist').html('Exist 0');
+
+    $("#id_unidades").val('');
+    $("#id_unidades").focus();
+  }
+
+  
+
 </script>
 {% endblock %}
 
@@ -33,18 +85,27 @@
   </div><!-- /header -->
 
   <div data-role="content"> 
-    <input type="text" name="name" id="basic" value="" placeholder="Clave..." data-mini="true" />
-    <label>Bicicleta estacionaria Ariane Kitres</label>
-    <label for="slider-1">Unidades: En inventario(12 piezas)</label>
-    <input type="range" name="slider-1" id="slider-1" value="60" min="0" max="100" />
+    <input type="text" name="name" id="id_clave" value="" placeholder="Clave..." data-mini="true" />
+    <label id='label_articulo'></label>
+    <fieldset class="ui-grid-a">
+    <div class="ui-block-a">
+      <h2 id='h2exist'>Exist. </h2>
+    </div>
+    <div class="ui-block-b">
+      <input type="tel" name="number" id="id_unidades" value="" class="ui-input-text ui-body-c ui-corner-all ui-shadow-inset">
+    </div>
+    </fieldset>
   </div><!-- /content -->
   <div data-role="footer">
-    <fieldset class="ui-grid-a">
+    <fieldset class="ui-grid-b ui-bar ui-bar-c" >
       <div class="ui-block-a">
-        <a href="index.html" data-theme="d" data-role="button" data-icon="back">Cancelar</a>
+        <a href="#" data-theme="b" data-role="button" data-icon="back">Regresar</a>
       </div>
       <div class="ui-block-b">
-        <a href="index.html" data-role="button" data-theme="d" data-icon="check">Enviar</a>
+        <a href="#" data-theme="b" data-role="button" id='a_cancelar' data-icon="delete">Cancelar</a>
+      </div>
+      <div class="ui-block-c">
+        <a href="#" data-role="button" data-theme="b" id='a_enviar' data-icon="check">Enviar</a>
       </div>
     </fieldset>
   </div>
