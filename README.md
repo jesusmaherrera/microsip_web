@@ -146,3 +146,6 @@ TIPOS DE POLIZAS
 ventas                      :Ingresos
 devoluciones                :Diario
 Cobros cuentas por cobrar   :Ingresos
+
+
+git update-index --assume-unchanged manage.py
