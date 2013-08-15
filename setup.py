@@ -1,3 +1,5 @@
+import os
+from setuptools import setup
 # this grabs the requirements from requirements.txt
 REQUIREMENTS = [i.strip() for i in open("requirements/common.txt").readlines()]
 
