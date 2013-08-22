@@ -217,3 +217,8 @@ background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAA
 {
   color:orange;
 }
+
+
+.navbar .nav > li > a {
+  padding: 5px 15px 4px;
+}

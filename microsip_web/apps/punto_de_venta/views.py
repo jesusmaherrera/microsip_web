@@ -2,7 +2,7 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from django.db import connection, transaction
+from django.db import connections, transaction
 from django.db.models import Q
 # user autentication
 from django.contrib.auth.decorators import login_required, permission_required
@@ -17,8 +17,13 @@ from microsip_web.libs import contabilidad
 from triggers import triggers
 from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_form
 
+@login_required(login_url='/login/')
 def inicializar_tablas(request):
-    c = connection.cursor()
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    c = connections[conexion_activa].cursor()
     #DETALLE DE VENTAS
     c.execute(triggers['SIC_PUNTOS_PV_DOCTOSPVDET_BU'])
     c.execute(triggers['SIC_PUNTOS_PV_DOCTOSPVDET_AD'])
@@ -72,20 +77,32 @@ def create_facturageneral_dia(request, cliente_id=None):
 
 @login_required(login_url='/login/')
 def inicializar_puntos_clientes(request):
-    Cliente.objects.update(puntos=0, dinero_electronico=0, hereda_valorpuntos=1, valor_puntos=0)
-    TipoCliente.objects.update(valor_puntos=0)
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    Cliente.objects.using(conexion_activa).update(puntos=0, dinero_electronico=0, hereda_valorpuntos=1, valor_puntos=0)
+    TipoCliente.objects.using(conexion_activa).update(valor_puntos=0)
     return HttpResponseRedirect('/punto_de_venta/clientes/')
 
 @login_required(login_url='/login/')
 def inicializar_puntos_articulos(request):
-    Articulos.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
-    LineaArticulos.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
-    GrupoLineas.objects.update(puntos=0, dinero_electronico=0)
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    Articulos.objects.using(conexion_activa).update(puntos=0, dinero_electronico=0, hereda_puntos=1)
+    LineaArticulos.objects.using(conexion_activa).update(puntos=0, dinero_electronico=0, hereda_puntos=1)
+    GrupoLineas.objects.using(conexion_activa).update(puntos=0, dinero_electronico=0)
     
     return HttpResponseRedirect('/punto_de_venta/articulos/')
 
 @login_required(login_url='/login/')
 def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punto_de_venta/articulos/articulos/articulos.html'):
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
     msg = ''
     if request.method =='POST':
         filtro_form = filtroarticulos_form(request.POST)
@@ -265,6 +282,7 @@ def gruposgrupo_delete(request, categoria_padre=None, categoria_id=None, templat
 
 @login_required(login_url='/login/')
 def clientes_view(request, template_name='main/clientes/clientes/clientes.html'):
+    
     msg = ''
     if request.method =='POST':
         filtro_form = filtro_clientes_form(request.POST)
@@ -500,15 +518,15 @@ def grupo_lineas_manageView(request, id = None, template_name='punto_de_venta/ar
 ##                                      ##
 ##########################################
 
-def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True, crear_polizas_por='Documento', crear_polizas_de='', plantilla_ventas='', plantilla_devoluciones='', descripcion= ''):
+def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_ventas = '', plantilla_devoluciones = '', descripcion = '', conexion_activa = None):
     error   = 0
     msg     = ''
     documentosData = []
     documentosGenerados = []
     documentosDataDevoluciones = []
-    depto_co = get_object_or_404(DeptoCo,clave='GRAL')
+    depto_co = DeptoCo.objects.using(conexion_activa).get(clave='GRAL')
     try:
-        informacion_contable = InformacionContable_pv.objects.all()[:1]
+        informacion_contable = InformacionContable_pv.objects.using(conexion_activa).all()[:1]
         informacion_contable = informacion_contable[0]
     except ObjectDoesNotExist:
         error = 1
@@ -520,14 +538,14 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
         devoluciones= []
         if ignorar_documentos_cont:
             if crear_polizas_de     == 'V':
-                ventas          = Docto_PV.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='V', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                ventas          = Docto_PV.objects.using(conexion_activa).filter(Q(estado='N')|Q(estado='D'), tipo ='V', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
             elif crear_polizas_de   == 'D':
-                devoluciones        = Docto_PV.objects.filter(estado = 'N').filter(tipo ='D', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                devoluciones        = Docto_PV.objects.using(conexion_activa).filter(estado = 'N').filter(tipo ='D', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
         else:
             if crear_polizas_de     == 'V':
-                ventas          = Docto_PV.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='V', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                ventas          = Docto_PV.objects.using(conexion_activa).filter(Q(estado='N')|Q(estado='D'), tipo ='V', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
             elif crear_polizas_de   == 'D':
-                devoluciones        = Docto_PV.objects.filter(estado = 'N').filter(tipo = 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                devoluciones        = Docto_PV.objects.using(conexion_activa).filter(estado = 'N').filter(tipo = 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
         
         if crear_polizas_de     == 'V':
             msg, documentosData = contabilidad.crear_polizas(
@@ -541,6 +559,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
                 msg = msg,
                 descripcion = descripcion, 
                 tipo_documento = 'V',
+                conexion_activa=  conexion_activa,
             )
             documentosGenerados = documentosData
         if crear_polizas_de     == 'D':
@@ -555,6 +574,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
                 msg = msg,
                 descripcion = descripcion, 
                 tipo_documento = 'D',
+                conexion_activa = conexion_activa,
             )
             
     elif error == 1 and msg=='':
@@ -564,12 +584,16 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 
 @login_required(login_url='/login/')
 def generar_polizas_View(request, template_name='punto_de_venta/herramientas/generar_polizas.html'):
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
     polizas_ventas  = []
     error           = 0
     msg             = msg_informacion =''
 
     if request.method == 'POST':
-        form = GenerarPolizasManageForm(request.POST)
+        form = GenerarPolizasManageForm( request.POST, database = conexion_activa )
         if form.is_valid():
 
             fecha_ini                   = form.cleaned_data['fecha_ini']
@@ -593,6 +617,7 @@ def generar_polizas_View(request, template_name='punto_de_venta/herramientas/gen
                     plantilla_ventas=plantilla_ventas, 
                     plantilla_devoluciones=plantilla_devoluciones, 
                     descripcion= descripcion,
+                    conexion_activa = conexion_activa,
                     )
             else:
                 error =1
@@ -601,10 +626,10 @@ def generar_polizas_View(request, template_name='punto_de_venta/herramientas/gen
             if polizas_ventas == [] and not error == 1:
                 msg = 'Lo siento, no se encontraron documentos para ralizar polizas con este filtro'
             elif not polizas_ventas == [] and not error == 1:
-                form = GenerarPolizasManageForm()       
+                form = GenerarPolizasManageForm( database = conexion_activa )       
                 msg_informacion = 'Polizas generadas satisfactoriamente, *Ahora revisa las polizas pendientes generadas en el modulo de contabilidad'
     else:
-        form = GenerarPolizasManageForm()
+        form = GenerarPolizasManageForm( database = conexion_activa )
     
     c = {'documentos':polizas_ventas,'msg':msg,'form':form,'msg_informacion':msg_informacion,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
@@ -687,7 +712,11 @@ def plantilla_poliza_manageView(request, id = None, template_name='punto_de_vent
 
 @login_required(login_url='/login/')
 def ventas_de_mostrador_view(request, template_name='punto_de_venta/documentos/ventas/ventas_de_mostrador.html'):
-    ventas_list = Docto_PV.objects.filter(tipo='V').order_by('-id')
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    ventas_list = Docto_PV.objects.using(conexion_activa).filter(tipo='V').order_by('-id')
 
     paginator = Paginator(ventas_list, 15) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -761,7 +790,11 @@ def venta_mostrador_manageView(request, id = None, template_name='punto_de_venta
 
 @login_required(login_url='/login/')
 def devoluciones_de_ventas_view(request, template_name='punto_de_venta/documentos/devoluciones/devoluciones_de_ventas.html'):
-    documentos_list = Docto_PV.objects.filter(tipo='D')
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    documentos_list = Docto_PV.objects.using(conexion_activa).filter(tipo='D')
     
     paginator = Paginator(documentos_list, 15) # Muestra 10 documentos por pagina
     page = request.GET.get('page')

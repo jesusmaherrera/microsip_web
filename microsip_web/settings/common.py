@@ -3,6 +3,7 @@
 
 # Identificando la ruta del proyecto
 import os
+import fdb
 RUTA_PROYECTO =os.path.dirname(os.path.realpath(__file__)).strip('settings')
 DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -12,19 +13,60 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-#DATABASE_ROUTERS = ['inventarios.router.MicrosipRouter']
+DATABASE_ROUTERS = ['microsip_web.libs.custom_db.databases_routers.MainRouter']
+
 DATABASES = {
     'default': {
-       'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
+        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'C:\Microsip datos\DJANGO.FDB',
+        'USER': 'SYSDBA',                      # Not used with sqlite3.
+        'PASSWORD': 'masterkey',                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
         'OPTIONS' : {'charset':'ISO8859_1'},
     },
-  
+    'config': {
+       'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'C:\Microsip datos\System\CONFIG.FDB',
+        'USER': 'SYSDBA',                      # Not used with sqlite3.
+        'PASSWORD': 'masterkey',                  # Not used with sqlite3.
+        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
+        'OPTIONS' : {'charset':'ISO8859_1'},
+    },
 }
+
+MICROSIP_DATABASES = {}
+
+db= fdb.connect(host="localhost",user="SYSDBA",password="masterkey",database="C:\Microsip datos\System\CONFIG.FDB")
+cur = db.cursor()
+cur.execute("SELECT NOMBRE_CORTO FROM EMPRESAS")
+empresas_rows = cur.fetchall()
+
+
+
+for empresa in empresas_rows:
+    MICROSIP_DATABASES[empresa[0]] = {
+        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': u'C:\Microsip datos\%s.FDB'% empresa[0],
+        'USER': 'SYSDBA',                      # Not used with sqlite3.
+        'PASSWORD': 'masterkey',                  # Not used with sqlite3.
+        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
+        'OPTIONS' : {'charset':'ISO8859_1'},
+    }
+
+    DATABASES[empresa[0]] = {
+        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': u'C:\Microsip datos\%s.FDB'% empresa[0],
+        'USER': 'SYSDBA',                      # Not used with sqlite3.
+        'PASSWORD': 'masterkey',                  # Not used with sqlite3.
+        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
+        'OPTIONS' : {'charset':'ISO8859_1'},
+    }
+
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

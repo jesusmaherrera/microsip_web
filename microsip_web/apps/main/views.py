@@ -12,35 +12,50 @@ from models import *
 from forms import *
 
 import datetime, time
-from django.db import connection, transaction
+from django.db import connections, transaction
 # user autentication
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, AdminPasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core import management
+import fdb
 
 def inicializar_tablas(request):
     #ventas_inicializar_tablas()
-    punto_de_venta_inicializar_tablas()
-    inventario_inicializar_tablas()
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    punto_de_venta_inicializar_tablas( database = conexion_activa )
+    inventario_inicializar_tablas( database = conexion_activa )
     #cuentas_por_pagar_inicializar_tablas()
     #cuentas_por_cobrar_inicializar_tablas()
+
+    #Sincronizar todas las bases de datos de microsip con tablas de la aplicacion
+    db= fdb.connect(host="localhost",user="SYSDBA",password="masterkey",database="C:\Microsip datos\System\CONFIG.FDB")
+    cur = db.cursor()
+    cur.execute(u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS")
+    empresas_rows = cur.fetchall()
+    for empresa_str in empresas_rows:
+        management.call_command('syncdb', database=empresa_str[0])
+
     return HttpResponseRedirect('/')
 
-def inventario_inicializar_tablas():
-    c = connection.cursor()
+def inventario_inicializar_tablas( database = None ):
+    c = connections[database].cursor()
     c.execute(procedures['SIC_DOCTOINVFISDET_AT'])
     c.execute("EXECUTE PROCEDURE SIC_DOCTOINVFISDET_AT;")
     transaction.commit_unless_managed()
 
-def ventas_inicializar_tablas():
-    c = connection.cursor()
+def ventas_inicializar_tablas( database = None ):
+    c = connections[database].cursor()
     c.execute(procedures['ventas_inicializar'])
     c.execute("EXECUTE PROCEDURE ventas_inicializar;")
     transaction.commit_unless_managed()
 
-def punto_de_venta_inicializar_tablas():
-    c = connection.cursor()
+def punto_de_venta_inicializar_tablas( database = None ):
+    c = connections[database].cursor()
     c.execute(procedures['SIC_PUNTOS_ARTICULOS_AT'])
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_ARTICULOS_AT;')
 
@@ -75,14 +90,14 @@ def punto_de_venta_inicializar_tablas():
 
     transaction.commit_unless_managed()
 
-def cuentas_por_pagar_inicializar_tablas():
-    c = connection.cursor()
+def cuentas_por_pagar_inicializar_tablas( database = None ):
+    c = connections[database].cursor()
     c.execute(procedures['cuentas_por_pagar_inicializar'])
     c.execute('EXECUTE PROCEDURE cuentas_por_pagar_inicializar;')
     transaction.commit_unless_managed()
 
-def cuentas_por_cobrar_inicializar_tablas():
-    c = connection.cursor()
+def cuentas_por_cobrar_inicializar_tablas( database = None ):
+    c = connections[database].cursor()
     c.execute(procedures['cuentas_por_cobrar_inicializar'])
     c.execute("EXECUTE PROCEDURE cuentas_por_cobrar_inicializar;")
     transaction.commit_unless_managed()

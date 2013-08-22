@@ -17,7 +17,7 @@ procedures['SIC_DOCTOINVFISDET_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'DOCTOS_INVFIS_DET' and rf.RDB$FIELD_NAME = 'SIC_USUARIO_ULT_MODIF')) then
-            execute statement 'ALTER TABLE DOCTOS_INVFIS_DET ADD SIC_USUARIO_ULT_MODIF ENTERO_ID';
+            execute statement 'ALTER TABLE DOCTOS_INVFIS_DET ADD SIC_USUARIO_ULT_MODIF USUARIO_TYPE';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf

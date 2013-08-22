@@ -13,9 +13,13 @@ from microsip_web.libs.tools import split_seq
 
 @dajaxice_register(method='GET')
 def get_articulosen_inventario(request, inventario_id, articulo_id):
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
     detalle_modificaciones = ''
     try:
-        doc = DoctosInvfisDet.objects.get(docto_invfis__id=inventario_id, articulo_id=articulo_id)
+        doc = DoctosInvfisDet.objects.using(conexion_activa).get(docto_invfis__id=inventario_id, articulo_id=articulo_id)
         unidades = doc.unidades
         detalle_modificaciones = doc.detalle_modificaciones
     except ObjectDoesNotExist:
@@ -26,9 +30,13 @@ def get_articulosen_inventario(request, inventario_id, articulo_id):
 
 @dajaxice_register(method='GET')
 def get_articulo_by_clave(request, clave):
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
     #se obtiene la provincia
     try:
-        clave_articulo = ClavesArticulos.objects.get(clave=clave)
+        clave_articulo = ClavesArticulos.objects.using(conexion_activa).get(clave=clave)
         articulo_id = clave_articulo.articulo.id
         articulo_nombre = clave_articulo.articulo.nombre
         
@@ -44,10 +52,14 @@ def get_articulo_by_clave(request, clave):
 
 @dajaxice_register(method='GET')
 def add_articulos_nocontabilizados_porlinea(request, inventario_id = None, linea_id= None):
-    inventario_fisico = DoctosInvfis.objects.get(pk=inventario_id)
-    linea = LineaArticulos.objects.get(pk=linea_id)
-    articulos_enInventario = DoctosInvfisDet.objects.filter(docto_invfis=inventario_fisico).order_by('-articulo').values_list('articulo__id', flat=True)
-    all_articulos_enceros = Articulos.objects.filter(es_almacenable='S',linea=linea).exclude(pk__in=articulos_enInventario).order_by('-id').values_list('id', flat=True)
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    inventario_fisico = DoctosInvfis.objects.using(conexion_activa).get(pk=inventario_id)
+    linea = LineaArticulos.objects.using(conexion_activa).get(pk=linea_id)
+    articulos_enInventario = DoctosInvfisDet.objects.using(conexion_activa).filter(docto_invfis=inventario_fisico).order_by('-articulo').values_list('articulo__id', flat=True)
+    all_articulos_enceros = Articulos.objects.using(conexion_activa).filter(es_almacenable='S',linea=linea).exclude(pk__in=articulos_enInventario).order_by('-id').values_list('id', flat=True)
     
     articulos_enceros = all_articulos_enceros[0:9000]
 
@@ -57,7 +69,7 @@ def add_articulos_nocontabilizados_porlinea(request, inventario_id = None, linea
     for articulos_enceros in articulos_enceros_list:
         detalles_en_ceros = []
         for articulo_id in articulos_enceros:
-            clave_articulo = ClavesArticulos.objects.filter(articulo__id=articulo_id)
+            clave_articulo = ClavesArticulos.objects.using(conexion_activa).filter(articulo__id=articulo_id)
             if clave_articulo.count() <= 0:
                 clave_articulo = ''
             else:
@@ -67,30 +79,34 @@ def add_articulos_nocontabilizados_porlinea(request, inventario_id = None, linea
                 id=-1,
                 docto_invfis= inventario_fisico,
                 clave = clave_articulo,
-                articulo = Articulos.objects.get(pk=articulo_id),
+                articulo = Articulos.objects.using(conexion_activa).get(pk=articulo_id),
                 unidades = 0)
 
 
             detalles_en_ceros.append(detalle_inventario)
         
         articulos_agregados = articulos_agregados + len(detalles_en_ceros)
-        DoctosInvfisDet.objects.bulk_create(detalles_en_ceros)
+        DoctosInvfisDet.objects.using(conexion_activa).bulk_create(detalles_en_ceros)
 
     articulos_pendientes = all_articulos_enceros.count() -  articulos_agregados
     return simplejson.dumps({'articulos_agregados':articulos_agregados,'articulo_pendientes':articulos_pendientes,})
 
 @dajaxice_register(method='GET')
 def add_articulos_nocontabilizados(request, inventario_id = None):
-    inventario_fisico = DoctosInvfis.objects.get(pk=inventario_id)
-    articulos_enInventario = DoctosInvfisDet.objects.filter(docto_invfis=inventario_fisico).order_by('-articulo').values_list('articulo__id', flat=True)
-    all_articulos_enceros = Articulos.objects.filter(es_almacenable='S').exclude(pk__in=articulos_enInventario).order_by('-id').values_list('id', flat=True)
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+        
+    inventario_fisico = DoctosInvfis.objects.using(conexion_activa).get(pk=inventario_id)
+    articulos_enInventario = DoctosInvfisDet.objects.using(conexion_activa).filter(docto_invfis=inventario_fisico).order_by('-articulo').values_list('articulo__id', flat=True)
+    all_articulos_enceros = Articulos.objects.using(conexion_activa).filter(es_almacenable='S').exclude(pk__in=articulos_enInventario).order_by('-id').values_list('id', flat=True)
     articulos_enceros = all_articulos_enceros[0:9000]
     articulos_enceros_list = split_seq(articulos_enceros, 2000)
     articulos_agregados = 0
     for articulos_enceros in articulos_enceros_list:
         detalles_en_ceros = []
         for articulo_id in articulos_enceros:
-            clave_articulo = ClavesArticulos.objects.filter(articulo__id=articulo_id)
+            clave_articulo = ClavesArticulos.objects.using(conexion_activa).filter(articulo__id=articulo_id)
             if clave_articulo.count() <= 0:
                 clave_articulo = ''
             else:
@@ -100,14 +116,14 @@ def add_articulos_nocontabilizados(request, inventario_id = None):
                 id=-1,
                 docto_invfis= inventario_fisico,
                 clave = clave_articulo,
-                articulo = Articulos.objects.get(pk=articulo_id),
+                articulo = Articulos.objects.using(conexion_activa).get(pk=articulo_id),
                 unidades = 0)
 
 
             detalles_en_ceros.append(detalle_inventario)
     
         articulos_agregados = articulos_agregados + len(detalles_en_ceros)
-        DoctosInvfisDet.objects.bulk_create(detalles_en_ceros)
+        DoctosInvfisDet.objects.using(conexion_activa).bulk_create(detalles_en_ceros)
 
     articulos_pendientes = all_articulos_enceros.count() -  articulos_agregados
     return simplejson.dumps({'articulos_agregados':articulos_agregados,'articulo_pendientes': articulos_pendientes,})

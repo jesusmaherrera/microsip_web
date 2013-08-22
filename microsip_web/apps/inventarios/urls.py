@@ -5,7 +5,7 @@ from microsip_web.apps.inventarios import views
 urlpatterns = patterns('',
     #INVENTARIOS FISICOS
     (r'^InventariosFisicos/$', views.invetariosFisicos_View),
-    (r'^InventarioFisico/$', views.invetarioFisico_manageView),
+    # (r'^InventarioFisico/$', views.invetarioFisico_manageView),
     # (r'^InventarioFisico/(?P<id>\d+)/', views.invetarioFisico_manageView),
     
     

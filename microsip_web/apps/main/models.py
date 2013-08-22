@@ -3,6 +3,17 @@ from django.db import models
 from datetime import datetime
 from django.contrib.auth.models import User
 
+class UserProfile(models.Model):  
+    usuario = models.OneToOneField(User)
+    conexion_activa = models.CharField(max_length=100)
+
+    def __str__(self):  
+          return "%s's profile" % self.usuario  
+    
+    class Meta:
+        db_table = u'sic_userprofile'
+        app_label =u'auth' 
+
 class Carpeta(models.Model):
     nombre  = models.CharField(max_length=30)
     carpeta_padre = models.ForeignKey('self', related_name='carpeta_padre_a', blank=True, null=True)
@@ -175,10 +186,6 @@ class Bitacora(models.Model):
 class BookmarksReportes(models.Model):
     class Meta:
         db_table = u'bookmarks_reportes'
-
-class Cajas(models.Model):
-    class Meta:
-        db_table = u'cajas'
 
 class CajasCajeros(models.Model):
     class Meta:
@@ -491,7 +498,7 @@ class DoctosInvfisDet(models.Model):
     articulo    = models.ForeignKey(Articulos, db_column='ARTICULO_ID')
     unidades    = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='UNIDADES')
     fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='SIC_FECHAHORA_U')
-    usuario_ult_modif = models.ForeignKey(User, blank=True, null=True, db_column='SIC_USUARIO_ULT_MODIF')
+    usuario_ult_modif = models.CharField(blank=True, null=True, max_length=31, db_column='SIC_USUARIO_ULT_MODIF')
     detalle_modificaciones = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLE_MODIFICACIONES')
 
     class Meta:
@@ -1175,7 +1182,7 @@ class Impuestos_grav_docto_pv(models.Model):
     documento_pv        = models.ForeignKey(Docto_PV, db_column='DOCTO_PV_ID')
     articulo            = models.ForeignKey(Articulos, on_delete= models.SET_NULL, blank=True, null=True, db_column='ARTICULO_ID')
     impuesto            = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_ID', related_name='impuesto')
-    impuesto_grav       = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_ID', related_name='impuesto_grav')
+    impuesto_grav       = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_GARV_ID', related_name='impuesto_grav')
     impuesto_gravado    = models.DecimalField(max_digits=18, decimal_places=6, db_column='IMPUESTO_GRAVADO')
     listo               = models.CharField(max_length=1, default='N', db_column='LISTO')
     

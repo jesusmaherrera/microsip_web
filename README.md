@@ -1,34 +1,25 @@
 microsip_web
 ============
 
-INSTALACION DE APLICACION
-
 /////////////RESPALDAR/////////////////
 1:Respaldar microsip app
 2:Respaldar microsip bases de datos
-3:Respaldar firebird de archivos de programa
+3:Respaldar firebird Y microsip de archivos de programa
 
-/////////////REINSTALAR FIREBIRD/////////////////
-4:detener firebird en services o servicios
-5:Desinstalar Firebird poner no nada borrar archivos
-6:Reinstalar firbird Server **poner no nada borrar archivos** (EN INSTALCION INDICAR Copiar la libreria cliente de firebird al directorio<system>)
+///////////// INTALAR APLICACION ////////////////////
+1) Ejecutar setup de la carpeta "instalador microsip apps" [con permisos de administrador]
 
-/////////////INTALAR APLICACION////////////////////
-7:Agregar en variables de entorno en path ";C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts;" o con [setx PATH "%PATH%;C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts"]
-8:Descromprimir archivo instaladores_microsip_web en c:/instaladores_microsip_web
-9:En carpeta descomprimida ejecutar instaladores segun estan numerados ejemplo "1)Nombre de instaldor" asta el cuatro
-10: Configurar conexion a base de datos "C:\microsip_web_compilado\microsip_web\settings\prod.py
+///////////// CONFIGURACION ////////////////////
+1) Configurar conexion a base de datos "C:\microsip_web_compilado\microsip_web\settings\prod.py
+2) Ejecutar archivo "C:\microsip_web_compilado\actualizar.lnk  
+3) configurar ip de servidor en archivo "C:\microsip_web_compilado\extras\scripts\Iniciar microsip app.cmd"
+4) Ejecutar <ip:puerto>/inicializar_tablas para inicializar tablas
+5) Listo
 
-/////////////CONFIGURAR Y SYNCRONISAR BASE DE DATOS////////////////////
-11:sincronizar base de datos con python manage.py syncdb
-12:configurar ip de servidor en archivo "C:\microsip_web_compilado\extras\scripts\Iniciar microsip app.cmd"
-13:Ejecutar aplicacion con ip:puerto indicados anteriormente
-14: ejecutar <ip:puerto>/inicializar_tablas para inicializar tablas
-15:listo
 
 ACTUALIZACION DE APLICACION
 
-1: Ejecutar archivo "C:\microsip_web_compilado\actualizar.lnk
+
 
 
 CONFIGURACION EN APACHE
@@ -52,7 +43,7 @@ Repocitorio en github https://github.com/yourlabs/django-autocomplete-light
 
 
 1) Instalar el paquete con django-autocomplete-light:
-	pip install django-autocomplete-light
+    pip install django-autocomplete-light
 
 2) En carpeta static copiar carpeta autocomplete_light de css y js
 
@@ -61,10 +52,10 @@ Repocitorio en github https://github.com/yourlabs/django-autocomplete-light
 4) Agregar archivo autocomplete_light_registry.py a carpeta de aplicacion
 
 5) En formulario donde se desee aplicar poner el codigo segun el modelo a usar (archivo forms.py):
-	#agregar al primcipio del archivo
-	import autocomplete_light
-	#agregar despues de class Meta:
-  	"widgets = autocomplete_light.get_widgets_dict(DoctosInvfisDet)"
+    #agregar al primcipio del archivo
+    import autocomplete_light
+    #agregar despues de class Meta:
+    "widgets = autocomplete_light.get_widgets_dict(DoctosInvfisDet)"
 
 
 

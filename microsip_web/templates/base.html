@@ -74,16 +74,25 @@
           
         </ul>
         <ul class="nav pull-right">
+          {% if not user.is_anonymous %}
+          <li id="fat-menu" class="dropdown">
+            <a href="#" id="drop3" role="button" class="dropdown-toggle" data-toggle="dropdown" style="padding-top: 0.7em;">
+              <i class="icon-user"></i> {{ user.username }} ({{ request.user.userprofile.conexion_activa }})
+              <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="/select_db/"><i class="icon-cog"></i> Cambiar Empresa</a></li>
+              <li role="presentation" class="divider"></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="/logout/"> <i class="icon-remove"></i> Cerrar Sesion</a></li>
+            </ul>
+          </li>
+          {% else %}
           <div id=" span breadcrumbs" style="margin-left: 35px;">
-
             <div class ='span'style="text-align:right; height:2em; margin-right: 2em; margin-top: 6px; vertical-align:bottom;">
-              {% if not user.is_anonymous %}
-              {{ user.username }} <a href="/logout/"><i class="msicon-logout"></i></a>
-              {% else %}
-              <a class="btn btn-small btn-success" href="/login/">Iniciar Sesión</a>
-              {% endif %}
+              <a class="btn btn-small" href="/login/"><i class="icon-user"></i> Iniciar Sesión</a>
             </div>
-          </div>
+          </div>  
+          {% endif %}
         </ul>
       </div>
     </div>
@@ -102,8 +111,32 @@
       {% block content %}{% endblock %}
     </div>
   </section>
-  <footer>      
-    SIC &copy; 2013
+  <footer > 
+    <br>
+    <div class="row-fluid text-left">
+      <div class="span6 offset1">
+        <strong>CONTACTO </strong>
+        <br>
+        <br>
+        <address>
+          <abbr title="Telefono">Tel 1:</abbr> (625) 582-5014<br>
+          <abbr title="Telefono">Tel 2:</abbr> (625) 587-7607<br>
+          <br>
+          <strong>Ventas</strong><br>
+          <a href="mailto:#">ventas@sicompu.com</a>
+        </address>
+      </div>
+      <div class="span3">
+        <p class="text-right">
+          <!-- <img src="{{STATIC_URL}}img/logo.png" style="height: 65px; width: 80px;"> -->
+          <br>
+        </p>
+      </div>
+    </div>
+    <div>
+      SIC &copy; 2013
+    </div>
+    
   </footer>
 
   <div id="IrArriba" style="display: block;">

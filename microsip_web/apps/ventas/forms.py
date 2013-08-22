@@ -47,8 +47,6 @@ class GenerarPolizasManageForm(forms.Form):
     )
     crear_polizas_por       = forms.ChoiceField(choices=CREAR_POR)
 
-    plantilla   = forms.ModelChoiceField(queryset= PlantillaPolizas_V.objects.filter(tipo='F'), required=False)
-    plantilla_2 = forms.ModelChoiceField(queryset= PlantillaPolizas_V.objects.filter(tipo='D'), required=False)
     descripcion = forms.CharField(max_length=100, required=False)
 
     CREAR_DE = (
@@ -59,6 +57,13 @@ class GenerarPolizasManageForm(forms.Form):
     )
     crear_polizas_de        = forms.ChoiceField(choices=CREAR_DE)
 
+
+    def __init__(self,*args,**kwargs):
+        self.database = kwargs.pop('database')
+        super(GenerarPolizasManageForm,self).__init__(*args,**kwargs)
+        self.fields['plantilla'] = forms.ModelChoiceField(queryset= PlantillaPolizas_V.objects.using(self.database).filter(tipo='F'), required=True)
+        self.fields['plantilla_2'] = forms.ModelChoiceField(queryset= PlantillaPolizas_V.objects.using(self.database).filter(tipo='D'), required=True)
+    
 class PlantillaPolizaManageForm(forms.ModelForm):
     class Meta:
         model = PlantillaPolizas_V

@@ -1,0 +1,13 @@
+{% extends "main/base.html" %}
+{% block title %}Selecciona una base de datos{% endblock %}
+
+{% block content %}
+<form  style='text-align:center;' id='formulario' action="#" method="post">{% csrf_token %}
+	{{ form.errors }}
+	<br>
+	Empresa <br>
+	{{ form.conexion }}<br>
+	<input class="btn" type="submit" value="Seleccionar" />
+</form>
+
+{% endblock %}

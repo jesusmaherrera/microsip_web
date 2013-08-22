@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     #LOGIN
     url(r'^login/$','microsip_web.apps.inventarios.views.ingresar'),
+    url(r'^select_db/$','microsip_web.apps.inventarios.views.select_db'),    
     url(r'^logout/$', 'microsip_web.apps.inventarios.views.logoutUser'),
 )
 

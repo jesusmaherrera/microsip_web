@@ -57,15 +57,15 @@ def pedidos_view(request, template_name='ventas/documentos/pedidos/pedidos.html'
     c = {'pedidos':pedidos, }
     return render_to_response(template_name, c, context_instance=RequestContext(request))   
 
-def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True, crear_polizas_por='Documento', crear_polizas_de='', plantilla_facturas='', plantilla_devoluciones='', descripcion= ''):
+def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_facturas = '', plantilla_devoluciones ='', descripcion = '', conexion_activa = None):
     error   = 0
     msg     = ''
     documentosData = []
     documentosGenerados = []
     documentosDataDevoluciones = []
-    depto_co = get_object_or_404(DeptoCo,clave='GRAL')
+    depto_co = DeptoCo.objects.using(conexion_activa).get(clave='GRAL')
     try:
-        informacion_contable = InformacionContable_V.objects.all()[:1]
+        informacion_contable = InformacionContable_V.objects.using(conexion_activa).all()[:1]
         informacion_contable = informacion_contable[0]
     except ObjectDoesNotExist:
         error = 1
@@ -77,14 +77,14 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
         devoluciones= []
         if ignorar_documentos_cont:
             if crear_polizas_de     == 'F' or crear_polizas_de  == 'FD':
-                facturas            = DoctoVe.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='F', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                facturas            = DoctoVe.objects.using(conexion_activa).filter(Q(estado='N')|Q(estado='D'), tipo ='F', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
             elif crear_polizas_de   == 'D' or crear_polizas_de  == 'FD':
-                devoluciones        = DoctoVe.objects.filter(estado = 'N').filter(tipo  ='D', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                devoluciones        = DoctoVe.objects.using(conexion_activa).filter(estado = 'N').filter(tipo  ='D', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
         else:
             if crear_polizas_de     == 'F' or crear_polizas_de  == 'FD':
-                facturas            = DoctoVe.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='F', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                facturas            = DoctoVe.objects.using(conexion_activa).filter(Q(estado='N')|Q(estado='D'), tipo ='F', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
             elif crear_polizas_de   == 'D' or crear_polizas_de  == 'FD':
-                devoluciones        = DoctoVe.objects.filter(estado = 'N').filter(tipo  = 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                devoluciones        = DoctoVe.objects.using(conexion_activa).filter(estado = 'N').filter(tipo  = 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
 
         #PREFIJO
         prefijo = informacion_contable.tipo_poliza_ve.prefijo
@@ -103,6 +103,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
                 msg = msg,
                 descripcion = descripcion, 
                 tipo_documento = 'F',
+                conexion_activa = conexion_activa,
             )
             documentosGenerados = documentosData
         if crear_polizas_de     == 'D' or crear_polizas_de  == 'FD':
@@ -117,6 +118,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
                 msg = msg,
                 descripcion = descripcion, 
                 tipo_documento = 'D',
+                conexion_activa = conexion_activa,
             )
 
     elif error == 1 and msg=='':
@@ -126,13 +128,17 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 
 @login_required(login_url='/login/')
 def facturas_View(request, template_name='ventas/herramientas/generar_polizas.html'):
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
     documentosData = []
     polizas_de_devoluciones = []
     msg             = msg_informacion =''
     error = 0
 
     if request.method == 'POST':
-        form = GenerarPolizasManageForm(request.POST)
+        form = GenerarPolizasManageForm(request.POST, database = conexion_activa)
         if form.is_valid():
 
             fecha_ini               = form.cleaned_data['fecha_ini']
@@ -144,7 +150,7 @@ def facturas_View(request, template_name='ventas/herramientas/generar_polizas.ht
             plantilla_devoluciones  = form.cleaned_data['plantilla_2']
             descripcion             = form.cleaned_data['descripcion']
             if (crear_polizas_de == 'F' and not plantilla_facturas== None) or (crear_polizas_de == 'D' and not plantilla_devoluciones== None) or (crear_polizas_de == 'FD' and not plantilla_facturas== None and not plantilla_devoluciones== None):
-                documentosData, polizas_de_devoluciones, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla_facturas, plantilla_devoluciones, descripcion)
+                documentosData, polizas_de_devoluciones, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla_facturas, plantilla_devoluciones, descripcion, conexion_activa)
             else:
                 error =1
                 msg = 'Seleciona una plantilla'
@@ -158,10 +164,10 @@ def facturas_View(request, template_name='ventas/herramientas/generar_polizas.ht
                 msg = 'Lo siento, no se encontraron facturas ni devoluciones para este filtro'
             
             if (not documentosData == [] or not polizas_de_devoluciones == []) and error == 0:
-                form = GenerarPolizasManageForm()       
+                form = GenerarPolizasManageForm(database = conexion_activa)       
                 msg_informacion = 'Polizas generadas satisfactoriamente, *Ahora revisa las polizas pendientes generadas en el modulo de contabilidad'
     else:
-        form = GenerarPolizasManageForm()
+        form = GenerarPolizasManageForm(database = conexion_activa)
     
     c = {'documentos':documentosData, 'polizas_de_devoluciones':polizas_de_devoluciones,'msg':msg,'form':form,'msg_informacion':msg_informacion,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
