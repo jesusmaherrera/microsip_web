@@ -142,6 +142,7 @@ class DoctosInvfisDetManageForm(forms.ModelForm):
         self.fields['articulo'] = forms.ModelChoiceField(queryset= Articulos.objects.using(self.database).all())
 
     class Meta:
+        widgets = autocomplete_light.get_widgets_dict(DoctosInvfisDet)
         model   = DoctosInvfisDet
         exclude = (
             'docto_invfis',
