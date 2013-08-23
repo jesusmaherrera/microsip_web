@@ -62,7 +62,7 @@ def select_db(request, template_name='main/select_db.html'):
         form = SelectDBForm(request.POST, usuario= request.user )
         if form.is_valid():
             user_profile = UserProfile.objects.filter(usuario= request.user)
-            conexion = form.cleaned_data['conexion']
+            conexion = form.cleaned_data['conexion'].replace(' ','_')
             if user_profile.exists():
                 user_profile.update(conexion_activa = conexion)
             else:
@@ -207,7 +207,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
     articulos_discretos_actuales = []
     #POST
     if request.method == 'POST':
-        detalleInvForm = DoctosInvfisDetManageForm(request.POST, database =  conexion_activa )
+        detalleInvForm = DoctosInvfisDetManageForm(request.POST, database=conexion_activa)
         ubicacion_form = UbicacionArticulosForm(request.POST)
         if detalleInvForm.is_valid():
             articulos_discretos_formset = articulos_discretos_formset(request.POST, request.FILES)
@@ -326,7 +326,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                         return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s/'% id)
                            
     else:
-        detalleInvForm = DoctosInvfisDetManageForm( database =  conexion_activa)
+        detalleInvForm = DoctosInvfisDetManageForm(database=conexion_activa)
         ubicacion_form = UbicacionArticulosForm()
 
         articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)    

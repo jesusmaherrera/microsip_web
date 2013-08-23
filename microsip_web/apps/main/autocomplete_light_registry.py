@@ -1,28 +1,29 @@
 from models import *
 from microsip_web.apps.main.filtros.models import *
+from microsip_web.apps.config.models import Empresa
+from microsip_web.settings.common import MICROSIP_DATABASES
 import autocomplete_light
+import fdb
 
 autocomplete_light.register(ClavesArticulos, search_fields=('clave',),
     autocomplete_js_attributes={'placeholder': 'Clave ..'})
 
-class AutocompleteArticulos(autocomplete_light.AutocompleteModelBase):
-	autocomplete_js_attributes = {'placeholder':'Articulo'}
-	search_fields = ('nombre',)
+autocomplete_light.register(Articulos, autocomplete_js_attributes = {'placeholder':'Articulo'},
+        search_fields = ('nombre',), choices= Articulos.objects.using('VETERINARIA').all())
 
-	def choices_for_request(Self):
-		self.request.GET.get('q','')
-		articulo_id = self.request.GET.get('articulo_id', None)
-		conexion_activa =  request.user.userprofile.conexion_activa
-		choices = Articulos.objects.using(conexion_activa).all()
+#Autocomplete para todas las empresas
+# db= fdb.connect(host="localhost",user="SYSDBA",password="masterkey",database="C:\Microsip datos\System\CONFIG.FDB")
+# cur = db.cursor()
+# consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS"
+# cur.execute(consulta)
+# empresas_rows = cur.fetchall()
 
-		if q:
-			choices = choices.filter(nombre=q)
-		if articulo_id:
-			articulo_id = choices.filter(articulo_id=articulo_id)
-		
-		return self.order_choices(choice)[0:self.limit_choices]
+for empresa in MICROSIP_DATABASES.keys():
+    autocomplete_light.register(Articulos, autocomplete_js_attributes = {'placeholder':'Articulo'},
+        search_fields=('nombre',), choices= Articulos.objects.using(empresa).all(), name='ArticulosAutocomplete-%s'%empresa)
 
-autocomplete_light.register(Articulos, AutocompleteArticulos)
+    autocomplete_light.register(Cliente, autocomplete_js_attributes={'placeholder': 'Busca un cliente ..'}, 
+        search_fields=('nombre',), choices= Cliente.objects.using(empresa).all(), name='ClienteAutocomplete-%s'%empresa)
 
 autocomplete_light.register(Ciudad, search_fields=('nombre',),
     autocomplete_js_attributes={'placeholder': 'Ciudad ..'})
@@ -30,7 +31,6 @@ autocomplete_light.register(Ciudad, search_fields=('nombre',),
 autocomplete_light.register(CuentaCo, search_fields=('cuenta',),
     autocomplete_js_attributes={'placeholder': 'Cuenta ..'})
 
-autocomplete_light.register(Cliente, search_fields=('nombre',),
-    autocomplete_js_attributes={'placeholder': 'Busca un cliente ..'})
+
 
 autocomplete_light.register(Carpeta, search_fields=('nombre',))

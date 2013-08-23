@@ -105,7 +105,7 @@ def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punt
 
     msg = ''
     if request.method =='POST':
-        filtro_form = filtroarticulos_form(request.POST)
+        filtro_form = filtroarticulos_form(request.POST, database=conexion_activa)
         if filtro_form.is_valid():
             articulo = filtro_form.cleaned_data['articulo']
             nombre = filtro_form.cleaned_data['nombre']
@@ -114,17 +114,17 @@ def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punt
             if articulo != None:
                 return HttpResponseRedirect('/punto_de_venta/articulo/%s/'% articulo.id)
             elif clave != '':
-                clave_articulo = ClavesArticulos.objects.filter(clave=clave)
+                clave_articulo = ClavesArticulos.objects.using(conexion_activa).filter(clave=clave)
                 if clave_articulo.count() > 0:
                     return HttpResponseRedirect('/punto_de_venta/articulo/%s/'% clave_articulo[0].articulo.id)
                 else:
-                    articulos_list = Articulos.objects.filter(nombre__icontains=nombre).order_by('nombre')
+                    articulos_list = Articulos.objects.using(conexion_activa).filter(nombre__icontains=nombre).order_by('nombre')
                     msg='No se encontro ningun articulo con esta clave'
             else:
-                articulos_list = Articulos.objects.filter(nombre__icontains=nombre).order_by('nombre')
+                articulos_list = Articulos.objects.using(conexion_activa).filter(nombre__icontains=nombre).order_by('nombre')
     else:
-        filtro_form = filtroarticulos_form()
-        articulos_list = Articulos.objects.filter(carpeta__id=carpeta).order_by('nombre') #filter(carpeta = carpeta)
+        filtro_form = filtroarticulos_form(database=conexion_activa)
+        articulos_list = Articulos.objects.using(conexion_activa).filter(Q(carpeta__id=carpeta)| Q(carpeta__id=None)).order_by('nombre') #filter(carpeta = carpeta)
     
     paginator = Paginator(articulos_list, 20) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -282,10 +282,13 @@ def gruposgrupo_delete(request, categoria_padre=None, categoria_id=None, templat
 
 @login_required(login_url='/login/')
 def clientes_view(request, template_name='main/clientes/clientes/clientes.html'):
-    
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
     msg = ''
     if request.method =='POST':
-        filtro_form = filtro_clientes_form(request.POST)
+        filtro_form = filtro_clientes_form(request.POST, database=conexion_activa)
         if filtro_form.is_valid():
             cliente = filtro_form.cleaned_data['cliente']
             nombre = filtro_form.cleaned_data['nombre']
@@ -294,17 +297,17 @@ def clientes_view(request, template_name='main/clientes/clientes/clientes.html')
             if cliente != None:
                 return HttpResponseRedirect('/punto_de_venta/cliente/%s/'% cliente.id)
             elif clave != '':
-                clave_cliente = ClavesClientes.objects.filter(clave=clave)
+                clave_cliente = ClavesClientes.objects.using(conexion_activa).filter(clave=clave)
                 if clave_cliente.count() > 0:
                     return HttpResponseRedirect('/punto_de_venta/cliente/%s/'% clave_cliente[0].cliente.id)
                 else:
-                    clientes_list = Cliente.objects.filter(nombre__icontains=nombre).order_by('nombre')
+                    clientes_list = Cliente.objects.using(conexion_activa).filter(nombre__icontains=nombre).order_by('nombre')
                     msg='No se encontro ningun cliente con esta clave'
             else:
-                clientes_list = Cliente.objects.filter(nombre__icontains=nombre).order_by('nombre')
+                clientes_list = Cliente.objects.using(conexion_activa).filter(nombre__icontains=nombre).order_by('nombre')
     else:
-        filtro_form = filtro_clientes_form()
-        clientes_list = Cliente.objects.all().order_by('nombre')
+        filtro_form = filtro_clientes_form(database=conexion_activa)
+        clientes_list = Cliente.objects.using(conexion_activa).all().order_by('nombre')
     
     paginator = Paginator(clientes_list, 20) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -324,7 +327,11 @@ def clientes_view(request, template_name='main/clientes/clientes/clientes.html')
 
 @login_required(login_url='/login/')
 def tipos_cliente_view(request, template_name='main/clientes/tipos_cliente/tipos_clientes.html'):
-    tipos_cliente_list = TipoCliente.objects.all()
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    tipos_cliente_list = TipoCliente.objects.using(conexion_activa).all()
 
     paginator = Paginator(tipos_cliente_list, 20) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -428,7 +435,11 @@ def cliente_searchView(request, template_name='main/clientes/clientes/cliente_se
 
 @login_required(login_url='/login/')
 def lineas_articulos_view(request, template_name='punto_de_venta/articulos/lineas/lineas_articulos.html'):
-    linea_articulos_list = LineaArticulos.objects.all()
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    linea_articulos_list = LineaArticulos.objects.using(conexion_activa).all()
 
     paginator = Paginator(linea_articulos_list, 15) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -474,7 +485,11 @@ def linea_articulos_manageView(request, id = None, template_name='punto_de_venta
 
 @login_required(login_url='/login/')
 def grupos_lineas_view(request, template_name='punto_de_venta/articulos/grupos/grupos_lineas.html'):
-    grupos_lineas_list = GrupoLineas.objects.all()
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    grupos_lineas_list = GrupoLineas.objects.using(conexion_activa).all()
 
     paginator = Paginator(grupos_lineas_list, 15) # Muestra 10 ventas por pagina
     page = request.GET.get('page')

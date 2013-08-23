@@ -46,7 +46,7 @@ empresas_rows = cur.fetchall()
 
 
 for empresa in empresas_rows:
-    MICROSIP_DATABASES[empresa[0]] = {
+    MICROSIP_DATABASES[empresa[0].replace(' ','_')] = {
         'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': u'C:\Microsip datos\%s.FDB'% empresa[0],
         'USER': 'SYSDBA',                      # Not used with sqlite3.
@@ -56,7 +56,7 @@ for empresa in empresas_rows:
         'OPTIONS' : {'charset':'ISO8859_1'},
     }
 
-    DATABASES[empresa[0]] = {
+    DATABASES[empresa[0].replace(' ','_')] = {
         'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': u'C:\Microsip datos\%s.FDB'% empresa[0],
         'USER': 'SYSDBA',                      # Not used with sqlite3.

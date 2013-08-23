@@ -125,7 +125,7 @@ def preferenciasEmpresa_View(request, template_name='cuentas_por_pagar/herramien
     if request.method == 'POST':
         form = InformacionContableManageForm(request.POST, instance=informacion_contable, database = conexion_activa )
         if form.is_valid():
-            form.save()
+            form.save(using=conexion_activa)
             msg = 'Datos Guardados Exitosamente'
     else:
         form = InformacionContableManageForm(instance=informacion_contable, database = conexion_activa)

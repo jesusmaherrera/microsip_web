@@ -7,10 +7,18 @@
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
 
-{% block breadcrumb %}{{ block.super }} documentos {% endblock %}
+{% block breadcrumb %}{{ block.super }} Devoluciones {% endblock %}
 {% block content %}
+<div class="ms-custom-form container-fluid" style=" height: 2em; ">
+  <div class="row-fluid">
+      <div class="span2"><h3>Devoluciones</h3></div>
+    <div class='span9' style=" margin-top: 1em; ">  
+      <a class="btn" href="/punto_de_venta/documento/">Nuevo</a>
+    </div>
+  </div>
+</div>
 <div class="form-actions mainmenu">
-  <a class="btn btn-success" href="/punto_de_venta/documento/">Nuevo</a>
+  
 </div>
 <table class="table tableCell table-hover">
     <tr>

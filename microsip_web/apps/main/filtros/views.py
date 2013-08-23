@@ -1,8 +1,8 @@
-from django.db import connection
+from django.db import connections
 
-def get_next_id_carpeta():
+def get_next_id_carpeta(database=None):
     """ return next value of sequence """
-    c = connection.cursor()
+    c = connections[database].cursor()
     c.execute('SELECT NEXT VALUE FOR "SIC_CARPETA_SQ" FROM RDB$DATABASE;')
     row = c.fetchone()
     return int(row[0])

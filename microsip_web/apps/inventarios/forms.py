@@ -10,6 +10,7 @@ from microsip_web.settings.common import MICROSIP_DATABASES
 from django.contrib.auth.forms import AuthenticationForm
 from microsip_web.apps.config.models import *
 import fdb
+import autocomplete_light
 
 class SelectDBForm(forms.Form):    
      def __init__(self,*args,**kwargs):
@@ -133,16 +134,19 @@ class inventario_pa_form(forms.Form):
     modo_rapido = forms.BooleanField(required=False)
 
 class DoctosInvfisDetManageForm(forms.ModelForm):
-    clave = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'clave ...'}),required=False)
+    clave = forms.CharField(
+        max_length=100, 
+        widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'clave ...'}),
+        required=False
+        )
     unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades ...'}),required=True)
     
     def __init__(self,*args,**kwargs):
-        self.database = kwargs.pop('database')
+        database = kwargs.pop('database')
         super(DoctosInvfisDetManageForm,self).__init__(*args,**kwargs)
-        self.fields['articulo'] = forms.ModelChoiceField(queryset= Articulos.objects.using(self.database).all())
-
+        self.fields['articulo'] = forms.ModelChoiceField(Articulos.objects.using(database).all(), widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete-%s'%database))
+        
     class Meta:
-        widgets = autocomplete_light.get_widgets_dict(DoctosInvfisDet)
         model   = DoctosInvfisDet
         exclude = (
             'docto_invfis',

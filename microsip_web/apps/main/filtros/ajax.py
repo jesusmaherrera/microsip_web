@@ -8,27 +8,47 @@ from microsip_web.apps.main.models import *
 
 @dajaxice_register(method='GET')
 def crear_nodo(request, nombre, padre):
-    id = get_next_id_carpeta()
-    Carpeta.objects.create(id = id, nombre=nombre, carpeta_padre =get_object_or_404(Carpeta, pk=padre))
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    id = get_next_id_carpeta(conexion_activa)
+    Carpeta.objects.using(conexion_activa).create(id=id, nombre=nombre, carpeta_padre=Carpeta.objects.using(conexion_activa).get(pk=padre))
     return simplejson.dumps({'id':id})
 
 @dajaxice_register(method='GET')
 def update_node(request, id, padre_id):
-    Carpeta.objects.filter(id=id).update(carpeta_padre = get_object_or_404(Carpeta, pk=padre_id))
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    Carpeta.objects.using(conexion_activa).filter(id=id).update(carpeta_padre=Carpeta.objects.using(conexion_activa).get(pk=padre_id))
     return ''
 
 @dajaxice_register(method='GET')
 def rename_node(request, id, nombre):
-    Carpeta.objects.filter(id=id).update(nombre = nombre)
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    Carpeta.objects.using(conexion_activa).filter(id=id).update(nombre=nombre)
     return ''
 
 @dajaxice_register(method='GET')
 def remove_node(request, id):
-    Carpeta.objects.get(id = id).delete()
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    Carpeta.objects.using(conexion_activa).get(id = id).delete()
     return ''
 
 @dajaxice_register(method='GET')
 def create_articulocompatiblecarpeta(request, articulo_id, carpeta_id):
-    ArticuloCompatibleCarpeta.objects.create(articulo = Articulos.objects.get(pk=articulo_id), carpeta_compatible=Carpeta.objects.get(pk=carpeta_id))
+    conexion_activa =  request.user.userprofile.conexion_activa
+    if conexion_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    ArticuloCompatibleCarpeta.objects.using(conexion_activa).create(articulo=Articulos.objects.using(conexion_activa).get(pk=articulo_id), carpeta_compatible=Carpeta.objects.using(conexion_activa).get(pk=carpeta_id))
     return ''
 

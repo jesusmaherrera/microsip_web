@@ -17,7 +17,7 @@ class InformacionContableManageForm(forms.ModelForm):
     def __init__(self,*args,**kwargs):
         self.database = kwargs.pop('database')
         super(InformacionContableManageForm,self).__init__(*args,**kwargs)
-        self.fields['condicion_pago_contado'] = forms.ModelChoiceField(queryset= CondicionPagoCp.objects.using(self.database).all(), required=True)
+        self.fields['condicion_pago_contado'] = forms.ModelChoiceField(CondicionPagoCp.objects.using(self.database).all(), required=True)
 
     class Meta:
         model = InformacionContable_CP
