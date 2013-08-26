@@ -14,11 +14,6 @@ class ProveedorManageForm(forms.ModelForm):
         model = Proveedor
 
 class InformacionContableManageForm(forms.ModelForm):
-    def __init__(self,*args,**kwargs):
-        self.database = kwargs.pop('database')
-        super(InformacionContableManageForm,self).__init__(*args,**kwargs)
-        self.fields['condicion_pago_contado'] = forms.ModelChoiceField(CondicionPagoCp.objects.using(self.database).all(), required=True)
-
     class Meta:
         model = InformacionContable_CP
 
@@ -32,22 +27,13 @@ class GenerarPolizasManageForm(forms.Form):
         ('Periodo', 'Periodo'),
     )
     crear_polizas_por       = forms.ChoiceField(choices=CREAR_POR)
-
+    plantilla = forms.ModelChoiceField(queryset= PlantillaPolizas_CP.objects.all(), required=True)
+    crear_polizas_de = forms.ModelChoiceField(queryset= ConceptoCp.objects.filter(crear_polizas='S'), required=True)
     #plantilla_2 = forms.ModelChoiceField(queryset= PlantillaPolizas_V.objects.all(), required=True)
     descripcion = forms.CharField(max_length=100, required=False)
-    
-
-    def __init__(self,*args,**kwargs):
-        self.database = kwargs.pop('database')
-        super(GenerarPolizasManageForm,self).__init__(*args,**kwargs)
-        self.fields['plantilla'] = forms.ModelChoiceField(queryset= PlantillaPolizas_CP.objects.using(self.database).all(), required=True)
-        self.fields['crear_polizas_de'] = forms.ModelChoiceField(queryset= ConceptoCp.objects.using(self.database).filter(crear_polizas='S'), required=True)
         
 class PlantillaPolizaManageForm(forms.ModelForm):
-    def __init__(self,*args,**kwargs):
-        self.database = kwargs.pop('database')
-        super(PlantillaPolizaManageForm,self).__init__(*args,**kwargs)
-        self.fields['tipo'] = forms.ModelChoiceField(queryset= ConceptoCp.objects.using(self.database).filter(crear_polizas='S'), required=True)
+    tipo = forms.ModelChoiceField(queryset= ConceptoCp.objects.filter(crear_polizas='S'), required=True)
 
     class Meta:
         model = PlantillaPolizas_CP
@@ -85,7 +71,7 @@ class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
 
     def clean_cuenta_co(self):
         cuenta_co = self.cleaned_data['cuenta_co']
-        if CuentaCo.objects.using(self.database).filter(cuenta_padre=cuenta_co.id).count() > 1:
+        if CuentaCo.objects.filter(cuenta_padre=cuenta_co.id).count() > 1:
             raise forms.ValidationError(u'la cuenta contable (%s) no es de ultimo nivel, por favor seleciona una cuenta de ultimo nivel' % cuenta_co )
         return cuenta_co
 

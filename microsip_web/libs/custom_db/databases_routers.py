@@ -1,6 +1,3 @@
-# def get_database_inuse
-# 
-
 class MainRouter(object):
     """
     A router to control all database operations on models.
@@ -10,6 +7,13 @@ class MainRouter(object):
             return 'config'
         elif model._meta.app_label == 'auth':
             return 'default'
+        elif model._meta.app_label == 'main' or model._meta.app_label == 'cuentas_por_pagar' or\
+            model._meta.app_label == 'cuentas_por_cobrar' or model._meta.app_label == 'ventas' or\
+            model._meta.app_label == 'punto_de_venta':
+
+            from middleware import my_local_global
+            return my_local_global.database_name
+
         return None
 
     def db_for_write(self, model, **hints):
@@ -20,6 +24,12 @@ class MainRouter(object):
             return 'config'
         elif model._meta.app_label == 'auth':
             return 'default'
+        elif model._meta.app_label == 'main' or model._meta.app_label == 'cuentas_por_pagar' or\
+            model._meta.app_label == 'cuentas_por_cobrar' or model._meta.app_label == 'ventas' or\
+            model._meta.app_label == 'punto_de_venta':
+            from middleware import my_local_global
+            return my_local_global.database_name
+
         return None
 
     def allow_relation(self, obj1, obj2, **hints):
@@ -28,6 +38,13 @@ class MainRouter(object):
         """
         if obj1._meta.app_label  == obj2._meta.app_label:
            return True
+        elif (obj1._meta.app_label == 'main' or obj1._meta.app_label == 'cuentas_por_pagar' or\
+            obj1._meta.app_label == 'cuentas_por_cobrar' or obj1._meta.app_label == 'ventas' or\
+            obj1._meta.app_label == 'punto_de_venta') and \
+            (obj2._meta.app_label == 'main' or obj2._meta.app_label == 'cuentas_por_pagar' or\
+            obj2._meta.app_label == 'cuentas_por_cobrar' or obj2._meta.app_label == 'ventas' or\
+            obj2._meta.app_label == 'punto_de_venta'):
+            return True
         return False
 
     def allow_syncdb(self, db, model):
@@ -45,11 +62,5 @@ class MainRouter(object):
             return False
         else:
             return True
-        #     else:
-        #         return False
-        # elif model._meta.app_label == 'django'
-        #     return True
-        # elif model._meta.app_label == 'main':
-        #     return True
 
         return None

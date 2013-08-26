@@ -1,12 +1,10 @@
 # Django settings for libreria project.
 #encoding:utf-8
-
 # Identificando la ruta del proyecto
 import os
 import fdb
 RUTA_PROYECTO =os.path.dirname(os.path.realpath(__file__)).strip('settings')
 DIR = os.path.abspath(os.path.dirname(__file__))
-
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
@@ -127,6 +125,7 @@ STATICFILES_FINDERS = (
 
 )
 
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '3pq$&amp;*)sd$k_olmn@lup_5)-)d=qk-&amp;)18!+5bw7+$z++n2jm@'
 
@@ -141,6 +140,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'microsip_web.libs.custom_db.middleware.CustomerMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:

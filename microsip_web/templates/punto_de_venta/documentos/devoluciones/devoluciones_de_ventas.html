@@ -22,7 +22,6 @@
 </div>
 <table class="table tableCell table-hover">
     <tr>
-      <th>ID</th>
       <th>FOLIO</th>
     </tr>
     {% for documento in documentos%}
@@ -42,9 +41,8 @@
     </div>
     <tr>
       <td>
-        <a href="/punto_de_venta/documento/{{ documento.id }}/">{{ documento.id }}</a>
+        <a href="/punto_de_venta/documento/{{ documento.id }}/">{{ documento.folio }}</a>
       </td>
-      <td>{{ documento.folio }}</td>
       <td style="text-align:center;">
         <a href='#myModal{{ documento.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
       </td>

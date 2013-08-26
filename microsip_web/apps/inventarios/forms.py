@@ -36,7 +36,7 @@ class linea_articulos_form(forms.Form):
     def __init__(self,*args,**kwargs):
         self.database = kwargs.pop('database')
         super(linea_articulos_form,self).__init__(*args,**kwargs)
-        self.fields['linea'] = forms.ModelChoiceField(queryset= LineaArticulos.objects.using(self.database).all())
+        self.fields['linea'] = forms.ModelChoiceField(queryset= LineaArticulos.objects.all())
 
 class UbicacionArticulosForm(forms.Form):
     ubicacion = forms.CharField(widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'Ubicacion..'}))
@@ -139,13 +139,9 @@ class DoctosInvfisDetManageForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'clave ...'}),
         required=False
         )
+    articulo = forms.ModelChoiceField(Articulos.objects.all(), widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
     unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades ...'}),required=True)
     
-    def __init__(self,*args,**kwargs):
-        database = kwargs.pop('database')
-        super(DoctosInvfisDetManageForm,self).__init__(*args,**kwargs)
-        self.fields['articulo'] = forms.ModelChoiceField(Articulos.objects.using(database).all(), widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete-%s'%database))
-        
     class Meta:
         model   = DoctosInvfisDet
         exclude = (

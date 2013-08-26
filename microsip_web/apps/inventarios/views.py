@@ -69,6 +69,7 @@ def select_db(request, template_name='main/select_db.html'):
                 UserProfile.objects.create(usuario= request.user, conexion_activa=conexion)
 
             return HttpResponseRedirect('/')
+            call_command('runserver')
     else:
         form = SelectDBForm(usuario= request.user)
     c =  {'form':form,}
@@ -201,13 +202,13 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
     inicio_form = False
     movimiento = ''
 
-    InventarioFisico = DoctosInvfis.objects.using(conexion_activa).get(pk=id)
-    detallesInventario = DoctosInvfisDet.objects.using(conexion_activa).filter(docto_invfis=InventarioFisico).filter(Q(usuario_ult_modif = request.user.username) | Q(usuario_ult_modif = None)).order_by('-fechahora_ult_modif')
+    InventarioFisico = DoctosInvfis.objects.get(pk=id)
+    detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico).filter(Q(usuario_ult_modif = request.user.username) | Q(usuario_ult_modif = None)).order_by('-fechahora_ult_modif')
     articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)
     articulos_discretos_actuales = []
     #POST
     if request.method == 'POST':
-        detalleInvForm = DoctosInvfisDetManageForm(request.POST, database=conexion_activa)
+        detalleInvForm = DoctosInvfisDetManageForm(request.POST)
         ubicacion_form = UbicacionArticulosForm(request.POST)
         if detalleInvForm.is_valid():
             articulos_discretos_formset = articulos_discretos_formset(request.POST, request.FILES)
@@ -221,9 +222,9 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
             #Para cargar por primera ves el formset de los nuemeros de serie del articulo
             if detalleInv.articulo.seguimiento == 'S':
                 if detalleInv != '':
-                    doc_det = DoctosInvfisDet.objects.using(conexion_activa).filter(docto_invfis=InventarioFisico, articulo=detalleInv.articulo)
+                    doc_det = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico, articulo=detalleInv.articulo)
                     if doc_det.count() > 0:
-                        articulos_discretos_actuales = DesgloseEnDiscretosInvfis.objects.using(conexion_activa).filter(
+                        articulos_discretos_actuales = DesgloseEnDiscretosInvfis.objects.filter(
                         docto_invfis_det=doc_det[0].id)
 
                 if total_forms != unidades:
@@ -250,7 +251,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                 if articulos_discretos_formset.is_valid()  and ubicacion_form.is_valid() and (articulos_discretos_formset.total_form_count() > 0 or detalleInv.articulo.seguimiento == 'N'):
                     unidades = 0
                     try:
-                        doc = DoctosInvfisDet.objects.using(conexion_activa).get(docto_invfis=InventarioFisico, articulo=detalleInv.articulo)
+                        doc = DoctosInvfisDet.objects.get(docto_invfis=InventarioFisico, articulo=detalleInv.articulo)
                         id_detalle = doc.id
                         
                         unidades = doc.unidades + detalleInv.unidades
@@ -264,7 +265,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                         if detalleInv.unidades >= 0:
                             id_detalle = c_get_next_key('ID_DOCTOS', conexion_activa)
                             detalleInv.id = id_detalle
-                            articulos_claves =ClavesArticulos.objects.using(conexion_activa).filter(articulo= detalleInv.articulo)
+                            articulos_claves =ClavesArticulos.objects.filter(articulo= detalleInv.articulo)
                             
                             if articulos_claves.count() < 1:
                                 articulo_clave = ''
@@ -278,14 +279,14 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                     if detalleInv.articulo.seguimiento == 'S':    
                         for form in articulos_discretos_formset.forms:
                             form = form.save(commit=False)
-                            art_discreto = ArticulosDiscretos.objects.using(conexion_activa).filter(articulo = form.articulo, clave = form.clave)
+                            art_discreto = ArticulosDiscretos.objects.filter(articulo = form.articulo, clave = form.clave)
 
                             if art_discreto.count() > 0:
                                 art_discreto = art_discreto[0]
                             else:
-                                art_discreto = ArticulosDiscretos.objects.using(conexion_activa).create(id=next_id('ID_CATALOGOS', conexion_activa), clave = form.clave, articulo = form.articulo, tipo='S', fecha= None)        
+                                art_discreto = ArticulosDiscretos.objects.create(id=next_id('ID_CATALOGOS', conexion_activa), clave = form.clave, articulo = form.articulo, tipo='S', fecha= None)        
 
-                            if DesgloseEnDiscretosInvfis.objects.using(conexion_activa).filter(art_discreto = art_discreto).exists() and detalleInv.unidades > 0:
+                            if DesgloseEnDiscretosInvfis.objects.filter(art_discreto = art_discreto).exists() and detalleInv.unidades > 0:
                                 msg_series = 'Ya existe un articulo registrado en inventario con numero de serie [%s]'%form.clave
                                 error = 1                                
                             if error == 0:
@@ -295,13 +296,13 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
 
                                     desglose = DesgloseEnDiscretosInvfis(
                                         id = -1,
-                                        docto_invfis_det = DoctosInvfisDet.objects.using(conexion_activa).get(id=id_detalle),
+                                        docto_invfis_det = DoctosInvfisDet.objects.get(id=id_detalle),
                                         art_discreto = art_discreto,
                                         unidades = 1,
                                         )
                                     desglose.save(using='conexion_activa')
                                 else:
-                                    desgloses_a_eliminar = DesgloseEnDiscretosInvfis.objects.using(conexion_activa).filter(art_discreto=art_discreto)
+                                    desgloses_a_eliminar = DesgloseEnDiscretosInvfis.objects.filter(art_discreto=art_discreto)
                                     
                                     if desgloses_a_eliminar.count() <= 0:
                                         error = 2
@@ -314,7 +315,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                             detalleInv.detalle_modificaciones = '[%s/%s=%s], '%(request.user.username, ubicacion_form.cleaned_data['ubicacion'], detalleInvForm.cleaned_data['unidades'])
                             detalleInv.save()
                         elif movimiento == 'actualizar':
-                            detalleInv = DoctosInvfisDet.objects.using(conexion_activa).get(id=id_detalle)
+                            detalleInv = DoctosInvfisDet.objects.get(id=id_detalle)
                             detalleInv.fechahora_ult_modif = datetime.now()
                             detalleInv.unidades = unidades
                             detalleInv.usuario_ult_modif = request.user.username
@@ -326,7 +327,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                         return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s/'% id)
                            
     else:
-        detalleInvForm = DoctosInvfisDetManageForm(database=conexion_activa)
+        detalleInvForm = DoctosInvfisDetManageForm()
         ubicacion_form = UbicacionArticulosForm()
 
         articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)    

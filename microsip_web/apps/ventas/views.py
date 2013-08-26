@@ -63,9 +63,9 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
     documentosData = []
     documentosGenerados = []
     documentosDataDevoluciones = []
-    depto_co = DeptoCo.objects.using(conexion_activa).get(clave='GRAL')
+    depto_co = DeptoCo.objects.get(clave='GRAL')
     try:
-        informacion_contable = InformacionContable_V.objects.using(conexion_activa).all()[:1]
+        informacion_contable = InformacionContable_V.objects.all()[:1]
         informacion_contable = informacion_contable[0]
     except ObjectDoesNotExist:
         error = 1
@@ -77,14 +77,14 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
         devoluciones= []
         if ignorar_documentos_cont:
             if crear_polizas_de     == 'F' or crear_polizas_de  == 'FD':
-                facturas            = DoctoVe.objects.using(conexion_activa).filter(Q(estado='N')|Q(estado='D'), tipo ='F', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                facturas            = DoctoVe.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='F', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
             elif crear_polizas_de   == 'D' or crear_polizas_de  == 'FD':
-                devoluciones        = DoctoVe.objects.using(conexion_activa).filter(estado = 'N').filter(tipo  ='D', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                devoluciones        = DoctoVe.objects.filter(estado = 'N').filter(tipo  ='D', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
         else:
             if crear_polizas_de     == 'F' or crear_polizas_de  == 'FD':
-                facturas            = DoctoVe.objects.using(conexion_activa).filter(Q(estado='N')|Q(estado='D'), tipo ='F', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                facturas            = DoctoVe.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='F', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
             elif crear_polizas_de   == 'D' or crear_polizas_de  == 'FD':
-                devoluciones        = DoctoVe.objects.using(conexion_activa).filter(estado = 'N').filter(tipo  = 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                devoluciones        = DoctoVe.objects.filter(estado = 'N').filter(tipo  = 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
 
         #PREFIJO
         prefijo = informacion_contable.tipo_poliza_ve.prefijo

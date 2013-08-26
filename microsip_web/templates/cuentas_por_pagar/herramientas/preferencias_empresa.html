@@ -33,16 +33,13 @@
       <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
       {% csrf_token %}
         {{ form.errors }}
-        <fieldset>
-        <legend>:</legend>
         <div class="span4" >
           <label>Condicion de pago de CONTADO</label>
           <div class="input-prepend input-append">
             {{ form.condicion_pago_contado }}
           </div>
         </div>
-        </fieldset>
-        <fieldset>
+        <fieldset style='clear:both;'>
         <legend>Plantillas Polizas:     
           <a href='/cuentas_por_pagar/plantilla_poliza/' class="btn btn-success btn-mini"/><i class="icon-plus-sign"></i> Nueva Plantilla</a>
         </legend>

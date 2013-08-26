@@ -19,7 +19,6 @@
 </div>
 <table class="table tableCell table-hover">
     <tr>
-      <th>Id</th>
       <th>Folio</th>
       <th>Fecha</th>
       <th>Puntos</th>
@@ -42,10 +41,7 @@
       </div>
     </div>
     <tr>
-      <td>
-        <a href="/punto_de_venta/venta/{{ venta.id }}/">{{ venta.id }}</a>
-      </td>
-      <td>{{ venta.folio }}</td>
+      <td><a href="/punto_de_venta/venta/{{ venta.id }}/">{{ venta.folio }}</a></td>
       <td>{{ venta.fecha }}</td>
       <td>{{ venta.puntos }}</td>
       <td>{{ venta.dinero_electronico }}</td>

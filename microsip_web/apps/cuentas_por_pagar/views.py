@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from microsip_web.apps.inventarios.models import *
+from django.db.models.query import EmptyQuerySet
 
 from forms import *
 
@@ -31,13 +32,13 @@ from microsip_web.libs import contabilidad
 
 def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True, crear_polizas_por='Documento', crear_polizas_de='', plantilla='', descripcion= '', conexion_activa=''):
     
-    depto_co = DeptoCo.objects.using(conexion_activa).get(clave='GRAL')
+    depto_co = DeptoCo.objects.get(clave='GRAL')
     error   = 0
     msg     = ''
     documentosCPData = []
     
     try:
-        informacion_contable = InformacionContable_CP.objects.using(conexion_activa).all()[:1]
+        informacion_contable = InformacionContable_CP.objects.all()[:1]
         informacion_contable = informacion_contable[0]
     except ObjectDoesNotExist:
         error = 1
@@ -46,9 +47,9 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
     if error == 0:
 
         if ignorar_documentos_cont:
-            documentosCP  = DoctosCp.objects.using(conexion_activa).filter(contabilizado ='N', concepto= crear_polizas_de , fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+            documentosCP  = DoctosCp.objects.filter(contabilizado ='N', concepto= crear_polizas_de , fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
         else:
-            documentosCP  = DoctosCp.objects.using(conexion_activa).filter(concepto= crear_polizas_de , fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+            documentosCP  = DoctosCp.objects.filter(concepto= crear_polizas_de , fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
             
         msg, documentosCPData = contabilidad.crear_polizas(
             origen_documentos   = 'cuentas_por_pagar',
@@ -79,7 +80,7 @@ def generar_polizas_View(request, template_name='cuentas_por_pagar/herramientas/
 
     if request.method == 'POST':
         
-        form = GenerarPolizasManageForm(request.POST, database= conexion_activa)
+        form = GenerarPolizasManageForm(request.POST)
         if form.is_valid():
             fecha_ini               = form.cleaned_data['fecha_ini']
             fecha_fin               = form.cleaned_data['fecha_fin']
@@ -95,11 +96,10 @@ def generar_polizas_View(request, template_name='cuentas_por_pagar/herramientas/
             if documentosData == []:
                 msg_resultados = 'Lo siento, no se encontraron resultados para este filtro'
             else:
-                form = GenerarPolizasManageForm(database=conexion_activa)       
+                form = GenerarPolizasManageForm()       
                 msg_informacion = 'Polizas generadas satisfactoriamente, *Ahora revisa las polizas pendientes generadas en el modulo de contabilidad'
-
     else:
-        form = GenerarPolizasManageForm(database= conexion_activa)
+        form = GenerarPolizasManageForm()
     c = {'documentos':documentosData,'msg':msg,'form':form, 'msg_resultados':msg_resultados,'msg_informacion':msg_informacion,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
@@ -116,21 +116,19 @@ def preferenciasEmpresa_View(request, template_name='cuentas_por_pagar/herramien
         return HttpResponseRedirect('/select_db/')
 
     try:
-        informacion_contable = InformacionContable_CP.objects.using(conexion_activa).all()[:1]
+        informacion_contable = InformacionContable_CP.objects.all()[:1]
         informacion_contable = informacion_contable[0]
     except:
         informacion_contable = InformacionContable_CP()
-
+    condpago = informacion_contable.condicion_pago_contado
+    
+    form = InformacionContableManageForm(request.POST or None, instance=informacion_contable)
     msg = ''
-    if request.method == 'POST':
-        form = InformacionContableManageForm(request.POST, instance=informacion_contable, database = conexion_activa )
-        if form.is_valid():
-            form.save(using=conexion_activa)
-            msg = 'Datos Guardados Exitosamente'
-    else:
-        form = InformacionContableManageForm(instance=informacion_contable, database = conexion_activa)
+    if form.is_valid():
+        form.save()
+        msg = 'Datos Guardados Exitosamente'
 
-    plantillas = PlantillaPolizas_CP.objects.using(conexion_activa).all()
+    plantillas = PlantillaPolizas_CP.objects.all()
     c= {'form':form,'msg':msg,'plantillas':plantillas,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
@@ -149,12 +147,12 @@ def plantilla_poliza_manageView(request, id = None, template_name='cuentas_por_p
     message = ''
 
     if id:
-        plantilla = PlantillaPolizas_CP.objects.using(conexion_activa).get(pk=id)
+        plantilla = PlantillaPolizas_CP.objects.get(pk=id)
     else:
         plantilla =PlantillaPolizas_CP()
 
     if request.method == 'POST':
-        plantilla_form = PlantillaPolizaManageForm(request.POST, request.FILES, instance=plantilla,  database = conexion_activa)
+        plantilla_form = PlantillaPolizaManageForm(request.POST, request.FILES, instance=plantilla)
 
         plantilla_items         = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
         plantilla_items_formset = plantilla_items(request.POST, request.FILES, instance=plantilla)
@@ -174,9 +172,9 @@ def plantilla_poliza_manageView(request, id = None, template_name='cuentas_por_p
             return HttpResponseRedirect('/cuentas_por_pagar/PreferenciasEmpresa/')
     else:
         plantilla_items = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
-        plantilla_form= PlantillaPolizaManageForm(instance=plantilla,  database = conexion_activa )
+        plantilla_form= PlantillaPolizaManageForm(instance=plantilla)
 
-        plantilla_items_formset  = plantilla_items(queryset= PlantillaPolizas_CP.objects.using(conexion_activa).none())
+        plantilla_items_formset  = plantilla_items(queryset= PlantillaPolizas_CP.objects.none())
 
     c = {'plantilla_form': plantilla_form, 'formset': plantilla_items_formset , 'message':message,}
 

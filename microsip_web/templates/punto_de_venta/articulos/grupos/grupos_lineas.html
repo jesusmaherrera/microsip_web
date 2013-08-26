@@ -19,32 +19,14 @@
 <table class="table tableCell table-hover">
     <tr>
       <th>Nombre</th>
-      <th>Opciones</th>
       <th>Puntos</th>
-      <th>Dienro Electronico</th>
+      <th>Dinero Electronico</th>
     </tr>
     {% for grupo_lineas in grupos_lineas%}
-    <div id="myModal{{ grupo_lineas.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
-      </div>
-      <div class="modal-body">
-        <h4>Al eliminar el grupo_lineas</h4>
-        <p style="color:red;">Ya no sera posible recuperar los datos del grupo_lineas</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" data-dismiss="modal">Cancelar</button>
-        <a href="#" class="btn btn-primary">Estoy Seguro</a>
-      </div>
-    </div>
     <tr>
       <td><a href="/punto_de_venta/grupo_lineas/{{ grupo_lineas.id }}/">{{ grupo_lineas.nombre }}</a></td>
       <td>{{ grupo_lineas.puntos }}</td>
       <td>{{ grupo.dinero_electronico }}</td>
-      <td style="text-align:center;">
-        <!-- <a href='#myModal{{ grupo_lineas.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a> -->
-      </td>
     </tr>
     {% endfor %}
 

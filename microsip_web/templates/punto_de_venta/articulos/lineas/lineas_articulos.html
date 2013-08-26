@@ -21,30 +21,12 @@
       <th>Nombre</th>
       <th>Puntos</th>
       <th>Dinero Electronico</th>
-      <th>Opciones</th>
     </tr>
     {% for linea_articulos in lineas_articulos%}
-    <div id="myModal{{ linea_articulos.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
-      </div>
-      <div class="modal-body">
-        <h4>Al eliminar el linea_articulos</h4>
-        <p style="color:red;">Ya no sera posible recuperar los datos del linea_articulos</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" data-dismiss="modal">Cancelar</button>
-        <a href="#" class="btn btn-primary">Estoy Seguro</a>
-      </div>
-    </div>
     <tr>
       <td><a href="/punto_de_venta/linea_articulos/{{ linea_articulos.id }}/">{{ linea_articulos.nombre }}</a></td>
       <td>{{ linea_articulos.puntos }}</td>
       <td>{{ linea_articulos.dinero_electronico }}</td>
-      <td style="text-align:center;">
-        <!-- <a href='#myModal{{ linea_articulos.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a> -->
-      </td>
     </tr>
     {% endfor %}
 
