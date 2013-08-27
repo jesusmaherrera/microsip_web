@@ -691,32 +691,25 @@ def plantilla_poliza_manageView(request, id = None, template_name='punto_de_vent
     else:
         plantilla =PlantillaPolizas_pv()
 
-    if request.method == 'POST':
-        plantilla_form = PlantillaPolizaManageForm(request.POST, request.FILES, instance=plantilla)
+    plantilla_form = PlantillaPolizaManageForm(request.POST or None, instance=plantilla)
+    plantilla_items = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
+    plantilla_items_formset = plantilla_items(request.POST or None, instance=plantilla)
+    
+    if plantilla_form.is_valid() and plantilla_items_formset.is_valid():
+        plantilla = plantilla_form.save(commit = False)
+        plantilla.save()
 
-        plantilla_items         = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
-        plantilla_items_formset = plantilla_items(request.POST, request.FILES, instance=plantilla)
+        #GUARDA CONCEPTOS DE PLANTILLA
+        for concepto_form in plantilla_items_formset :
+            Detalleplantilla = concepto_form.save(commit = False)
+            #PARA CREAR UNO NUEVO
+            if not Detalleplantilla.id:
+                Detalleplantilla.plantilla_poliza_pv = plantilla
         
-        if plantilla_form.is_valid() and plantilla_items_formset.is_valid():
-            plantilla = plantilla_form.save(commit = False)
-            plantilla.save()
-
-            #GUARDA CONCEPTOS DE PLANTILLA
-            for concepto_form in plantilla_items_formset :
-                Detalleplantilla = concepto_form.save(commit = False)
-                #PARA CREAR UNO NUEVO
-                if not Detalleplantilla.id:
-                    Detalleplantilla.plantilla_poliza_pv = plantilla
-            
-            plantilla_items_formset .save()
-            return HttpResponseRedirect('/punto_de_venta/PreferenciasEmpresa/')
-    else:
-        plantilla_items = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
-        plantilla_form= PlantillaPolizaManageForm(instance=plantilla)
-        plantilla_items_formset  = plantilla_items(instance=plantilla)
+        plantilla_items_formset .save()
+        return HttpResponseRedirect('/punto_de_venta/PreferenciasEmpresa/')
     
     c = {'plantilla_form': plantilla_form, 'formset': plantilla_items_formset , 'message':message,}
-
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################

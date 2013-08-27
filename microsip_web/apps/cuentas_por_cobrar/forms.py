@@ -35,6 +35,7 @@ class GenerarPolizasManageForm(forms.Form):
 
 class PlantillaPolizaManageForm(forms.ModelForm):
     tipo = forms.ModelChoiceField(queryset= ConceptoCc.objects.filter(crear_polizas='S'), required=True)
+    
     class Meta:
         model = PlantillaPolizas_CC
 

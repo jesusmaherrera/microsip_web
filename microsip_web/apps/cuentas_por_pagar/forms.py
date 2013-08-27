@@ -66,7 +66,7 @@ class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
     asiento_ingora  = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
 
     class Meta:
-        # widgets = autocomplete_light.get_widgets_dict(DetallePlantillaPolizas_CP)
+        widgets = autocomplete_light.get_widgets_dict(DetallePlantillaPolizas_CP)
         model = DetallePlantillaPolizas_CP
 
     def clean_cuenta_co(self):
