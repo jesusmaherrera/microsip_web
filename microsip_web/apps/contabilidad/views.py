@@ -24,7 +24,7 @@ def polizas_View(request, template_name='contabilidad/polizas/polizas.html'):
     if conexion_activa == '':
         return HttpResponseRedirect('/select_db/')
 
-    polizas_list = DoctoCo.objects.using(conexion_activa).filter(estatus='N').order_by('-fecha') 
+    polizas_list = DoctoCo.objects.filter(estatus='N').order_by('-fecha') 
 
     paginator = Paginator(polizas_list, 15) # Muestra 5 inventarios por pagina
     page = request.GET.get('page')
@@ -48,8 +48,7 @@ def polizas_pendientesView(request, template_name='contabilidad/polizas/polizas_
     if conexion_activa == '':
         return HttpResponseRedirect('/select_db/')
 
-    #polizas_list = DoctoCo.objects.using('db_chuy').filter(estatus='P').order_by('-fecha') 
-    polizas_list = DoctoCo.objects.using(conexion_activa).filter(estatus='P').order_by('-fecha') 
+    polizas_list = DoctoCo.objects.filter(estatus='P').order_by('-fecha') 
 
     paginator = Paginator(polizas_list, 15) # Muestra 5 inventarios por pagina
     page = request.GET.get('page')

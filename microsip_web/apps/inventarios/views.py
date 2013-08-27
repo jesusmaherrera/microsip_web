@@ -127,7 +127,7 @@ def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisic
     if conexion_activa == '':
         return HttpResponseRedirect('/select_db/')
     
-    inventarios_fisicos_list = DoctosInvfis.objects.using(conexion_activa).filter(aplicado='N', cancelado='N').order_by('-fecha')
+    inventarios_fisicos_list = DoctosInvfis.objects.filter(aplicado='N', cancelado='N').order_by('-fecha')
 
 
     paginator = Paginator(inventarios_fisicos_list, 15) # Muestra 5 inventarios por pagina
