@@ -1,3 +1,5 @@
+MICROSIP_DATOS_PATH = u'C:\Microsip datos'
+
 MICROSIP_MODULES = (
     'microsip_web.apps.main',
     'microsip_web.apps.config',

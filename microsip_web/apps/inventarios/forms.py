@@ -17,13 +17,14 @@ class SelectDBForm(forms.Form):
         usuario = kwargs.pop('usuario')
         db= fdb.connect(host="localhost",user="SYSDBA",password="masterkey",database="C:\Microsip datos\System\CONFIG.FDB")
         cur = db.cursor()
-        if Usuario.objects.filter(nombre=usuario)[0].acceso_empresas != 'T':
+        if Usuario.objects.get(nombre__exact=usuario.username).acceso_empresas != 'T':
             consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS_USUARIOS, EMPRESAS, USUARIOS WHERE USUARIOS.usuario_id = empresas_usuarios.usuario_id AND EMPRESAS.empresa_id = empresas_usuarios.empresa_id AND usuarios.nombre = '%s'"% usuario
         else:
             consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS"
-        cur.execute(consulta)
 
+        cur.execute(consulta)
         empresas_rows = cur.fetchall()
+        db.close()
         empresas = []
         for empresa_str in empresas_rows:
             empresa_option = [empresa_str[0], empresa_str[0]]

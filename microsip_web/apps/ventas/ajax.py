@@ -51,7 +51,7 @@ def get_gruposby_grupopadre(request, carpetapadre_id):
     data = serializers.serialize("json", grupos, indent=4, relations=('grupo',))
     return HttpResponse(data, mimetype="application/javascript")
 
-def buscar_hijos(data=[], conexion_activa= None):
+def buscar_hijos(data=[]):
     if data != None:
         hijos = Carpeta.objects.filter(carpeta_padre= Carpeta.objects.get(pk=data['attr']['id']))
     else:
@@ -62,7 +62,7 @@ def buscar_hijos(data=[], conexion_activa= None):
         datahijo = {}
         datahijo['data'] = hijo.nombre
         datahijo['attr'] = {'id':hijo.id}
-        datahijo = buscar_hijos(datahijo, conexion_activa)
+        datahijo = buscar_hijos(datahijo)
         datoshijos.append(datahijo)
     
     if data != None:
@@ -73,7 +73,7 @@ def buscar_hijos(data=[], conexion_activa= None):
 
 @dajaxice_register(method='GET')
 def get_estructura_carpetas(request):
-    datos = buscar_hijos(None, conexion_activa)
+    datos = buscar_hijos(None)
     return HttpResponse(json.dumps(datos), mimetype="application/javascript")
 
 @dajaxice_register(method='GET')

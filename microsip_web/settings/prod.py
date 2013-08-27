@@ -1,5 +1,4 @@
 from common import *
-from local_settings import MICROSIP_MODULES
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

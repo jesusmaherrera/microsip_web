@@ -85,18 +85,37 @@ def ingresar(request):
         if formulario.is_valid:
             usuario = request.POST['username']
             clave = request.POST['password']
-            acceso = authenticate(username=usuario, password=clave)
-            usuariomicrosip = Usuario.objects.filter(nombre=usuario, tipo='U')
-            if acceso is not None and usuariomicrosip.exists():
+            
+            acceso = None
+            try:
+                db = fdb.connect(host="localhost",user=usuario,password=str(clave), database="C:\Microsip datos\System\CONFIG.FDB")
+            except fdb.DatabaseError:
+                message = 'Nombre de usaurio o password no validos.'
+            else:
+                u = User.objects.filter(username__exact=usuario)
+                
+                if u.exists():
+                    u[0].set_password(str(clave))
+                    u[0].save()
+                else:
+                    User.objects.create_user(username = usuario, password=str(clave))
+
+                acceso = authenticate(username=usuario, password=clave)
+
+            if acceso is not None:
+                try:
+                    db = fdb.connect(host="localhost",user=usuario,password=str(clave), database="C:\Microsip datos\System\CONFIG.FDB")
+                except fdb.DatabaseError:
+                    objects.asd
                 if acceso.is_active:
+                    
+
                     login(request, acceso)
                     return HttpResponseRedirect('/select_db/')
                 else:
                     return render_to_response('noactivo.html', context_instance=RequestContext(request))
             else:
-                if not usuariomicrosip.exists():
-                    message = 'El usuario no existe en microsip no puedes logearte hasta entonces.'
-                elif acceso is None:
+                if acceso is None:
                     message = 'Nombre de usaurio o password no validos.'
     else:
         formulario = AuthenticationForm()

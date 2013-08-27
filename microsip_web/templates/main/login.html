@@ -4,6 +4,17 @@
 <script type="text/javascript">
 $(document).ready(function(){
   $("#id_username").focus();
+
+  $("#id_username").bind('keyup', function (e) {
+      if (e.which >= 97 && e.which <= 122) {
+          var newKey = e.which - 32;
+          // I have tried setting those
+          e.keyCode = newKey;
+          e.charCode = newKey;
+      }
+
+      $("#id_username").val(($("#id_username").val()).toUpperCase());
+  });
 });
 </script>    
 {% endblock %}
