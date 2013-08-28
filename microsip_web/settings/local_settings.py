@@ -1,4 +1,6 @@
 MICROSIP_DATOS_PATH = u'C:\Microsip datos'
+FIREBIRD_USERNAME = 'SYSDBA'
+FIREBIRD_PASSWORD = 'A'
 
 MICROSIP_MODULES = (
     'microsip_web.apps.main',

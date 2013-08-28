@@ -2,7 +2,7 @@
 from django import forms
 
 import autocomplete_light
-
+from django.core.exceptions import ObjectDoesNotExist
 from microsip_web.apps.inventarios.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
@@ -15,19 +15,21 @@ import autocomplete_light
 class SelectDBForm(forms.Form):    
      def __init__(self,*args,**kwargs):
         usuario = kwargs.pop('usuario')
-        db= fdb.connect(host="localhost",user="SYSDBA",password="masterkey",database="%s\System\CONFIG.FDB"%MICROSIP_DATOS_PATH)
-        cur = db.cursor()
-        if Usuario.objects.get(nombre__exact=usuario.username).acceso_empresas != 'T':
-            consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS_USUARIOS, EMPRESAS, USUARIOS WHERE USUARIOS.usuario_id = empresas_usuarios.usuario_id AND EMPRESAS.empresa_id = empresas_usuarios.empresa_id AND usuarios.nombre = '%s'"% usuario
-        else:
-            consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS"
 
-        cur.execute(consulta)
-        empresas_rows = cur.fetchall()
-        db.close()
+        try:
+            acceso_empresas = Usuario.objects.get(nombre__exact=usuario.username).acceso_empresas
+        except ObjectDoesNotExist:
+            if usuario.username == 'SYSDBA':
+                acceso_empresas = 'T'            
+
+        if acceso_empresas == 'T':
+            consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS"
+        else:
+            consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS_USUARIOS, EMPRESAS, USUARIOS WHERE USUARIOS.usuario_id = empresas_usuarios.usuario_id AND EMPRESAS.empresa_id = empresas_usuarios.empresa_id AND usuarios.nombre = '%s'"% usuario
+        
         empresas = []
-        for empresa_str in empresas_rows:
-            empresa_option = [empresa_str[0], empresa_str[0]]
+        for empresa in MICROSIP_DATABASES.keys():
+            empresa_option = [empresa, empresa]
             empresas.append(empresa_option)
 
         super(SelectDBForm,self).__init__(*args,**kwargs)

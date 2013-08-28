@@ -3,7 +3,7 @@
 # Identificando la ruta del proyecto
 import os
 import fdb
-from local_settings import MICROSIP_MODULES, MICROSIP_DATOS_PATH
+from local_settings import MICROSIP_MODULES, MICROSIP_DATOS_PATH, FIREBIRD_USERNAME, FIREBIRD_PASSWORD
 
 RUTA_PROYECTO =os.path.dirname(os.path.realpath(__file__)).strip('settings')
 DIR = os.path.abspath(os.path.dirname(__file__))
@@ -19,8 +19,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME':  '%s\USERS.FDB'% RUTA_PROYECTO,
-        'USER': 'SYSDBA',                      # Not used with sqlite3.
-        'PASSWORD': 'masterkey',                  # Not used with sqlite3.
+        'USER': FIREBIRD_USERNAME,                      # Not used with sqlite3.
+        'PASSWORD': FIREBIRD_PASSWORD,                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
         'OPTIONS' : {'charset':'ISO8859_1'},
@@ -28,8 +28,8 @@ DATABASES = {
     'config': {
        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': '%s\System\CONFIG.FDB'% MICROSIP_DATOS_PATH,
-        'USER': 'SYSDBA',                      # Not used with sqlite3.
-        'PASSWORD': 'masterkey',                  # Not used with sqlite3.
+        'USER': FIREBIRD_USERNAME,                      # Not used with sqlite3.
+        'PASSWORD': FIREBIRD_PASSWORD,                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
         'OPTIONS' : {'charset':'ISO8859_1'},
@@ -38,7 +38,7 @@ DATABASES = {
 
 MICROSIP_DATABASES = {}
 
-db= fdb.connect(host="localhost",user="SYSDBA",password="masterkey",database="%s\System\CONFIG.FDB"% MICROSIP_DATOS_PATH)
+db= fdb.connect(host="localhost",user=FIREBIRD_USERNAME,password=FIREBIRD_PASSWORD,database="%s\System\CONFIG.FDB"% MICROSIP_DATOS_PATH)
 cur = db.cursor()
 cur.execute("SELECT NOMBRE_CORTO FROM EMPRESAS")
 empresas_rows = cur.fetchall()
@@ -49,8 +49,8 @@ for empresa in empresas_rows:
     MICROSIP_DATABASES[empresa[0].replace(' ','_')] = {
         'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': u'%s\%s.FDB'% (MICROSIP_DATOS_PATH, empresa[0]),
-        'USER': 'SYSDBA',                      # Not used with sqlite3.
-        'PASSWORD': 'masterkey',                  # Not used with sqlite3.
+        'USER': FIREBIRD_USERNAME,                      # Not used with sqlite3.
+        'PASSWORD': FIREBIRD_PASSWORD,                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
         'OPTIONS' : {'charset':'ISO8859_1'},
@@ -59,8 +59,8 @@ for empresa in empresas_rows:
     DATABASES[empresa[0].replace(' ','_')] = {
         'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': u'%s\%s.FDB'% (MICROSIP_DATOS_PATH, empresa[0]),
-        'USER': 'SYSDBA',                      # Not used with sqlite3.
-        'PASSWORD': 'masterkey',                  # Not used with sqlite3.
+        'USER': FIREBIRD_USERNAME,                      # Not used with sqlite3.
+        'PASSWORD': FIREBIRD_PASSWORD,                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
         'OPTIONS' : {'charset':'ISO8859_1'},

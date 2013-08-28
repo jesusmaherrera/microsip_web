@@ -92,29 +92,26 @@ def ingresar(request):
                 db = fdb.connect(host="localhost",user=usuario,password=str(clave), database="%s\System\CONFIG.FDB"% MICROSIP_DATOS_PATH)
                 db.close()
             except fdb.DatabaseError:
-                message = 'Nombre de usaurio o password no validos.'
+                message = 'Nombre de usaurio o password no validos. EEEE'
             else:
-                u = User.objects.filter(username__exact=usuario)
-                
-                if u.exists():
-                    u[0].set_password(str(clave))
-                    u[0].save()
-                else:
+                try:
+                    u = User.objects.get(username__exact=usuario)
+                    u.set_password(str(clave))
+                    u.save()
+                except ObjectDoesNotExist:
                     User.objects.create_user(username = usuario, password=str(clave))
+                    if usuario == 'SYSDBA':
+                        User.objects.filter(username = 'SYSDBA').update(is_superuser=True, is_staff=True)
 
                 acceso = authenticate(username=usuario, password=clave)
-
             if acceso is not None:
                 if acceso.is_active:
-                    
-
                     login(request, acceso)
                     return HttpResponseRedirect('/select_db/')
                 else:
                     return render_to_response('noactivo.html', context_instance=RequestContext(request))
             else:
-                if acceso is None:
-                    message = 'Nombre de usaurio o password no validos.'
+                message = 'Nombre de usaurio o password no validos.'
     else:
         formulario = AuthenticationForm()
 
@@ -163,8 +160,8 @@ def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisic
     c = {'inventarios_fisicos':inventarios_fisicos}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
-def inventario_getnew_folio(data_base=None):
-    registro_folioinventario = Registry.objects.using(data_base).get(nombre='SIG_FOLIO_INVFIS')
+def inventario_getnew_folio():
+    registro_folioinventario = Registry.objects.get(nombre='SIG_FOLIO_INVFIS')
     folio = registro_folioinventario.valor 
     siguiente_folio = "%09d" % (int(folio) +1)
     registro_folioinventario.valor = siguiente_folio
@@ -173,15 +170,20 @@ def inventario_getnew_folio(data_base=None):
 
 @login_required(login_url='/login/')
 def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inventarios Fisicos/create_inventario_fisico_pa.html'):
+    message = ''
     conexion_activa =  request.user.userprofile.conexion_activa
     if conexion_activa == '':
         return HttpResponseRedirect('/select_db/')
 
-    message = ''
-    if request.method == 'POST':
-        form = DoctoInvfis_CreateForm(request.POST, database=conexion_activa)
+    form = DoctoInvfis_CreateForm(request.POST or None, database=conexion_activa)
+    
+    ultimofolio = Registry.objects.filter(nombre='SIG_FOLIO_INVFIS')
+
+    if not ultimofolio.exists():
+        message = 'Para poder crear un inventario es nesesario Asignarles folios automaticos a estos'
+    else:
         if form.is_valid():
-            folio = inventario_getnew_folio(conexion_activa)
+            folio = inventario_getnew_folio()
             inventario = form.save(commit= False)
             inventario.id =-1
             inventario.folio = folio
@@ -191,15 +193,8 @@ def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inv
             inventario.usuario_aut_modif =request.user.username
             inventario.save(using=conexion_activa)
             return HttpResponseRedirect('/inventarios/InventariosFisicos/')
-
-    else:
-        form = DoctoInvfis_CreateForm(database=conexion_activa)
-
-    c = {
-        'message':message,
-        'form':form
-        }
-
+        
+    c = {'message':message,'form':form}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
@@ -388,84 +383,6 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
-# @login_required(login_url='/login/')
-# def invetarioFisico_manageView(request, id = None, template_name='inventarios/Inventarios Fisicos/inventario_fisico.html'):
-#     message = ''
-#     hay_repetido = False
-#     if id:
-#         InventarioFisico = get_object_or_404(DoctosInvfis, pk=id)
-#     else:
-#         InventarioFisico = DoctosInvfis()
-
-#     if request.method == 'POST':
-#         InventarioFisico_form = DoctosInvfisManageForm(request.POST, request.FILES, instance=InventarioFisico)
-
-#         #PARA CARGAR DATOS DE EXCEL
-#         if 'excel' in request.POST:
-#             input_excel = request.FILES['file_inventario']
-#             book = xlrd.open_workbook(file_contents=input_excel.read())
-#             sheet = book.sheet_by_index(0)
-#             articulos = Articulos.objects.filter(es_almacenable='S')
-
-#             inventarioFisico_items = inventarioFisico_items_formset(DoctosInvfisDetManageForm, extra=articulos.count(), can_delete=True)
-            
-#             lista = []
-#             lista_articulos = []        
-
-#             for i in range(sheet.nrows):
-#                 clave_articulo = get_object_or_404(ClavesArticulos, clave=sheet.cell_value(i,0))
-#                 if clave_articulo and clave_articulo.articulo.es_almacenable=='S':
-#                     if clave_articulo.articulo.id in lista_articulos:
-#                         message = 'El Articulo [%s] con clave [%s] esta repetido en el archivo de excel por favor corrigelo para continuar '% (clave_articulo.articulo.nombre, clave_articulo.clave)
-#                         hay_repetido = True
-#                     lista.append({'articulo': clave_articulo.articulo, 'unidades':int(sheet.cell_value(i,1)),})
-#                     lista_articulos.append(clave_articulo.articulo.id)
-
-            
-#             articulos_enceros = Articulos.objects.exclude(pk__in=lista_articulos).filter(es_almacenable='S')
-            
-#             for i in articulos_enceros:
-                
-#                 #clave_articulo = ClavesArticulos.objects.filter(articulo__id=i.id)
-#                 articulosclav = ClavesArticulos.objects.filter(articulo__id=i.id)
-#                 if articulosclav:
-#                     lista.append({'articulo': i, 'clave':articulosclav[0].clave , 'unidades':0,})   
-#                 else:
-#                     lista.append({'articulo': i, 'clave':'', 'unidades':0,})    
-
-#             InventarioFisicoItems_formset = inventarioFisico_items(initial=lista)
-#         #GUARDA CAMBIOS EN INVENTARIO FISICO
-#         else:
-#             inventarioFisico_items = inventarioFisico_items_formset(DoctosInvfisDetManageForm, extra=1, can_delete=True)
-#             InventarioFisicoItems_formset = inventarioFisico_items(request.POST, request.FILES, instance=InventarioFisico)
-            
-#             if InventarioFisico_form.is_valid() and InventarioFisicoItems_formset.is_valid():
-#                 inventarioFisico = InventarioFisico_form.save(commit = False)
-
-#                 #CARGA NUEVO ID
-#                 if not inventarioFisico.id:
-#                     inventarioFisico.id = c_get_next_key('ID_DOCTOS')
-                
-#                 inventarioFisico.save()
-
-#                 #GUARDA ARTICULOS DE INVENTARIO FISICO
-#                 for articulo_form in InventarioFisicoItems_formset:
-#                     DetalleInventarioFisico = articulo_form.save(commit = False)
-#                     #PARA CREAR UNO NUEVO
-#                     if not DetalleInventarioFisico.id:
-#                         DetalleInventarioFisico.id = -1
-#                         DetalleInventarioFisico.docto_invfis = inventarioFisico
-                
-#                 InventarioFisicoItems_formset.save()
-#                 return HttpResponseRedirect('/inventarios/InventariosFisicos/')
-#     else:
-#         inventarioFisico_items = inventarioFisico_items_formset(DoctosInvfisDetManageForm, extra=1, can_delete=True)
-#         InventarioFisico_form= DoctosInvfisManageForm(instance=InventarioFisico)
-#         InventarioFisicoItems_formset = inventarioFisico_items(instance=InventarioFisico)
-    
-#     c = {'InventarioFisico_form': InventarioFisico_form, 'formset': InventarioFisicoItems_formset, 'message':message,}
-
-#     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
 def invetarioFisico_delete(request, id = None):
