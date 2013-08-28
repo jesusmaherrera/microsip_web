@@ -6,7 +6,7 @@ import autocomplete_light
 from microsip_web.apps.inventarios.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-from microsip_web.settings.common import MICROSIP_DATABASES
+from microsip_web.settings.common import MICROSIP_DATABASES, MICROSIP_DATOS_PATH
 from django.contrib.auth.forms import AuthenticationForm
 from microsip_web.apps.config.models import *
 import fdb
@@ -15,7 +15,7 @@ import autocomplete_light
 class SelectDBForm(forms.Form):    
      def __init__(self,*args,**kwargs):
         usuario = kwargs.pop('usuario')
-        db= fdb.connect(host="localhost",user="SYSDBA",password="masterkey",database="C:\Microsip datos\System\CONFIG.FDB")
+        db= fdb.connect(host="localhost",user="SYSDBA",password="masterkey",database="%s\System\CONFIG.FDB"%MICROSIP_DATOS_PATH)
         cur = db.cursor()
         if Usuario.objects.get(nombre__exact=usuario.username).acceso_empresas != 'T':
             consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS_USUARIOS, EMPRESAS, USUARIOS WHERE USUARIOS.usuario_id = empresas_usuarios.usuario_id AND EMPRESAS.empresa_id = empresas_usuarios.empresa_id AND usuarios.nombre = '%s'"% usuario

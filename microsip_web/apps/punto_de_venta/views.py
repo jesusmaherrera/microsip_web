@@ -533,7 +533,7 @@ def grupo_lineas_manageView(request, id = None, template_name='punto_de_venta/ar
 ##                                      ##
 ##########################################
 
-def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_ventas = '', plantilla_devoluciones = '', descripcion = '', conexion_activa = None):
+def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_ventas = '', plantilla_devoluciones = '', descripcion = '', conexion_activa = None, usuario_micorsip=''):
     error   = 0
     msg     = ''
     documentosData = []
@@ -574,7 +574,8 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
                 msg = msg,
                 descripcion = descripcion, 
                 tipo_documento = 'V',
-                conexion_activa=  conexion_activa,
+                conexion_activa =  conexion_activa,
+                usuario_micorsip = usuario_micorsip,
             )
             documentosGenerados = documentosData
         if crear_polizas_de     == 'D':
@@ -590,6 +591,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
                 descripcion = descripcion, 
                 tipo_documento = 'D',
                 conexion_activa = conexion_activa,
+                usuario_micorsip = usuario_micorsip,
             )
             
     elif error == 1 and msg=='':
@@ -633,6 +635,7 @@ def generar_polizas_View(request, template_name='punto_de_venta/herramientas/gen
                     plantilla_devoluciones=plantilla_devoluciones, 
                     descripcion= descripcion,
                     conexion_activa = conexion_activa,
+                    usuario_micorsip = request.user.username,
                     )
             else:
                 error =1

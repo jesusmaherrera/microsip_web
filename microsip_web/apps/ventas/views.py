@@ -57,7 +57,7 @@ def pedidos_view(request, template_name='ventas/documentos/pedidos/pedidos.html'
     c = {'pedidos':pedidos, }
     return render_to_response(template_name, c, context_instance=RequestContext(request))   
 
-def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_facturas = '', plantilla_devoluciones ='', descripcion = '', conexion_activa = None):
+def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_facturas = '', plantilla_devoluciones ='', descripcion = '', conexion_activa = None, usuario_micorsip=''):
     error   = 0
     msg     = ''
     documentosData = []
@@ -104,6 +104,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
                 descripcion = descripcion, 
                 tipo_documento = 'F',
                 conexion_activa = conexion_activa,
+                usuario_micorsip = usuario_micorsip,
             )
             documentosGenerados = documentosData
         if crear_polizas_de     == 'D' or crear_polizas_de  == 'FD':
@@ -119,6 +120,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
                 descripcion = descripcion, 
                 tipo_documento = 'D',
                 conexion_activa = conexion_activa,
+                usuario_micorsip = usuario_micorsip,
             )
 
     elif error == 1 and msg=='':
@@ -150,7 +152,7 @@ def facturas_View(request, template_name='ventas/herramientas/generar_polizas.ht
             plantilla_devoluciones  = form.cleaned_data['plantilla_2']
             descripcion             = form.cleaned_data['descripcion']
             if (crear_polizas_de == 'F' and not plantilla_facturas== None) or (crear_polizas_de == 'D' and not plantilla_devoluciones== None) or (crear_polizas_de == 'FD' and not plantilla_facturas== None and not plantilla_devoluciones== None):
-                documentosData, polizas_de_devoluciones, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla_facturas, plantilla_devoluciones, descripcion, conexion_activa)
+                documentosData, polizas_de_devoluciones, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla_facturas, plantilla_devoluciones, descripcion, conexion_activa, request.user.username)
             else:
                 error =1
                 msg = 'Seleciona una plantilla'

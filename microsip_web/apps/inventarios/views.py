@@ -31,6 +31,7 @@ from microsip_web.libs.tools import split_seq
 from triggers import triggers
 from microsip_web.apps.config.models import *
 import fdb
+from microsip_web.settings.common import MICROSIP_DATOS_PATH
 ##########################################
 ##                                      ##
 ##               LOGIN                  ##
@@ -88,7 +89,8 @@ def ingresar(request):
             
             acceso = None
             try:
-                db = fdb.connect(host="localhost",user=usuario,password=str(clave), database="C:\Microsip datos\System\CONFIG.FDB")
+                db = fdb.connect(host="localhost",user=usuario,password=str(clave), database="%s\System\CONFIG.FDB"% MICROSIP_DATOS_PATH)
+                db.close()
             except fdb.DatabaseError:
                 message = 'Nombre de usaurio o password no validos.'
             else:
@@ -103,10 +105,6 @@ def ingresar(request):
                 acceso = authenticate(username=usuario, password=clave)
 
             if acceso is not None:
-                try:
-                    db = fdb.connect(host="localhost",user=usuario,password=str(clave), database="C:\Microsip datos\System\CONFIG.FDB")
-                except fdb.DatabaseError:
-                    objects.asd
                 if acceso.is_active:
                     
 
@@ -187,10 +185,10 @@ def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inv
             inventario = form.save(commit= False)
             inventario.id =-1
             inventario.folio = folio
-            inventario.usuario_creador ='SYSDBA'
-            inventario.usuario_aut_creacion ='SYSDBA'
-            inventario.usuario_ult_modif ='SYSDBA'
-            inventario.usuario_aut_modif ='SYSDBA'
+            inventario.usuario_creador = request.user.username
+            inventario.usuario_aut_creacion =request.user.username
+            inventario.usuario_ult_modif =request.user.username
+            inventario.usuario_aut_modif =request.user.username
             inventario.save(using=conexion_activa)
             return HttpResponseRedirect('/inventarios/InventariosFisicos/')
 

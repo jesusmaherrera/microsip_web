@@ -45,6 +45,11 @@
       $("#id_clave").focus();
     });
 
+    $('#a_buscar').on('click',function(){
+      Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
+    });
+    
+
   });
 
    function mostrar_articulo(data){
@@ -99,7 +104,7 @@
   <div data-role="footer">
     <fieldset class="ui-grid-b ui-bar ui-bar-c" >
       <div class="ui-block-a">
-        <a href="#" data-theme="b" data-role="button" data-icon="back">Regresar</a>
+        <a href="#" data-theme="b" data-role="button" id='a_buscar' data-icon="back">buscar</a>
       </div>
       <div class="ui-block-b">
         <a href="#" data-theme="b" data-role="button" id='a_cancelar' data-icon="delete">Cancelar</a>

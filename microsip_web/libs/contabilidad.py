@@ -795,7 +795,7 @@ def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_
     
     return totales_cuentas, error, msg
 
-def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable, plantilla=None, crear_polizas_por='',crear_polizas_de=None, conexion_activa = None, **kwargs):
+def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable, plantilla=None, crear_polizas_por='',crear_polizas_de=None, conexion_activa = None, usuario_micorsip='',**kwargs):
     """ Crea las polizas contables segun el tipo y origen de documentos que se mande """
     
     msg             = kwargs.get('msg', '')
@@ -880,9 +880,9 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
                         nombre                  = '',
                         grupo_poliza_periodo    = None,
                         integ_ba                = 'N',
-                        usuario_creador         = 'SYSDBA',
+                        usuario_creador         = usuario_micorsip,
                         fechahora_creacion      = datetime.now(), usuario_aut_creacion = None, 
-                        usuario_ult_modif       = 'SYSDBA', fechahora_ult_modif = datetime.now(), usuario_aut_modif    = None,
+                        usuario_ult_modif       = usuario_micorsip, fechahora_ult_modif = datetime.now(), usuario_aut_modif    = None,
                         usuario_cancelacion     = None, fechahora_cancelacion   =  None, usuario_aut_cancelacion                = None,
                     )
                 

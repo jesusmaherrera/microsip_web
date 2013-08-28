@@ -20,6 +20,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core import management
 import fdb
+from microsip_web.settings.common import MICROSIP_DATABASES
 
 def inicializar_tablas(request):
     #ventas_inicializar_tablas()
@@ -33,12 +34,9 @@ def inicializar_tablas(request):
     #cuentas_por_cobrar_inicializar_tablas()
 
     #Sincronizar todas las bases de datos de microsip con tablas de la aplicacion
-    db= fdb.connect(host="localhost",user="SYSDBA",password="masterkey",database="C:\Microsip datos\System\CONFIG.FDB")
-    cur = db.cursor()
-    cur.execute(u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS")
-    empresas_rows = cur.fetchall()
-    for empresa_str in empresas_rows:
-        management.call_command('syncdb', database=empresa_str[0])
+    
+    for empresa in MICROSIP_DATABASES.keys():
+        management.call_command('syncdb', database=empresa)
 
     return HttpResponseRedirect('/')
 

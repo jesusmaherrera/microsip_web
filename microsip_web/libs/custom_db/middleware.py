@@ -10,35 +10,18 @@ class CustomerMiddleware(object):
 
 def get_database_name(request):
     session_key = request.session.session_key
+    
     try:
         session = Session.objects.get(session_key=session_key)
         uid = session.get_decoded().get('_auth_user_id')
+        
         user = User.objects.get(pk=uid)
-         
-        profile = UserProfile.objects.get(pk=uid)
- 
+        
+        profile = UserProfile.objects.get(usuario=uid)
+        
         if profile:
             return profile.conexion_activa
         else:
             return None
     except:
         return None
-#     # db= fdb.connect(host="localhost",user="SYSDBA",password="masterkey",database="C:\Microsip datos\DJANGO.FDB")
-#     # cur = db.cursor()
-#     # cur.execute("SELECT SESSION_DATA FROM DJANGO_SESSION WHERE SESSION_KEY=%s"%session_key)
-#     # empresas_rows = cur.fetchall()
-#     # return 'AD2007'
-#     try:
-#         session = Session.objects.get(session_key=session_key)
-#         uid = session.get_decoded().get('_auth_user_id')
-#         user = User.objects.get(pk=uid)
-
-#         profile = UserProfile.objects.get(pk=uid)
-
-#         return 'AD2007'
-#         # if profile:
-            
-#         # else:
-#         #     return None
-#     except:
-#         return None

@@ -31,7 +31,7 @@ from microsip_web.apps.cuentas_por_cobrar import models as modelsCC
 ##                                      ##
 ##########################################
 
-def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True, crear_polizas_por='Documento', crear_polizas_de='', plantilla='', descripcion= '', conexion_activa=''):
+def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True, crear_polizas_por='Documento', crear_polizas_de='', plantilla='', descripcion= '', conexion_activa='', usuario_micorsip=''):
     
     depto_co = DeptoCo.objects.get(clave='GRAL')
     error   = 0
@@ -63,6 +63,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
             msg = msg,
             descripcion = descripcion, 
             conexion_activa = conexion_activa,
+            usuario_micorsip = usuario_micorsip
         )
 
     elif error == 1 and msg=='':
@@ -93,7 +94,7 @@ def generar_polizas_View(request, template_name='cuentas_por_pagar/herramientas/
 
             msg = 'es valido'
 
-            documentosData, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla, descripcion, conexion_activa)
+            documentosData, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla, descripcion, conexion_activa, request.user.username)
             if documentosData == []:
                 msg_resultados = 'Lo siento, no se encontraron resultados para este filtro'
             else:
