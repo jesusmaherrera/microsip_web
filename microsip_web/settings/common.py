@@ -17,13 +17,12 @@ DATABASE_ROUTERS = ['microsip_web.libs.custom_db.databases_routers.MainRouter']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME':  '%s\USERS.FDB'% RUTA_PROYECTO,
-        'USER': FIREBIRD_USERNAME,                      # Not used with sqlite3.
-        'PASSWORD': FIREBIRD_PASSWORD,                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
-        'OPTIONS' : {'charset':'ISO8859_1'},
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME':  'USERS',
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
     'config': {
        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
