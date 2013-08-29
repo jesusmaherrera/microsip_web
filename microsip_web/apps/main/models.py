@@ -3,16 +3,31 @@ from django.db import models
 from datetime import datetime
 from django.contrib.auth.models import User
 
+class ConexionDB(models.Model):  
+    nombre = models.CharField(max_length=100)
+    TIPOS = (('L', 'Local'),('R', 'Remota'),)
+    tipo = models.CharField(max_length=1, choices=TIPOS)
+    servidor = models.CharField(max_length=250)
+    carpeta_datos = models.CharField(max_length=300)
+    usuario = models.CharField(max_length=300)
+    password = models.CharField(max_length=300)
+
+    def __str__(self):  
+          return nombre    
+          
+    class Meta:
+        app_label =u'auth' 
+        
 class UserProfile(models.Model):  
     usuario = models.OneToOneField(User)
-    conexion_activa = models.CharField(max_length=100)
+    basedatos_activa = models.CharField(max_length=100)
+    conexion_activa = models.ForeignKey(ConexionDB)
 
     def __str__(self):  
           return "%s's profile" % self.usuario  
     
     class Meta:
-        db_table = u'sic_userprofile'
-        app_label =u'auth' 
+        app_label =u'auth'
 
 class Carpeta(models.Model):
     nombre  = models.CharField(max_length=30)

@@ -2,6 +2,14 @@
 {% block title %}Selecciona una base de datos{% endblock %}
 
 {% block content %}
+{% if message %}
+<div class="alert alert-block alert-error fade in">
+<button type="button" class="close" data-dismiss="alert">×</button>
+<br>
+<p>{{ message }}</p>
+</div>
+{% endif %}
+
 <form  style='text-align:center;' id='formulario' action="#" method="post">{% csrf_token %}
 	{{ form.errors }}
 	<br>

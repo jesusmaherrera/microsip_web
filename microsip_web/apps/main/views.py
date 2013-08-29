@@ -2,12 +2,11 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect
-
 from django.template import RequestContext
 
 from decimal import *
 from microsip_web.libs.custom_db.procedures import procedures
-
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from models import *
 from forms import *
 
@@ -22,21 +21,46 @@ from django.core import management
 import fdb
 from microsip_web.settings.common import MICROSIP_DATABASES
 
+@login_required(login_url='/login/')
+def conexiones_View(request, template_name='main/conexiones/conexiones.html'):
+    c = {'conexiones':ConexionDB.objects.all()}
+    return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def conexion_manageView(request, id = None, template_name='main/conexiones/conexion.html'):
+    message = ''
+
+    if id:
+        conexion = get_object_or_404( ConexionDB, pk=id)
+    else:
+        conexion =  ConexionDB()
+        
+    if request.method == 'POST':
+        form = ConexionManageForm(request.POST, instance=  conexion)
+        if form.is_valid():
+            grupo = form.save()
+            return HttpResponseRedirect('/conexiones/')
+    else:
+        form = ConexionManageForm(instance= conexion)
+
+    c = {'form':form,}
+    return render_to_response(template_name, c, context_instance=RequestContext(request))
+
 def inicializar_tablas(request):
     #ventas_inicializar_tablas()
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
-    punto_de_venta_inicializar_tablas( database = conexion_activa )
-    inventario_inicializar_tablas( database = conexion_activa )
+    punto_de_venta_inicializar_tablas( database = basedatos_activa )
+    inventario_inicializar_tablas( database = basedatos_activa )
     #cuentas_por_pagar_inicializar_tablas()
     #cuentas_por_cobrar_inicializar_tablas()
 
     #Sincronizar todas las bases de datos de microsip con tablas de la aplicacion
     
-    for empresa in MICROSIP_DATABASES.keys():
-        management.call_command('syncdb', database=empresa)
+    # for empresa in MICROSIP_DATABASES.keys():
+    management.call_command('syncdb', database=basedatos_activa)
 
     return HttpResponseRedirect('/')
 

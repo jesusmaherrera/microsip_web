@@ -77,11 +77,16 @@
           {% if not user.is_anonymous %}
           <li id="fat-menu" class="dropdown">
             <a href="#" id="drop3" role="button" class="dropdown-toggle" data-toggle="dropdown" style="padding-top: 0.7em;">
-              <i class="icon-user"></i> {{ user.username }} ({{ request.user.userprofile.conexion_activa }})
+              <i class="icon-user"></i> {{ user.username }} ({{ request.user.userprofile.basedatos_activa }})
               <b class="caret"></b>
             </a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
               <li role="presentation"><a role="menuitem" tabindex="-1" href="/select_db/"><i class="icon-cog"></i> Cambiar Empresa</a></li>
+              <li role="presentation" class="divider"></li>
+              {% if request.user.username == 'SYSDBA' %}
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="/conexiones/"><i class="icon-random"></i> Conexiones</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="/inicializar_tablas/"><i class="icon-refresh"></i> Actualizar base de datos</a></li>
+              {% endif %}
               <li role="presentation" class="divider"></li>
               <li role="presentation"><a role="menuitem" tabindex="-1" href="/logout/"> <i class="icon-remove"></i> Cerrar Sesion</a></li>
             </ul>

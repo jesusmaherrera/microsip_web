@@ -20,8 +20,8 @@ from django.db.models import Sum, Max
 
 @login_required(login_url='/login/')
 def polizas_View(request, template_name='contabilidad/polizas/polizas.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     polizas_list = DoctoCo.objects.filter(estatus='N').order_by('-fecha') 
@@ -44,8 +44,8 @@ def polizas_View(request, template_name='contabilidad/polizas/polizas.html'):
 
 @login_required(login_url='/login/')
 def polizas_pendientesView(request, template_name='contabilidad/polizas/polizas_pendientes.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     polizas_list = DoctoCo.objects.filter(estatus='P').order_by('-fecha') 

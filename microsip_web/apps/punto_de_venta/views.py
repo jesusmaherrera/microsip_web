@@ -19,11 +19,11 @@ from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_f
 
 @login_required(login_url='/login/')
 def inicializar_tablas(request):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
-    c = connections[conexion_activa].cursor()
+    c = connections[basedatos_activa].cursor()
     #DETALLE DE VENTAS
     c.execute(triggers['SIC_PUNTOS_PV_DOCTOSPVDET_BU'])
     c.execute(triggers['SIC_PUNTOS_PV_DOCTOSPVDET_AD'])
@@ -77,8 +77,8 @@ def create_facturageneral_dia(request, cliente_id=None):
 
 @login_required(login_url='/login/')
 def inicializar_puntos_clientes(request):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     Cliente.objects.update(puntos=0, dinero_electronico=0, hereda_valorpuntos=1, valor_puntos=0)
@@ -87,8 +87,8 @@ def inicializar_puntos_clientes(request):
 
 @login_required(login_url='/login/')
 def inicializar_puntos_articulos(request):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     Articulos.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
@@ -99,8 +99,8 @@ def inicializar_puntos_articulos(request):
 
 @login_required(login_url='/login/')
 def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punto_de_venta/articulos/articulos/articulos.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     msg = ''
@@ -282,8 +282,8 @@ def gruposgrupo_delete(request, categoria_padre=None, categoria_id=None, templat
 
 @login_required(login_url='/login/')
 def clientes_view(request, template_name='main/clientes/clientes/clientes.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     msg = ''
@@ -327,8 +327,8 @@ def clientes_view(request, template_name='main/clientes/clientes/clientes.html')
 
 @login_required(login_url='/login/')
 def tipos_cliente_view(request, template_name='main/clientes/tipos_cliente/tipos_clientes.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     tipos_cliente_list = TipoCliente.objects.all()
@@ -435,8 +435,8 @@ def cliente_searchView(request, template_name='main/clientes/clientes/cliente_se
 
 @login_required(login_url='/login/')
 def lineas_articulos_view(request, template_name='punto_de_venta/articulos/lineas/lineas_articulos.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     linea_articulos_list = LineaArticulos.objects.all()
@@ -485,8 +485,8 @@ def linea_articulos_manageView(request, id = None, template_name='punto_de_venta
 
 @login_required(login_url='/login/')
 def grupos_lineas_view(request, template_name='punto_de_venta/articulos/grupos/grupos_lineas.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     grupos_lineas_list = GrupoLineas.objects.all()
@@ -533,7 +533,7 @@ def grupo_lineas_manageView(request, id = None, template_name='punto_de_venta/ar
 ##                                      ##
 ##########################################
 
-def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_ventas = '', plantilla_devoluciones = '', descripcion = '', conexion_activa = None, usuario_micorsip=''):
+def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_ventas = '', plantilla_devoluciones = '', descripcion = '', basedatos_activa = None, usuario_micorsip=''):
     error   = 0
     msg     = ''
     documentosData = []
@@ -574,7 +574,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
                 msg = msg,
                 descripcion = descripcion, 
                 tipo_documento = 'V',
-                conexion_activa =  conexion_activa,
+                basedatos_activa =  basedatos_activa,
                 usuario_micorsip = usuario_micorsip,
             )
             documentosGenerados = documentosData
@@ -590,7 +590,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
                 msg = msg,
                 descripcion = descripcion, 
                 tipo_documento = 'D',
-                conexion_activa = conexion_activa,
+                basedatos_activa = basedatos_activa,
                 usuario_micorsip = usuario_micorsip,
             )
             
@@ -601,8 +601,8 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
 
 @login_required(login_url='/login/')
 def generar_polizas_View(request, template_name='punto_de_venta/herramientas/generar_polizas.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     polizas_ventas  = []
@@ -610,7 +610,7 @@ def generar_polizas_View(request, template_name='punto_de_venta/herramientas/gen
     msg             = msg_informacion =''
 
     if request.method == 'POST':
-        form = GenerarPolizasManageForm( request.POST, database = conexion_activa )
+        form = GenerarPolizasManageForm( request.POST, database = basedatos_activa )
         if form.is_valid():
 
             fecha_ini                   = form.cleaned_data['fecha_ini']
@@ -634,7 +634,7 @@ def generar_polizas_View(request, template_name='punto_de_venta/herramientas/gen
                     plantilla_ventas=plantilla_ventas, 
                     plantilla_devoluciones=plantilla_devoluciones, 
                     descripcion= descripcion,
-                    conexion_activa = conexion_activa,
+                    basedatos_activa = basedatos_activa,
                     usuario_micorsip = request.user.username,
                     )
             else:
@@ -644,10 +644,10 @@ def generar_polizas_View(request, template_name='punto_de_venta/herramientas/gen
             if polizas_ventas == [] and not error == 1:
                 msg = 'Lo siento, no se encontraron documentos para ralizar polizas con este filtro'
             elif not polizas_ventas == [] and not error == 1:
-                form = GenerarPolizasManageForm( database = conexion_activa )       
+                form = GenerarPolizasManageForm( database = basedatos_activa )       
                 msg_informacion = 'Polizas generadas satisfactoriamente, *Ahora revisa las polizas pendientes generadas en el modulo de contabilidad'
     else:
-        form = GenerarPolizasManageForm( database = conexion_activa )
+        form = GenerarPolizasManageForm( database = basedatos_activa )
     
     c = {'documentos':polizas_ventas,'msg':msg,'form':form,'msg_informacion':msg_informacion,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
@@ -723,8 +723,8 @@ def plantilla_poliza_manageView(request, id = None, template_name='punto_de_vent
 
 @login_required(login_url='/login/')
 def ventas_de_mostrador_view(request, template_name='punto_de_venta/documentos/ventas/ventas_de_mostrador.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     ventas_list = Docto_PV.objects.filter(tipo='V').order_by('-id')
@@ -801,8 +801,8 @@ def venta_mostrador_manageView(request, id = None, template_name='punto_de_venta
 
 @login_required(login_url='/login/')
 def devoluciones_de_ventas_view(request, template_name='punto_de_venta/documentos/devoluciones/devoluciones_de_ventas.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     documentos_list = Docto_PV.objects.filter(tipo='D')

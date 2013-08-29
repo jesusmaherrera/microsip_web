@@ -1,0 +1,37 @@
+{% extends "main/base.html" %}
+{% block title %}Conexiones{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Conexiones {% endblock %}
+{% block content %}
+<div class="ms-custom-form container-fluid" style=" height: 4em; ">
+  <div class="row-fluid">
+    <div class="span3"><h3>Conexiones</h3></div>
+    <div class="span8" style=" margin-top: 15px; ">
+      <a class="btn" href="/conexion/"><i class=" icon-plus"></i></a>
+    </div>
+  </div>
+</div>
+<table class="table table-striped table-hover">
+    <tr>
+      <th>Nombre</th>
+      <th>Tipo</th>
+      <th>Servidor</th>
+      <th>Carpeta de datos</th>
+    </tr>
+    {% for conexion in conexiones %}
+    <tr>
+      <td><a href="/conexion/{{ conexion.id }}/">{{ conexion.nombre }}</a></td>
+      <td>{{ conexion.tipo }}</td>
+      <td>{{ conexion.servidor }}</td>
+      <td>{{ conexion.carpeta_datos }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<br>
+{% endblock %}

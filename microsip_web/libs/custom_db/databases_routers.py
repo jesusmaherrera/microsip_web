@@ -4,7 +4,7 @@ class MainRouter(object):
     """
     def db_for_read(self, model, **hints):
         if model._meta.app_label == 'config':
-            return 'config'
+            return '1-CONFIG'
         elif model._meta.app_label == 'auth':
             return 'default'
         elif model._meta.app_label == 'django':
@@ -24,7 +24,7 @@ class MainRouter(object):
         Attempts to write auth models go to auth_db.
         """
         if model._meta.app_label == 'config':
-            return 'config'
+            return '1-CONFIG'
         elif model._meta.app_label == 'auth':
             return 'default'
         elif model._meta.app_label == 'django':
@@ -59,7 +59,7 @@ class MainRouter(object):
         Make sure the auth app only appears in the 'auth_db'
         database.
         """
-        if model._meta.app_label == 'config' or db == 'config':
+        if model._meta.app_label == 'config' or db == '1-CONFIG':
             return False
         elif model._meta.app_label == 'auth' and db != 'default':
             return False

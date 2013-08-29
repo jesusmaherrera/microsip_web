@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from microsip_web.apps.inventarios.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-from microsip_web.settings.common import MICROSIP_DATABASES, MICROSIP_DATOS_PATH
+from microsip_web.settings.common import MICROSIP_DATABASES, DATABASES
 from django.contrib.auth.forms import AuthenticationForm
 from microsip_web.apps.config.models import *
 import fdb
@@ -15,22 +15,22 @@ import autocomplete_light
 class SelectDBForm(forms.Form):    
      def __init__(self,*args,**kwargs):
         usuario = kwargs.pop('usuario')
-
-        try:
-            acceso_empresas = Usuario.objects.get(nombre__exact=usuario.username).acceso_empresas
-        except ObjectDoesNotExist:
-            if usuario.username == 'SYSDBA':
-                acceso_empresas = 'T'            
-
-        if acceso_empresas == 'T':
-            consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS"
-        else:
-            consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS_USUARIOS, EMPRESAS, USUARIOS WHERE USUARIOS.usuario_id = empresas_usuarios.usuario_id AND EMPRESAS.empresa_id = empresas_usuarios.empresa_id AND usuarios.nombre = '%s'"% usuario
-        
         empresas = []
-        for empresa in MICROSIP_DATABASES.keys():
-            empresa_option = [empresa, empresa]
-            empresas.append(empresa_option)
+        if '1-CONFIG' in DATABASES.keys():
+            try:
+                acceso_empresas = Usuario.objects.get(nombre__exact=usuario.username).acceso_empresas
+            except ObjectDoesNotExist:
+                if usuario.username == 'SYSDBA':
+                    acceso_empresas = 'T'            
+
+            if acceso_empresas == 'T':
+                consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS"
+            else:
+                consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS_USUARIOS, EMPRESAS, USUARIOS WHERE USUARIOS.usuario_id = empresas_usuarios.usuario_id AND EMPRESAS.empresa_id = empresas_usuarios.empresa_id AND usuarios.nombre = '%s'"% usuario
+            
+            for empresa in MICROSIP_DATABASES.keys():
+                empresa_option = [empresa, empresa]
+                empresas.append(empresa_option)
 
         super(SelectDBForm,self).__init__(*args,**kwargs)
         self.fields['conexion'] = forms.ChoiceField(choices= empresas)

@@ -57,7 +57,7 @@ def pedidos_view(request, template_name='ventas/documentos/pedidos/pedidos.html'
     c = {'pedidos':pedidos, }
     return render_to_response(template_name, c, context_instance=RequestContext(request))   
 
-def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_facturas = '', plantilla_devoluciones ='', descripcion = '', conexion_activa = None, usuario_micorsip=''):
+def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_facturas = '', plantilla_devoluciones ='', descripcion = '', basedatos_activa = None, usuario_micorsip=''):
     error   = 0
     msg     = ''
     documentosData = []
@@ -103,7 +103,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
                 msg = msg,
                 descripcion = descripcion, 
                 tipo_documento = 'F',
-                conexion_activa = conexion_activa,
+                basedatos_activa = basedatos_activa,
                 usuario_micorsip = usuario_micorsip,
             )
             documentosGenerados = documentosData
@@ -119,7 +119,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
                 msg = msg,
                 descripcion = descripcion, 
                 tipo_documento = 'D',
-                conexion_activa = conexion_activa,
+                basedatos_activa = basedatos_activa,
                 usuario_micorsip = usuario_micorsip,
             )
 
@@ -130,8 +130,8 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
 
 @login_required(login_url='/login/')
 def facturas_View(request, template_name='ventas/herramientas/generar_polizas.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     documentosData = []
@@ -140,7 +140,7 @@ def facturas_View(request, template_name='ventas/herramientas/generar_polizas.ht
     error = 0
 
     if request.method == 'POST':
-        form = GenerarPolizasManageForm(request.POST, database = conexion_activa)
+        form = GenerarPolizasManageForm(request.POST, database = basedatos_activa)
         if form.is_valid():
 
             fecha_ini               = form.cleaned_data['fecha_ini']
@@ -152,7 +152,7 @@ def facturas_View(request, template_name='ventas/herramientas/generar_polizas.ht
             plantilla_devoluciones  = form.cleaned_data['plantilla_2']
             descripcion             = form.cleaned_data['descripcion']
             if (crear_polizas_de == 'F' and not plantilla_facturas== None) or (crear_polizas_de == 'D' and not plantilla_devoluciones== None) or (crear_polizas_de == 'FD' and not plantilla_facturas== None and not plantilla_devoluciones== None):
-                documentosData, polizas_de_devoluciones, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla_facturas, plantilla_devoluciones, descripcion, conexion_activa, request.user.username)
+                documentosData, polizas_de_devoluciones, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla_facturas, plantilla_devoluciones, descripcion, basedatos_activa, request.user.username)
             else:
                 error =1
                 msg = 'Seleciona una plantilla'
@@ -166,10 +166,10 @@ def facturas_View(request, template_name='ventas/herramientas/generar_polizas.ht
                 msg = 'Lo siento, no se encontraron facturas ni devoluciones para este filtro'
             
             if (not documentosData == [] or not polizas_de_devoluciones == []) and error == 0:
-                form = GenerarPolizasManageForm(database = conexion_activa)       
+                form = GenerarPolizasManageForm(database = basedatos_activa)       
                 msg_informacion = 'Polizas generadas satisfactoriamente, *Ahora revisa las polizas pendientes generadas en el modulo de contabilidad'
     else:
-        form = GenerarPolizasManageForm(database = conexion_activa)
+        form = GenerarPolizasManageForm(database = basedatos_activa)
     
     c = {'documentos':documentosData, 'polizas_de_devoluciones':polizas_de_devoluciones,'msg':msg,'form':form,'msg_informacion':msg_informacion,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))

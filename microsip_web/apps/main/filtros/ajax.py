@@ -8,7 +8,7 @@ from microsip_web.apps.main.models import *
 
 @dajaxice_register(method='GET')
 def crear_nodo(request, nombre, padre):
-    id = get_next_id_carpeta(conexion_activa)
+    id = get_next_id_carpeta(basedatos_activa)
     Carpeta.objects.create(id=id, nombre=nombre, carpeta_padre=Carpeta.objects.get(pk=padre))
     return simplejson.dumps({'id':id})
 

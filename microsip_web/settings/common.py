@@ -3,7 +3,8 @@
 # Identificando la ruta del proyecto
 import os
 import fdb
-from local_settings import MICROSIP_MODULES, MICROSIP_DATOS_PATH, FIREBIRD_USERNAME, FIREBIRD_PASSWORD
+import sqlite3
+from local_settings import MICROSIP_MODULES
 
 RUTA_PROYECTO =os.path.dirname(os.path.realpath(__file__)).strip('settings')
 DIR = os.path.abspath(os.path.dirname(__file__))
@@ -14,57 +15,73 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ROUTERS = ['microsip_web.libs.custom_db.databases_routers.MainRouter']
-
+MICROSIP_DATABASES = {}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME':  'datos\USERS',
+        'NAME':  'datos\USERS.sqlite',
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
-    'config': {
-       'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '%s\System\CONFIG.FDB'% MICROSIP_DATOS_PATH,
-        'USER': FIREBIRD_USERNAME,                      # Not used with sqlite3.
-        'PASSWORD': FIREBIRD_PASSWORD,                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
-        'OPTIONS' : {'charset':'ISO8859_1'},
-    },
 }
+try:
+    users_conn = sqlite3.connect('datos\USERS.sqlite')
+    users_cur = users_conn.cursor()
+    users_cur.execute('''SELECT * FROM auth_conexiondb''')
+    conexiones_rows = users_cur.fetchall()
+    users_conn.close()
 
-MICROSIP_DATABASES = {}
+    for conexion in conexiones_rows:
+        host = conexion[3]
+        password = conexion[6]
+        user = conexion[5]
+        carpeta_datos = conexion[4]
+        conexion_exitosa = True
+        try:
+            db= fdb.connect(host=host, user=user, password=password, database="%s\System\CONFIG.FDB"%carpeta_datos )
+        except fdb.DatabaseError:
+            conexion_exitosa = False
+        else:
+            cur = db.cursor()
+            cur.execute("SELECT NOMBRE_CORTO FROM EMPRESAS")
+            empresas_rows = cur.fetchall()
+            db.close()
 
-db= fdb.connect(host="localhost",user=FIREBIRD_USERNAME,password=FIREBIRD_PASSWORD,database="%s\System\CONFIG.FDB"% MICROSIP_DATOS_PATH)
-cur = db.cursor()
-cur.execute("SELECT NOMBRE_CORTO FROM EMPRESAS")
-empresas_rows = cur.fetchall()
-db.close()
+        if conexion_exitosa:
+            DATABASES[ '%s-CONFIG'%conexion[0] ] = {
+                'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+                'NAME': '%s\System\CONFIG.FDB'% carpeta_datos,
+                'USER': user,                      # Not used with sqlite3.
+                'PASSWORD': password,                  # Not used with sqlite3.
+                'HOST': host,                      # Set to empty string for localhost. Not used with sqlite3.
+                'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
+                'OPTIONS' : {'charset':'ISO8859_1'},
+            }
 
+            for empresa in empresas_rows:
+                MICROSIP_DATABASES[empresa[0].replace(' ','_')] = {
+                    'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+                    'NAME': u'%s\%s.FDB'% (carpeta_datos, empresa[0]),
+                    'USER': user,                      # Not used with sqlite3.
+                    'PASSWORD': password,                  # Not used with sqlite3.
+                    'HOST': host,                      # Set to empty string for localhost. Not used with sqlite3.
+                    'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
+                    'OPTIONS' : {'charset':'ISO8859_1'},
+                }
 
-for empresa in empresas_rows:
-    MICROSIP_DATABASES[empresa[0].replace(' ','_')] = {
-        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': u'%s\%s.FDB'% (MICROSIP_DATOS_PATH, empresa[0]),
-        'USER': FIREBIRD_USERNAME,                      # Not used with sqlite3.
-        'PASSWORD': FIREBIRD_PASSWORD,                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
-        'OPTIONS' : {'charset':'ISO8859_1'},
-    }
-
-    DATABASES[empresa[0].replace(' ','_')] = {
-        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': u'%s\%s.FDB'% (MICROSIP_DATOS_PATH, empresa[0]),
-        'USER': FIREBIRD_USERNAME,                      # Not used with sqlite3.
-        'PASSWORD': FIREBIRD_PASSWORD,                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
-        'OPTIONS' : {'charset':'ISO8859_1'},
-    }
-
+                DATABASES[empresa[0].replace(' ','_')] = {
+                    'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+                    'NAME': u'%s\%s.FDB'% (carpeta_datos, empresa[0]),
+                    'USER': user,                      # Not used with sqlite3.
+                    'PASSWORD': password,                  # Not used with sqlite3.
+                    'HOST': host,                      # Set to empty string for localhost. Not used with sqlite3.
+                    'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
+                    'OPTIONS' : {'charset':'ISO8859_1'},
+                }
+except sqlite3.Error, e:
+    print "Error %s:" % e.args[0]
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.

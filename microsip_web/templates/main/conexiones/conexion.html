@@ -1,0 +1,65 @@
+{% extends "main/base.html" %}
+{% block title %}Conexion{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} <a href="/conexiones/">Conexiones</a> <i class=" icon-play"></i> Conexion{% endblock %}
+{% block content %}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
+  {% csrf_token %}
+    {{ form.errors }}
+  <div class="span4" >
+    <label>Nombre</label>
+    <div class="input-prepend input-append">
+      {{ form.nombre }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Tipo</label>
+    <div class="input-prepend input-append">
+      {{ form.tipo }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Servidor</label>
+    <div class="input-prepend input-append">
+      {{ form.servidor }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Carpeta Datos</label>
+    <div class="input-prepend input-append">
+      {{ form.carpeta_datos }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Usuario</label>
+    <div class="input-prepend input-append">
+      {{ form.usuario }}
+    </div>
+  </div>
+  <div class="span4" >
+    <label>Password</label>
+    <div class="input-prepend input-append">
+      {{ form.password }}
+    </div>
+  </div>
+
+  {% if message %}
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
+    <p>{{ message }}</p>
+  </div>
+  {% endif %}
+  <br style='clear:both;'>
+  <br>
+  <div class="form-actions mainmenu" >
+    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+  </div>
+</form>
+{% endblock %}

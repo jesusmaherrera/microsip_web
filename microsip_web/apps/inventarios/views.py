@@ -31,7 +31,7 @@ from microsip_web.libs.tools import split_seq
 from triggers import triggers
 from microsip_web.apps.config.models import *
 import fdb
-from microsip_web.settings.common import MICROSIP_DATOS_PATH
+from microsip_web.settings.common import MICROSIP_DATABASES, DATABASES
 ##########################################
 ##                                      ##
 ##               LOGIN                  ##
@@ -39,11 +39,11 @@ from microsip_web.settings.common import MICROSIP_DATOS_PATH
 ##########################################
 
 def inicializar_tablas(request):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
-    c = connections[conexion_activa].cursor()
+    c = connections[basedatos_activa].cursor()
     #ENTRADAS Y SALIDAS DE INVENTARIOS
     c.execute(triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'])
     c.execute(triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'])
@@ -58,22 +58,23 @@ def inicializar_tablas(request):
 
 @login_required(login_url='/login/')
 def select_db(request, template_name='main/select_db.html'):
+    form = SelectDBForm(request.POST or None, usuario= request.user )
+    message = ''
+    if not '1-CONFIG' in DATABASES.keys():
+        message = 'datos incorrectos en conexion de datos selecionada'
 
-    if request.method == 'POST':
-        form = SelectDBForm(request.POST, usuario= request.user )
-        if form.is_valid():
-            user_profile = UserProfile.objects.filter(usuario= request.user)
-            conexion = form.cleaned_data['conexion'].replace(' ','_')
-            if user_profile.exists():
-                user_profile.update(conexion_activa = conexion)
-            else:
-                UserProfile.objects.create(usuario= request.user, conexion_activa=conexion)
+    if form.is_valid():
+        user_profile = UserProfile.objects.filter(usuario= request.user)
+        conexion = form.cleaned_data['conexion'].replace(' ','_')
+        if user_profile.exists():
+            user_profile.update(basedatos_activa = conexion)
+        else:
+            UserProfile.objects.create(usuario= request.user, basedatos_activa=conexion)
 
-            return HttpResponseRedirect('/')
-            call_command('runserver')
-    else:
-        form = SelectDBForm(usuario= request.user)
-    c =  {'form':form,}
+        return HttpResponseRedirect('/')
+        call_command('runserver')
+    
+    c =  {'form':form, 'message':message,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 def ingresar(request):
@@ -88,22 +89,26 @@ def ingresar(request):
             clave = request.POST['password']
             
             acceso = None
-            try:
-                db = fdb.connect(host="localhost",user=usuario,password=str(clave), database="%s\System\CONFIG.FDB"% MICROSIP_DATOS_PATH)
-                db.close()
-            except fdb.DatabaseError:
-                message = 'Nombre de usaurio o password no validos. EEEE'
-            else:
-                try:
-                    u = User.objects.get(username__exact=usuario)
-                    u.set_password(str(clave))
-                    u.save()
-                except ObjectDoesNotExist:
-                    User.objects.create_user(username = usuario, password=str(clave))
-                    if usuario == 'SYSDBA':
-                        User.objects.filter(username = 'SYSDBA').update(is_superuser=True, is_staff=True)
 
-                acceso = authenticate(username=usuario, password=clave)
+            conexion = ConexionDB.objects.filter(pk=1)
+
+            if conexion.exists():
+                db = fdb.connect(host=conexion[0].servidor ,user=usuario,password=str(clave), database="%s\System\CONFIG.FDB"% conexion[0].carpeta_datos)
+                db.close()
+            else:
+                message = 'Nombre de usaurio o password no validos.'
+            
+            try:
+                u = User.objects.get(username__exact=usuario)
+                u.set_password(str(clave))
+                u.save()
+            except ObjectDoesNotExist:
+                User.objects.create_user(username = usuario, password=str(clave))
+                if usuario == 'SYSDBA':
+                    User.objects.filter(username = 'SYSDBA').update(is_superuser=True, is_staff=True)
+
+            acceso = authenticate(username=usuario, password=clave)
+                
             if acceso is not None:
                 if acceso.is_active:
                     login(request, acceso)
@@ -118,7 +123,7 @@ def ingresar(request):
     return render_to_response('main/login.html',{'form':formulario, 'message':message,}, context_instance=RequestContext(request))
 
 def logoutUser(request):
-    user_profile = UserProfile.objects.filter(usuario= request.user).update(conexion_activa = "")
+    user_profile = UserProfile.objects.filter(usuario= request.user).update(basedatos_activa = "")
     logout(request)
     return HttpResponseRedirect('/')
 
@@ -137,8 +142,8 @@ def c_get_next_key(seq_name, database = None ):
 
 @login_required(login_url='/login/')
 def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisicos/inventarios_fisicos.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
     
     inventarios_fisicos_list = DoctosInvfis.objects.filter(aplicado='N', cancelado='N').order_by('-fecha')
@@ -171,11 +176,11 @@ def inventario_getnew_folio():
 @login_required(login_url='/login/')
 def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inventarios Fisicos/create_inventario_fisico_pa.html'):
     message = ''
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
-    form = DoctoInvfis_CreateForm(request.POST or None, database=conexion_activa)
+    form = DoctoInvfis_CreateForm(request.POST or None, database=basedatos_activa)
     
     ultimofolio = Registry.objects.filter(nombre='SIG_FOLIO_INVFIS')
 
@@ -191,7 +196,7 @@ def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inv
             inventario.usuario_aut_creacion =request.user.username
             inventario.usuario_ult_modif =request.user.username
             inventario.usuario_aut_modif =request.user.username
-            inventario.save(using=conexion_activa)
+            inventario.save(using=basedatos_activa)
             return HttpResponseRedirect('/inventarios/InventariosFisicos/')
         
     c = {'message':message,'form':form}
@@ -205,8 +210,8 @@ def invetarioFisico_mobile_pa_manageView(request, id = None, rapido=1, template_
 
 @login_required(login_url='/login/')
 def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa.html'):
-    conexion_activa =  request.user.userprofile.conexion_activa
-    if conexion_activa == '':
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
     message = ''
@@ -276,7 +281,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
 
                     except ObjectDoesNotExist:
                         if detalleInv.unidades >= 0:
-                            id_detalle = c_get_next_key('ID_DOCTOS', conexion_activa)
+                            id_detalle = c_get_next_key('ID_DOCTOS', basedatos_activa)
                             detalleInv.id = id_detalle
                             articulos_claves =ClavesArticulos.objects.filter(articulo= detalleInv.articulo)
                             
@@ -297,7 +302,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                             if art_discreto.count() > 0:
                                 art_discreto = art_discreto[0]
                             else:
-                                art_discreto = ArticulosDiscretos.objects.create(id=next_id('ID_CATALOGOS', conexion_activa), clave = form.clave, articulo = form.articulo, tipo='S', fecha= None)        
+                                art_discreto = ArticulosDiscretos.objects.create(id=next_id('ID_CATALOGOS', basedatos_activa), clave = form.clave, articulo = form.articulo, tipo='S', fecha= None)        
 
                             if DesgloseEnDiscretosInvfis.objects.filter(art_discreto = art_discreto).exists() and detalleInv.unidades > 0:
                                 msg_series = 'Ya existe un articulo registrado en inventario con numero de serie [%s]'%form.clave
@@ -305,7 +310,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                             if error == 0:
                                 if detalleInv.unidades > 0 :
                                     if movimiento == 'crear':
-                                        detalleInv.save(using='conexion_activa')
+                                        detalleInv.save(using='basedatos_activa')
 
                                     desglose = DesgloseEnDiscretosInvfis(
                                         id = -1,
@@ -313,7 +318,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                                         art_discreto = art_discreto,
                                         unidades = 1,
                                         )
-                                    desglose.save(using='conexion_activa')
+                                    desglose.save(using='basedatos_activa')
                                 else:
                                     desgloses_a_eliminar = DesgloseEnDiscretosInvfis.objects.filter(art_discreto=art_discreto)
                                     
@@ -365,7 +370,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
         # If page is out of range (e.g. 9999), deliver last page of results.
         detallesInventario = paginator.page(paginator.num_pages)
 
-    lineas_form = linea_articulos_form(database=conexion_activa)
+    lineas_form = linea_articulos_form(database=basedatos_activa)
 
     c = {
         'message':message,
