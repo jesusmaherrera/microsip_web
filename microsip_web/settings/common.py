@@ -34,6 +34,8 @@ try:
     users_conn.close()
 
     for conexion in conexiones_rows:
+        conexion_id = conexion[0]
+        conexion_id = "%02d" % conexion_id
         host = conexion[3]
         password = conexion[6]
         user = conexion[5]
@@ -50,7 +52,7 @@ try:
             db.close()
 
         if conexion_exitosa:
-            DATABASES[ '%s-CONFIG'%conexion[0] ] = {
+            DATABASES[ '%s-CONFIG'%conexion_id ] = {
                 'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
                 'NAME': '%s\System\CONFIG.FDB'% carpeta_datos,
                 'USER': user,                      # Not used with sqlite3.
@@ -61,7 +63,7 @@ try:
             }
 
             for empresa in empresas_rows:
-                MICROSIP_DATABASES[empresa[0].replace(' ','_')] = {
+                MICROSIP_DATABASES['%s-%s'%(conexion_id, empresa[0].replace(' ','_'))] = {
                     'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
                     'NAME': u'%s\%s.FDB'% (carpeta_datos, empresa[0]),
                     'USER': user,                      # Not used with sqlite3.
@@ -71,7 +73,7 @@ try:
                     'OPTIONS' : {'charset':'ISO8859_1'},
                 }
 
-                DATABASES[empresa[0].replace(' ','_')] = {
+                DATABASES['%s-%s'%(conexion_id, empresa[0].replace(' ','_'))] = {
                     'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
                     'NAME': u'%s\%s.FDB'% (carpeta_datos, empresa[0]),
                     'USER': user,                      # Not used with sqlite3.

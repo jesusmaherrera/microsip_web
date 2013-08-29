@@ -6,7 +6,7 @@ my_local_global = local()
 
 class CustomerMiddleware(object):
     def process_request(self, request):
-        my_local_global.database_name = get_database_name(request)
+        my_local_global.database_name, my_local_global.conexion_activa = get_database_name(request)
 
 def get_database_name(request):
     session_key = request.session.session_key
@@ -20,8 +20,8 @@ def get_database_name(request):
         profile = UserProfile.objects.get(usuario=uid)
         
         if profile:
-            return profile.basedatos_activa
+            return profile.basedatos_activa, profile.conexion_activa.id
         else:
-            return None
+            return None, None
     except:
-        return None
+        return None, None

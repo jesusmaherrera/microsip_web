@@ -17,6 +17,7 @@ $(document).ready(function(){
   });
 });
 </script>    
+
 {% endblock %}
 {% block content %}
 	<header>
@@ -26,15 +27,14 @@ $(document).ready(function(){
 </header>
 <form id='formulario' action="/login/" method="post">{% csrf_token %}
 	<div style="margin: 0 auto 0 auto; display: block; width: 290px;">
+   {{ form.errors }} 
 	<span class="span3" style="text-align:left;">
-  		{{ form.non_field_errors }}
-  		{{ form.username.errors }}
+      {{ form.conexion_db }}
   		Usuario:<br>
   		{{ form.username }}
   	</span>
 	<span class="span3" style="clear:both; text-align:left;">
   		Contraseña:<br>
-  		{{ form.password.errors }}
   		{{ form.password }} 
       <input class="btn" type="submit" value="Ingresar" />
   	</span>

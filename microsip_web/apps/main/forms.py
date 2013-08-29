@@ -2,6 +2,7 @@
 from django import forms
 from models import *
 import autocomplete_light
+from django.contrib.auth.forms import AuthenticationForm
 
 class filtroarticulos_form(forms.Form):
     clave   = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'Clave...'}),required=False)

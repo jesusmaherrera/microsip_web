@@ -13,7 +13,7 @@ class ConexionDB(models.Model):
     password = models.CharField(max_length=300)
 
     def __str__(self):  
-          return nombre    
+          return self.nombre    
           
     class Meta:
         app_label =u'auth' 
@@ -21,7 +21,7 @@ class ConexionDB(models.Model):
 class UserProfile(models.Model):  
     usuario = models.OneToOneField(User)
     basedatos_activa = models.CharField(max_length=100)
-    conexion_activa = models.ForeignKey(ConexionDB)
+    conexion_activa = models.ForeignKey(ConexionDB, blank=True, null=True)
 
     def __str__(self):  
           return "%s's profile" % self.usuario  

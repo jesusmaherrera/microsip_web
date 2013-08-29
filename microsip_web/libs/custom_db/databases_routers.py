@@ -4,7 +4,8 @@ class MainRouter(object):
     """
     def db_for_read(self, model, **hints):
         if model._meta.app_label == 'config':
-            return '1-CONFIG'
+            from middleware import my_local_global
+            return '%02d-CONFIG'% my_local_global.conexion_activa
         elif model._meta.app_label == 'auth':
             return 'default'
         elif model._meta.app_label == 'django':
@@ -14,8 +15,7 @@ class MainRouter(object):
             model._meta.app_label == 'punto_de_venta' or model._meta.app_label == 'contabilidad':
 
             from middleware import my_local_global
-            db_name = my_local_global.database_name
-            return my_local_global.database_name
+            return '%02d-%s'% (my_local_global.conexion_activa ,my_local_global.database_name)
 
         return None
 
@@ -24,7 +24,8 @@ class MainRouter(object):
         Attempts to write auth models go to auth_db.
         """
         if model._meta.app_label == 'config':
-            return '1-CONFIG'
+            from middleware import my_local_global
+            return '%02d-CONFIG'% my_local_global.conexion_activa
         elif model._meta.app_label == 'auth':
             return 'default'
         elif model._meta.app_label == 'django':
@@ -33,7 +34,7 @@ class MainRouter(object):
             model._meta.app_label == 'cuentas_por_cobrar' or model._meta.app_label == 'ventas' or\
             model._meta.app_label == 'punto_de_venta' or model._meta.app_label == 'contabilidad':
             from middleware import my_local_global
-            return my_local_global.database_name
+            return '%02d-%s'% (my_local_global.conexion_activa ,my_local_global.database_name)
 
         return None
 
@@ -59,7 +60,10 @@ class MainRouter(object):
         Make sure the auth app only appears in the 'auth_db'
         database.
         """
-        if model._meta.app_label == 'config' or db == '1-CONFIG':
+        from middleware import my_local_global
+        dbconfig = '%s-CONFIG'% my_local_global.conexion_activa
+
+        if model._meta.app_label == 'config' or db == dbconfig:
             return False
         elif model._meta.app_label == 'auth' and db != 'default':
             return False

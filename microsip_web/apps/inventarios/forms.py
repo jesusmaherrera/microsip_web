@@ -12,25 +12,48 @@ from microsip_web.apps.config.models import *
 import fdb
 import autocomplete_light
 
+class CustomAuthenticationForm(forms.Form):
+    conexion_db = forms.ModelChoiceField(ConexionDB.objects.all(), required= False)
+    username = forms.CharField( max_length=150)
+    password = forms.CharField(widget=forms.PasswordInput())
+    
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        conexion_db = cleaned_data.get("conexion_db")
+        usuario = cleaned_data.get("username")
+        if conexion_db == None and usuario != 'SYSDBA':
+            raise forms.ValidationError(u'Por favor selecciona una conexion')
+
+        return cleaned_data
+
 class SelectDBForm(forms.Form):    
      def __init__(self,*args,**kwargs):
         usuario = kwargs.pop('usuario')
         empresas = []
-        if '1-CONFIG' in DATABASES.keys():
-            try:
-                acceso_empresas = Usuario.objects.get(nombre__exact=usuario.username).acceso_empresas
-            except ObjectDoesNotExist:
-                if usuario.username == 'SYSDBA':
-                    acceso_empresas = 'T'            
+        profile = UserProfile.objects.get(usuario=usuario)
+        if profile.conexion_activa:
+            if '%02d-CONFIG'% profile.conexion_activa.id  in DATABASES.keys():
+                acceso_empresas = ''
+                try:
+                    acceso_empresas = Usuario.objects.get(nombre__exact=usuario.username).acceso_empresas
+                except ObjectDoesNotExist:
+                    if usuario.username == 'SYSDBA':
+                        acceso_empresas = 'T'            
+                consulta = ''
+                if acceso_empresas == 'T':
+                    consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS"
+                elif acceso_empresas == 'L':
+                    consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS_USUARIOS, EMPRESAS, USUARIOS WHERE USUARIOS.usuario_id = empresas_usuarios.usuario_id AND EMPRESAS.empresa_id = empresas_usuarios.empresa_id AND usuarios.nombre = '%s'"% usuario
+                
+                db= fdb.connect(host=profile.conexion_activa.servidor, user= profile.conexion_activa.usuario, password=profile.conexion_activa.password, database="%s\System\CONFIG.FDB"%profile.conexion_activa.carpeta_datos)
+                cur = db.cursor()
+                cur.execute(consulta)
+                empresas_rows = cur.fetchall()
 
-            if acceso_empresas == 'T':
-                consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS"
-            else:
-                consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS_USUARIOS, EMPRESAS, USUARIOS WHERE USUARIOS.usuario_id = empresas_usuarios.usuario_id AND EMPRESAS.empresa_id = empresas_usuarios.empresa_id AND usuarios.nombre = '%s'"% usuario
-            
-            for empresa in MICROSIP_DATABASES.keys():
-                empresa_option = [empresa, empresa]
-                empresas.append(empresa_option)
+                for empresa in empresas_rows:
+                    empresa = empresa[0]
+                    empresa_option = [empresa, empresa]
+                    empresas.append(empresa_option)
 
         super(SelectDBForm,self).__init__(*args,**kwargs)
         self.fields['conexion'] = forms.ChoiceField(choices= empresas)

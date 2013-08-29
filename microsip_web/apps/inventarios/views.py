@@ -60,8 +60,12 @@ def inicializar_tablas(request):
 def select_db(request, template_name='main/select_db.html'):
     form = SelectDBForm(request.POST or None, usuario= request.user )
     message = ''
-    if not '1-CONFIG' in DATABASES.keys():
-        message = 'datos incorrectos en conexion de datos selecionada'
+    conexion_activa = request.user.userprofile.conexion_activa
+    if conexion_activa:
+        conexion_id = conexion_activa.id
+
+        if not '%02d-CONFIG'%conexion_id in DATABASES.keys():
+            message = 'datos incorrectos en conexion de datos'
 
     if form.is_valid():
         user_profile = UserProfile.objects.filter(usuario= request.user)
@@ -81,49 +85,61 @@ def ingresar(request):
     # if not request.user.is_anonymous():
     #   return HttpResponseRedirect('/')
     message = ''
-    if request.method == 'POST':
-        formulario = AuthenticationForm(request.POST)
+    formulario = CustomAuthenticationForm(request.POST or None)
 
-        if formulario.is_valid:
-            usuario = request.POST['username']
-            clave = request.POST['password']
-            
-            acceso = None
+    if formulario.is_valid():
+        usuario = request.POST['username']
+        clave = request.POST['password']
+        conexion_db = request.POST['conexion_db']
 
-            conexion = ConexionDB.objects.filter(pk=1)
-
-            if conexion.exists():
-                db = fdb.connect(host=conexion[0].servidor ,user=usuario,password=str(clave), database="%s\System\CONFIG.FDB"% conexion[0].carpeta_datos)
-                db.close()
-            else:
-                message = 'Nombre de usaurio o password no validos.'
-            
+        acceso = None
+        conexion = ConexionDB.objects.filter(pk=int(conexion_db))
+        usuarios_rows = []
+        if conexion.exists():
             try:
-                u = User.objects.get(username__exact=usuario)
-                u.set_password(str(clave))
-                u.save()
-            except ObjectDoesNotExist:
-                User.objects.create_user(username = usuario, password=str(clave))
-                if usuario == 'SYSDBA':
-                    User.objects.filter(username = 'SYSDBA').update(is_superuser=True, is_staff=True)
+                db = fdb.connect(host=conexion[0].servidor ,user=usuario,password=str(clave), database="%s\System\CONFIG.FDB"% conexion[0].carpeta_datos)
+                cur = db.cursor()
+                cur.execute("SELECT * FROM USUARIOS WHERE NOMBRE ='%s'"% usuario)
+                usuarios_rows = cur.fetchall()
+                db.close()
 
-            acceso = authenticate(username=usuario, password=clave)
-                
-            if acceso is not None:
-                if acceso.is_active:
-                    login(request, acceso)
-                    return HttpResponseRedirect('/select_db/')
-                else:
-                    return render_to_response('noactivo.html', context_instance=RequestContext(request))
-            else:
+            except fdb.DatabaseError:
                 message = 'Nombre de usaurio o password no validos.'
-    else:
-        formulario = AuthenticationForm()
+            else:
+                if usuarios_rows != []:
+                    try:
+                        u = User.objects.get(username__exact=usuario)
+                        u.set_password(str(clave))
+                        u.save()
+                    except ObjectDoesNotExist:
+                        User.objects.create_user(username = usuario, password=str(clave))
+                        if usuario == 'SYSDBA':
+                            User.objects.filter(username = 'SYSDBA').update(is_superuser=True, is_staff=True)
+
+                    acceso = authenticate(username=usuario, password=clave)
+
+                    user_profile = UserProfile.objects.filter(usuario = acceso)
+                
+                    if user_profile.exists():
+                        user_profile.update(conexion_activa = conexion[0])
+                    else:
+                        UserProfile.objects.create(usuario= acceso, basedatos_activa='', conexion_activa= conexion[0])
+                else:
+                    message = 'Nombre de usaurio o password no validos.'
+            
+        if acceso is not None:
+            if acceso.is_active:
+                login(request, acceso)
+                return HttpResponseRedirect('/select_db/')
+            else:
+                return render_to_response('noactivo.html', context_instance=RequestContext(request))
+        else:
+            message = 'Nombre de usaurio o password no validos.'
 
     return render_to_response('main/login.html',{'form':formulario, 'message':message,}, context_instance=RequestContext(request))
 
 def logoutUser(request):
-    user_profile = UserProfile.objects.filter(usuario= request.user).update(basedatos_activa = "")
+    user_profile = UserProfile.objects.filter(usuario= request.user).update(basedatos_activa = "", conexion_activa= "")
     logout(request)
     return HttpResponseRedirect('/')
 
