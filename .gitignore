@@ -133,6 +133,7 @@ Desktop.ini
 
 *.py[co]
 microsip_web/settings/local_settings.py
+datos/USERS
 # Packages
 *.egg
 *.egg-info
