@@ -18,7 +18,7 @@ DATABASE_ROUTERS = ['microsip_web.libs.custom_db.databases_routers.MainRouter']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME':  'USERS',
+        'NAME':  'data\USERS',
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.

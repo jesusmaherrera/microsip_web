@@ -1,5 +1,5 @@
 {% extends "base_mobile.html" %}
-{% block title %}Inicio{% endblock %}
+{% block title %}INV. {{ InventarioFisico.folio}} ({{ InventarioFisico.almacen}}) {% endblock %}
 
 <!-- CSS Code -->
 {% block style_css %}{% endblock %}
@@ -104,13 +104,13 @@
   <div data-role="footer">
     <fieldset class="ui-grid-b ui-bar ui-bar-c" >
       <div class="ui-block-a">
-        <a href="#" data-theme="b" data-role="button" id='a_buscar' data-icon="back">buscar</a>
+        <a href="#" data-theme="b" data-role="button" id='a_buscar' data-icon="back">B</a>
       </div>
       <div class="ui-block-b">
-        <a href="#" data-theme="b" data-role="button" id='a_cancelar' data-icon="delete">Cancelar</a>
+        <a href="#" data-theme="b" data-role="button" id='a_cancelar' data-icon="delete">C</a>
       </div>
       <div class="ui-block-c">
-        <a href="#" data-role="button" data-theme="b" id='a_enviar' data-icon="check">Enviar</a>
+        <a href="#" data-role="button" data-theme="b" id='a_enviar' data-icon="check">E</a>
       </div>
     </fieldset>
   </div>
