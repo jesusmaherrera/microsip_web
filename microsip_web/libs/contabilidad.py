@@ -19,7 +19,7 @@ from microsip_web.apps.punto_de_venta.models import *
 #libs
 from custom_db.main import next_id
 
-def agregarTotales(totales_cuentas, basedatos_activa= None, **kwargs):
+def agregarTotales(totales_cuentas, connection_name= None, **kwargs):
 
     #Valores cuentas por pagar
     compras_16_credito  = kwargs.get('compras_16_credito', 0)
@@ -153,15 +153,15 @@ def agregarTotales(totales_cuentas, basedatos_activa= None, **kwargs):
         cuenta  = []
         clave_cuenta_tipoAsiento = []
         if concepto.valor_tipo == 'Segmento_1' and not campos_particulares.segmento_1 == None and campos_particulares.segmento_1 != '':
-            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_1, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, basedatos_activa)
+            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_1, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, connection_name)
         elif concepto.valor_tipo == 'Segmento_2' and not campos_particulares.segmento_2 == None and campos_particulares.segmento_2 != '': 
-            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_2, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, basedatos_activa)
+            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_2, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, connection_name)
         elif concepto.valor_tipo == 'Segmento_3' and not campos_particulares.segmento_3 == None and campos_particulares.segmento_3 != '': 
-            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_3, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, basedatos_activa)
+            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_3, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, connection_name)
         elif concepto.valor_tipo == 'Segmento_4' and not campos_particulares.segmento_4 == None and campos_particulares.segmento_4 != '':
-            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_4, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, basedatos_activa)
+            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_4, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, connection_name)
         elif concepto.valor_tipo == 'Segmento_5' and not campos_particulares.segmento_5 == None and campos_particulares.segmento_5 != '': 
-            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_5, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, basedatos_activa)
+            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_5, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, connection_name)
         elif concepto.valor_tipo == 'Compras' and not concepto.posicion in asientos_a_ingorar:
             if concepto.valor_contado_credito == 'Credito':
                 if concepto.valor_iva == '0':
@@ -284,7 +284,7 @@ def agregarTotales(totales_cuentas, basedatos_activa= None, **kwargs):
 
     return totales_cuentas, error, msg
 
-def new_folio_poliza(tipo_poliza, fecha = None, basedatos_activa = None):
+def new_folio_poliza(tipo_poliza, fecha = None, connection_name = None):
     """ Generar un folio nuevo de una poliza e incrementa el consecutivo de folios """
     prefijo = tipo_poliza.prefijo
     if not tipo_poliza.prefijo:
@@ -299,7 +299,7 @@ def new_folio_poliza(tipo_poliza, fecha = None, basedatos_activa = None):
             tipo_poliza_det = TipoPolizaDet.objects.get(tipo_poliza = tipo_poliza, mes=0, ano =0)
     except ObjectDoesNotExist:
         if tipo_poliza.tipo_consec == 'M':      
-            tipo_poliza_det = TipoPolizaDet.objects.create(id=next_id('ID_CATALOGOS', basedatos_activa), tipo_poliza=tipo_poliza, ano=fecha.year, mes=fecha.month, consecutivo = 1,)
+            tipo_poliza_det = TipoPolizaDet.objects.create(id=next_id('ID_CATALOGOS', connection_name), tipo_poliza=tipo_poliza, ano=fecha.year, mes=fecha.month, consecutivo = 1,)
         elif tipo_poliza.tipo_consec == 'E':
             #Si existe permanente toma su consecutivo para crear uno nuevo si no existe inicia en 1
             consecutivo = TipoPolizaDet.objects.filter(tipo_poliza = tipo_poliza, mes=0, ano =0).aggregate(max = Sum('consecutivo'))['max']
@@ -307,14 +307,14 @@ def new_folio_poliza(tipo_poliza, fecha = None, basedatos_activa = None):
             if consecutivo == None:
                 consecutivo = 1
 
-            tipo_poliza_det = TipoPolizaDet.objects.create(id=next_id('ID_CATALOGOS', basedatos_activa), tipo_poliza=tipo_poliza, ano=fecha.year, mes=0, consecutivo=consecutivo,)
+            tipo_poliza_det = TipoPolizaDet.objects.create(id=next_id('ID_CATALOGOS', connection_name), tipo_poliza=tipo_poliza, ano=fecha.year, mes=0, consecutivo=consecutivo,)
         elif tipo_poliza.tipo_consec == 'P':
             consecutivo = TipoPolizaDet.objects.all().aggregate(max = Sum('consecutivo'))['max']
 
             if consecutivo == None:
                 consecutivo = 1
 
-            tipo_poliza_det = TipoPolizaDet.objects.create(id=next_id('ID_CATALOGOS', basedatos_activa), tipo_poliza=tipo_poliza, ano=0, mes=0, consecutivo = consecutivo,)                                
+            tipo_poliza_det = TipoPolizaDet.objects.create(id=next_id('ID_CATALOGOS', connection_name), tipo_poliza=tipo_poliza, ano=0, mes=0, consecutivo = consecutivo,)                                
     
     
 
@@ -332,19 +332,19 @@ def get_object_or_empty(model, **kwargs):
     except model.DoesNotExist:
         return model()
 
-def get_descuento_total_ve(facturaID, basedatos_activa = None):
-    c = connections[basedatos_activa].cursor()
+def get_descuento_total_ve(facturaID, connection_name = None):
+    c = connections[connection_name].cursor()
     c.execute("SELECT SUM(A.dscto_arts + A.dscto_extra_importe) AS TOTAL FROM CALC_TOTALES_DOCTO_VE(%s,'S') AS  A;"% facturaID)
     row = c.fetchone()
     return int(row[0])
 
-def get_descuento_total_pv(documentoId, basedatos_activa = None):
-    c = connections[basedatos_activa].cursor()
+def get_descuento_total_pv(documentoId, connection_name = None):
+    c = connections[connection_name].cursor()
     c.execute("SELECT SUM(A.dscto_arts + A.dscto_extra_importe) AS TOTAL FROM CALC_TOTALES_DOCTO_PV(%s,'','',0) AS  A;"% documentoId)
     row = c.fetchone()
     return int(row[0])
 
-def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=None, concepto_tipo=None, error=0, msg='', documento_folio='', asiento_ingora=0, basedatos_activa=None):
+def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=None, concepto_tipo=None, error=0, msg='', documento_folio='', asiento_ingora=0, connection_name=None):
     importe = 0
     if asiento_ingora=='':
         asiento_ingora = 0
@@ -398,7 +398,7 @@ def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=Non
 ##                                      ##
 ##########################################
 
-def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_poliza=None, totales_cuentas=None, msg='', error='',depto_co=None, basedatos_activa = None):
+def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_poliza=None, totales_cuentas=None, msg='', error='',depto_co=None, connection_name = None):
     
     try:
         cuenta_cliente =  CuentaCo.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
@@ -504,13 +504,13 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
         depto_co            = depto_co,
         error               = error,
         msg                 = msg,
-        basedatos_activa = basedatos_activa,
+        connection_name = connection_name,
     )
 
 
     return totales_cuentas, error, msg
 
-def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_poliza=None, totales_cuentas=None, msg='', error='',depto_co=None, basedatos_activa = None):
+def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_poliza=None, totales_cuentas=None, msg='', error='',depto_co=None, connection_name = None):
     campos_particulares = get_object_or_empty(LibresCargosCP, pk=documento.id)
 
     try:
@@ -606,12 +606,12 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
         cuenta_proveedor    = cuenta_proveedor,
         error               = error,
         msg                 = msg,
-        basedatos_activa = basedatos_activa,
+        connection_name = connection_name,
     )
 
     return totales_cuentas, error, msg
 
-def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_poliza=None, totales_cuentas=None, msg='', error='', depto_co=None, basedatos_activa =None):  
+def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_poliza=None, totales_cuentas=None, msg='', error='', depto_co=None, connection_name =None):  
     #Si es una factura
     if documento.tipo == 'F':
         campos_particulares = LibresFacturasV.objects.filter(pk=documento.id)[0]
@@ -635,7 +635,7 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
     impuestos           = documento.total_impuestos * documento.tipo_cambio
     importe_neto        = documento.importe_neto * documento.tipo_cambio
     total               = impuestos + importe_neto
-    descuento           = get_descuento_total_ve(documento.id, basedatos_activa) * documento.tipo_cambio
+    descuento           = get_descuento_total_ve(documento.id, connection_name) * documento.tipo_cambio
     clientes            = 0
     bancos              = 0
     iva_efec_cobrado    = 0
@@ -703,12 +703,12 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
         depto_co            = depto_co,
         error               = error,
         msg                 = msg,
-        basedatos_activa = basedatos_activa,
+        connection_name = connection_name,
     )
 
     return totales_cuentas, error, msg
 
-def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_poliza = None, totales_cuentas = None, msg = '', error='', depto_co = None, basedatos_activa = None):  
+def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_poliza = None, totales_cuentas = None, msg = '', error='', depto_co = None, connection_name = None):  
     es_contado = False
     try:
         cuenta_cliente =  CuentaCo.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
@@ -724,7 +724,7 @@ def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_
     impuestos           = documento.total_impuestos * documento.tipo_cambio
     importe_neto        = documento.importe_neto * documento.tipo_cambio
     total               = impuestos + importe_neto
-    descuento           = get_descuento_total_pv(documento.id, basedatos_activa) * documento.tipo_cambio
+    descuento           = get_descuento_total_pv(documento.id, connection_name) * documento.tipo_cambio
     clientes            = 0
     bancos              = 0
     iva_efec_cobrado    = 0
@@ -790,12 +790,12 @@ def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_
         depto_co            = depto_co,
         error               = error,
         msg                 = msg,
-        basedatos_activa = basedatos_activa,
+        connection_name = connection_name,
     )
     
     return totales_cuentas, error, msg
 
-def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable, plantilla=None, crear_polizas_por='',crear_polizas_de=None, basedatos_activa = None, usuario_micorsip='',**kwargs):
+def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable, plantilla=None, crear_polizas_por='',crear_polizas_de=None, connection_name = None, usuario_micorsip='',**kwargs):
     """ Crea las polizas contables segun el tipo y origen de documentos que se mande """
     
     msg             = kwargs.get('msg', '')
@@ -830,15 +830,15 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
         siguente_documento = documentos[(documento_no +1)%len(documentos)]
         documento_numero = documento_no
         if origen_documentos == 'cuentas_por_cobrar':
-            totales_cuentas, error, msg = get_totales_documento_cc(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co, basedatos_activa)
+            totales_cuentas, error, msg = get_totales_documento_cc(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co, connection_name)
         elif origen_documentos == 'cuentas_por_pagar':
             descripcion_extra = documento.proveedor.nombre
 
-            totales_cuentas, error, msg = get_totales_documento_cp(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co, basedatos_activa)
+            totales_cuentas, error, msg = get_totales_documento_cp(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co, connection_name)
         elif origen_documentos == 'ventas':
-            totales_cuentas, error, msg = get_totales_documento_ve(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co, basedatos_activa)
+            totales_cuentas, error, msg = get_totales_documento_ve(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co, connection_name)
         elif origen_documentos == 'punto_de_venta':
-            totales_cuentas, error, msg = get_totales_documento_pv(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co, basedatos_activa)
+            totales_cuentas, error, msg = get_totales_documento_pv(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co, connection_name)
         
         if error == 0:
             #Cuando la fecha de la documento siguiente sea diferente y sea por DIA, o sea la ultima
@@ -854,9 +854,10 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
                     tipo_poliza = TipoPoliza.objects.filter(clave=documento.concepto.clave_tipo_poliza)[0]
                 elif origen_documentos == 'punto_de_venta':
                     if  tipo_documento == 'V':
-                        tipo_poliza = informacion_contable.tipo_poliza_ve_m
+                        tipo_poliza = TipoPoliza.objects.get(clave=Registry.objects.get(nombre='TIPO_POLIZA_VENTAS_PV').valor) 
                     elif tipo_documento == 'D':
-                        tipo_poliza = informacion_contable.tipo_poliza_dev_m
+                        tipo_poliza = TipoPoliza.objects.get(clave=Registry.objects.get(nombre='TIPO_POLIZA_DEVOL_PV').valor)
+                        #form_reg.fields['tipo_poliza_cobros_cc'].initial = Registry.objects.get(nombre='TIPO_POLIZA_COBROS_CXC_PV').valor
 
                 #Si no tiene una descripcion el documento se pone lo que esta indicado en la descripcion general
                 descripcion_doc = "(%s) %s"% (descripcion_extra, documento.descripcion)
@@ -869,7 +870,7 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
                     referencia = ''
 
                 poliza = DoctoCo(
-                        id                      = next_id('ID_DOCTOS', basedatos_activa),
+                        id                      = next_id('ID_DOCTOS', connection_name),
                         tipo_poliza             = tipo_poliza,
                         fecha                   = documento.fecha,
                         moneda                  = moneda_local, 
@@ -924,12 +925,14 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
 
                 #DE NUEVO CONVIERTO LA VARIABLE A DICCIONARIO
                 totales_cuentas = {}
-
-            documento.contabilizado ='S'
-            documento.save()
+            if origen_documentos == 'punto_de_venta':
+                Docto_PV.objects.filter(pk=documento.id).update(contabilizado = 'S')
+            else:
+                documento.contabilizado ='S'
+                documento.save()
     if error == 0:
         for poliza in polizas:
-            poliza.poliza = new_folio_poliza(poliza.tipo_poliza, poliza.fecha, basedatos_activa)
+            poliza.poliza = new_folio_poliza(poliza.tipo_poliza, poliza.fecha, connection_name)
             DocumentosData.append({
                 'folio':poliza.poliza,
                 })

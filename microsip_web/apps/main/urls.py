@@ -5,6 +5,7 @@ from microsip_web.apps.main import views
 urlpatterns = patterns('',
     url(r'^$', 'microsip_web.apps.main.views.index'),
     url(r'^conexiones/$', views.conexiones_View),
+    url(r'^reiniciar_servidor/$', views.reiniciar_servidor),
     (r'^conexion/(?P<id>\d+)/', views.conexion_manageView),
     (r'^conexion/', views.conexion_manageView),
     url(r'^inicializar_tablas/$', 'microsip_web.apps.main.views.inicializar_tablas'),

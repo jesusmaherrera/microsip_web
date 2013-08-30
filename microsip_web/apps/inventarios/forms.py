@@ -53,9 +53,12 @@ class CustomAuthenticationForm(forms.Form):
             user_profile = UserProfile.objects.filter(usuario = usuario)
             if conexion_db:
                 if user_profile.exists():
-                    user_profile.update(conexion_activa = conexion_db)
+                    user_profile.update(conexion_activa = conexion_db, basedatos_activa='')
                 else:
                     UserProfile.objects.create(usuario= usuario, basedatos_activa='', conexion_activa= conexion_db)
+            elif usuario.username == 'SYSDBA' and not user_profile.exists():
+                UserProfile.objects.create(usuario= usuario, basedatos_activa='', conexion_activa=None)
+
 
         return cleaned_data
 
@@ -93,10 +96,7 @@ class SelectDBForm(forms.Form):
         self.fields['conexion'] = forms.ChoiceField(choices= empresas)
 
 class linea_articulos_form(forms.Form):
-    def __init__(self,*args,**kwargs):
-        self.database = kwargs.pop('database')
-        super(linea_articulos_form,self).__init__(*args,**kwargs)
-        self.fields['linea'] = forms.ModelChoiceField(queryset= LineaArticulos.objects.all())
+    linea = forms.ModelChoiceField(queryset= LineaArticulos.objects.all())
 
 class UbicacionArticulosForm(forms.Form):
     ubicacion = forms.CharField(widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'Ubicacion..'}))
@@ -137,14 +137,9 @@ class DoctosInDetManageForm(forms.ModelForm):
 
 class DoctoInvfis_CreateForm(forms.ModelForm):
     fecha = forms.DateField(widget=forms.TextInput(attrs={'class':'input-small'}))
-    # almacen = forms.ModelChoiceField(queryset= Almacenes.objects.all(), widget=forms.Select(attrs={'class':'input-medium'}))
+    almacen = forms.ModelChoiceField(queryset= Almacenes.objects.all(), widget=forms.Select(attrs={'class':'input-medium'}))
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'rows':'3', 'cols':'20',}))
     
-    def __init__(self,*args,**kwargs):
-        self.database = kwargs.pop('database')
-        super(DoctoInvfis_CreateForm,self).__init__(*args,**kwargs)
-        self.fields['almacen'] = forms.ModelChoiceField(queryset= Almacenes.objects.using(self.database).all(), widget=forms.Select(attrs={'class':'input-medium'}))
-
     class Meta:
         model = DoctosInvfis
         exclude = (
@@ -162,7 +157,7 @@ class DoctoInvfis_CreateForm(forms.ModelForm):
     def clean(self):
         cleaned_data = self.cleaned_data
         almacen = cleaned_data.get("almacen")
-        if DoctosInvfis.objects.using(self.database).filter(aplicado='N', almacen = almacen).exists():
+        if DoctosInvfis.objects.filter(aplicado='N', almacen = almacen).exists():
             raise forms.ValidationError(u'Ya existe un inventario fisico abierto para el almacen [%s], porfavor crea uno que no sea de ese almacen.'% almacen)
         return cleaned_data
 

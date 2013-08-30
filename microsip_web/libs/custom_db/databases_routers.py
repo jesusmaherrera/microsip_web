@@ -67,8 +67,7 @@ class MainRouter(object):
         elif model._meta.app_label == 'django' and db != 'default':
             return False
         elif db == 'default' and \
-            ( model._meta.app_label == 'main' or model._meta.app_label == 'cuentas_por_pagar' or  \
-                model._meta.app_label == 'ventas' or model._meta.app_label == 'cuentas_por_cobrar' or model._meta.app_label == 'punto_de_venta' or model._meta.app_label == 'contabilidad'):
+            ( model._meta.app_label == 'main' or model._meta.app_label == 'cuentas_por_pagar' or  model._meta.app_label == 'ventas' or model._meta.app_label == 'cuentas_por_cobrar' or model._meta.app_label == 'punto_de_venta' or model._meta.app_label == 'contabilidad'):
             return False
         else:
             return True

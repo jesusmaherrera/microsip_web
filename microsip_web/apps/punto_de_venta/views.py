@@ -16,6 +16,7 @@ from microsip_web.apps.main.filtros.models import *
 from microsip_web.libs import contabilidad
 from triggers import triggers
 from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_form
+from microsip_web.libs.custom_db.main import get_conecctionname
 
 def create_facturageneral_dia(request, cliente_id=None):
     cliente_id = 331
@@ -50,8 +51,8 @@ def create_facturageneral_dia(request, cliente_id=None):
 
 @login_required(login_url='/login/')
 def inicializar_puntos_clientes(request):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
-    if basedatos_activa == '':
+    connection_name = get_conecctionname(request.user.userprofile)
+    if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
     Cliente.objects.update(puntos=0, dinero_electronico=0, hereda_valorpuntos=1, valor_puntos=0)
@@ -506,7 +507,7 @@ def grupo_lineas_manageView(request, id = None, template_name='punto_de_venta/ar
 ##                                      ##
 ##########################################
 
-def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_ventas = '', plantilla_devoluciones = '', descripcion = '', basedatos_activa = None, usuario_micorsip=''):
+def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_ventas = '', plantilla_devoluciones = '', descripcion = '', connection_name = None, usuario_micorsip=''):
     error   = 0
     msg     = ''
     documentosData = []
@@ -547,7 +548,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
                 msg = msg,
                 descripcion = descripcion, 
                 tipo_documento = 'V',
-                basedatos_activa =  basedatos_activa,
+                connection_name =  connection_name,
                 usuario_micorsip = usuario_micorsip,
             )
             documentosGenerados = documentosData
@@ -563,7 +564,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
                 msg = msg,
                 descripcion = descripcion, 
                 tipo_documento = 'D',
-                basedatos_activa = basedatos_activa,
+                connection_name = connection_name,
                 usuario_micorsip = usuario_micorsip,
             )
             
@@ -574,8 +575,8 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
 
 @login_required(login_url='/login/')
 def generar_polizas_View(request, template_name='punto_de_venta/herramientas/generar_polizas.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
-    if basedatos_activa == '':
+    connection_name = get_conecctionname(request.user.userprofile)
+    if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
     polizas_ventas  = []
@@ -583,7 +584,7 @@ def generar_polizas_View(request, template_name='punto_de_venta/herramientas/gen
     msg             = msg_informacion =''
 
     if request.method == 'POST':
-        form = GenerarPolizasManageForm( request.POST, database = basedatos_activa )
+        form = GenerarPolizasManageForm( request.POST)
         if form.is_valid():
 
             fecha_ini                   = form.cleaned_data['fecha_ini']
@@ -607,7 +608,7 @@ def generar_polizas_View(request, template_name='punto_de_venta/herramientas/gen
                     plantilla_ventas=plantilla_ventas, 
                     plantilla_devoluciones=plantilla_devoluciones, 
                     descripcion= descripcion,
-                    basedatos_activa = basedatos_activa,
+                    connection_name = connection_name,
                     usuario_micorsip = request.user.username,
                     )
             else:
@@ -617,10 +618,10 @@ def generar_polizas_View(request, template_name='punto_de_venta/herramientas/gen
             if polizas_ventas == [] and not error == 1:
                 msg = 'Lo siento, no se encontraron documentos para ralizar polizas con este filtro'
             elif not polizas_ventas == [] and not error == 1:
-                form = GenerarPolizasManageForm( database = basedatos_activa )       
+                form = GenerarPolizasManageForm()       
                 msg_informacion = 'Polizas generadas satisfactoriamente, *Ahora revisa las polizas pendientes generadas en el modulo de contabilidad'
     else:
-        form = GenerarPolizasManageForm( database = basedatos_activa )
+        form = GenerarPolizasManageForm()
     
     c = {'documentos':polizas_ventas,'msg':msg,'form':form,'msg_informacion':msg_informacion,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
@@ -639,17 +640,26 @@ def preferenciasEmpresa_View(request, template_name='punto_de_venta/herramientas
     except:
         informacion_contable = InformacionContable_pv()
 
-    msg = ''
     if request.method == 'POST':
-        form = InformacionContableManageForm(request.POST, instance=informacion_contable)
-        if form.is_valid():
-            form.save()
-            msg = 'Datos Guardados Exitosamente'
+        form_reg = InformacioncontableRegManageForm(request.POST)
     else:
-        form = InformacionContableManageForm(instance=informacion_contable)
+        form_reg = InformacioncontableRegManageForm()
+        form_reg.fields['tipo_poliza_ventas'].initial = Registry.objects.get(nombre='TIPO_POLIZA_VENTAS_PV').valor
+        form_reg.fields['tipo_poliza_devol'].initial = Registry.objects.get(nombre='TIPO_POLIZA_DEVOL_PV').valor
+        form_reg.fields['tipo_poliza_cobros_cc'].initial = Registry.objects.get(nombre='TIPO_POLIZA_COBROS_CXC_PV').valor
 
+    form = InformacionContableManageForm(request.POST or None, instance=informacion_contable)
+    msg = ''    
+    if form.is_valid() and form_reg.is_valid():
+        Registry.objects.filter(nombre='TIPO_POLIZA_VENTAS_PV').update(valor=form_reg.cleaned_data['tipo_poliza_ventas']) 
+        Registry.objects.filter(nombre='TIPO_POLIZA_DEVOL_PV').update(valor=form_reg.cleaned_data['tipo_poliza_devol']) 
+        Registry.objects.filter(nombre='TIPO_POLIZA_COBROS_CXC_PV').update(valor=form_reg.cleaned_data['tipo_poliza_cobros_cc']) 
+
+        form.save()
+        msg = 'Datos Guardados Exitosamente'
+    
     plantillas = PlantillaPolizas_pv.objects.all()
-    c= {'form':form,'msg':msg,'plantillas':plantillas,}
+    c= {'form':form,'msg':msg,'plantillas':plantillas, 'form_reg':form_reg,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################
@@ -696,8 +706,8 @@ def plantilla_poliza_manageView(request, id = None, template_name='punto_de_vent
 
 @login_required(login_url='/login/')
 def ventas_de_mostrador_view(request, template_name='punto_de_venta/documentos/ventas/ventas_de_mostrador.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
-    if basedatos_activa == '':
+    connection_name = get_conecctionname(request.user.userprofile)
+    if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
     ventas_list = Docto_PV.objects.filter(tipo='V').order_by('-id')
@@ -774,8 +784,8 @@ def venta_mostrador_manageView(request, id = None, template_name='punto_de_venta
 
 @login_required(login_url='/login/')
 def devoluciones_de_ventas_view(request, template_name='punto_de_venta/documentos/devoluciones/devoluciones_de_ventas.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
-    if basedatos_activa == '':
+    connection_name = get_conecctionname(request.user.userprofile)
+    if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
     documentos_list = Docto_PV.objects.filter(tipo='D')

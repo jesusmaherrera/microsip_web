@@ -32,6 +32,8 @@ from triggers import triggers
 from microsip_web.apps.config.models import *
 import fdb
 from microsip_web.settings.common import MICROSIP_DATABASES, DATABASES
+from microsip_web.libs.custom_db.main import get_conecctionname
+
 ##########################################
 ##                                      ##
 ##               LOGIN                  ##
@@ -76,9 +78,9 @@ def logoutUser(request):
     logout(request)
     return HttpResponseRedirect('/')
 
-def c_get_next_key(seq_name, database = None ):
+def c_get_next_key(connection_name = None ):
     """ return next value of sequence """
-    c = connections[database].cursor()
+    c = connections[connection_name].cursor()
     c.execute("SELECT GEN_ID( ID_DOCTOS , 1 ) FROM RDB$DATABASE;")
     row = c.fetchone()
     return int(row[0])
@@ -91,8 +93,8 @@ def c_get_next_key(seq_name, database = None ):
 
 @login_required(login_url='/login/')
 def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisicos/inventarios_fisicos.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
-    if basedatos_activa == '':
+    connection_name = get_conecctionname(request.user.userprofile)
+    if connection_name == '':
         return HttpResponseRedirect('/select_db/')
     
     inventarios_fisicos_list = DoctosInvfis.objects.filter(aplicado='N', cancelado='N').order_by('-fecha')
@@ -125,8 +127,8 @@ def inventario_getnew_folio():
 @login_required(login_url='/login/')
 def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inventarios Fisicos/create_inventario_fisico_pa.html'):
     message = ''
-    basedatos_activa =  request.user.userprofile.basedatos_activa
-    if basedatos_activa == '':
+    connection_name = get_conecctionname(request.user.userprofile)
+    if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
     form = DoctoInvfis_CreateForm(request.POST or None, database=basedatos_activa)
@@ -159,9 +161,13 @@ def invetarioFisico_mobile_pa_manageView(request, id = None, rapido=1, template_
 
 @login_required(login_url='/login/')
 def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
+    basedatos_activa = request.user.userprofile.basedatos_activa
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
+    else:
+        conexion_activa_id = request.user.userprofile.conexion_activa.id
+
+    conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
 
     message = ''
     msg_series=''
@@ -230,7 +236,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
 
                     except ObjectDoesNotExist:
                         if detalleInv.unidades >= 0:
-                            id_detalle = c_get_next_key('ID_DOCTOS', basedatos_activa)
+                            id_detalle = c_get_next_key('ID_DOCTOS', conexion_name)
                             detalleInv.id = id_detalle
                             articulos_claves =ClavesArticulos.objects.filter(articulo= detalleInv.articulo)
                             
@@ -251,7 +257,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                             if art_discreto.count() > 0:
                                 art_discreto = art_discreto[0]
                             else:
-                                art_discreto = ArticulosDiscretos.objects.create(id=next_id('ID_CATALOGOS', basedatos_activa), clave = form.clave, articulo = form.articulo, tipo='S', fecha= None)        
+                                art_discreto = ArticulosDiscretos.objects.create(id=next_id('ID_CATALOGOS', conexion_name), clave = form.clave, articulo = form.articulo, tipo='S', fecha= None)        
 
                             if DesgloseEnDiscretosInvfis.objects.filter(art_discreto = art_discreto).exists() and detalleInv.unidades > 0:
                                 msg_series = 'Ya existe un articulo registrado en inventario con numero de serie [%s]'%form.clave
@@ -259,7 +265,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                             if error == 0:
                                 if detalleInv.unidades > 0 :
                                     if movimiento == 'crear':
-                                        detalleInv.save(using='basedatos_activa')
+                                        detalleInv.save()
 
                                     desglose = DesgloseEnDiscretosInvfis(
                                         id = -1,
@@ -267,7 +273,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                                         art_discreto = art_discreto,
                                         unidades = 1,
                                         )
-                                    desglose.save(using='basedatos_activa')
+                                    desglose.save()
                                 else:
                                     desgloses_a_eliminar = DesgloseEnDiscretosInvfis.objects.filter(art_discreto=art_discreto)
                                     
@@ -319,7 +325,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
         # If page is out of range (e.g. 9999), deliver last page of results.
         detallesInventario = paginator.page(paginator.num_pages)
 
-    lineas_form = linea_articulos_form(database=basedatos_activa)
+    lineas_form = linea_articulos_form()
 
     c = {
         'message':message,

@@ -33,35 +33,30 @@
       <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
       {% csrf_token %}
         {{ form.errors }}
-        <fieldset style='clear:both;' >
-        <legend>Pólizas de ventas de mostrador:</legend>
-        <div class="span3" style='clear:both;'>
-          <label>Tipo de Póliza</label>
-          <div class="input-prepend input-append">
-            {{ form.tipo_poliza_ve_m }}
-          </div>
-        </div>
-        </fieldset>
-        <fieldset style='clear:both;' >
-        <legend>Pólizas de devoluciones de mostrador:</legend>
-        <div class="span3" style='clear:both;'>
-          <label>Tipo de Póliza</label>
-          <div class="input-prepend input-append">
-            {{ form.tipo_poliza_dev_m }}
-          </div>
-        </div>
-        </fieldset>
-        <fieldset style='clear:both;' >
-        <legend>Pólizas de cobros de cuentas por cobrar:</legend>
-        <div class="span3" style='clear:both;'>
-          <label>Tipo de Póliza</label>
-          <div class="input-prepend input-append">
-            {{ form.tipo_poliza_cc }}
-          </div>
-        </div>
-        </fieldset>
         <fieldset>
-        <legend>:</legend>
+        <legend>Tipos de polizas</legend>
+          <div class="span4" style='clear:both;'>
+            <label>Pólizas de ventas de mostrador:</label>
+            <div class="input-prepend input-append">
+              {{ form_reg.tipo_poliza_ventas }}
+            </div>
+          </div>
+          <div class="span4">
+            <label>Pólizas de devoluciones de mostrador:</label>
+            <div class="input-prepend input-append">
+              {{ form_reg.tipo_poliza_devol }} 
+            </div>
+          </div>
+          <div class="span4">
+            <label>Pólizas de cobros de cuentas por cobrar:</label>
+            <div class="input-prepend input-append">
+              {{ form_reg.tipo_poliza_cobros_cc }}
+            </div>
+          </div>
+        </fieldset>
+        <br>
+        <fieldset>
+        <legend></legend>
         <div class="span4" >
           <label>Condicion de pago de CONTADO</label>
           <div class="input-prepend input-append">

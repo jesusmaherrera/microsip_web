@@ -49,6 +49,12 @@ def conexion_manageView(request, id = None, template_name='main/conexiones/conex
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
+def reiniciar_servidor(request):
+    if request.user.is_superuser:
+        management.call_command("runserver", noreload=True)
+    return HttpResponseRedirect('/')
+
+@login_required(login_url='/login/')
 def inicializar_tablas(request):
     #ventas_inicializar_tablas()
     if request.user.is_superuser:
@@ -59,7 +65,7 @@ def inicializar_tablas(request):
             conexion_activa_id = request.user.userprofile.conexion_activa.id
 
         conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
-        MS = MICROSIP_MODULES
+        
         quitar = False
         if 'microsip_web.apps.punto_de_venta' in MICROSIP_MODULES:
             punto_de_venta_actualizar_tablas( conexion_name = conexion_name )
@@ -76,7 +82,7 @@ def inicializar_tablas(request):
 
         #Sincronizar todas las bases de datos de microsip con tablas de la aplicacion
         
-        #management.call_command('syncdb', database=conexion_name)
+        management.call_command('syncdb', database=conexion_name)
 
     return HttpResponseRedirect('/')
 

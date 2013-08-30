@@ -17,11 +17,12 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum, Max
+from microsip_web.libs.custom_db.main import get_conecctionname
 
 @login_required(login_url='/login/')
 def polizas_View(request, template_name='contabilidad/polizas/polizas.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
-    if basedatos_activa == '':
+    connection_name = get_conecctionname(request.user.userprofile)
+    if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
     polizas_list = DoctoCo.objects.filter(estatus='N').order_by('-fecha') 
@@ -44,8 +45,8 @@ def polizas_View(request, template_name='contabilidad/polizas/polizas.html'):
 
 @login_required(login_url='/login/')
 def polizas_pendientesView(request, template_name='contabilidad/polizas/polizas_pendientes.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
-    if basedatos_activa == '':
+    connection_name = get_conecctionname(request.user.userprofile)
+    if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
     polizas_list = DoctoCo.objects.filter(estatus='P').order_by('-fecha') 

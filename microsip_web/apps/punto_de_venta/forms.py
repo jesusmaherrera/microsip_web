@@ -51,6 +51,16 @@ class GrupoLineasManageForm(forms.ModelForm):
             'cuenta_ventas',
         }
 
+class InformacioncontableRegManageForm(forms.Form):
+    TIPOS_POLIZA = []
+    for tipo_poliza in TipoPoliza.objects.all():
+        opcion = [tipo_poliza.clave, tipo_poliza.nombre]
+        TIPOS_POLIZA.append(opcion)
+
+    tipo_poliza_ventas = forms.ChoiceField(choices=TIPOS_POLIZA, required=True)
+    tipo_poliza_devol  = forms.ChoiceField(choices=TIPOS_POLIZA, required=True)
+    tipo_poliza_cobros_cc = forms.ChoiceField(choices=TIPOS_POLIZA, required =True)    
+
 class InformacionContableManageForm(forms.ModelForm):
     condicion_pago_contado  = forms.ModelChoiceField(queryset= CondicionPago.objects.all(), required=True)
 
@@ -76,12 +86,9 @@ class GenerarPolizasManageForm(forms.Form):
     )
     crear_polizas_de            = forms.ChoiceField(choices=TIPOS, required=True)
 
-    def __init__(self,*args,**kwargs):
-        self.database = kwargs.pop('database')
-        super(GenerarPolizasManageForm,self).__init__(*args,**kwargs)
-        self.fields['plantilla_ventas'] = forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.using(database).filter(tipo='V'), required=True)
-        self.fields['plantilla_devoluciones'] = forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.using(database).filter(tipo='D'), required=True)
-        self.fields['plantilla_cobros_cc'] = forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.using(database).filter(tipo='F'), required=True)
+    plantilla_ventas = forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.filter(tipo='V'), required=False)
+    plantilla_devoluciones = forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.filter(tipo='D'), required=False)
+    plantilla_cobros_cc = forms.ModelChoiceField(queryset= PlantillaPolizas_pv.objects.filter(tipo='F'), required=False)
 
 class ClienteSearchForm(forms.Form):
     cliente = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'autofocus':''}),required=True)

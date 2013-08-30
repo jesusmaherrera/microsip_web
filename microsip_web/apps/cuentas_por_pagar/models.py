@@ -12,12 +12,18 @@ class InformacionContable_CP(models.Model):
     def __unicode__(self):
         return u'%s'% self.id
 
+    class Meta:
+        db_table = u'sic_cp_informacioncontable'
+
 class PlantillaPolizas_CP(models.Model):
     nombre  = models.CharField(max_length=200)
     tipo    = models.ForeignKey(ConceptoCp)
     
     def __unicode__(self):
         return u'%s'%self.nombre
+
+    class Meta:
+        db_table = u'sic_cp_plantillapoliza'
 
 class DetallePlantillaPolizas_CP(models.Model):
     TIPOS = (('C', 'Cargo'),('A', 'Abono'),)
@@ -50,3 +56,6 @@ class DetallePlantillaPolizas_CP(models.Model):
 
     def __unicode__(self):
         return u'%s'%self.id
+        
+    class Meta:
+        db_table = u'sic_cp_plantillapoliza_det'

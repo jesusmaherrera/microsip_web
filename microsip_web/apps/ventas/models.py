@@ -20,6 +20,9 @@ class clientes_config_cuenta(models.Model):
     valor_contado_credito   = models.CharField(max_length=10, choices=VALOR_CONTADO_CREDITO_TIPOS, default='Ambos')
     valor_iva               = models.CharField(max_length=2, choices=VALOR_IVA_TIPOS, default='A')
 
+    class Meta:
+        db_table = u'sic_ve_clientconfigcuenta'
+
 class InformacionContable_V(models.Model):
     tipo_poliza_ve          = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_ve')
     tipo_poliza_dev         = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_dev')
@@ -28,6 +31,9 @@ class InformacionContable_V(models.Model):
     def __unicode__(self):
         return u'%s'% self.id
 
+    class Meta:
+        db_table = u'sic_ve_informacioncontable'
+
 class PlantillaPolizas_V(models.Model):
     nombre  = models.CharField(max_length=200)
     TIPOS   = (('F', 'Facturas'),('D', 'Devoluciones'),)
@@ -35,6 +41,9 @@ class PlantillaPolizas_V(models.Model):
 
     def __unicode__(self):
         return u'%s'%self.nombre
+    
+    class Meta:
+        db_table = u'sic_ve_plantillapoliza'
 
 class DetallePlantillaPolizas_V(models.Model):
     TIPOS = (('C', 'Cargo'),('A', 'Abono'),)
@@ -64,6 +73,9 @@ class DetallePlantillaPolizas_V(models.Model):
 
     def __unicode__(self):
         return u'%s'%self.id
+
+    class Meta:
+        db_table = u'sic_ve_plantillapoliza_det'
 
 # class CompatibilidadesArticulos(models.Model):
 #     articulo = models.ForeignKey(Articulos, related_name="articulo")

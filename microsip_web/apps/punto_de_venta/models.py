@@ -11,9 +11,9 @@ from microsip_web.apps.main.models import *
 ################################################################
 
 class InformacionContable_pv(models.Model):
-    tipo_poliza_ve_m          = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_ve_m')
-    tipo_poliza_dev_m         = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_dev_m')
-    tipo_poliza_cc         = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_cc')    
+    # tipo_poliza_ve_m          = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_ve_m')
+    # tipo_poliza_dev_m         = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_dev_m')
+    # tipo_poliza_cc         = models.ForeignKey(TipoPoliza, blank=True, null=True, related_name='tipo_poliza_cc')    
 
     condicion_pago_contado  = models.ForeignKey(CondicionPago, blank=True, null=True)
 

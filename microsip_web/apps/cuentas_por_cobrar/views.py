@@ -18,13 +18,15 @@ from django.db.models import Sum, Max
 from django.db import connection
 from microsip_web.apps.inventarios.views import c_get_next_key
 from microsip_web.libs import contabilidad
+from microsip_web.libs.custom_db.main import get_conecctionname
+
 ##########################################
 ##                                      ##
 ##        Generacion de polizas         ##
 ##                                      ##
 ##########################################
 
-def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True, crear_polizas_por='Documento', crear_polizas_de='', plantilla='', descripcion= '', basedatos_activa= None, usuario_micorsip=''):
+def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True, crear_polizas_por='Documento', crear_polizas_de='', plantilla='', descripcion= '', connection_name= None, usuario_micorsip=''):
     depto_co = DeptoCo.objects.get(clave='GRAL')
     error   = 0
     msg     = ''
@@ -54,8 +56,8 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
             crear_polizas_de    = crear_polizas_de,
             msg = msg,
             descripcion = descripcion, 
-            basedatos_activa= basedatos_activa,
-            suario_micorsip = usuario_micorsip,
+            connection_name= connection_name,
+            usuario_micorsip = usuario_micorsip,
         )
 
     elif error == 1 and msg=='':
@@ -65,16 +67,16 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
 
 @login_required(login_url='/login/')
 def generar_polizas_View(request, template_name='cuentas_por_cobrar/herramientas/generar_polizas.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
-    if basedatos_activa == '':
+    connection_name = get_conecctionname(request.user.userprofile)
+    if connection_name == '':
         return HttpResponseRedirect('/select_db/')
-
+    
     documentosData  = []
     msg             = msg_resultados = msg_informacion =''
 
     if request.method == 'POST':
         
-        form = GenerarPolizasManageForm(request.POST, database = basedatos_activa )
+        form = GenerarPolizasManageForm(request.POST)
         if form.is_valid():
             fecha_ini               = form.cleaned_data['fecha_ini']
             fecha_fin               = form.cleaned_data['fecha_fin']
@@ -86,14 +88,14 @@ def generar_polizas_View(request, template_name='cuentas_por_cobrar/herramientas
 
             msg = 'es valido'
 
-            documentosData, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla, descripcion, basedatos_activa, request.user.username)
+            documentosData, msg = generar_polizas(fecha_ini, fecha_fin, ignorar_documentos_cont, crear_polizas_por, crear_polizas_de, plantilla, descripcion, connection_name, request.user.username)
             if documentosData == []:
                 msg_resultados = 'Lo siento, no se encontraron resultados para este filtro'
             else:
-                form = GenerarPolizasManageForm( database = basedatos_activa )       
+                form = GenerarPolizasManageForm( )       
                 msg_informacion = 'Polizas generadas satisfactoriamente, *Ahora revisa las polizas pendientes generadas en el modulo de contabilidad'
     else:
-        form = GenerarPolizasManageForm( database = basedatos_activa )
+        form = GenerarPolizasManageForm( )
 
     c = {'documentos':documentosData,'msg':msg,'form':form, 'msg_resultados':msg_resultados,'msg_informacion':msg_informacion,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))

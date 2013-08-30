@@ -8,7 +8,16 @@ from microsip_web.apps.main.models import *
 
 @dajaxice_register(method='GET')
 def crear_nodo(request, nombre, padre):
-    id = get_next_id_carpeta(basedatos_activa)
+    basedatos_activa =  request.user.userprofile.basedatos_activa
+    connecion_activa = ''
+    if basedatos_activa == '':
+        return HttpResponseRedirect('/select_db/')
+    else:
+        connecion_activa = request.user.userprofile.conexion_activa.id
+
+    conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
+
+    id = get_next_id_carpeta(connection_name=conexion_name)
     Carpeta.objects.create(id=id, nombre=nombre, carpeta_padre=Carpeta.objects.get(pk=padre))
     return simplejson.dumps({'id':id})
 
