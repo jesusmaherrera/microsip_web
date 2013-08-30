@@ -60,10 +60,7 @@ class MainRouter(object):
         Make sure the auth app only appears in the 'auth_db'
         database.
         """
-        from middleware import my_local_global
-        dbconfig = '%s-CONFIG'% my_local_global.conexion_activa
-
-        if model._meta.app_label == 'config' or db == dbconfig:
+        if model._meta.app_label == 'config' or 'CONFIG' in db:
             return False
         elif model._meta.app_label == 'auth' and db != 'default':
             return False
