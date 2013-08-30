@@ -3,7 +3,6 @@ from django.views import generic
 from microsip_web.apps.punto_de_venta import views
 
 urlpatterns = patterns('',
-    (r'^inicializar_tablas/$', views.inicializar_tablas),
 	(r'^venta/$', views.venta_mostrador_manageView),
     (r'^fectura_general/$', views.create_facturageneral_dia),
     

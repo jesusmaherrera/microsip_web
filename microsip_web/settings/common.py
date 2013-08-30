@@ -19,7 +19,7 @@ MICROSIP_DATABASES = {}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME':  'datos\USERS.sqlite',
+        'NAME':  RUTA_PROYECTO + 'data\USERS.sqlite',
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -27,7 +27,7 @@ DATABASES = {
     },
 }
 try:
-    users_conn = sqlite3.connect('datos\USERS.sqlite')
+    users_conn = sqlite3.connect(RUTA_PROYECTO + 'data\USERS.sqlite')
     users_cur = users_conn.cursor()
     users_cur.execute('''SELECT * FROM auth_conexiondb''')
     conexiones_rows = users_cur.fetchall()

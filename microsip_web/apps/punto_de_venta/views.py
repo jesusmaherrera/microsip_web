@@ -17,33 +17,6 @@ from microsip_web.libs import contabilidad
 from triggers import triggers
 from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_form
 
-@login_required(login_url='/login/')
-def inicializar_tablas(request):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
-    if basedatos_activa == '':
-        return HttpResponseRedirect('/select_db/')
-
-    c = connections[basedatos_activa].cursor()
-    #DETALLE DE VENTAS
-    c.execute(triggers['SIC_PUNTOS_PV_DOCTOSPVDET_BU'])
-    c.execute(triggers['SIC_PUNTOS_PV_DOCTOSPVDET_AD'])
-    #VENTAS
-    c.execute(triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'])
-    c.execute(triggers['SIC_PUNTOS_PV_DOCTOSPV_AD'])
-    #CLIENTES
-    c.execute(triggers['SIC_PUNTOS_PV_CLIENTES_BU'])
-    #EXCEPTION
-    try:
-        c.execute(
-        '''
-        CREATE EXCEPTION EX_CLIENTE_SIN_SALDO 'El cliente no tiene suficiente saldo';   
-        ''')
-    except Exception, e:
-       print "Oops!  No pudo agregarse la excepción EX_CLIENTE_SIN_SALDO por que esta ya existe. "
-
-    transaction.commit_unless_managed()
-    return HttpResponseRedirect('/punto_de_venta/ventas/')
-
 def create_facturageneral_dia(request, cliente_id=None):
     cliente_id = 331
     # fecha = datetime.date.today()

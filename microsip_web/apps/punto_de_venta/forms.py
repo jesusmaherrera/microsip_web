@@ -6,27 +6,11 @@ from microsip_web.apps.inventarios.models import *
 from microsip_web.apps.ventas.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-from sets import Set
 from models import *
-
-# class ArticuloCompatibleClasificacion_ManageForm(forms.ModelForm):
-#   class Meta:
-#       model = ArticuloCompatibleClasificacion
-#       exclude = ('articulo',)
 
 class ArticuloCompatibleArticulo_ManageForm(forms.Form):
     compatible_articulo = forms.ModelChoiceField(queryset=Articulos.objects.all(),
         widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
-
-# class Grupo_ManageForm(forms.ModelForm):
-#   #nombre = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'clasificacion...'}),required=False)
-#   class Meta:
-#       widgets = autocomplete_light.get_widgets_dict(Grupo)
-#       model = Grupo
-
-# class GruposGrupo_bypadre_ManageForm(forms.Form):
-#   newgrupo = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'clasificacion...'}),required=False)
-#   grupo = forms.ModelChoiceField(queryset= Grupo.objects.all(), required=False)
 
 class ArticuloManageForm(forms.ModelForm):
     
@@ -107,22 +91,6 @@ class PlantillaPolizaManageForm(forms.ModelForm):
         model = PlantillaPolizas_pv
 
 class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
-    TIPOS                       = (('C', 'Cargo'),('A', 'Abono'),)
-    VALOR_IVA_TIPOS             = (('A', 'Ambos'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
-    VALOR_CONTADO_CREDITO_TIPOS = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)
-    VALOR_TIPOS =(
-        ('Ventas', 'Ventas'),
-        ('Clientes', 'Clientes'),
-        ('Bancos', 'Bancos'),
-        ('Descuentos', 'Descuentos'),
-        ('IVA', 'IVA'),
-    )
-
-    #tipo                   = forms.ChoiceField(choices=TIPOS, widget=forms.Select(attrs={'class':'span2'}),)
-    #valor_tipo                 = forms.ChoiceField(choices=VALOR_TIPOS, widget=forms.Select(attrs={'class':'span2'}),)
-    # valor_iva                 = forms.ChoiceField(choices=VALOR_IVA_TIPOS, widget=forms.Select(attrs={'class':'span2'}),)
-    # valor_contado_credito     = forms.ChoiceField(choices=VALOR_CONTADO_CREDITO_TIPOS, widget=forms.Select(attrs={'class':'span2'}),)
-
     posicion        =  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
     asiento_ingora  = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
 

@@ -19,7 +19,9 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core import management
 import fdb
-from microsip_web.settings.common import MICROSIP_DATABASES
+from microsip_web.settings.common import MICROSIP_MODULES
+from microsip_web.apps.inventarios.triggers import triggers as inventarios_triggers
+from microsip_web.apps.punto_de_venta.triggers import triggers as punto_de_venta_triggers
 
 @login_required(login_url='/login/')
 def conexiones_View(request, template_name='main/conexiones/conexiones.html'):
@@ -46,38 +48,60 @@ def conexion_manageView(request, id = None, template_name='main/conexiones/conex
     c = {'form':form,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
+@login_required(login_url='/login/')
 def inicializar_tablas(request):
     #ventas_inicializar_tablas()
-    basedatos_activa =  request.user.userprofile.basedatos_activa
-    if basedatos_activa == '':
-        return HttpResponseRedirect('/select_db/')
+    if request.user.is_superuser:
+        basedatos_activa = request.user.userprofile.basedatos_activa
+        if basedatos_activa == '':
+            return HttpResponseRedirect('/select_db/')
+        else:
+            conexion_activa_id = request.user.userprofile.conexion_activa.id
 
-    punto_de_venta_inicializar_tablas( database = basedatos_activa )
-    inventario_inicializar_tablas( database = basedatos_activa )
-    #cuentas_por_pagar_inicializar_tablas()
-    #cuentas_por_cobrar_inicializar_tablas()
+        conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
+        MS = MICROSIP_MODULES
+        quitar = False
+        if 'microsip_web.apps.punto_de_venta' in MICROSIP_MODULES:
+            punto_de_venta_actualizar_tablas( conexion_name = conexion_name )
+        else:
+            quitar = True
 
-    #Sincronizar todas las bases de datos de microsip con tablas de la aplicacion
-    
-    # for empresa in MICROSIP_DATABASES.keys():
-    management.call_command('syncdb', database=basedatos_activa)
+        if 'microsip_web.apps.inventarios' in MICROSIP_MODULES:
+            inventario_actualizar_tablas( conexion_name = conexion_name )
+        else:
+            quitar = True
+
+        #cuentas_por_pagar_inicializar_tablas()
+        #cuentas_por_cobrar_inicializar_tablas()
+
+        #Sincronizar todas las bases de datos de microsip con tablas de la aplicacion
+        
+        #management.call_command('syncdb', database=conexion_name)
 
     return HttpResponseRedirect('/')
 
-def inventario_inicializar_tablas( database = None ):
-    c = connections[database].cursor()
+def inventario_actualizar_tablas( conexion_name = None ):
+    c = connections[conexion_name].cursor()
+    ################## STRORE PROCEDURES ###################
     c.execute(procedures['SIC_DOCTOINVFISDET_AT'])
     c.execute("EXECUTE PROCEDURE SIC_DOCTOINVFISDET_AT;")
+    ####################### TRIGGERS #######################
+    c.execute(inventarios_triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'])
+    c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'])
+    c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'])
+    c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSIN_BU'])
+
     transaction.commit_unless_managed()
 
-def ventas_inicializar_tablas( database = None ):
-    c = connections[database].cursor()
+def ventas_inicializar_tablas( conexion_name = None ):
+    c = connections[conexion_name].cursor()
     c.execute(procedures['ventas_inicializar'])
     c.execute("EXECUTE PROCEDURE ventas_inicializar;")
     transaction.commit_unless_managed()
 
-def punto_de_venta_inicializar_tablas( database = None ):
-    c = connections[database].cursor()
+def punto_de_venta_actualizar_tablas( conexion_name = None ):
+    c = connections[conexion_name].cursor()
+    ################## STRORE PROCEDURES ###################
     c.execute(procedures['SIC_PUNTOS_ARTICULOS_AT'])
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_ARTICULOS_AT;')
 
@@ -109,17 +133,34 @@ def punto_de_venta_inicializar_tablas( database = None ):
 
     c.execute(procedures['SIC_FILTROS_ARTICULOS_AT'])
     c.execute('EXECUTE PROCEDURE SIC_FILTROS_ARTICULOS_AT;')    
+    ####################### TRIGGERS #######################
+     #DETALLE DE VENTAS
+    c.execute(punto_de_venta_triggers['SIC_PUNTOS_PV_DOCTOSPVDET_BU'])
+    c.execute(punto_de_venta_triggers['SIC_PUNTOS_PV_DOCTOSPVDET_AD'])
+    #VENTAS
+    c.execute(punto_de_venta_triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'])
+    c.execute(punto_de_venta_triggers['SIC_PUNTOS_PV_DOCTOSPV_AD'])
+    #CLIENTES
+    c.execute(punto_de_venta_triggers['SIC_PUNTOS_PV_CLIENTES_BU'])
+    #EXCEPTION
+    try:
+        c.execute(
+        '''
+        CREATE EXCEPTION EX_CLIENTE_SIN_SALDO 'El cliente no tiene suficiente saldo';   
+        ''')
+    except Exception, e:
+       temp = 0
 
     transaction.commit_unless_managed()
 
-def cuentas_por_pagar_inicializar_tablas( database = None ):
-    c = connections[database].cursor()
+def cuentas_por_pagar_inicializar_tablas( conexion_name = None ):
+    c = connections[conexion_name].cursor()
     c.execute(procedures['cuentas_por_pagar_inicializar'])
     c.execute('EXECUTE PROCEDURE cuentas_por_pagar_inicializar;')
     transaction.commit_unless_managed()
 
-def cuentas_por_cobrar_inicializar_tablas( database = None ):
-    c = connections[database].cursor()
+def cuentas_por_cobrar_inicializar_tablas( conexion_name = None ):
+    c = connections[conexion_name].cursor()
     c.execute(procedures['cuentas_por_cobrar_inicializar'])
     c.execute("EXECUTE PROCEDURE cuentas_por_cobrar_inicializar;")
     transaction.commit_unless_managed()
