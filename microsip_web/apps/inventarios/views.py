@@ -93,39 +93,43 @@ def ingresar(request):
         conexion_db = request.POST['conexion_db']
 
         acceso = None
-        conexion = ConexionDB.objects.filter(pk=int(conexion_db))
+        conexion = None
+        if conexion_db != '':
+            conexion = ConexionDB.objects.filter(pk=int(conexion_db))
         usuarios_rows = []
-        if conexion.exists():
+        
+        if conexion or conexion_db == '':
             try:
-                db = fdb.connect(host=conexion[0].servidor ,user=usuario,password=str(clave), database="%s\System\CONFIG.FDB"% conexion[0].carpeta_datos)
-                cur = db.cursor()
-                cur.execute("SELECT * FROM USUARIOS WHERE NOMBRE ='%s'"% usuario)
-                usuarios_rows = cur.fetchall()
-                db.close()
-
+                if usuario != 'SYSDBA':
+                    db = fdb.connect(host=conexion[0].servidor ,user=usuario,password=str(clave), database="%s\System\CONFIG.FDB"% conexion[0].carpeta_datos)
+                    cur = db.cursor()
+                    cur.execute("SELECT * FROM USUARIOS WHERE NOMBRE ='%s'"% usuario)
+                    usuarios_rows = cur.fetchall()
+                    db.close()
             except fdb.DatabaseError:
                 message = 'Nombre de usaurio o password no validos.'
-            else:
-                if usuarios_rows != []:
-                    try:
-                        u = User.objects.get(username__exact=usuario)
-                        u.set_password(str(clave))
-                        u.save()
-                    except ObjectDoesNotExist:
-                        User.objects.create_user(username = usuario, password=str(clave))
-                        if usuario == 'SYSDBA':
-                            User.objects.filter(username = 'SYSDBA').update(is_superuser=True, is_staff=True)
+            
+            if usuarios_rows != [] or usuario == 'SYSDBA':
+                try:
+                    u = User.objects.get(username__exact=usuario)
+                    u.set_password(str(clave))
+                    u.save()
+                except ObjectDoesNotExist:
+                    User.objects.create_user(username = usuario, password=str(clave))
+                    if usuario == 'SYSDBA':
+                        User.objects.filter(username = 'SYSDBA').update(is_superuser=True, is_staff=True)
 
-                    acceso = authenticate(username=usuario, password=clave)
+                acceso = authenticate(username=usuario, password=clave)
 
-                    user_profile = UserProfile.objects.filter(usuario = acceso)
+                user_profile = UserProfile.objects.filter(usuario = acceso)
                 
+                if conexion:
                     if user_profile.exists():
                         user_profile.update(conexion_activa = conexion[0])
                     else:
                         UserProfile.objects.create(usuario= acceso, basedatos_activa='', conexion_activa= conexion[0])
-                else:
-                    message = 'Nombre de usaurio o password no validos.'
+            else:
+                message = 'Nombre de usaurio o password no validos.'
             
         if acceso is not None:
             if acceso.is_active:
