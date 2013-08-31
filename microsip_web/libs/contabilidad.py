@@ -709,6 +709,8 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
     return totales_cuentas, error, msg
 
 def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_poliza = None, totales_cuentas = None, msg = '', error='', depto_co = None, connection_name = None):  
+    """ Obtiene los totales de un documento indicado para posteriormente crear las polizas """
+    
     es_contado = False
     try:
         cuenta_cliente =  CuentaCo.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
@@ -743,6 +745,8 @@ def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_
                 "impuestos.PCTJE_IMPUESTO = 0 ",
             ],
         ).aggregate(ventas_0 = Sum('precio_total_neto'))['ventas_0']
+    
+    impuestos_documento = Impuestos_docto_pv.objects.filter(documento_pv=documento)
     
     if ventas_0 == None:
         ventas_0 = 0 
@@ -925,11 +929,9 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
 
                 #DE NUEVO CONVIERTO LA VARIABLE A DICCIONARIO
                 totales_cuentas = {}
-            if origen_documentos == 'punto_de_venta':
-                Docto_PV.objects.filter(pk=documento.id).update(contabilizado = 'S')
-            else:
-                documento.contabilizado ='S'
-                documento.save()
+            
+            documento.contabilizado ='S'
+            documento.save(update_fields=['contabilizado'])
     if error == 0:
         for poliza in polizas:
             poliza.poliza = new_folio_poliza(poliza.tipo_poliza, poliza.fecha, connection_name)

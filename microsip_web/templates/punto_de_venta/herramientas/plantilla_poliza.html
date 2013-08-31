@@ -29,6 +29,7 @@ $(function() {
 $(document).ready(function() {
     //$("#id_detalles_data").tablesorter();
     $( "#sortable" ).sortable();
+     
       // items: ".sortable-item",
       //   update : function(ev, ui) {
 
@@ -96,16 +97,16 @@ $(document).ready(function() {
   <hr>
   <div>
     <fieldset style='clear:both;'>
-      <table class="table tableCell table-hover tablesorter" id="id_detalles_data" border="0" cellpadding="0" cellspacing="5">
+      <table class="table tableCell table-striped table-hover tablesorter" id="id_detalles_data" border="0" cellpadding="0" cellspacing="5">
         <thead>
           <tr>
             <th >Numero</th>
-            <th >Cuenta</th>
             <th>Tipo</th>
             <th>Valor</th>
             <th>IVA</th>
-            <th>Credito/Contado</th>
-            <th>Opciones</th>
+            <th>Cred/Cont</th>
+            <th >Cuenta</th>
+            <th></th>
           </tr>
         </thead>
         <tbody id="sortable">
@@ -113,13 +114,13 @@ $(document).ready(function() {
           <tr id="{{ form.prefix }}-row" class="form-container">
             {{ form.errors }}
              <td>{{ form.posicion }}</td>
-            <td>{{ form.cuenta_co }}</td>
             <td>{{ form.tipo }}
               {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
             </td>
             <td>{{ form.valor_tipo }}{{ form.asiento_ingora }}</td>
             <td>{{ form.valor_iva }}</td>
             <td>{{ form.valor_contado_credito }}</td>
+            <td>{{ form.cuenta_co }}</td>
             <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}</td>
           </tr>
           {% endfor %}

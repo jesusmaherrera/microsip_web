@@ -40,6 +40,13 @@ class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
     posicion =  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
     asiento_ingora = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
 
+    def __init__(self, *args, **kwargs):
+        super(ConceptoPlantillaPolizaManageForm, self).__init__(*args, **kwargs)
+        self.fields['tipo'].widget.attrs['class'] = 'input-small'
+        self.fields['valor_tipo'].widget.attrs['class'] = 'input-medium'
+        self.fields['valor_iva'].widget.attrs['class'] = 'input-small'
+        self.fields['valor_contado_credito'].widget.attrs['class'] = 'input-small'
+        
     class Meta:
         widgets = autocomplete_light.get_widgets_dict(DetallePlantillaPolizas_CC)
         model = DetallePlantillaPolizas_CC

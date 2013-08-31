@@ -13,15 +13,17 @@ def get_database_name(request):
     
     try:
         session = Session.objects.get(session_key=session_key)
-        uid = session.get_decoded().get('_auth_user_id')
-        
-        user = User.objects.get(pk=uid)
-        
-        profile = UserProfile.objects.get(usuario=uid)
-        
-        if profile:
-            return profile.basedatos_activa, profile.conexion_activa.id
-        else:
-            return None, None
     except:
         return None, None
+    else:
+        uid = session.get_decoded().get('_auth_user_id')
+        if uid:
+            user = User.objects.get(pk=uid)
+            
+            profile = UserProfile.objects.get(usuario=uid)
+            if profile:
+                return profile.basedatos_activa, profile.conexion_activa.id
+            else:
+                return None, None
+        else:
+            return None, None

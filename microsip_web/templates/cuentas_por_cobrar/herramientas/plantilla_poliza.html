@@ -86,12 +86,12 @@ $(document).ready(function() {
         <thead>
           <tr>
             <th>Numero</th>
-            <th>Cuenta</th>
             <th>Tipo</th>
             <th>Valor</th>
             <th>IVA</th>
-            <th>Credito/Contado</th>
-            <th>Opciones</th>
+            <th>Cred/Cont</th>
+            <th>Cuenta</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -99,13 +99,13 @@ $(document).ready(function() {
           <tr id="{{ form.prefix }}-row" class="form-container">
             {{ form.errors }}
              <td>{{ form.posicion }}</td>
-            <td>{{ form.cuenta_co }}</td>
             <td>{{ form.tipo }}
               {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
             </td>
             <td>{{ form.valor_tipo }}{{ form.asiento_ingora }}</td>
             <td>{{ form.valor_iva }}</td>
             <td>{{ form.valor_contado_credito }}</td>
+            <td>{{ form.cuenta_co }}</td>
             <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}</td>
           </tr>
           {% endfor %}
