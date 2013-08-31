@@ -53,9 +53,9 @@ class GrupoLineasManageForm(forms.ModelForm):
 
 class InformacioncontableRegManageForm(forms.Form):
     TIPOS_POLIZA = []
-    for tipo_poliza in TipoPoliza.objects.all():
-        opcion = [tipo_poliza.clave, tipo_poliza.nombre]
-        TIPOS_POLIZA.append(opcion)
+    # for tipo_poliza in TipoPoliza.objects.all():
+    #     opcion = [tipo_poliza.clave, tipo_poliza.nombre]
+    #     TIPOS_POLIZA.append(opcion)
 
     tipo_poliza_ventas = forms.ChoiceField(choices=TIPOS_POLIZA, required=True)
     tipo_poliza_devol  = forms.ChoiceField(choices=TIPOS_POLIZA, required=True)

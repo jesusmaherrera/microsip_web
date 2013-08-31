@@ -131,7 +131,7 @@ def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inv
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
-    form = DoctoInvfis_CreateForm(request.POST or None, database=basedatos_activa)
+    form = DoctoInvfis_CreateForm(request.POST or None)
     
     ultimofolio = Registry.objects.filter(nombre='SIG_FOLIO_INVFIS')
 
@@ -147,7 +147,7 @@ def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inv
             inventario.usuario_aut_creacion =request.user.username
             inventario.usuario_ult_modif =request.user.username
             inventario.usuario_aut_modif =request.user.username
-            inventario.save(using=basedatos_activa)
+            inventario.save()
             return HttpResponseRedirect('/inventarios/InventariosFisicos/')
         
     c = {'message':message,'form':form}
@@ -236,7 +236,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
 
                     except ObjectDoesNotExist:
                         if detalleInv.unidades >= 0:
-                            id_detalle = c_get_next_key('ID_DOCTOS', conexion_name)
+                            id_detalle = c_get_next_key( conexion_name)
                             detalleInv.id = id_detalle
                             articulos_claves =ClavesArticulos.objects.filter(articulo= detalleInv.articulo)
                             
