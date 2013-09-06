@@ -693,6 +693,9 @@ class Impuesto(models.Model):
     nombre          = models.CharField(max_length=30, db_column='NOMBRE')
     porcentaje      = models.DecimalField(default=0, blank=True, null=True, max_digits=9, decimal_places=6, db_column='PCTJE_IMPUESTO')
 
+    def __unicode__(self):
+        return self.nombre
+        
     class Meta:
         db_table = u'impuestos'
 
@@ -1184,7 +1187,7 @@ class Docto_pv_cobro_refer(models.Model):
 #Impuestos de documentos
 class Impuestos_docto_pv(models.Model):
     documento_pv        = models.ForeignKey(Docto_PV, db_column='DOCTO_PV_ID')
-    impuesto            = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_ID')
+    impuesto            = models.ForeignKey(Impuesto, db_column='IMPUESTO_ID')
     venta_neta          = models.DecimalField(max_digits=15, decimal_places=2, db_column='VENTA_NETA')
     otros_impuestos     = models.DecimalField(max_digits=15, decimal_places=2, db_column='OTROS_IMPUESTOS')
     porcentaje_impuestos= models.DecimalField(max_digits=9, decimal_places=6, db_column='PCTJE_IMPUESTOS')
@@ -1192,6 +1195,7 @@ class Impuestos_docto_pv(models.Model):
     
     class Meta:
         db_table = u'impuestos_doctos_pv'
+        
 
 class Impuestos_grav_docto_pv(models.Model):
     documento_pv        = models.ForeignKey(Docto_PV, db_column='DOCTO_PV_ID')

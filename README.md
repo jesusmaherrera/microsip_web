@@ -95,10 +95,12 @@ ventas
         - Al 16                                     A               C
         - Al 0                                      A               C
         - Ambos                                     A               C
+        - x...                                      A               C
     -Credito
         - Al 16                                     A               C
         - Al 0                                      A               C
         - Ambos                                     A               C
+        - x...                                      A               C
 IVA
     - Contado (IVA efectivo cobrado)                A               C
     - Credito (IVA pendiente cobrar)                A               C
@@ -106,7 +108,7 @@ IVA
 
 SEGMENTOS (etc...)                                 C-A             C-A
 
-////////////////////////////PLANTILLAS DE CUENTAS POR PAGAR////////////////////////////////
+////////////////////////////PLANTILLAS DE CUENTAS POR PAGAR, COMPRAS ////////////////////////////////
 
 Proveedores                                         A
 

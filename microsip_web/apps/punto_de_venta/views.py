@@ -678,8 +678,10 @@ def plantilla_poliza_manageView(request, id = None, template_name='punto_de_vent
         plantilla =PlantillaPolizas_pv()
 
     plantilla_form = PlantillaPolizaManageForm(request.POST or None, instance=plantilla)
-    plantilla_items = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
+    
+    plantilla_items = PlantillaPoliza_items_formset(DetPlantillaPolVentasManageForm, extra=0, can_delete=True)
     plantilla_items_formset = plantilla_items(request.POST or None, instance=plantilla)
+    empty_plantilla_form = plantilla_items(None, instance=plantilla)
     
     if plantilla_form.is_valid() and plantilla_items_formset.is_valid():
         plantilla = plantilla_form.save(commit = False)
@@ -691,11 +693,14 @@ def plantilla_poliza_manageView(request, id = None, template_name='punto_de_vent
             #PARA CREAR UNO NUEVO
             if not Detalleplantilla.id:
                 Detalleplantilla.plantilla_poliza_pv = plantilla
+                Detalleplantilla.rama =  RamaDetallesPlantilla.objects.get(pk=1)
+                Detalleplantilla.tipo_valor = 'Ventas'
+                Detalleplantilla.tipo_asiento = 'C'
         
         plantilla_items_formset .save()
         return HttpResponseRedirect('/punto_de_venta/PreferenciasEmpresa/')
     
-    c = {'plantilla_form': plantilla_form, 'formset': plantilla_items_formset , 'message':message,}
+    c = {'plantilla_form': plantilla_form, 'formset': plantilla_items_formset , 'message':message,'empty_plantilla_form':empty_plantilla_form,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################

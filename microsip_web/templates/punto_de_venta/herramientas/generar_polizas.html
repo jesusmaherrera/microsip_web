@@ -132,7 +132,6 @@
       <label>.</label>
       <div class="btn-group">
         <input type="submit" class="btn btn-primary" onclick="this.disabled=true,this.form.submit(), this.value='Generando polizas...';" value="Generar Polizas" />
-        <!-- <a class='btn' href="#" id='submit_ajax' >Enviar por ajax</a> -->
       </div>
     </div>
   </div>
@@ -143,7 +142,7 @@
 <table class="table tableCell table-hover">
   {%if documentos %}
     <tr>
-      	<th>Folios de polizas generadas/th>
+      	<th>Folios de polizas generadas</th>
     </tr>
   {%endif %}
 	{% for documento in documentos %}

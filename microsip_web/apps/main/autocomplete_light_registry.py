@@ -15,7 +15,7 @@ autocomplete_light.register(Cliente, autocomplete_js_attributes={'placeholder': 
 autocomplete_light.register(Ciudad, search_fields=('nombre',),
     autocomplete_js_attributes={'placeholder': 'Ciudad ..'})
 
-autocomplete_light.register(CuentaCo, search_fields=('cuenta',),
+autocomplete_light.register(CuentaCo, search_fields=('cuenta','nombre',),
     autocomplete_js_attributes={'placeholder': 'Cuenta ..'})
 
 autocomplete_light.register(Carpeta, search_fields=('nombre',))

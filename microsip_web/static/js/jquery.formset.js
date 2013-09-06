@@ -24,9 +24,11 @@
             },
 
             updateElementIndex = function(elem, prefix, ndx) {
+
                 var idRegex = new RegExp('(' + prefix + '-\\d+-)|(^)'),
                     replacement = prefix + '-' + ndx + '-';
-                if (elem.attr("for")) elem.attr("for", elem.attr("for").replace(idRegex, replacement));
+                         
+                                if (elem.attr("for")) elem.attr("for", elem.attr("for").replace(idRegex, replacement));
                 if (elem.attr('id')) elem.attr('id', elem.attr('id').replace(idRegex, replacement));
                 if (elem.attr('name')) elem.attr('name', elem.attr('name').replace(idRegex, replacement));
             },
@@ -95,19 +97,21 @@
         });
 
         if ($$.length) {
-            var addButton, template;
+            var addButton, template, desglosarButton;
             if (options.formTemplate) {
                 // If a form template was specified, we'll clone it to generate new form instances:
                 template = (options.formTemplate instanceof $) ? options.formTemplate : $(options.formTemplate);
                 template.removeAttr('id').addClass(options.formCssClass).addClass('formset-custom-template');
                 template.find('input,select,textarea,label').each(function() {
                     updateElementIndex($(this), options.prefix, 2012);
+
                 });
                 insertDeleteLink(template);
             } else {
                 // Otherwise, use the last form in the formset; this works much better if you've got
                 // extra (>= 1) forms (thnaks to justhamade for pointing this out):
-                template = $('.' + options.formCssClass + ':last').clone(true).removeAttr('id');
+                template = $('.' + options.formCssClass + ':last').clone(true).attr('id','');
+
                 template.find('input:hidden[id $= "-DELETE"]').remove();
                 template.find('input,select,textarea,label').each(function() {
                     var elem = $(this);
@@ -123,6 +127,8 @@
             // FIXME: Perhaps using $.data would be a better idea?
             options.formTemplate = template;
 
+            desglosarButton = $$.parent().find("input[name*='check-']")
+
             if ($$.attr('tagName') == 'TR') {
                 // If forms are laid out as table rows, insert the
                 // "add" button in a new table row:
@@ -135,15 +141,62 @@
                 $$.filter(':last').after('<a class="' + options.addCssClass + '" href="javascript:void(0)">' + options.addText + '</a>');
                 addButton = $$.filter(':last').next();
             }
+
+            desglosarButton.click(function() {
+                var rowPrincipal = options.formTemplate.clone(true).removeClass('formset-custom-template'),
+                    buttonRow = $(this).parents('tr.' + options.formCssClass + '-add').get(0) || this,
+                    thisprincipal = $(this);
+
+                $cuentas = rowPrincipal.find("select[name*='impuesto'] > option");
+                
+                if (desglosarButton.attr('checked'))
+                {
+                    $cuentas.each(function( index ) {
+                        if ($(this).val())
+                        {
+                            var row = options.formTemplate.clone(true).removeClass('formset-custom-template'),
+                                formCount = parseInt($('#id_' + options.prefix + '-TOTAL_FORMS').val());
+                            row.find("select[name*='impuesto']").val($(this).val());
+                            row.find("select[name*='impuesto']").hide();
+                            row.find("span[id*='cuenta_co-deck']").text("");
+                            row.find("span[id*='cuenta_co-deck']").before("<div class='span3'>"+$(this).text()+"</span>");
+                            row.find("input[name*='check']").hide();
+                            row.find(".delete-row").hide()
+                            row.find("select[name*='-rama']").hide()
+                            // applyExtraClasses(row, formCount);
+                            row.insertAfter($(buttonRow).parent().parent().parent()).show();
+                            row.find('input,select,textarea,label').each(function() {
+                                updateElementIndex($(this), options.prefix, formCount);
+
+                            });
+                            $('#id_' + options.prefix + '-TOTAL_FORMS').val(formCount + 1);
+                            // If a post-add callback was supplied, call it with the added form:
+                            if (options.added) options.added(row);
+                        }
+                    });
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+                
+            });
+
             addButton.click(function() {
                 var formCount = parseInt($('#id_' + options.prefix + '-TOTAL_FORMS').val()),
                     row = options.formTemplate.clone(true).removeClass('formset-custom-template'),
                     buttonRow = $(this).parents('tr.' + options.formCssClass + '-add').get(0) || this;
+
                 applyExtraClasses(row, formCount);
                 row.insertBefore($(buttonRow)).show();
+
                 row.find('input,select,textarea,label').each(function() {
                     updateElementIndex($(this), options.prefix, formCount);
+
                 });
+
                 $('#id_' + options.prefix + '-TOTAL_FORMS').val(formCount + 1);
                 // If a post-add callback was supplied, call it with the added form:
                 if (options.added) options.added(row);

@@ -38,26 +38,40 @@ class PlantillaPolizas_pv(models.Model):
     class Meta:
         db_table = u'sic_pv_plantillapoliza'
 
+
+class RamaDetallesPlantilla(models.Model):
+    nombre = models.CharField(max_length=150)
+    nivel = models.CharField(max_length=1, blank=True, null=True)
+
+    def __unicode__(self):
+        return self.nombre
+
+    class Meta:
+        db_table = u'sic_pv_rama_plantpol_det'
+
 class DetallePlantillaPolizas_pv(models.Model):
-    TIPOS = (('C', 'Cargo'),('A', 'Abono'),)
-    VALOR_TIPOS =(
+    plantilla_poliza_pv = models.ForeignKey(PlantillaPolizas_pv)
+    posicion = models.CharField(max_length=2)
+    rama = models.ForeignKey(RamaDetallesPlantilla, blank=True, null=True)
+
+    TIPOS_ASIENTO = (('C', 'Cargo'),('A', 'Abono'),)
+    tipo_asiento = models.CharField(max_length=2, choices=TIPOS_ASIENTO)
+    
+    TIPOS_VALOR =(
         ('Ventas', 'Ventas'),
         ('Clientes', 'Clientes'),
         ('Bancos', 'Bancos'),
         ('Descuentos', 'Descuentos'),
-        ('IVA', 'IVA'),
+        ('IVA', 'Impuestos'),
     )
-    VALOR_IVA_TIPOS             = (('A', 'Ambos'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
-    VALOR_CONTADO_CREDITO_TIPOS = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)
-    
-    posicion                = models.CharField(max_length=2)
-    plantilla_poliza_pv     = models.ForeignKey(PlantillaPolizas_pv)
-    cuenta_co               = models.ForeignKey(CuentaCo)
-    tipo                    = models.CharField(max_length=2, choices=TIPOS, default='C')
-    asiento_ingora          = models.CharField(max_length=2, blank=True, null=True)
-    valor_tipo              = models.CharField(max_length=20, choices=VALOR_TIPOS)
-    valor_iva               = models.CharField(max_length=2, choices=VALOR_IVA_TIPOS, default='A')
-    valor_contado_credito   = models.CharField(max_length=10, choices=VALOR_CONTADO_CREDITO_TIPOS, default='Ambos')
+    tipo_valor = models.CharField(max_length=20, choices=TIPOS_VALOR)
+
+    TIPOS_CONDICIONPAGO = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)
+    tipo_condicionpago = models.CharField(max_length=10, choices=TIPOS_CONDICIONPAGO, blank=True, null=True, default='Ambos')
+
+    impuesto = models.ForeignKey(Impuesto, blank=True, null=True)
+    cuenta_co = models.ForeignKey(CuentaCo)
+    asiento_ingora = models.CharField(max_length=2, blank=True, null=True)
 
     def __unicode__(self):
         return u'%s'%self.id

@@ -19,7 +19,7 @@ from microsip_web.apps.punto_de_venta.models import *
 #libs
 from custom_db.main import next_id
 
-def agregarTotales(totales_cuentas, connection_name= None, **kwargs):
+def agregarTotales(totales_cuentas, **kwargs):
 
     #Valores cuentas por pagar
     compras_16_credito  = kwargs.get('compras_16_credito', 0)
@@ -54,6 +54,7 @@ def agregarTotales(totales_cuentas, connection_name= None, **kwargs):
 
     error = kwargs.get('error', 0)
     msg = kwargs.get('msg', '')
+    impuestos_documento = kwargs.get('impuestos_documento', [])
 
     asientos_a_ingorar = []
     valores_extra = {}
@@ -504,7 +505,6 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
         depto_co            = depto_co,
         error               = error,
         msg                 = msg,
-        connection_name = connection_name,
     )
 
 
@@ -606,7 +606,6 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
         cuenta_proveedor    = cuenta_proveedor,
         error               = error,
         msg                 = msg,
-        connection_name = connection_name,
     )
 
     return totales_cuentas, error, msg
@@ -703,10 +702,25 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
         depto_co            = depto_co,
         error               = error,
         msg                 = msg,
-        connection_name = connection_name,
     )
 
     return totales_cuentas, error, msg
+
+def get_impuestos_documento(documento, connection_name):
+    """ Para obtener impuestos de un documento determinado """
+    documento_tipo = documento.__class__.__name__
+    c = connections[connection_name].cursor()
+    if documento_tipo == 'Docto_PV':
+        consulta ="SELECT IMPUESTO_ID, IMPORTE_IMPUESTO FROM IMPUESTOS_DOCTOS_PV WHERE DOCTO_PV_ID= %s"% documento.id
+    elif documento_tipo == 'DoctoVe':
+        consulta ="SELECT IMPUESTO_ID, IMPORTE_IMPUESTO FROM IMPUESTOS_DOCTOS_VE WHERE DOCTO_VE_ID= %s"% documento.id
+    elif documento_tipo == 'DoctosCm':
+        consulta ="SELECT IMPUESTO_ID, IMPORTE_IMPUESTO FROM IMPUESTOS_DOCTOS_CM WHERE DOCTO_CM_ID= %s"% documento.id
+    c.execute(consulta)
+    impuestos = c.fetchall()
+    c.close()
+    return impuestos
+
 
 def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_poliza = None, totales_cuentas = None, msg = '', error='', depto_co = None, connection_name = None):  
     """ Obtiene los totales de un documento indicado para posteriormente crear las polizas """
@@ -794,7 +808,7 @@ def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_
         depto_co            = depto_co,
         error               = error,
         msg                 = msg,
-        connection_name = connection_name,
+        impuestos_documento = impuestos_documento,
     )
     
     return totales_cuentas, error, msg

@@ -13,26 +13,55 @@
       window.scrollTo(0, 1);
     }, 0);
   });
-
+  
   $(document).ready(function(){
+    alert ("hello world");
     $('#id_clave').focus();
-    
     $('#id_unidades').focus(function() { 
       setTimeout(function(){
         window.scrollTo(0, 1);
       }, 0);  
     });
 
+    // $("#id_clave").live('mouseup', function () {
+    //   $(this).select();
+    // });
 
-    $('#id_clave').live('keydown', function(e) { 
-      var keyCode = e.keyCode || e.which; 
+    // $('#id_clave').keypress(function() {
+    //   $("#id_unidades").val('');
+    //   $('#label_articulo').html('');
+    //   $("#id_unidades").show();
+    //   $("#id_unidades").val('');
+    //   $("#id_unidades").focus();
+    // });
 
-      if (keyCode == 13 || keyCode == 9) 
-      { 
-        if($("#id_clave").val() != '')
-          Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
-        return false
-      }
+    // $('#id_clave').live('keydown', function(e) { 
+    //   var keyCode = e.keyCode || e.which; 
+    //   // if($("#id_clave").val() != '')
+    //   // {
+    //   //   Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
+    //   // $("#id_unidades").val('');
+    //   // $('#label_articulo').html('');
+    //   // $("#id_unidades").show();
+    //   // $("#id_unidades").val('');
+    //   // $("#id_unidades").focus();
+        
+    //   // }
+    //     // if (keyCode == 13 || keyCode == 9) 
+    //     // {  
+        
+    //     // if($("#id_clave").val() != '')
+    //     // {
+    //     //   $("#id_unidades").val('');
+    //     //   $('#label_articulo').html('');
+    //     //   $("#id_unidades").show();
+    //     //   $("#id_unidades").val('');
+    //     //   $("#id_unidades").focus();
+    //     //   // Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
+          
+    //     // }
+        
+    //   }
 
     });
 
@@ -47,7 +76,21 @@
 
     $('#a_buscar').on('click',function(){
       Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
+      $("#id_unidades").val('');
+      $('#label_articulo').html('');
+      $("#id_unidades").show();
+      $("#id_unidades").val('');
+      $("#id_unidades").focus();
     });
+
+    // $('#a_buscar').on('click',function(){
+    //   // Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
+    //   $("#id_unidades").val('');
+    //   $('#label_articulo').html('');
+    //   $("#id_clave").show();
+    //   $("#id_clave").val('');
+    //   $("#id_clave").focus();
+    // });
     
 
   });
@@ -62,6 +105,8 @@
     }
     else
       $("#id_clave").show();
+    $("#id_unidades").show();
+    $("#id_unidades").focus();
   }
 
   function mostrar_unidades(data) 
@@ -75,6 +120,7 @@
       $('#h2exist').html('Exist 0');
 
     $("#id_unidades").val('');
+    $("#id_unidades").show();
     $("#id_unidades").focus();
   }
 
