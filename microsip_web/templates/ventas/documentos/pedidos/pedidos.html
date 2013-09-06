@@ -9,9 +9,14 @@
 
 {% block breadcrumb %}{{ block.super }}  pedidos {% endblock %}
 {% block content %}
-<div class="form-actions mainmenu">
-    <a class="btn btn-success" href="/ventas/pedido/"> Nuevo</a>
-</div>
+<div class="ms-custom-form container-fluid" style=" height: 2em; ">
+    <div class="row-fluid">
+        <div class="span2"><h3>Pedidos</h3></div>
+      <div class='span7' style=" margin-top: 1em; ">  
+        <a class="btn" href="/ventas/pedido/"> Nuevo</a>
+      </div>
+    </div>
+  </div>
 <table class="table tableCell table-hover">
     <tr>
       <th>Nombre</th>
