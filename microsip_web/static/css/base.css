@@ -214,10 +214,29 @@ background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAA
     display: table-cell;
 }
 
+.big_screen 
+{
+    display: block;
+}
+
+.small_screen
+{
+  display: none;
+}
+
 /* Pantallas grandes */
 @media only screen and (max-width : 900px) {
   .label_extra {
     display: none;
+  }
+
+  .big_screen {
+    display: none;
+  }
+
+  .small_screen
+  {
+    display: inline-block ;
   }
 }
 

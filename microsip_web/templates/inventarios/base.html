@@ -8,11 +8,11 @@
 {% endblock %}
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
-{% block selected_module %}<a href="/inventarios/InventariosFisicos/"> <i class="msicon-inventarios"></i></a>{% endblock %}
+{% block selected_module %}<a href="#"> <i class="msicon-inventarios"></i> <label class="small_screen"> Inventarios</label></a>{% endblock %}
 {% block btn_modulo_inventarios%}
-<li style='color: #555555; background-color: #e5e5e5;'><a href="/inventarios/InventariosFisicos/"> <i class="msicon-inventarios"></i></a> </li>
+<li style='color: #555555; background-color: #e5e5e5;'><a href="/inventarios/InventariosFisicos/"> <i class="msicon-inventarios"></i> <label class='small_screen'> Inventarios</label></a> </li>
 {% endblock %}
-{% block breadcrumb %}{{ block.super }} Inventarios <i class=" icon-play"></i> {% endblock %}
+{% block breadcrumb %}{{ block.super }}{% endblock %}
 {% block tools-module %}{% endblock %}
 {% block content %}
 {% endblock %}
