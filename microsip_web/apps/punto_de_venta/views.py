@@ -679,7 +679,7 @@ def plantilla_poliza_manageView(request, id = None, template_name='punto_de_vent
 
     plantilla_form = PlantillaPolizaManageForm(request.POST or None, instance=plantilla)
     
-    plantilla_items = PlantillaPoliza_items_formset(DetPlantillaPolVentasManageForm, extra=0, can_delete=True)
+    plantilla_items = PlantillaPoliza_items_formset(DetPlantillaPolVentasManageForm, extra=1, can_delete=True)
     plantilla_items_formset = plantilla_items(request.POST or None, instance=plantilla)
     empty_plantilla_form = plantilla_items(None, instance=plantilla)
     

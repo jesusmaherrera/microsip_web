@@ -97,21 +97,7 @@ def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisic
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
     
-    inventarios_fisicos_list = DoctosInvfis.objects.filter(aplicado='N', cancelado='N').order_by('-fecha')
-
-
-    paginator = Paginator(inventarios_fisicos_list, 15) # Muestra 5 inventarios por pagina
-    page = request.GET.get('page')
-
-    #####PARA PAGINACION##############
-    try:
-        inventarios_fisicos = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        inventarios_fisicos = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        inventarios_fisicos = paginator.page(paginator.num_pages)
+    inventarios_fisicos = DoctosInvfis.objects.filter(aplicado='N', cancelado='N').order_by('-fecha')
 
     c = {'inventarios_fisicos':inventarios_fisicos}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
@@ -343,7 +329,9 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
         'articulos_discretos_actuales':articulos_discretos_actuales,
         }
    
-
+    if "Chrome" in request.META['HTTP_USER_AGENT']:
+       request.mobile = False
+       
     if request.mobile:
         template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_pa_mobile.html'
     else:

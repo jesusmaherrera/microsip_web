@@ -22,7 +22,10 @@ def get_database_name(request):
             
             profile = UserProfile.objects.get(usuario=uid)
             if profile:
-                return profile.basedatos_activa, profile.conexion_activa.id
+                try:
+                    return profile.basedatos_activa, profile.conexion_activa.id
+                except:
+                    return None, None
             else:
                 return None, None
         else:

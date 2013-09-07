@@ -8,6 +8,7 @@
 
   <!-- Estilos -->
   <link rel='stylesheet' href='{{STATIC_URL}}css/bootstrap.css'/>
+  <link rel='stylesheet' href='{{STATIC_URL}}css/bootstrap-responsive.css'/>
   <link rel='stylesheet' href='{{STATIC_URL}}css/base.css'/>
   <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css">
   <link href='http://fonts.googleapis.com/css?family=Marcellus+SC' rel='stylesheet' type='text/css'>
@@ -17,21 +18,6 @@
   {% block modulestyle_css %}{% endblock %}
 
   <link rel='shortcut icon' href='{{STATIC_URL}}img/logo.png'>
-
-  <script src="{{STATIC_URL}}js/jquery.min.js" ></script>
-  <script src='{{STATIC_URL}}js/bootstrap.js' ></script>
-  <script src='{{STATIC_URL}}js/jquery-ui-1.8.23.custom.min.js'></script>
-  <script src='{{STATIC_URL}}js/jquery-ui-timepicker.js'></script>
-  <script src='{{STATIC_URL}}js/jquery.tablesorter.js'></script>
-  
-  <script src='{{STATIC_URL}}js/jquery.cookie.js'></script>
-  <script src='{{STATIC_URL}}js/jquery.hotkeys.js'></script>
-  <script src='{{STATIC_URL}}js/jquery.jstree.js'></script>
-
-  
-  {% block js_code %}
-    
-  {% endblock %}
   {% dajaxice_js_import %}
 </head>
 <body>
@@ -39,41 +25,45 @@
     <div class="navbar-inner inventarios_btn" >
       <div class="container" style="width: auto;">
         <!-- <a class="brand" href="#"><i class="icon-home"></i></a> -->
-        <ul class="nav" role="navigation">
-          
-          {% load main_menu_tags %}
-          {% block btn_modulo_cuentas_por_cobrar %}
-            {% microsip_module_btn 'microsip_web.apps.cuentas_por_cobrar' %}
-          {% endblock %}
+        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <!-- <a class="brand" href="#"></a> --><div class="span1 label_min"> {% block selected_module %}{% endblock %}</div>
+        <div class="nav-collapse collapse">
+          <ul class="nav" role="navigation">
+            
+            {% load main_menu_tags %}
+            {% block btn_modulo_cuentas_por_cobrar %}
+              {% microsip_module_btn 'microsip_web.apps.cuentas_por_cobrar' %}
+            {% endblock %}
 
-          {% block btn_modulo_inventarios%}
-            {% microsip_module_btn 'microsip_web.apps.inventarios' %}
-          {% endblock %}
+            {% block btn_modulo_inventarios%}
+              {% microsip_module_btn 'microsip_web.apps.inventarios' %}
+            {% endblock %}
 
-          {% block btn_modulo_ventas%}
-            {% microsip_module_btn 'microsip_web.apps.ventas' %}
-          {% endblock %}
+            {% block btn_modulo_ventas%}
+              {% microsip_module_btn 'microsip_web.apps.ventas' %}
+            {% endblock %}
 
-          {% block btn_modulo_cuentas_por_pagar %}
-            {% microsip_module_btn 'microsip_web.apps.cuentas_por_pagar' %}
-          {% endblock %}
+            {% block btn_modulo_cuentas_por_pagar %}
+              {% microsip_module_btn 'microsip_web.apps.cuentas_por_pagar' %}
+            {% endblock %}
 
-          {% microsip_module_btn 'microsip_web.apps.compras' %}
-          
-          {% block btn_modulo_punto_venta %}
-            {% microsip_module_btn 'microsip_web.apps.punto_de_venta' %}
-            <!-- {% microsip_module_btn 'admin' %} -->
-          {% endblock %}
+            {% microsip_module_btn 'microsip_web.apps.compras' %}
+            
+            {% block btn_modulo_punto_venta %}
+              {% microsip_module_btn 'microsip_web.apps.punto_de_venta' %}
+              <!-- {% microsip_module_btn 'admin' %} -->
+            {% endblock %}
 
-          {% block btn_modulo_contabilidad %}
-            {% microsip_module_btn 'microsip_web.apps.contabilidad' %}
-          {% endblock %}
-
-          
-          
-          
-        </ul>
-        <ul class="nav pull-right">
+            {% block btn_modulo_contabilidad %}
+              {% microsip_module_btn 'microsip_web.apps.contabilidad' %}
+            {% endblock %}
+            
+          </ul>
+          <ul class="nav pull-right">  
           {% if not user.is_anonymous %}
           <li id="fat-menu" class="dropdown">
             <a href="#" id="drop3" role="button" class="dropdown-toggle" data-toggle="dropdown" style="padding-top: 0.7em;">
@@ -100,6 +90,7 @@
           </div>  
           {% endif %}
         </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -138,7 +129,20 @@
     <div>
       SIC &copy; 2013
     </div>
+    <script src="{{STATIC_URL}}js/jquery.min.js" ></script>
+    <script src='{{STATIC_URL}}js/bootstrap.js' ></script>
+    <script src='{{STATIC_URL}}js/jquery-ui-1.8.23.custom.min.js'></script>
+    <script src='{{STATIC_URL}}js/jquery-ui-timepicker.js'></script>
+    <script src='{{STATIC_URL}}js/jquery.tablesorter.js'></script>
     
+    <script src='{{STATIC_URL}}js/jquery.cookie.js'></script>
+    <script src='{{STATIC_URL}}js/jquery.hotkeys.js'></script>
+    <script src='{{STATIC_URL}}js/jquery.jstree.js'></script>
+
+    
+    {% block js_code %}
+      
+    {% endblock %}
   </footer>
 
   <div id="IrArriba" style="display: block;">

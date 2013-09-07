@@ -195,15 +195,28 @@ display: block;
 background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAAAACPI/ojfEGiaNmGw/s60/flecha-arriba.png) no-repeat center center;
 }
 
-.labelMenu {
-    display:inline-block;
-    vertical-align: bottom;
+.label_min 
+{
+    display:none;
+}
+
+/* Pantallas grandes */
+@media only screen and (max-width : 980px) {
+  .label_min {
+    display:block;
+    padding-top: .4em;
+  }
 }
 
 
+.label_extra 
+{
+    display: table-cell;
+}
+
 /* Pantallas grandes */
-@media only screen and (max-width : 1312px) {
-  .labelMenu {
+@media only screen and (max-width : 900px) {
+  .label_extra {
     display: none;
   }
 }

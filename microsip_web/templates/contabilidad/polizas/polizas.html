@@ -14,12 +14,11 @@
 </div>
 <table class="table tableCell table-hover">
     <tr>
-      <th>ID</th>
-      <th>FOLIO</th>
-      <th>FECHA</th>
-      <th>DESCRIPCION</th>
-      <th>APLICADO</th>
-      <th>OPCIONES</th>
+      <th >FOLIO</th>
+      <th class="label_extra">FECHA</th>
+      <th class="label_extra">DESCRIPCION</th>
+      <th class="label_extra">APLICADO</th>
+      <th class="label_extra">OPCIONES</th>
     </tr>
     {% for poliza in polizas%}
     <div id="myModal{{ poliza.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -37,20 +36,17 @@
       </div>
     </div>
     <tr>
-      <td>
-        <a href="/contabilidad/poliza/{{ poliza.id }}/">{{ poliza.id }}</a>
-      </td>
-      <td>{{ poliza.poliza }}</td>
-      <td>{{ poliza.fecha }}</td>
-      <td>{{ poliza.descripcion }}</td>
-      <td>{{ poliza.aplicado }}</td>
-      <td style="text-align:center;">
+      <td> <a href="/contabilidad/poliza/{{ poliza.id }}/"> {{ poliza.poliza }} </a> </td>
+      <td class="label_extra">{{ poliza.fecha }}</td>
+      <td class="label_extra">{{ poliza.descripcion }}</td>
+      <td class="label_extra">{{ poliza.aplicado }}</td>
+      <td class="label_extra" style="text-align:center;">
         <a href='#myModal{{ poliza.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
       </td>
     </tr>
     {% endfor %}
 
-    <div class="pagination pagination-mini mainmenu">
+    <div class="pagination pagination-mini mainmenu ">
       <ul>
         {% if polizas.has_previous %}
         <li><a href="?page={{ polizas.previous_page_number }}">Anterior</a></li>

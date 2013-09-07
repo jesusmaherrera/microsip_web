@@ -1,0 +1,46 @@
+{% extends "base_mobile.html" %}
+{% block title %}{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block content %}
+<div data-role="page">
+
+  <div data-role="header">
+    Almacenes fisicos Abieros
+  </div><!-- /header -->
+
+  <div data-role="content"> 
+    <table class="table table-striped table-hover">
+      <tr>
+        <th>FOLIO</th>
+        <th>Almacen</th>
+      </tr>
+      {% for inventario_fisico in inventarios_fisicos %}
+      <tr>
+        <td><a href="/inventarios/InventarioFisico_pa/{{ inventario_fisico.id }}/">{{ inventario_fisico.folio }}</a></td>
+        <td>{{ inventario_fisico.almacen }}</td>
+      </tr>
+      {% endfor %}
+  </table>
+  </div><!-- /content -->
+  <div data-role="footer">
+    <fieldset class="ui-grid-b ui-bar ui-bar-c" >
+      <div class="ui-block-a">
+        <a href="#" data-theme="b" data-role="button" id='a_regresar' data-icon="back">C</a>
+      </div>
+      <div class="ui-block-b">
+        <a href="#" data-theme="b" data-role="button" id='a_buscar' data-icon="back">B</a>
+      </div>
+      <div class="ui-block-c">
+        <a href="#" data-role="button" data-theme="b" id='a_enviar' data-icon="check">E</a>
+      </div>
+    </fieldset>
+  </div>
+
+</div><!-- /page -->
+{% endblock %}
