@@ -6,6 +6,7 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}
+{% include 'autocomplete_light/static.html' %}      
 <script src="{{ STATIC_URL }}admin/js/admin/RelatedObjectLookups.js"></script>
 
 
@@ -165,7 +166,7 @@
 
 
 {% endblock %}
-{% block breadcrumb %}{{ block.super }} <a href="/inventarios/InventariosFisicos/">Inventarios Fisico</a> <i class=" icon-play"></i> Inventario Fisico a apuerta abierta{% endblock %}
+{% block breadcrumb %}<span class="big_screen"> {{ block.super }} <a href="/inventarios/InventariosFisicos/">Inventarios Fisico</a> <i class=" icon-play"></i>Inventario Fisico a apuerta abierta </span>{% endblock %}
 {% block content %}
 <div id="modal_cargando" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <p class="text-center">Agregando articulos, Por favor espera.</p>
@@ -180,8 +181,8 @@
     <p>{{ message }}</p>
   </div>
   {% endif %}
-  <div class="ms-custom-form" style=" height: 5em; ">
-    <div class='span'>
+  <div class="ms-custom-form">
+    <div class='span big_screen' >
       <h3 class='span'>Inventario Fisico 
         <ul class="nav btn btn-mini" style=" margin: 0px; ">
           <li class="dropdown">
@@ -197,7 +198,7 @@
       </h3>
     </div>
     
-    <div class=" pull-right ms-form-right-detail">
+    <div class=" pull-right ms-form-right-detail big_screen">
       <div class="span2" >
         <label>Fecha</label>
         <div class="input-prepend input-append">
@@ -212,10 +213,10 @@
       </div>  
     </div>
     <div style='clear:both;'>
-      <div class='span' style="font-size:.7em; margin-left: 4em; ">
+      <div class='span all_screen' style="font-size:.7em; ">
         {{ ubicacion_form.ubicacion }}  
       </div>
-      <div  class=" pull-right ">
+      <div  class=" pull-right big_screen">
         <div class="span4">
           <strong>Alamacen: </strong> {{ InventarioFisico_form.almacen }} {{ InventarioFisico.almacen }} 
         </div>
@@ -252,7 +253,7 @@
       <h3 id="myModalLabel">Numeros de Series</h3>
     </div>
     <div class="modal-body">
-      <table class="table tableCell table-hover tablesorter" id="id_numeros_serie" border="0" cellpadding="0" cellspacing="1">
+      <table class="table tableCell table-hover tablesorter table_bigscreen" id="id_numeros_serie" border="0" cellpadding="0" cellspacing="1">
         <thead>
           <tr>
             <th >Claves o Numeros de series</th>
@@ -312,7 +313,7 @@
   </div>
   <br style='clear:both;'>
   <br>
-   <div class="pagination pagination-mini mainmenu" style=" margin-bottom: 0px; ">
+   <div class="pagination pagination-mini mainmenu big_screen" style=" margin-bottom: 0px; ">
       <ul>
         {% if detallesInventario.has_previous %}
         <li><a href="?page={{ detallesInventario.previous_page_number }}">Anterior</a></li>
@@ -327,9 +328,9 @@
         {% endif %} 
       </ul>
     </div>
-  <p class="text-center">Son {{ articulos_eninventario }} Articulos en total</p>
+  <p class="text-center big_screen">Son {{ articulos_eninventario }} Articulos en total</p>
   
-  <table class="table table-striped table-hover">
+  <table class="table table-striped table-hover table_bigscreen">
     <tr>
       <th>Clave</th>
       <th>Articulo</th>
@@ -347,5 +348,4 @@
   
 </form>
 
-{% include 'autocomplete_light/static.html' %}
 {% endblock %}

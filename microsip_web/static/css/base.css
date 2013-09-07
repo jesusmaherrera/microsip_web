@@ -214,9 +214,15 @@ background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAA
     display: table-cell;
 }
 
+
 .big_screen 
 {
     display: block;
+}
+
+.table_bigscreen 
+{
+    display: table;
 }
 
 .small_screen
@@ -224,9 +230,24 @@ background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAA
   display: none;
 }
 
+.all_screen #id_ubicacion
+{
+    margin: .7em;
+}
+
+.ms-custom-form
+{
+  height: 5em;
+}
+
 /* Pantallas grandes */
-@media only screen and (max-width : 900px) {
+@media only screen and (max-width : 770px) {
   .label_extra {
+    display: none;
+  }
+
+  .table_bigscreen
+  {
     display: none;
   }
 
@@ -238,6 +259,22 @@ background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAA
   {
     display: inline-block ;
   }
+
+  .all_screen
+  {
+    display: inline-block; 
+  }
+
+  .all_screen #id_ubicacion
+  {
+    margin: 0;
+  }
+
+  .ms-custom-form
+  {
+    height: 0;
+  }
+  
 }
 
 .input-append, .input-prepend

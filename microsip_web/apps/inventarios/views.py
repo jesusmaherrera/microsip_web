@@ -329,13 +329,13 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
         'articulos_discretos_actuales':articulos_discretos_actuales,
         }
    
-    if "Chrome" in request.META['HTTP_USER_AGENT']:
-       request.mobile = False
+    # if "Chrome" in request.META['HTTP_USER_AGENT']:
+    #    request.mobile = False
        
-    if request.mobile:
-        template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_pa_mobile.html'
-    else:
-        template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_pa.html'
+    # if request.mobile:
+    #     template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_pa_mobile.html'
+    # else:
+    #     template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_pa.html'
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
