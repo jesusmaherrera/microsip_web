@@ -26,14 +26,14 @@
       <th>FOLIO</th>
       <th class="label_extra">FECHA</th>
       <th class="label_extra">DESCRIPCION</th>
-      <th class="label_extra">Almacen</th>
+      <th>Almacen</th>
     </tr>
     {% for inventario_fisico in inventarios_fisicos %}
     <tr>
       <td><a href="/inventarios/InventarioFisico_pa/{{ inventario_fisico.id }}/">{{ inventario_fisico.folio }}</a></td>
       <td class="label_extra">{{ inventario_fisico.fecha }}</td>
       <td class="label_extra">{{ inventario_fisico.descripcion }}</td>
-      <td class="label_extra">{{ inventario_fisico.almacen }}</td>
+      <td>{{ inventario_fisico.almacen }}</td>
     </tr>
     {% endfor %}
 

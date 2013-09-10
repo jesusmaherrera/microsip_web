@@ -7,7 +7,6 @@ from django.forms.models import inlineformset_factory
 
 #Paginacion
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from mobi.decorators import detect_mobile
 # user autentication
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, AdminPasswordChangeForm
 from django.contrib.auth.models import User
@@ -145,7 +144,6 @@ def invetarioFisico_mobile_pa_manageView(request, id = None, rapido=1, template_
     c = {'InventarioFisico':InventarioFisico,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))    
 
-@detect_mobile
 @login_required(login_url='/login/')
 def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa.html'):
     basedatos_activa = request.user.userprofile.basedatos_activa

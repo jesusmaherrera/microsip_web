@@ -1,5 +1,5 @@
 {% extends "inventarios/base.html" %}
-{% block title %}Inicio{% endblock %}
+{% block title %}INV. {{ InventarioFisico.folio}} ({{ InventarioFisico.almacen}}){% endblock %}
 
 <!-- CSS Code -->
 {% block style_css %}{% endblock %}
@@ -7,10 +7,12 @@
 <!-- JavaScript Code -->
 {% block js_code %}
 {% include 'autocomplete_light/static.html' %}      
+<link rel='stylesheet' href='{{STATIC_URL}}css/inventarios.css'/>
 <script src="{{ STATIC_URL }}admin/js/admin/RelatedObjectLookups.js"></script>
 
 
 <script type="text/javascript">
+ 
 
   function agregar_articulos_porlineafn()
   {
@@ -47,8 +49,31 @@
     $( "#id_fecha" ).datepicker({dateFormat:'dd/mm/yy',});
   });
    
-   
+  function myJsFunc()
+  {
+    if($("#id_clave").val() != '')
+    {
+      Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
+      $("#id_unidades").val('');
+      $('#label_articulo').html('');
+      $("#id_unidades").show();
+      $("#id_unidades").val('');
+      $("#id_unidades").focus();
+    }
+    else
+      $("#id_articulo_text").focus();
+    return false
+  }
+
   $(document).ready(function(){
+    
+    $('#id_clave').focus();
+    $('#id_unidades, #id_articulo_text').focus(function() { 
+      setTimeout(function(){
+        window.scrollTo(0, 3);
+      }, 0);  
+    });
+
     modo_rapido = localStorage.getItem("modo_rapido");
     if (modo_rapido == null)
       localStorage.setItem("modo_rapido", 'false');
@@ -92,6 +117,11 @@
 
     });
 
+    
+     $('#buscar_btn').click(function(){
+      
+     });
+
     $("#id_articulo").change(function(){
       if ($("#id_articulo").children().length > 0)
         Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});
@@ -102,6 +132,8 @@
     $("#id_clave").live('mouseup', function () {
       $(this).select();
     });
+
+
 
     $('#btnCancel').on('click', function () {
       $("#myModal input").val()='';
@@ -130,7 +162,6 @@
       $('#id_articulo_text').hide();
 
       Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});
-      
     }
      else
     {
@@ -157,6 +188,14 @@
     else
       $('#span_alerta_unidades').html('');
 
+    $(".remove").on('click', function(){
+      $('#span_alerta_unidades').html('');
+      $("#id_unidades").val('');
+      $(".span_clave").show();
+      $("#id_unidades").focus();
+    });
+
+    $(".span_clave").hide();
     $("#id_unidades").val('');
     $("#id_unidades").focus();
   }
@@ -181,7 +220,7 @@
     <p>{{ message }}</p>
   </div>
   {% endif %}
-  <div class="ms-custom-form">
+  <div class="ms-custom-form collapse">
     <div class='span big_screen' >
       <h3 class='span'>Inventario Fisico 
         <ul class="nav btn btn-mini" style=" margin: 0px; ">
@@ -197,24 +236,26 @@
         <ul>
       </h3>
     </div>
-    
     <div class=" pull-right ms-form-right-detail big_screen">
       <div class="span2" >
         <label>Fecha</label>
-        <div class="input-prepend input-append">
+        <div >
           {{ InventarioFisico.fecha }} 
         </div>
       </div> 
       <div class="span2" >
         <label>Folio</label>
-        <div class="input-prepend input-append">
+        <div >
           {{ InventarioFisico.folio }} 
         </div>
       </div>  
     </div>
     <div style='clear:both;'>
-      <div class='span all_screen' style="font-size:.7em; ">
-        {{ ubicacion_form.ubicacion }}  
+      <div class='span all_screen' >
+        <label class="small_screen"> Ubicacion</label> {{ ubicacion_form.ubicacion }}  <input type = "checkbox" id = "chkHam" value = "ham" /><div style="
+    display: inline-block;
+    font-size: .8em;
+">Rapido</div>
       </div>
       <div  class=" pull-right big_screen">
         <div class="span4">
@@ -222,6 +263,11 @@
         </div>
       </div>  
     </div>
+  </div>
+  <div id="span_details" class="small_screen_block">
+    <button type="button" class="btn btn-mini btn-navbar" data-toggle="collapse"  data-target=".ms-custom-form">
+      <i class="icon-arrow-down"></i>
+    </button>
   </div>
   {% csrf_token %}
    <div id="articulosnocont_porlinea_Modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -292,9 +338,11 @@
   
   {{ ubicacion_form.errors }}  
   {{ detalleInvForm.errors }}
-  <div class="span" >
+  <div class="span span_clave" >
     <div class="input-prepend input-append">
+      <span class="add-on small_screen">#</span>
       {{ detalleInvForm.clave }}
+      <a id"buscar_btn" class= "btn small_screen" href="#" onclick="myJsFunc();" > <i class="icon-search"></i></a>
     </div>
   </div>
   <div class="span" >
@@ -306,11 +354,12 @@
   <div class="span1" >
     <div class="input-prepend input-append">
       {{ detalleInvForm.unidades }}
+      <button type="submit" class="btn" onclick="this.disabled=true,this.form.submit(), this.value='Enviando...';" id='btn_submit_articulos' name='add_button'>Enviar</button>
     </div>
   </div>
-  <div class="span" >
+  <!-- <div class="span" >
       <button type="submit" class="btn" onclick="this.disabled=true,this.form.submit(), this.value='Enviando...';" id='btn_submit_articulos' name='add_button'>Enviar</button>
-  </div>
+  </div> -->
   <br style='clear:both;'>
   <br>
    <div class="pagination pagination-mini mainmenu big_screen" style=" margin-bottom: 0px; ">

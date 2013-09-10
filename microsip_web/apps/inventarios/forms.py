@@ -191,7 +191,7 @@ class inventario_pa_form(forms.Form):
 class DoctosInvfisDetManageForm(forms.ModelForm):
     clave = forms.CharField(
         max_length=100, 
-        widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'clave ...'}),
+        widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'clave ...'}),
         required=False
         )
     articulo = forms.ModelChoiceField(Articulos.objects.all(), widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))

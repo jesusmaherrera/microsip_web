@@ -3,20 +3,18 @@
 <html lang='es'>
 <head>
   <meta charset='utf-8'>
-  <title>Micosip</title>
+  <title>{% block title %}Microsip{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1 maximum-scale=1" />
 
   <!-- Estilos -->
+  <link rel='stylesheet' href='{{STATIC_URL}}css/normalize.css'/>
   <link rel='stylesheet' href='{{STATIC_URL}}css/bootstrap.css'/>
   <link rel='stylesheet' href='{{STATIC_URL}}css/bootstrap-responsive.css'/>
-  <link rel='stylesheet' href='{{STATIC_URL}}css/base.css'/>
-  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css">
-  <link href='http://fonts.googleapis.com/css?family=Marcellus+SC' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="{{STATIC_URL}}css/jquery-ui.css">
   <link rel="stylesheet" href="{{STATIC_URL}}css/!style.css" />
+  <link rel='stylesheet' href='{{STATIC_URL}}css/base.css'/>
 
   {% block style_css %}{% endblock %}
-  {% block modulestyle_css %}{% endblock %}
-
   <link rel='shortcut icon' href='{{STATIC_URL}}img/logo.png'>
   {% dajaxice_js_import %}
 </head>
@@ -94,7 +92,7 @@
       </div>
     </div>
   </div>
-  <div class="navbar-inner navbar-inner_min" style=" background-image: linear-gradient(to bottom, #e5e5e5, #e5e5e5); ">
+  <div id="tools-module-bar" class="navbar-inner navbar-inner_min" style=" background-image: linear-gradient(to bottom, #e5e5e5, #e5e5e5); ">
     {% block tools-module %}
     {% endblock %}
   </div>
@@ -131,7 +129,7 @@
     </div>
     <script src="{{STATIC_URL}}js/jquery.min.js" ></script>
     <script src='{{STATIC_URL}}js/bootstrap.js' ></script>
-    <script src='{{STATIC_URL}}js/jquery-ui-1.8.23.custom.min.js'></script>
+    <script src='{{STATIC_URL}}js/jquery-ui.min.js'></script>
     <script src='{{STATIC_URL}}js/jquery-ui-timepicker.js'></script>
     <script src='{{STATIC_URL}}js/jquery.tablesorter.js'></script>
     
