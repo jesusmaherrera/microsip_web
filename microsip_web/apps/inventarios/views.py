@@ -22,7 +22,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import formset_factory
 import datetime, time
 import xlrd
-
+from mobi.decorators import detect_mobile
 from models import *
 from forms import *
 from microsip_web.libs.custom_db.main import next_id
@@ -140,10 +140,90 @@ def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inv
 
 @login_required(login_url='/login/')
 def invetarioFisico_mobile_pa_manageView(request, id = None, rapido=1, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa_mobile.html'):
+    basedatos_activa = request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
+        return HttpResponseRedirect('/select_db/')
+    else:
+        conexion_activa_id = request.user.userprofile.conexion_activa.id
+
+    conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
+
+    message = ''
+    msg_series=''
+    error = 0
+    inicio_form = False
+    movimiento = ''
+
     InventarioFisico = DoctosInvfis.objects.get(pk=id)
-    c = {'InventarioFisico':InventarioFisico,}
+    
+    #POST
+    if request.method == 'POST':
+        detalleInvForm = DoctosInvfisDetManageForm(request.POST)
+        ubicacion_form = UbicacionArticulosForm(request.POST)
+        if detalleInvForm.is_valid():
+            detalleInv = detalleInvForm.save(commit=False)  
+            unidades = abs(detalleInv.unidades)
+            
+            if detalleInv.articulo.seguimiento == 'N':
+                if ubicacion_form.is_valid() and detalleInv.articulo.seguimiento == 'N':
+                    unidades = 0
+                    try:
+                        doc = DoctosInvfisDet.objects.get(docto_invfis=InventarioFisico, articulo=detalleInv.articulo)
+                        id_detalle = doc.id
+                        
+                        unidades = doc.unidades + detalleInv.unidades
+                        
+                        if unidades < 0:
+                            unidades = 0
+
+                        movimiento = 'actualizar'
+
+                    except ObjectDoesNotExist:
+                        if detalleInv.unidades >= 0:
+                            id_detalle = c_get_next_key( conexion_name)
+                            detalleInv.id = id_detalle
+                            articulos_claves =ClavesArticulos.objects.filter(articulo= detalleInv.articulo)
+                            
+                            if articulos_claves.count() < 1:
+                                articulo_clave = ''
+                            else:
+                                articulo_clave = articulos_claves[0].clave
+
+                            detalleInv.clave = articulo_clave
+                            detalleInv.docto_invfis = InventarioFisico
+                            movimiento = 'crear'
+                    if error == 0:
+                        if movimiento == 'crear':
+                            detalleInv.usuario_ult_modif=request.user.username
+                            detalleInv.detalle_modificaciones = '[%s/%s=%s], '%(request.user.username, ubicacion_form.cleaned_data['ubicacion'], detalleInvForm.cleaned_data['unidades'])
+                            detalleInv.save()
+                        elif movimiento == 'actualizar':
+                            detalleInv = DoctosInvfisDet.objects.get(id=id_detalle)
+                            detalleInv.fechahora_ult_modif = datetime.now()
+                            detalleInv.unidades = unidades
+                            detalleInv.usuario_ult_modif = request.user.username
+                            if detalleInv.detalle_modificaciones == None:
+                                detalleInv.detalle_modificaciones = ''
+                            detalleInv.detalle_modificaciones += '[%s/%s=%s],'%(request.user.username, ubicacion_form.cleaned_data['ubicacion'], detalleInvForm.cleaned_data['unidades'])
+                            detalleInv.save()
+
+                        return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s/'% id)
+                           
+    else:
+        detalleInvForm = DoctosInvfisDetManageForm()
+        ubicacion_form = UbicacionArticulosForm()
+
+    c = {
+        'message':message,
+        'detalleInvForm':detalleInvForm, 
+        'InventarioFisico':InventarioFisico,
+        'ubicacion_form':ubicacion_form,
+        'inventario_id':id,
+        }
+
     return render_to_response(template_name, c, context_instance=RequestContext(request))    
 
+@detect_mobile
 @login_required(login_url='/login/')
 def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa.html'):
     basedatos_activa = request.user.userprofile.basedatos_activa
@@ -161,7 +241,11 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
     movimiento = ''
 
     InventarioFisico = DoctosInvfis.objects.get(pk=id)
-    detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico).filter(Q(usuario_ult_modif = request.user.username) | Q(usuario_ult_modif = None)).order_by('-fechahora_ult_modif')
+    if request.mobile:
+        detallesInventario = []
+    else:
+        detallesInventario = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico).filter(Q(usuario_ult_modif = request.user.username) | Q(usuario_ult_modif = None)).order_by('-fechahora_ult_modif')
+
     articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm)
     articulos_discretos_actuales = []
     #POST
@@ -295,8 +379,10 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
             'form-MAX_NUM_FORMS': u'',
         }
         articulos_discretos_formset = articulos_discretos_formset(data)
-    
-    articulos_eninventario = detallesInventario.count()
+    if request.mobile:
+        articulos_eninventario = 0
+    else:
+        articulos_eninventario = detallesInventario.count()
     paginator = Paginator(detallesInventario, 30) # Muestra 5 inventarios por pagina
     page = request.GET.get('page')
 
@@ -327,13 +413,13 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
         'articulos_discretos_actuales':articulos_discretos_actuales,
         }
    
-    # if "Chrome" in request.META['HTTP_USER_AGENT']:
-    #    request.mobile = False
+    if "Chrome" in request.META['HTTP_USER_AGENT']:
+       request.mobile = False
        
-    # if request.mobile:
-    #     template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_pa_mobile.html'
-    # else:
-    #     template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_pa.html'
+    if request.mobile:
+        template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_pa_mobile.html'
+    else:
+        template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_pa.html'
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 

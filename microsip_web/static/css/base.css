@@ -247,7 +247,7 @@ background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAA
 }
 
 
-/* Pantallas grandes */
+/*/* Pantallas grandes */
 @media only screen and (max-width : 770px) {
   body{
     padding: 0;
@@ -297,7 +297,7 @@ background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAA
 
   }
   
-}
+}*/
 
 .text-error
 {

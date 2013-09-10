@@ -12,7 +12,22 @@
 
 
 <script type="text/javascript">
- 
+  function enviar_unidades()
+  {
+    Dajaxice.microsip_web.apps.inventarios.add_aticulosinventario(limpiarForm, {'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val(),'unidades':$('#id_unidades').val(),});
+  }
+
+  function limpiarForm()
+  {
+      $('#span_alerta_unidades').html('');
+      $("#id_unidades").val('');
+      $(".span_clave").show();
+      $("#id_clave").val('');
+
+      $('#id_articulo-deck').html('');
+      $('#id_articulo').html('');
+      $("#id_clave").focus();
+  }
 
   function agregar_articulos_porlineafn()
   {
@@ -66,7 +81,8 @@
   }
 
   $(document).ready(function(){
-    
+    $("#id_articulo_text").hide();
+    $("#id_ubicacion").val("estante1");
     $('#id_clave').focus();
     $('#id_unidades, #id_articulo_text').focus(function() { 
       setTimeout(function(){
@@ -354,7 +370,8 @@
   <div class="span1" >
     <div class="input-prepend input-append">
       {{ detalleInvForm.unidades }}
-      <button type="submit" class="btn" onclick="this.disabled=true,this.form.submit(), this.value='Enviando...';" id='btn_submit_articulos' name='add_button'>Enviar</button>
+      <a class="btn small_screen" id="enviar_btn" onclick="enviar_unidades();" href="#">Enviar</a>
+      <button type="submit" class="btn big_screen_block" onclick="this.disabled=true,this.form.submit(), this.value='Enviando...';" id='btn_submit_articulos' name='add_button'>Enviar</button>
     </div>
   </div>
   <!-- <div class="span" >

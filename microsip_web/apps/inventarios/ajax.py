@@ -6,10 +6,44 @@ from django.core import serializers
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 import json
-
+from decimal import *
 from models import *
 
 from microsip_web.libs.tools import split_seq
+
+@dajaxice_register(method='GET')
+def add_aticulosinventario(request, inventario_id, articulo_id, unidades):
+    basedatos_activa = request.user.userprofile.basedatos_activa
+    if basedatos_activa == '':
+        return HttpResponseRedirect('/select_db/')
+    else:
+        conexion_activa_id = request.user.userprofile.conexion_activa.id
+
+    conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
+
+    message = ''
+    msg_series=''
+    error = 0
+    inicio_form = False
+    movimiento = ''
+    doc = DoctosInvfisDet.objects.get(docto_invfis__id=inventario_id, articulo__id=articulo_id)
+    str_unidades = unidades
+    unidades = Decimal(unidades)
+    doc_unidades = doc.unidades
+    
+    unidades = doc.unidades + unidades
+    if unidades < 0:
+        unidades = 0
+
+    doc.fechahora_ult_modif = datetime.now()
+    doc.unidades = unidades
+    doc.usuario_ult_modif = request.user.username
+    tamano_detalles = len(doc.detalle_modificaciones + '[%s/%s=%s],'%(request.user.username, "estante1", str_unidades))
+    
+    if  tamano_detalles  < 400:
+        doc.detalle_modificaciones += '[%s/%s=%s],'%(request.user.username, "estante1", str_unidades)
+    doc.save()
+    return simplejson.dumps({'message':'exito'})
 
 @dajaxice_register(method='GET')
 def get_articulosen_inventario(request, inventario_id, articulo_id):

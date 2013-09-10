@@ -1,7 +1,17 @@
 /* Pantallas grandes */
+#span_alerta_unidades
+{
+	font-size: 12px;
+}
+
 .small_screen_block
 {
 	display: none;
+}
+
+.big_screen_block
+{
+	display: inline-block;
 }
 
 #span_details
@@ -11,6 +21,11 @@
 
 @media only screen and (max-width : 770px) {
 	#tools-module-bar
+	{
+		display: none;
+	}
+
+	.big_screen_block
 	{
 		display: none;
 	}
