@@ -57,8 +57,8 @@ class GenerarPolizasManageForm(forms.Form):
     )
     crear_polizas_de        = forms.ChoiceField(choices=CREAR_DE)
 
-    plantilla = forms.ModelChoiceField(queryset= PlantillaPolizas_V.objects.filter(tipo='F'), required=True)
-    plantilla_2 = forms.ModelChoiceField(queryset= PlantillaPolizas_V.objects.filter(tipo='D'), required=True)
+    plantilla = forms.ModelChoiceField(queryset= PlantillaPolizas_V.objects.filter(tipo='F'), required=False)
+    plantilla_2 = forms.ModelChoiceField(queryset= PlantillaPolizas_V.objects.filter(tipo='D'), required=False)
     
 class PlantillaPolizaManageForm(forms.ModelForm):
     class Meta:

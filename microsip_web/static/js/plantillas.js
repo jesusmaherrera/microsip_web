@@ -23,7 +23,7 @@ function ajustarFormulario(selecion) {
   else if($(selecion).val() == "Compras" || $(selecion).val() == "Ventas" || $(selecion).val()=='Anticipos')  
   {
     $(selecion).parent().parent().find("select[name*='valor_contado_credito']").show();
-    // $(selecion).parent().parent().find("select[name*='valor_iva']").show();
+    $(selecion).parent().parent().find("select[name*='valor_iva']").show();
     $(selecion).parent().parent().find("input[name*='asiento_ingora']").show(); 
     $(selecion).parent().parent().find("select[name*='impuesto']").show();
   }

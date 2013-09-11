@@ -191,12 +191,16 @@ class inventario_pa_form(forms.Form):
 class DoctosInvfisDetManageForm(forms.ModelForm):
     clave = forms.CharField(
         max_length=100, 
-        widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'clave ...'}),
+        widget=forms.TextInput(attrs={"class":"input-medium", "placeholder":"clave ...",}),
         required=False
         )
-    articulo = forms.ModelChoiceField(Articulos.objects.all(), widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
+    articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
     unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades ...'}),required=True)
     
+    def __init__(self, *args, **kwargs):
+        super(DoctosInvfisDetManageForm, self).__init__(*args, **kwargs)
+        self.fields['articulo'].widget.attrs['class'] = 'input-medium'
+
     class Meta:
         model   = DoctosInvfisDet
         exclude = (
@@ -210,6 +214,7 @@ class DoctosInvfisDetManageForm(forms.ModelForm):
             raise forms.ValidationError(u'Este articulo no es almacenable')
         return articulo
 
+# attrs={'class':'input-medium'}
 def doctoIn_items_formset(form, formset = BaseInlineFormSet, **kwargs):
     return inlineformset_factory(DoctosIn, DoctosInDet, form, formset, **kwargs)
 

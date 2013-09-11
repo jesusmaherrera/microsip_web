@@ -12,7 +12,7 @@ from models import *
 from microsip_web.libs.tools import split_seq
 
 @dajaxice_register(method='GET')
-def add_aticulosinventario(request, inventario_id, articulo_id, unidades):
+def add_aticulosinventario(request, inventario_id, articulo_id, unidades, ubicacion):
     basedatos_activa = request.user.userprofile.basedatos_activa
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
@@ -41,7 +41,7 @@ def add_aticulosinventario(request, inventario_id, articulo_id, unidades):
     tamano_detalles = len(doc.detalle_modificaciones + '[%s/%s=%s],'%(request.user.username, "estante1", str_unidades))
     
     if  tamano_detalles  < 400:
-        doc.detalle_modificaciones += '[%s/%s=%s],'%(request.user.username, "estante1", str_unidades)
+        doc.detalle_modificaciones += '[%s/%s=%s],'%(request.user.username, ubicacion, str_unidades)
     doc.save()
     return simplejson.dumps({'message':'exito'})
 

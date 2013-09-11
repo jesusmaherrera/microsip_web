@@ -14,12 +14,23 @@
 	display: inline-block;
 }
 
+
 #span_details
 {
 	height: 0;
 }
+#chbx_modorapido
+{
+	display: none;
+}
 
 @media only screen and (max-width : 770px) {
+	
+	#chbx_modorapido
+	{
+		display: inline-block;
+	}	
+
 	#tools-module-bar
 	{
 		display: none;

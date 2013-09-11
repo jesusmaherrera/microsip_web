@@ -2,19 +2,33 @@
 {% block title %}INV. {{ InventarioFisico.folio}} ({{ InventarioFisico.almacen}}){% endblock %}
 
 <!-- CSS Code -->
-{% block style_css %}{% endblock %}
+{% block style_css %}
+<link rel='stylesheet' href='{{STATIC_URL}}css/inventarios.css'/>
+{% endblock %}
 
 <!-- JavaScript Code -->
 {% block js_code %}
 {% include 'autocomplete_light/static.html' %}      
-<link rel='stylesheet' href='{{STATIC_URL}}css/inventarios.css'/>
 <script src="{{ STATIC_URL }}admin/js/admin/RelatedObjectLookups.js"></script>
 
 
 <script type="text/javascript">
+  
+
   function enviar_unidades()
   {
-    Dajaxice.microsip_web.apps.inventarios.add_aticulosinventario(limpiarForm, {'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val(),'unidades':$('#id_unidades').val(),});
+    if ($('#id_ubicacion').val() != '' &&  $('#id_unidades').val() != '')
+    { 
+      Dajaxice.microsip_web.apps.inventarios.add_aticulosinventario(limpiarForm, {'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val(),'unidades':$('#id_unidades').val(), "ubicacion": $('#id_ubicacion').val()});
+      limpiarForm();
+    }
+    else
+    {
+      if ($('#id_ubicacion').val() == '')
+        alert("Por favor indica una ubicacion");
+      if ($('#id_unidades').val() == '')
+        alert("Por favor indica la cantidad de articulos");
+    }
   }
 
   function limpiarForm()
@@ -22,11 +36,24 @@
       $('#span_alerta_unidades').html('');
       $("#id_unidades").val('');
       $(".span_clave").show();
+      $(".span_articulo").hide();
       $("#id_clave").val('');
+      $(".span_unidades").hide();
+      $("#cancelar_btn").hide();
+      $("#buscar_btn").show();
 
       $('#id_articulo-deck').html('');
       $('#id_articulo').html('');
       $("#id_clave").focus();
+  }
+
+  function limpiarFormunidades()
+  {
+      $("#id_unidades").val('');
+      $('#label_articulo').html('');
+      $("#id_unidades").show();
+      $("#id_unidades").val('');
+      $("#id_unidades").focus();
   }
 
   function agregar_articulos_porlineafn()
@@ -71,24 +98,52 @@
       Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
       $("#id_unidades").val('');
       $('#label_articulo').html('');
+      $(".span_unidades").show();
       $("#id_unidades").show();
       $("#id_unidades").val('');
       $("#id_unidades").focus();
+
     }
     else
       $("#id_articulo_text").focus();
-    return false
   }
 
   $(document).ready(function(){
     $("#id_articulo_text").hide();
-    $("#id_ubicacion").val("estante1");
     $('#id_clave').focus();
+    $(".span_unidades").hide();
+    $("#cancelar_btn").hide();
+    $("#chbx_modorapido").attr('checked', true);
+    // $("#id_clave").onkeypress(function(event){
+    //   if (event.keyCode==13)
+    //     alert("hola");
+    // });
+
     $('#id_unidades, #id_articulo_text').focus(function() { 
       setTimeout(function(){
         window.scrollTo(0, 3);
       }, 0);  
     });
+
+    $("#chbx_modorapido").change(function(){
+      if ($("#chbx_modorapido").is(':checked'))
+      {
+        $("#id_articulo_text").hide();
+        limpiarForm()
+      }
+      else
+      {
+        $("#id_articulo_text").show();
+        $(".span_clave").hide();
+        $(".span_articulo").show();
+        $('#buscar_btn').hide();
+        $("#id_articulo_text").focus();
+      }
+    });
+
+    ubicacion = localStorage.getItem("ubicacion");
+    if (ubicacion == null)
+      localStorage.setItem("ubicacion", 'sdasd');
 
     modo_rapido = localStorage.getItem("modo_rapido");
     if (modo_rapido == null)
@@ -134,10 +189,6 @@
     });
 
     
-     $('#buscar_btn').click(function(){
-      
-     });
-
     $("#id_articulo").change(function(){
       if ($("#id_articulo").children().length > 0)
         Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});
@@ -208,11 +259,16 @@
       $('#span_alerta_unidades').html('');
       $("#id_unidades").val('');
       $(".span_clave").show();
+      $(".span_articulo").hide();
       $("#id_unidades").focus();
     });
 
-    $(".span_clave").hide();
+    // $('#span_alerta_unidades').html('');
     $("#id_unidades").val('');
+    $(".span_clave").hide();
+    $(".span_articulo").show();
+    $("#buscar_btn").hide();
+    $("#cancelar_btn").show();
     $("#id_unidades").focus();
   }
 
@@ -268,8 +324,7 @@
     </div>
     <div style='clear:both;'>
       <div class='span all_screen' >
-        <label class="small_screen"> Ubicacion</label> {{ ubicacion_form.ubicacion }}  <input type = "checkbox" id = "chkHam" value = "ham" /><div style="
-    display: inline-block;
+        <label class="small_screen"> Ubicacion</label> {{ ubicacion_form.ubicacion }}  <input type="checkbox" id="chbx_modorapido" value="ham" /><div class="small_screen" style="
     font-size: .8em;
 ">Rapido</div>
       </div>
@@ -358,22 +413,26 @@
     <div class="input-prepend input-append">
       <span class="add-on small_screen">#</span>
       {{ detalleInvForm.clave }}
-      <a id"buscar_btn" class= "btn small_screen" href="#" onclick="myJsFunc();" > <i class="icon-search"></i></a>
     </div>
   </div>
-  <div class="span" >
+  <br>
+  <a id="buscar_btn" class= "btn btn-primary span12 small_screen" href="#" onclick="myJsFunc()" ><i class="icon-search icon-white"></i> Buscar</a>
+  <div class="span span_articulo" >
     <div class="input-prepend input-append">
+      <!-- <span class="add-on small_screen">Nom.</span> -->
       {{ detalleInvForm.articulo }}
       <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 0, 0); color: white;"> </span>
     </div>
   </div>
-  <div class="span1" >
+  <div class="span1 span_unidades" >
     <div class="input-prepend input-append">
       {{ detalleInvForm.unidades }}
-      <a class="btn small_screen" id="enviar_btn" onclick="enviar_unidades();" href="#">Enviar</a>
+      <a class="btn btn-success small_screen" id="enviar_btn" onclick="enviar_unidades()" href="#">Enviar</a>
       <button type="submit" class="btn big_screen_block" onclick="this.disabled=true,this.form.submit(), this.value='Enviando...';" id='btn_submit_articulos' name='add_button'>Enviar</button>
     </div>
   </div>
+  <br>
+  <a id="cancelar_btn" class= "btn btn-danger span12 small_screen" href="#" onclick="limpiarForm();" >Cancelar</a>
   <!-- <div class="span" >
       <button type="submit" class="btn" onclick="this.disabled=true,this.form.submit(), this.value='Enviando...';" id='btn_submit_articulos' name='add_button'>Enviar</button>
   </div> -->

@@ -633,7 +633,7 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
     
     impuestos           = documento.total_impuestos * documento.tipo_cambio
     importe_neto        = documento.importe_neto * documento.tipo_cambio
-    total               = impuestos + importe_neto
+    total               = (impuestos + importe_neto) * documento.tipo_cambio
     descuento           = get_descuento_total_ve(documento.id, connection_name) * documento.tipo_cambio
     clientes            = 0
     bancos              = 0
@@ -656,9 +656,8 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
     
     if ventas_0 == None:
         ventas_0 = 0 
-
+    documento_tipo_cambio = documento.tipo_cambio
     ventas_0 = ventas_0 * documento.tipo_cambio
-
     ventas_16 = total - ventas_0 - impuestos
 
     #si llega a  haber un proveedor que no tenga cargar impuestos

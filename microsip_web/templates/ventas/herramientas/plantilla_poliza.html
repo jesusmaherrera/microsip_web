@@ -15,6 +15,7 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}
+{% include 'autocomplete_light/static.html' %}
 <script type="text/javascript">
     // Define this so we don't have to bother with the admin jsi18n stuff:
     function gettext(msgid) { return msgid; }
@@ -130,6 +131,4 @@ $(document).ready(function() {
     <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
   </div>
 </form>
-
-{% include 'autocomplete_light/static.html' %}
 {% endblock %}
