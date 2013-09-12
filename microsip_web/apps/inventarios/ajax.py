@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 import json
 from decimal import *
 from models import *
-
+from microsip_web.libs.custom_db.main import next_id
 from microsip_web.libs.tools import split_seq
 
 @dajaxice_register(method='GET')
@@ -26,23 +26,47 @@ def add_aticulosinventario(request, inventario_id, articulo_id, unidades, ubicac
     error = 0
     inicio_form = False
     movimiento = ''
-    doc = DoctosInvfisDet.objects.get(docto_invfis__id=inventario_id, articulo__id=articulo_id)
-    str_unidades = unidades
-    unidades = Decimal(unidades)
-    doc_unidades = doc.unidades
-    
-    unidades = doc.unidades + unidades
-    if unidades < 0:
-        unidades = 0
+    try:
+        doc = DoctosInvfisDet.objects.get(docto_invfis__id=inventario_id, articulo__id=articulo_id)
+        str_unidades = unidades
+        unidades = Decimal(unidades)
+        doc_unidades = doc.unidades
+        
+        unidades = doc.unidades + unidades
+        if unidades < 0:
+            unidades = 0
+        movimiento = 'actualizar'
+    except:
+        if unidades >= 0:
+            articulos_claves =ClavesArticulos.objects.filter(articulo__id= articulo_id)
+            if articulos_claves.count() < 1:
+                articulo_clave = ''
+            else:
+                articulo_clave = articulos_claves[0].clave
 
-    doc.fechahora_ult_modif = datetime.now()
-    doc.unidades = unidades
-    doc.usuario_ult_modif = request.user.username
-    tamano_detalles = len(doc.detalle_modificaciones + '[%s/%s=%s],'%(request.user.username, "estante1", str_unidades))
+            movimiento = 'crear'
+
+    if movimiento == 'crear':
+        DoctosInvfisDet.objects.create(
+            id = next_id('ID_DOCTOS', conexion_name),
+            docto_invfis = DoctosInvfis.objects.get(pk=inventario_id),
+            unidades = unidades, 
+            articulo = Articulos.objects.get(pk=articulo_id),
+            usuario_ult_modif = request.user.username,
+            detalle_modificaciones = '[%s/%s=%s], '%(request.user.username, ubicacion, unidades),
+            )
+    elif movimiento == 'actualizar':
+        doc.fechahora_ult_modif = datetime.now()
+        doc.unidades = unidades
+        doc.usuario_ult_modif = request.user.username
+        if doc.detalle_modificaciones == None:
+            doc.detalle_modificaciones = ''
+        tamano_detalles = len(doc.detalle_modificaciones + '[%s/%s=%s],'%(request.user.username, ubicacion, str_unidades))
     
-    if  tamano_detalles  < 400:
-        doc.detalle_modificaciones += '[%s/%s=%s],'%(request.user.username, ubicacion, str_unidades)
-    doc.save()
+        if  tamano_detalles  < 400:
+            doc.detalle_modificaciones += '[%s/%s=%s],'%(request.user.username, ubicacion, str_unidades)
+        doc.save()
+
     return simplejson.dumps({'message':'exito'})
 
 @dajaxice_register(method='GET')
