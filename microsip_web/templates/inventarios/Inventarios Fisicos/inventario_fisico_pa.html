@@ -247,10 +247,18 @@
 
   function mostrar_unidades(data) 
   {
+    $("#id_unidades").val('');
+    $(".span_clave").hide();
+    $(".span_articulo").show();
+    $("#buscar_btn").hide();
+    $("#cancelar_btn").show();
+    $("#id_unidades").focus();
+
     if (data.unidades > 0 )
     {
       $('#span_alerta_unidades').html(' Ya existen '+ data.unidades + ' en inventario.');
       alert(' Ya existen '+ data.unidades + ' en inventario.\n Detalles:\n '+ data.detalle_modificaciones );
+      $("#id_unidades").focus();
     }
     else
       $('#span_alerta_unidades').html('');
@@ -263,13 +271,6 @@
       $("#id_unidades").focus();
     });
 
-    // $('#span_alerta_unidades').html('');
-    $("#id_unidades").val('');
-    $(".span_clave").hide();
-    $(".span_articulo").show();
-    $("#buscar_btn").hide();
-    $("#cancelar_btn").show();
-    $("#id_unidades").focus();
   }
 
 </script>
