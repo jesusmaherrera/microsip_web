@@ -11,7 +11,7 @@ urlpatterns = patterns('',
     
     (r'^InventarioFisico_pa/$', views.create_invetarioFisico_pa_createView),
     (r'^InventarioFisico_pa/(?P<id>\d+)/', views.invetarioFisico_pa_manageView),
-    (r'^InventarioFisico_pa_mobile/(?P<id>\d+)/', views.invetarioFisico_mobile_pa_manageView),
+    (r'^inventarioFisico_mobile/(?P<id>\d+)/', views.invetarioFisico_mobile_pa_manageView),
 
     #(r'^InventarioFisico/Delete/(?P<id>\d+)/', views.invetarioFisico_delete),
     #ENTRADAS

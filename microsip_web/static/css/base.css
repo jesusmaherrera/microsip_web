@@ -194,6 +194,16 @@ right: 30px; /* Distancia desde la derecha */
 	margin-bottom: -1px;
 }
 
+.autocomplete-light-widget
+{
+  font-size: 14px; 
+}
+
+.text-error
+{
+  font-size: 12px;
+}
+
 #IrArriba span {
 width: 60px; /* Ancho del botón */
 height: 60px; /* Alto del botón */
@@ -215,115 +225,15 @@ background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAA
 }
 
 
-.label_extra 
-{
-    display: table-cell;
-}
-
-
-.big_screen 
-{
-    display: block;
-}
-
-.table_bigscreen 
-{
-    display: table;
-}
-
 .small_screen
 {
   display: none;
 }
 
-.all_screen #id_ubicacion
-{
-    margin: .7em;
-}
-
-.ms-custom-form
-{
-  height: 5em;
-}
-
-/*/* Pantallas grandes */
-@media only screen and (max-width : 770px) {
-  body{
-    padding: 0;
-  }
-  
-  .all_screen
-  {
-    display: inline-block; 
-  }
-
-  .all_screen #id_ubicacion
-  {
-    margin: 0;
-  }
-
-  .big_screen {
-    display: none;
-  }
-
-  .pagecontent
-  {
-    padding: 0 .5em;    
-    margin: 0;
-    text-align: center;;
-  }
-
+/*/* Pantallas pequeñas */
+@media only screen and (max-width : 800px) {
   .small_screen
   {
     display: inline-block ;
-  }
-
-  
-  .table_bigscreen
-  {
-    display: none;
-  }
-
-  .label_extra {
-    display: none;
-  }
-
-  .ms-custom-form
-  {
-    margin: 0;
-    padding: 0;
-    height: 0;
-
-  }
-  
-}*/
-
-.text-error
-{
-
-  font-size: 12px;
-}
-
-.autocomplete-light-widget
-{
-  font-size: 14px; 
-}
-/*.input-append, .input-prepend
-{
-  font-size: 12px;
-}*/
-
-.money-text
-{
-  color:orange;
-}
-
-#btn-primarymenu
-{
-  background-color: rgb(211, 63, 63);
-  background-image: none;
-}
-
-.navbar .nav > li > a {
-  padding: 5px 15px 4px;
+  } 
 }
