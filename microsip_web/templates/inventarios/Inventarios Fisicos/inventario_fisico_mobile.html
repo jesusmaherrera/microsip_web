@@ -10,174 +10,184 @@
 {% block js_code %}
 {% include 'autocomplete_light/static.html' %}      
 
-<script type="text/javascript">
-  
-  function enviar_unidades()
-  {
-    if ($('#id_ubicacion').val() != '' &&  $('#id_unidades').val() != '')
-    { 
-      Dajaxice.microsip_web.apps.inventarios.add_aticulosinventario(limpiarForm, {'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val(),'unidades':$('#id_unidades').val(), "ubicacion": $('#id_ubicacion').val()});
-      limpiarForm();
-    }
-    else
-    {
-      if ($('#id_ubicacion').val() == '')
-        alert("Por favor indica una ubicacion");
-      if ($('#id_unidades').val() == '')
-        alert("Por favor indica la cantidad de articulos");
-    }
+<script type="text/javascript">  
+function enviar_unidades()
+{
+  if ($('#id_ubicacion').val() != '' &&  $('#id_unidades').val() != '')
+  { 
+    Dajaxice.microsip_web.apps.inventarios.add_aticulosinventario(limpiarForm, {'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val(),'unidades':$('#id_unidades').val(), "ubicacion": $('#id_ubicacion').val()});
+    limpiarForm();
   }
-
-  function limpiarForm()
+  else
   {
-    $('#span_alerta_unidades, #id_articulo, #id_articulo-deck').html('');
-    $("#id_unidades, #id_clave, #id_articulo_text").val('');
-    $("#buscar_btn").show();
-    $(".span_unidades, #cancelar_btn").hide();
-
-    if ($("#chbx_modorapido").is(':checked'))
-    {
-      $(".span_articulo").hide();
-      $(".span_clave, #id_clave").show();
-      $("#id_clave").focus();
-    }
-    else
-    {
-      $(".span_clave").hide();
-      $(".span_articulo, #id_articulo_text").show();
-      $("#id_articulo-text").focus();
-    }
+    if ($('#id_ubicacion').val() == '')
+      alert("Por favor indica una ubicacion");
+    if ($('#id_unidades').val() == '')
+      alert("Por favor indica la cantidad de articulos");
   }
+}
+
+function limpiarForm()
+{
+
+  $('#span_alerta_unidades, #id_articulo, #id_articulo-deck').html('');
+  $("#id_unidades, #id_clave, #id_articulo_text").val('');
+  $("#buscar_btn").show();
+  $(".span_unidades, #cancelar_btn").hide();
+
+  if ($("#chbx_modorapido").is(':checked'))
+  {
+    $(".span_articulo").hide();
+    $(".span_clave, #id_clave").show();
+    $("#id_clave").focus();
+  }
+  else
+  {
+    $(".span_clave").hide();
+    $(".span_articulo, #id_articulo_text").show();
+    $("#id_articulo-text").focus();
+  }
+}
    
-  function buscar_clave()
+function load_localstorage()
+{
+  modo_rapido = localStorage.getItem("modo_rapido");
+  if (modo_rapido == null)
+    localStorage.setItem("modo_rapido", 'false');
+  
+  if(localStorage.getItem("modo_rapido") == 'true')
+    $("#id_clave").focus();
+  else
   {
-    if($("#id_clave").val() != '')
-      Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
-    else
-      $("#id_clave").focus();
+    $("#id_articulo_text").focus();
+    $("#chbx_modorapido").attr('checked', true);
   }
 
-  $(document).ready(function(){
-    $("#id_articulo_text").hide();
-    $('#id_clave').focus();
-    $(".span_unidades").hide();
-    $("#cancelar_btn").hide();
-    $("#chbx_modorapido").attr('checked', true);
-
-    $('#id_unidades, #id_articulo_text').focus(function() { 
-      setTimeout(function(){
-        window.scrollTo(0, 3);
-      }, 0);  
-    });
-
-    $("#chbx_modorapido").change(limpiarForm);
-
-    /* LOCAL STORAGE */
-    ubicacion = localStorage.getItem("ubicacion");
-    if (ubicacion == null)
-      localStorage.setItem("ubicacion", 'sdasd');
-
-    modo_rapido = localStorage.getItem("modo_rapido");
-    if (modo_rapido == null)
-      localStorage.setItem("modo_rapido", 'false');
-    
-    if(localStorage.getItem("modo_rapido") == 'true')
-      $("#id_clave").focus();
-    else
-      $("#id_articulo_text").focus();
-
-    $('#id_clave').focusin(function(){
-      if (localStorage.getItem("modo_rapido") == 'false')
-        localStorage.setItem("modo_rapido", 'true');
-    });
-
-    $('#id_articulo_text').focusin(function(){
-      if (localStorage.getItem("modo_rapido") == 'true')
-        localStorage.setItem("modo_rapido", 'false');
-    });
-
-    ubicacion = localStorage.getItem("ubicacion");
-    if (ubicacion == null)
-      localStorage.setItem("ubicacion", '');
-    $("#id_ubicacion").val(localStorage.getItem("ubicacion"));
-    $("#id_ubicacion").change(function() {
-      localStorage.setItem("ubicacion",$("#id_ubicacion").val());
-    });
-
-
-
-    $('#id_clave').live('keydown', function(e) { 
-      var keyCode = e.keyCode || e.which; 
-
-      if (keyCode == 13 || keyCode == 9) 
-      { 
-        if($("#id_clave").val() != '')
-          Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
-        else
-          $("#id_articulo_text").focus();
-        return false
-      }
-
-    });
-
-    
-    $("#id_articulo").change(function(){
-      if ($("#id_articulo").children().length > 0)
-      {
-        $('#id_articulo_text, #id_clave, #buscar_btn, .span_clave').hide();
-        $("#cancelar_btn, #id_unidades, .span_unidades, #id_articulo-deck").show();
-        alert('hola');
-        Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});
-      }
-      else
-        $('#span_alerta_unidades').html('');
-    });
-    
-    $("#id_clave").live('mouseup', function () {
-      $(this).select();
-    });
-
+  $('#id_clave').focusin(function(){
+    if (localStorage.getItem("modo_rapido") == 'false')
+      localStorage.setItem("modo_rapido", 'true');
   });
 
-  function mostrar_articulo(data){
-    if (data.articulo_id != 0)
-    {
-      $('#id_articulo-deck').attr('style','');
-      $('#id_articulo-deck').html('<span class="div hilight" data-value="'+data.articulo_id+'"><span style="display: inline;" class="remove div">X</span>'+data.articulo_nombre+'</span>');
-      $('#id_articulo').html('<option selected="selected" value="'+data.articulo_id+'"></option>');
-      $('#id_articulo_text, #id_clave, #buscar_btn, .span_clave').hide();
-      $("#cancelar_btn, #id_unidades, .span_unidades, #id_articulo-deck, .span_articulo").show();
+  $('#id_articulo_text').focusin(function(){
+    if (localStorage.getItem("modo_rapido") == 'true')
+      localStorage.setItem("modo_rapido", 'false');
+  });
 
-      Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});
-    }
-     else
-    {
-      $('#id_articulo_text').attr('style','');
-      $('#id_articulo-deck, #id_articulo').html('');
-      $('#id_articulo_text').show(); 
-      alert('No existe ningun articulo con la clave ['+ $("#id_clave").val() +']');
-      $("#id_clave").focus();
-      $("#id_clave").select();
-    }
-  }
+  ubicacion = localStorage.getItem("ubicacion");
+  if (ubicacion == null)
+    localStorage.setItem("ubicacion", '');
+  
+  $("#id_ubicacion").val(localStorage.getItem("ubicacion"));
+  $("#id_ubicacion").change(function() {
+    localStorage.setItem("ubicacion",$("#id_ubicacion").val());
+  });
+}
 
+function buscar_clave()
+{
+  if($("#id_clave").val() != '')
+    Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
+  else
+    $("#id_clave").focus();
+}
 
-  function mostrar_unidades(data) 
+function mostrar_articulo(data){
+  if (data.articulo_id != 0)
   {
-    if (data.unidades > 0 )
-    {
-      $('#span_alerta_unidades').html(' Ya existen '+ data.unidades + ' en inventario.');
-      alert(' Ya existen '+ data.unidades + ' en inventario.\n Detalles:\n '+ data.detalle_modificaciones );
+    $('#id_articulo-deck').attr('style','');
+    $('#id_articulo-deck').html('<span class="div hilight" data-value="'+data.articulo_id+'"><span style="display: inline;" class="remove div">X</span>'+data.articulo_nombre+'</span>');
+    $('#id_articulo').html('<option selected="selected" value="'+data.articulo_id+'"></option>');
+    $('#id_articulo_text, #id_clave, #buscar_btn, .span_clave').hide();
+    $("#cancelar_btn, #id_unidades, .span_unidades, #id_articulo-deck, .span_articulo").show();
+
+    Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});
+  }
+   else
+  {
+    $('#id_articulo_text').attr('style','');
+    $('#id_articulo-deck, #id_articulo').html('');
+    $('#id_articulo_text').show(); 
+    alert('No existe ningun articulo con la clave ['+ $("#id_clave").val() +']');
+    $("#id_clave").focus();
+    $("#id_clave").select();
+  }
+}
+
+
+function mostrar_unidades(data) 
+{
+
+  if (data.unidades > 0 )
+  {
+    $('#span_alerta_unidades').html(' Ya existen '+ data.unidades + ' en inventario.');
+    alert(' Ya existen '+ data.unidades + ' en inventario.\n Detalles:\n '+ data.detalle_modificaciones );
+  }
+  else
+    $('#span_alerta_unidades').html('');
+
+  $(".remove").on('click', function(){
+    limpiarForm();
+  });
+
+  $("#id_unidades").focus();
+}
+
+$(document).ready(function(){
+  $("#id_articulo_text").hide();
+  $('#id_clave').focus();
+  $(".span_unidades").hide();
+  $("#cancelar_btn").hide();
+  
+
+  $('#id_unidades, #id_articulo_text').focus(function() { 
+    setTimeout(function(){
+      window.scrollTo(0, 3);
+    }, 0);  
+  });
+
+  /* LOCAL STORAGE */
+  load_localstorage();
+  $("#chbx_modorapido").change(limpiarForm);
+
+  //Busacar articulo por clave al precionar enter
+  $('#id_clave').live('keydown', function(e) { 
+    var keyCode = e.keyCode || e.which; 
+
+    if (keyCode == 13 || keyCode == 9) 
+    { 
+      if($("#id_clave").val() != '')
+        Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
+      else
+        $("#id_articulo_text").focus();
+      return false
     }
+  });
+
+  $("#id_articulo").change(function(){
+    if ($("#id_articulo").children().length > 0)
+      Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});
     else
       $('#span_alerta_unidades').html('');
+  });
 
-    $(".remove").on('click', function(){
-      limpiarForm();
-    });
+  // $("#id_articulo").change(function(){
+  //   if ($("#id_articulo").children().length > 0)
+  //   {
+  //     $("#cancelar_btn, #id_unidades, .span_unidades, #id_articulo-deck").show();
+  //     Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});
+  //     $('#id_clave, #buscar_btn, .span_clave').hide();
+  //   }
+  //   else
+  //     $('#span_alerta_unidades').html('');
+  // });
 
-    $("#id_unidades").focus();
-  }
+  $("#id_clave").live('mouseup', function () {
+    $(this).select();
+  });
+
+});
+
+
 </script>
 
 
