@@ -11,6 +11,7 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}
+{% include 'autocomplete_light/static.html' %}
 <script type="text/javascript">
 
   function cargar_articulos(articulos)
@@ -182,28 +183,28 @@ $(document).ready(function() {
     <strong>{{ msg }}</strong> 
 </div>
 {% endif %}
- <div class="ms-custom-form container-fluid" style=" height: 2em; ">
+ <div class="ms-custom-form container-fluid">
   <div class="row-fluid">
-      <div class="span2"><h3>Articulos</h3></div>
-    <div class='span9' style=" margin-top: 1em; "> 
+      <div class="span2 hidden-phone"><h3>Articulos</h3></div>
+    <div class='span9'> 
       
       <form method="post" class="form-inline" action="" enctype='multipart/form-data'>
         {% csrf_token %}  
-        <div class="span1">
+        <div class="span1 hidden-phone">
           <a tabindex="-1" class='btn' href='#' onclick='cargar_selector_movera();'><i class="icon-folder-open"></i></a> 
         </div>
-        <div class='span3'>
+        <div class='span3' >
         {{ filtro_form.articulo }}
         </div>
         {{ filtro_form.clave }}{{ filtro_form.nombre }}
-        <button class="btn" type="submit"><i class='icon-search'></i> </button>
+        <button class="btn" type="submit"><i class='icon-search'></i> <span class="visible-phone">Buscar</span></button>
       </form>   
     </div>
   </div>
 </div>
 <div class="container-fluid" style='clear:both;'>
   <div class="row-fluid">
-    <div class="span2">
+    <div class="span2 hidden-phone">
       <!-- <div class="input-append span">
         <input name="nombre" class='input-medium'  maxlength="100" placeholder="Busca una carpeta aqui..." type="text" id="text">
         <a class='btn' id="search"  href="#"><i class='icon-search'></i></a>
@@ -215,17 +216,17 @@ $(document).ready(function() {
     <div class="span10">
       <table class="table tableCell table-hover">
         <tr>
-          <th> <input id="select_article_all" value="" type="checkbox"/> </th>
+          <th class="hidden-phone"> <input id="select_article_all" value="" type="checkbox"/> </th>
           <th> Articulo</th>
-          <th> Puntos</th>
-          <th> Dinero Electronico</th>
+          <th class="hidden-phone"> Puntos</th>
+          <th class="hidden-phone"> Dinero Electronico</th>
         </tr>
         {% for articulo in articulos%}
         <tr>
-          <td><input id="select_article_{{ articulo.id }}" value="" type="checkbox"/></td>
-          <td><a href="/punto_de_venta/articulo/{{ articulo.id }}/" target="_blank">{{ articulo.nombre }}</a></td>
-          <td>{{articulo.puntos }}|{{articulo.carpeta.id }}</td>
-          <td>{{articulo.dinero_electronico }}</td>
+          <td class="hidden-phone"><input id="select_article_{{ articulo.id }}" value="" type="checkbox"/></td>
+          <td><a href="{{url_articulo}}{{ articulo.id }}/" target="_blank">{{ articulo.nombre }}</a></td>
+          <td class="hidden-phone">{{articulo.puntos }}|{{articulo.carpeta.id }}</td>
+          <td class="hidden-phone">{{articulo.dinero_electronico }}</td>
         </tr>
         {% endfor %}
 
@@ -262,5 +263,4 @@ $(document).ready(function() {
   </div>
 </div>
 <br>
-{% include 'autocomplete_light/static.html' %}
 {% endblock %}

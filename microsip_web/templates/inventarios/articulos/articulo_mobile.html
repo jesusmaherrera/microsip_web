@@ -1,0 +1,64 @@
+{% extends "inventarios/base.html" %}
+{% block title %}{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}
+<link rel='stylesheet' href='{{STATIC_URL}}css/inventarios.css'/>
+{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block content %}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
+  {% csrf_token %}
+  <fieldset>
+    {{ clave_articulo_form.errors }}
+    <legend>Clave:</legend>
+    {{ clave_articulo_form.rol }}
+    {{ clave_articulo_form.clave }}
+  </fieldset>
+  <fieldset>
+    {{articulo_form.errors }}
+    <legend>Datos generales:</legend>
+    <label>Nombre</label>
+    {{articulo_form.nombre }}
+    <label>Linea</label>
+    {{articulo_form.linea }}
+    <br>
+    <div class="input-prepend input-append mobile_inputdata">
+      <span class="add-on ">Unid vta</span>
+      {{articulo_form.unidad_venta}}
+    </div>
+    <br>
+    <div class="input-prepend input-append mobile_inputdata">
+      <span class="add-on ">Unid com</span>
+      {{articulo_form.unidad_compra }}
+    </div>
+  </fieldset>
+  <fieldset>
+    {{ precio_articulo_form.errors }}
+    {{ impuesto_articulo_form.errors }}
+    <legend>Precio:</legend>
+    {{ precio_articulo_form.precio_empresa }}
+    <div class="input-prepend input-append mobile_inputdata">
+      <span class="add-on">Precio</span>
+      {{ precio_articulo_form.precio }}
+    </div>
+    <div class="input-prepend input-append mobile_inputdata">
+      <span class="add-on ">Moneda</span>
+      {{ precio_articulo_form.moneda }}
+    </div>
+    <div class="input-prepend input-append mobile_inputdata">
+      <span class="add-on ">Impuesto</span>
+      {{ impuesto_articulo_form.impuesto }}      
+    </div>
+  </fieldset>
+  <br>
+  <div class="input-prepend input-append mobile_inputdata">
+      <a class="btn btn-danger" href="/inventarios/articulos/">Cancelar</a>
+      <input class='btn btn-success' type="submit" value='Guardar'>
+  </div>
+</form>
+{% endblock %}

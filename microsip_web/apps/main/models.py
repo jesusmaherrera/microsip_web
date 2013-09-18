@@ -148,8 +148,8 @@ class Articulos(models.Model):
     cuenta_ventas = models.CharField(max_length=30, blank=True, null=True, db_column='CUENTA_VENTAS')
     linea = models.ForeignKey(LineaArticulos, db_column='LINEA_ARTICULO_ID')
     nota_ventas = models.TextField(db_column='NOTAS_VENTAS', blank=True, null=True)
-    unidad_venta = models.CharField(max_length=20, blank=True, null=True, db_column='UNIDAD_VENTA')
-    unidad_compra = models.CharField(max_length=20, blank=True, null=True, db_column='UNIDAD_COMPRA')
+    unidad_venta = models.CharField(default = 'PIEZA', max_length=20, blank=True, null=True, db_column='UNIDAD_VENTA')
+    unidad_compra = models.CharField(default = 'PIEZA' , max_length=20, blank=True, null=True, db_column='UNIDAD_COMPRA')
     puntos = models.IntegerField(db_column='SIC_PUNTOS')
     dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
     hereda_puntos = models.BooleanField( db_column='SIC_HEREDA_PUNTOS')
@@ -160,6 +160,29 @@ class Articulos(models.Model):
 
     class Meta:
         db_table = u'articulos'
+
+class PrecioEmpresa(models.Model):
+    id                  = models.AutoField(primary_key=True, db_column='PRECIO_EMPRESA_ID')
+    nombre              = models.CharField(default='N', max_length=30, db_column='NOMBRE')
+    
+    def __unicode__(self):
+        return u'%s' % self.nombre
+
+    class Meta:
+        db_table = u'PRECIOS_EMPRESA'
+
+class PrecioArticulo(models.Model):
+    id                  = models.AutoField(primary_key=True, db_column='PRECIO_ARTICULO_ID')
+    articulo            = models.ForeignKey(Articulos, db_column='ARTICULO_ID')
+    precio_empresa      = models.ForeignKey(PrecioEmpresa, db_column='PRECIO_EMPRESA_ID')
+    precio              = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=6, db_column='PRECIO')
+    moneda              = models.ForeignKey(Moneda, db_column='MONEDA_ID')
+
+    def __unicode__(self):
+        return u'%s' % self.id
+
+    class Meta:
+        db_table = u'precios_articulos'
 
 
 class ArticulosClientes(models.Model):
@@ -258,6 +281,9 @@ class RolesClavesArticulos(models.Model):
     nombre = models.CharField(max_length=50, db_column='NOMBRE')
     es_ppal = models.CharField(default='N', max_length=1, db_column='ES_PPAL')
     
+    def __unicode__(self):
+        return u'%s' % self.nombre
+
     class Meta:
         db_table = u'roles_claves_articulos'
 
@@ -703,6 +729,9 @@ class ImpuestosArticulo(models.Model):
     id          = models.AutoField(primary_key=True, db_column='IMPUESTO_ART_ID')
     articulo    = models.ForeignKey(Articulos, on_delete= models.SET_NULL, blank=True, null=True, db_column='ARTICULO_ID')
     impuesto    = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_ID')
+
+    def __unicode__(self):
+        return self.impuesto
 
     class Meta:
         db_table = u'impuestos_articulos'

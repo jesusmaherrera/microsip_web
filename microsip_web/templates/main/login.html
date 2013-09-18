@@ -22,7 +22,7 @@ $(document).ready(function(){
 {% block content %}
 	<header>
     <br>
-	  <h1 class="text-center big_screen">Iniciar Sesión</h1>
+	  <h1 class="text-center hidden-phone">Iniciar Sesión</h1>
     <br>
 </header>
 <form id='formulario' action="/login/" method="post">{% csrf_token %}

@@ -95,7 +95,7 @@ function mostrar_articulo(data){
   if (data.articulo_id != 0)
   {
     $('#id_articulo-deck').attr('style','');
-    $('#id_articulo-deck').html('<span class="div hilight" data-value="'+data.articulo_id+'"><span style="display: inline;" class="remove div">X</span>'+data.articulo_nombre+'</span>');
+    $('#id_articulo-deck').html('<span class="div hilight" data-value="'+data.articulo_id+'"><span style="display: inline;" class="remove div">X</span><a href="/inventarios/articulo/'+ data.articulo_id +'/">'+data.articulo_nombre+'</a></span>');
     $('#id_articulo').html('<option selected="selected" value="'+data.articulo_id+'"></option>');
     $('#id_articulo_text, #id_clave, #buscar_btn, .span_clave').hide();
     $("#cancelar_btn, #id_unidades, .span_unidades, #id_articulo-deck, .span_articulo").show();

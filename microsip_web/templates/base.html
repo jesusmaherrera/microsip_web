@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="{{STATIC_URL}}css/jquery-ui.css">
   <link rel="stylesheet" href="{{STATIC_URL}}css/!style.css" />
   <link rel='stylesheet' href='{{STATIC_URL}}css/base.css'/>
+  <link rel='stylesheet' href='{{STATIC_URL}}css/mobile.css'/>
   
   {% block style_css %}{% endblock %}
   <link rel='shortcut icon' href='{{STATIC_URL}}img/logo.png'>
@@ -28,7 +29,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <!-- <a class="brand" href="#"></a> --><div class="span1 label_min"> {% block selected_module %}{% endblock %}</div>
+        <!-- <a class="brand" href="#"></a> --><div class="span1 label_min"> {% block selected_module %}Microsip{% endblock %}</div>
         <div class="nav-collapse collapse">
           <ul class="nav" role="navigation">
             
@@ -108,7 +109,7 @@
   </section>
   <footer> 
     <br>
-    <div class="row-fluid text-left big_screen">
+    <div class="row-fluid text-left hidden-phone">
       <div class="span6 offset1">
         <strong>CONTACTO </strong>
         <br>
@@ -143,7 +144,7 @@
     {% endblock %}
   </footer>
 
-  <div id="IrArriba" class="big_screen">
+  <div id="IrArriba" class="hidden-phone">
     <a href="#Arriba"><span></span></a>
   </div>
   <script type="text/javascript">

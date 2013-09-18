@@ -44,7 +44,7 @@ procedures['SIC_PUNTOS_ARTICULOS_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE ARTICULOS ADD SIC_DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+            execute statement 'ALTER TABLE ARTICULOS ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2) DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf

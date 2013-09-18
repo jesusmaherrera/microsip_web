@@ -1,0 +1,14 @@
+.mobile_inputdata span{width:20%}
+.mobile_inputdata input{width:60%}
+.mobile_inputdata select{width:60%}
+.ms-custom-form{padding:0 30px;}
+.ms-custom-form .row-fluid{margin:1em}
+@media only screen and (max-width : 770px){body{padding:0}
+fieldset{text-align:left}
+#tools-module-bar{padding:0 1px}
+.ms-custom-form{margin:0;}
+.ms-custom-form .row-fluid{margin:0}
+.ms-custom-form input{width:100%}
+.ms-custom-form button{width:100%;display:block}
+.pagecontent{padding:0;margin:0}
+}

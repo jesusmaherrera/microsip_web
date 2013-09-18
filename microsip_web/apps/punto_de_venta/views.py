@@ -17,6 +17,7 @@ from microsip_web.libs import contabilidad
 from triggers import triggers
 from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_form
 from microsip_web.libs.custom_db.main import get_conecctionname
+from mobi.decorators import detect_mobile
 
 def create_facturageneral_dia(request, cliente_id=None):
     cliente_id = 331
@@ -71,11 +72,20 @@ def inicializar_puntos_articulos(request):
     
     return HttpResponseRedirect('/punto_de_venta/articulos/')
 
+@detect_mobile
 @login_required(login_url='/login/')
 def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punto_de_venta/articulos/articulos/articulos.html'):
     basedatos_activa =  request.user.userprofile.basedatos_activa
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
+
+    if "Chrome" in request.META['HTTP_USER_AGENT']:
+        request.mobile = False
+       
+    if request.mobile:
+        url_articulo = '/inventarios/articulo/'
+    else:
+        url_articulo = '/punto_de_venta/articulo/'
 
     msg = ''
     if request.method =='POST':
@@ -86,11 +96,11 @@ def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punt
             clave = filtro_form.cleaned_data['clave']
 
             if articulo != None:
-                return HttpResponseRedirect('/punto_de_venta/articulo/%s/'% articulo.id)
+                return HttpResponseRedirect('%s%s/'% (url_articulo, articulo.id))
             elif clave != '':
                 clave_articulo = ClavesArticulos.objects.filter(clave=clave)
                 if clave_articulo.count() > 0:
-                    return HttpResponseRedirect('/punto_de_venta/articulo/%s/'% clave_articulo[0].articulo.id)
+                    return HttpResponseRedirect('%s%s/'% (url_articulo, clave_articulo[0].articulo.id))
                 else:
                     articulos_list = Articulos.objects.filter(nombre__icontains=nombre).order_by('nombre')
                     msg='No se encontro ningun articulo con esta clave'
@@ -113,17 +123,21 @@ def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punt
         # If page is out of range (e.g. 9999), deliver last page of results.
         articulos = paginator.page(paginator.num_pages)
     
+    
     PATH = request.path
     if  '/ventas/articulos/' in PATH:
         extend = 'ventas/base.html'
     elif '/punto_de_venta/articulos/' in PATH:
         extend = 'punto_de_venta/base.html'
+    elif '/inventarios/articulos/' in PATH:
+        extend = 'inventarios/base.html'
 
     c = {
         'articulos':articulos,
         'carpeta':carpeta,
         'extend':extend,
         'filtro_form':filtro_form,
+        'url_articulo':url_articulo,
     }
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))

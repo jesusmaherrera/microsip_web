@@ -12,6 +12,26 @@ from microsip_web.apps.config.models import *
 import fdb
 import autocomplete_light
 
+class impuestos_articulos_form(forms.ModelForm):
+    class Meta:
+        model = ImpuestosArticulo
+        exclude = ('articulo')
+        
+class precios_articulos_form(forms.ModelForm):
+    class Meta:
+        model = PrecioArticulo
+        exclude = ('articulo')
+
+class articulos_form(forms.ModelForm):
+    class Meta:
+        model = Articulos
+        exclude = ('seguimiento', 'puntos','es_almacenable',)
+
+class claves_articulos_form(forms.ModelForm):
+    class Meta:
+        model = ClavesArticulos
+        exclude = ('articulo',)
+
 class CustomAuthenticationForm(forms.Form):
     conexion_db = forms.ModelChoiceField(ConexionDB.objects.all(), required= False)
     username = forms.CharField( max_length=150)

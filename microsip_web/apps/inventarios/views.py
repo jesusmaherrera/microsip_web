@@ -33,6 +33,51 @@ import fdb
 from microsip_web.settings.common import MICROSIP_DATABASES, DATABASES
 from microsip_web.libs.custom_db.main import get_conecctionname
 
+
+@login_required(login_url='/login/')
+def ArticuloManageView(request, id, template_name='inventarios/articulos/articulo_mobile.html'):
+    articulo = get_object_or_404(Articulos, pk=id)
+
+    #Claves articulo
+    claves_articulo = ClavesArticulos.objects.filter(articulo=articulo)
+    if claves_articulo.count() > 0:
+        clave_articulo = claves_articulo[0]
+    else:
+        clave_articulo = ClavesArticulos()
+
+    precios_articulo = PrecioArticulo.objects.filter(articulo=articulo)
+    if precios_articulo.count() > 0:
+        precio_articulo = precios_articulo[0]
+    else:
+        precio_articulo = PrecioArticulo()
+
+    impuestos_articulo = ImpuestosArticulo.objects.filter(articulo=articulo)
+    if impuestos_articulo.count() > 0:
+        impuesto_articulo = impuestos_articulo[0]
+    else:
+        impuesto_articulo = ImpuestosArticulo()
+    
+    clave_articulo_form = claves_articulos_form(request.POST or None, instance=clave_articulo)
+    articulo_form = articulos_form(request.POST or None, instance= articulo)
+    precio_articulo_form = precios_articulos_form(request.POST or None, instance=precio_articulo)
+    impuesto_articulo_form = impuestos_articulos_form(request.POST or None, instance=impuesto_articulo)
+
+    #Si los datos de los formularios son correctos
+    if articulo_form.is_valid() and precio_articulo_form.is_valid() and impuesto_articulo_form.is_valid() and clave_articulo_form.is_valid():
+        articulo_form.save()
+        precio_articulo_form.save()
+        impuesto_articulo_form.save()
+        clave_articulo_form.save()
+        return HttpResponseRedirect('/inventarios/InventariosFisicos/')
+
+    c = {
+        'clave_articulo_form': clave_articulo_form,
+        'articulo_form':articulo_form,
+        'precio_articulo_form':precio_articulo_form,
+        'impuesto_articulo_form':impuesto_articulo_form,
+    } 
+    return render_to_response(template_name, c, context_instance=RequestContext(request))
+
 ##########################################
 ##                                      ##
 ##               LOGIN                  ##
