@@ -76,6 +76,7 @@ def inicializar_puntos_articulos(request):
 @login_required(login_url='/login/')
 def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punto_de_venta/articulos/articulos/articulos.html'):
     basedatos_activa =  request.user.userprofile.basedatos_activa
+    articulos_porpagina = 20  
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
@@ -84,6 +85,7 @@ def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punt
        
     if request.mobile:
         url_articulo = '/inventarios/articulo/'
+        articulos_porpagina = 5    
     else:
         url_articulo = '/punto_de_venta/articulo/'
 
@@ -110,7 +112,16 @@ def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punt
         filtro_form = filtroarticulos_form()
         articulos_list = Articulos.objects.filter(Q(carpeta__id=carpeta)| Q(carpeta__id=None)).order_by('nombre') #filter(carpeta = carpeta)
     
-    paginator = Paginator(articulos_list, 20) # Muestra 10 ventas por pagina
+      
+    PATH = request.path
+    if  '/ventas/articulos/' in PATH:
+        extend = 'ventas/base.html'
+    elif '/punto_de_venta/articulos/' in PATH:
+        extend = 'punto_de_venta/base.html'
+    elif '/inventarios/articulos/' in PATH:
+        extend = 'inventarios/base.html'
+
+    paginator = Paginator(articulos_list, articulos_porpagina) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
 
     #####PARA PAGINACION##############
@@ -124,13 +135,7 @@ def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punt
         articulos = paginator.page(paginator.num_pages)
     
     
-    PATH = request.path
-    if  '/ventas/articulos/' in PATH:
-        extend = 'ventas/base.html'
-    elif '/punto_de_venta/articulos/' in PATH:
-        extend = 'punto_de_venta/base.html'
-    elif '/inventarios/articulos/' in PATH:
-        extend = 'inventarios/base.html'
+    
 
     c = {
         'articulos':articulos,

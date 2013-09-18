@@ -1,14 +1,24 @@
+#ms-custom-form-header
+    height 4em
+    clear both
+            
+#ms-custom-form-footer
+    height 3em
+    clear both
+
 .mobile_inputdata
-    span 
+    .add-on 
         width 20%
     input
-        width 60%
+        width 75%
     select 
-        width 60%
+        width 79%
+
 .ms-custom-form
     padding 0 30px
     .row-fluid
         margin 1em
+
 
 @media only screen and (max-width : 770px)
     body
@@ -17,20 +27,31 @@
     fieldset
         text-align left
 
+    #form-search-articulo
+        input
+            width 69%
+    
     #tools-module-bar
         padding 0px 1px
 
+    .mobile_inputdata
+        width 100%
+
+        input
+            width 70%
+        select 
+            width 79%
+
     .ms-custom-form
         margin 0
-        
-        .row-fluid
-            margin 0
-        input
-            width 100%
+        padding 0
+
         button 
             width 100%
             display block
 
+        .row-fluid
+            margin 0
 
     .pagecontent
         padding 0

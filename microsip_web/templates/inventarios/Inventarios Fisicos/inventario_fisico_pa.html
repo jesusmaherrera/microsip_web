@@ -203,35 +203,37 @@
     <p>{{ message }}</p>
   </div>
   {% endif %}
-  <div class="ms-custom-form ">
-    <div class='span ' >
-      <h3 class='span'>Inventario Fisico 
-        <ul class="nav btn btn-mini" style=" margin: 0px; ">
-          <li class="dropdown">
-            <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i></a>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
-              <li><a tabindex="-1" href="#articulosnocont_porlinea_Modal" role="button" data-toggle="modal"><i class="icon-tasks"></i> Agregar articulos no contabilizados Por linea</a></li>
-              <li><a tabindex="-1" href="#" onclick="agregar_articulosfn()"><i class="icon-align-justify"></i> Agregar todos los articulos no contabilizados</a></li>
-            </ul>
-          </li>
-        </ul>
-      </h3>
+  <div class="ms-custom-form">
+    <div id="ms-custom-form-header">
+      <div class='span ' >
+        <h3 class='span'>Inventario Fisico 
+          <ul class="nav btn btn-mini" style=" margin: 0px; ">
+            <li class="dropdown">
+              <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i></a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+                <li><a tabindex="-1" href="#articulosnocont_porlinea_Modal" role="button" data-toggle="modal"><i class="icon-tasks"></i> Agregar articulos no contabilizados Por linea</a></li>
+                <li><a tabindex="-1" href="#" onclick="agregar_articulosfn()"><i class="icon-align-justify"></i> Agregar todos los articulos no contabilizados</a></li>
+              </ul>
+            </li>
+          </ul>
+        </h3>
+      </div>
+      <div class=" pull-right ms-form-right-detail hidden-phone">
+        <div class="span2" >
+          <label>Fecha</label>
+          <div >
+            {{ InventarioFisico.fecha }} 
+          </div>
+        </div> 
+        <div class="span2" >
+          <label>Folio</label>
+          <div >
+            {{ InventarioFisico.folio }} 
+          </div>
+        </div>  
+      </div>
     </div>
-    <div class=" pull-right ms-form-right-detail hidden-phone">
-      <div class="span2" >
-        <label>Fecha</label>
-        <div >
-          {{ InventarioFisico.fecha }} 
-        </div>
-      </div> 
-      <div class="span2" >
-        <label>Folio</label>
-        <div >
-          {{ InventarioFisico.folio }} 
-        </div>
-      </div>  
-    </div>
-    <div style='clear:both;'>
+    <div id="ms-custom-form-footer">
       <div class='span all_screen' >
         {{ ubicacion_form.ubicacion }}
       </div>

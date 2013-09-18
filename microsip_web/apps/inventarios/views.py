@@ -68,7 +68,7 @@ def ArticuloManageView(request, id, template_name='inventarios/articulos/articul
         precio_articulo_form.save()
         impuesto_articulo_form.save()
         clave_articulo_form.save()
-        return HttpResponseRedirect('/inventarios/InventariosFisicos/')
+        return HttpResponseRedirect('/inventarios/articulos/')
 
     c = {
         'clave_articulo_form': clave_articulo_form,
