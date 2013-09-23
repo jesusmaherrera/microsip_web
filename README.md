@@ -1,3 +1,40 @@
+## Descripción
+**Inventario físico a puerta abierta** es una herramienta para el apoyo a la hora de realizar un inventario físico **en Microsip** sin necesidad de cerrar la empresa.
+
+El inventario fisico lo puede realizar con con **cualquier dispositivo que tenga un explorador web** _(smart phone,tablet, ipod, ipad, laptop, o con una terminal con lector de código de barras)_.
+
+![pantalla de inventario fisico](https://fbcdn-sphotos-e-a.akamaihd.net/hphotos-ak-frc3/1269640_589440644431008_338792098_o.jpg)
+![Inventario físico mobile](https://fbcdn-sphotos-g-a.akamaihd.net/hphotos-ak-ash3/602930_589443801097359_1377843750_n.jpg)
+## Funcionamiento
+### Aplicación Web
+
+**Seleccionar artículos a inventariar**
+
+lo puede hacer ya sea **por medio de alguna clave del articulo** o por el **nombre del articulo** 
+al momento de seleccionar un articulo en el inventario si este articulo ya se a inventariado nos mostrara un mensaje de los detalles de este como que usuario, donde y que cantidad de unidades puso **[SYSDBA/Estante1=100]**:
+
+![detalles articulo](https://scontent-a-lax.xx.fbcdn.net/hphotos-ash3/598877_589449747763431_479784911_n.jpg)
+
+El filtro por nombre de articulo es por medio de una auto-completado el cual conforme va escribiendo el nombre del articulo, los artículos de microsip se van filtrando.
+
+![fIltro por articulo](https://scontent-b-lax.xx.fbcdn.net/hphotos-prn2/p480x480/1375691_589451821096557_570111113_n.jpg)
+
+### Aplicación **Microsip**
+
+Dentro de la aplicación Microsip **cualquier** movimiento que tenga que ver con inventarios ya sean _compra, venta, traspaso de almacén, etc._ afectara a nuestro inventario físico abierto desde el momento en que se cree el inventario físico abierto hasta que este mismo se aplique.
+
+> Si capturo **10 artículos(lápiz)** en inventario físico y posteriormente hago la venta de **5 artículos(lápiz)** en el inventario físico automáticamente se me van a rebajar esos últimos 5 artículos.
+
+> Si posteriormente realizo una compra de 6 artículos(lápiz) como resultado en mi inventario tendré **11 artículos(lápiz)**
+
+## Importante
+Para un mejor resultado al momento de realizar un inventario físico es de vital importancia tomar en cuanta los siguientes puntos.
+
+* En el periodo que se realice el inventario es necesario **separar las compras  y devoluciones**
+* En caso de tener el mismo articulo en varios estantes (**comunicar al personal de ventas para que tome los artículos del estante donde ya se contaron** si es el caso en que ya se contaron [si no se an contado no hay problema la aplicación ignorara estos])
+
+
+
 microsip_web
 ============
 
