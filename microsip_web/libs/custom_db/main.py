@@ -7,10 +7,10 @@ def next_id(generator_name, connection_name = None):
     row = c.fetchone()
     return int(row[0])
 
-def get_conecctionname(userprofile =None):
-	basedatos_activa = userprofile.basedatos_activa
+def get_conecctionname(session =None):
+	basedatos_activa = session['selected_database']
 	if basedatos_activa != '':
-	    conexion_activa_id = userprofile.conexion_activa.id
+	    conexion_activa_id = session['conexion_activa']
 	    return "%02d-%s"%(conexion_activa_id, basedatos_activa)
 	else:
 		return ''

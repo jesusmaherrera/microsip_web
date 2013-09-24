@@ -131,7 +131,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
 
 @login_required(login_url='/login/')
 def facturas_View(request, template_name='ventas/herramientas/generar_polizas.html'):
-    connection_name = get_conecctionname(request.user.userprofile)
+    connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 

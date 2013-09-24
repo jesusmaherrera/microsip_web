@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*
 from threading import local
 from django.contrib.sessions.models import Session
 from django.contrib.auth.models import User
-from microsip_web.apps.main.models import UserProfile
+
 my_local_global = local()
 
 class CustomerMiddleware(object):
@@ -18,15 +19,12 @@ def get_database_name(request):
     else:
         uid = session.get_decoded().get('_auth_user_id')
         if uid:
-            user = User.objects.get(pk=uid)
-            
-            profile = UserProfile.objects.get(usuario=uid)
-            if profile:
-                try:
-                    return profile.basedatos_activa, profile.conexion_activa.id
-                except:
-                    return None, None
-            else:
-                return None, None
+            selected_database = None
+            conexion_activa = None
+            if 'selected_database' in request.session:
+                selected_database = request.session['selected_database']
+            if 'conexion_activa' in request.session:
+                conexion_activa = request.session['conexion_activa']
+            return selected_database, conexion_activa
         else:
             return None, None

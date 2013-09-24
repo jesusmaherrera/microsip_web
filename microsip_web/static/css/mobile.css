@@ -9,6 +9,8 @@
 fieldset{text-align:left}
 #form-search-articulo input{width:69%}
 #tools-module-bar{padding:0 1px}
+.span_articulo{margin-top:.5em}
+#span_alerta_unidades{margin-bottom:.5em}
 .mobile_inputdata{width:100%;}
 .mobile_inputdata input{width:70%}
 .mobile_inputdata select{width:79%}
@@ -16,4 +18,5 @@ fieldset{text-align:left}
 .ms-custom-form button{width:100%;display:block}
 .ms-custom-form .row-fluid{margin:0}
 .pagecontent{padding:0;margin:0}
+#id_articulo-deck .hilight{margin:0;padding:0}
 }

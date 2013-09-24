@@ -21,7 +21,7 @@ from microsip_web.libs.custom_db.main import get_conecctionname
 
 @login_required(login_url='/login/')
 def polizas_View(request, template_name='contabilidad/polizas/polizas.html'):
-    connection_name = get_conecctionname(request.user.userprofile)
+    connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
@@ -45,7 +45,7 @@ def polizas_View(request, template_name='contabilidad/polizas/polizas.html'):
 
 @login_required(login_url='/login/')
 def polizas_pendientesView(request, template_name='contabilidad/polizas/polizas_pendientes.html'):
-    connection_name = get_conecctionname(request.user.userprofile)
+    connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 

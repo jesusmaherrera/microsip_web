@@ -3,6 +3,17 @@ from django.db import models
 from datetime import datetime
 from django.contrib.auth.models import User
 
+from django.core.cache import cache
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+ 
+from django.contrib.sessions.models import Session
+ 
+@receiver(post_save)
+def clear_cache(sender, **kwargs):
+    if sender != Session:
+        cache.clear()
+
 class ConexionDB(models.Model):  
     nombre = models.CharField(max_length=100)
     TIPOS = (('L', 'Local'),('R', 'Remota'),)
@@ -18,16 +29,16 @@ class ConexionDB(models.Model):
     class Meta:
         app_label =u'auth' 
         
-class UserProfile(models.Model):  
-    usuario = models.OneToOneField(User)
-    basedatos_activa = models.CharField(max_length=100)
-    conexion_activa = models.ForeignKey(ConexionDB, blank=True, null=True)
+# class UserProfile(models.Model):  
+#     usuario = models.OneToOneField(User)
+#     basedatos_activa = models.CharField(max_length=100)
+#     conexion_activa = models.ForeignKey(ConexionDB, blank=True, null=True)
 
-    def __str__(self):  
-          return "%s's profile" % self.usuario  
+#     def __str__(self):  
+#           return "%s's profile" % self.usuario  
     
-    class Meta:
-        app_label =u'auth'
+#     class Meta:
+#         app_label =u'auth'
 
 class Carpeta(models.Model):
     nombre  = models.CharField(max_length=30)

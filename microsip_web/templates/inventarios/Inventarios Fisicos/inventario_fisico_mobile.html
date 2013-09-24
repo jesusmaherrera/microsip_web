@@ -13,18 +13,23 @@
 <script type="text/javascript">  
 function enviar_unidades()
 {
-  if ($('#id_ubicacion').val() != '' &&  $('#id_unidades').val() != '')
-  { 
-    Dajaxice.microsip_web.apps.inventarios.add_aticulosinventario(limpiarForm, {'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val(),'unidades':$('#id_unidades').val(), "ubicacion": $('#id_ubicacion').val()});
-    limpiarForm();
-  }
+  if ( $("#id_seguimiento").val() == 'S')
+    window.location.href = "/inventarios/inventarioFisico_mobile/articulo_serie/" + $('#id_articulo option:selected').val() + "/" + $("#id_unidades").val() + "/";
   else
   {
-    if ($('#id_ubicacion').val() == '')
-      alert("Por favor indica una ubicacion");
-    if ($('#id_unidades').val() == '')
-      alert("Por favor indica la cantidad de articulos");
-  }
+    if ($('#id_ubicacion').val() != '' &&  $('#id_unidades').val() != '')
+    { 
+      Dajaxice.microsip_web.apps.inventarios.add_aticulosinventario(limpiarForm, {'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val(),'unidades':$('#id_unidades').val(), "ubicacion": $('#id_ubicacion').val()});
+      limpiarForm();
+    }
+    else
+    {
+      if ($('#id_ubicacion').val() == '')
+        alert("Por favor indica una ubicacion");
+      if ($('#id_unidades').val() == '')
+        alert("Por favor indica la cantidad de articulos");
+    }
+  } 
 }
 
 function limpiarForm()
@@ -35,7 +40,7 @@ function limpiarForm()
   $("#buscar_btn").show();
   $(".span_unidades, #cancelar_btn").hide();
 
-  if ($("#chbx_modorapido").is(':checked'))
+  if ($("#chbx_modorapido").is('checked'))
   {
     $(".span_articulo").hide();
     $(".span_clave, #id_clave").show();
@@ -92,6 +97,8 @@ function buscar_clave()
 }
 
 function mostrar_articulo(data){
+  $("#id_seguimiento").val(data.articulo_seguimiento);
+  
   if (data.articulo_id != 0)
   {
     $('#id_articulo-deck').attr('style','');
@@ -111,6 +118,8 @@ function mostrar_articulo(data){
     $("#id_clave").focus();
     $("#id_clave").select();
   }
+  
+
 }
 
 
@@ -125,9 +134,9 @@ function mostrar_unidades(data)
   else
     $('#span_alerta_unidades').html('');
 
-  $(".remove").on('click', function(){
-    limpiarForm();
-  });
+  // $(".remove").on('click', function(){
+    
+  // });
 
   $("#id_unidades").focus();
 }
@@ -137,6 +146,7 @@ $(document).ready(function(){
   $('#id_clave').focus();
   $(".span_unidades").hide();
   $("#cancelar_btn").hide();
+  $("#chbx_modorapido").attr('checked', true);
   
 
   $('#id_unidades, #id_articulo_text').focus(function() { 
@@ -148,9 +158,9 @@ $(document).ready(function(){
   /* LOCAL STORAGE */
   load_localstorage();
   $("#chbx_modorapido").change(limpiarForm);
-
+  
   //Busacar articulo por clave al precionar enter
-  $('#id_clave').live('keydown', function(e) { 
+  $('#id_clave').on( "keydown", function(e) { 
     var keyCode = e.keyCode || e.which; 
 
     if (keyCode == 13 || keyCode == 9) 
@@ -168,6 +178,8 @@ $(document).ready(function(){
       Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});
     else
       $('#span_alerta_unidades').html('');
+
+    
   });
 
   // $("#id_articulo").change(function(){
@@ -196,6 +208,7 @@ $(document).ready(function(){
 {% block breadcrumb %}{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="#">
+  <input type="hidden" id ="id_seguimiento" name="seguimiento" value="">
   <div class="ms-custom-form collapse">
     <div>
       <div class='span all_screen' >
@@ -226,7 +239,6 @@ $(document).ready(function(){
     </div>
     <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 0, 0); color: white;"> </span>
   </div>
-  <br>
   <a id="buscar_btn" class= "btn btn-primary span12 " href="#" onclick="buscar_clave()" ><i class="icon-search icon-white"></i> Buscar</a>
   <div class="span1 span_unidades" >
     <div class="input-prepend input-append">

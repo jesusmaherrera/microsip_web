@@ -13,11 +13,11 @@ from microsip_web.libs.tools import split_seq
 
 @dajaxice_register(method='GET')
 def add_aticulosinventario(request, inventario_id, articulo_id, unidades, ubicacion):
-    basedatos_activa = request.user.userprofile.basedatos_activa
+    basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
     else:
-        conexion_activa_id = request.user.userprofile.conexion_activa.id
+        conexion_activa_id = request.session['conexion_activa']
 
     conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
 
@@ -89,15 +89,16 @@ def get_articulo_by_clave(request, clave):
         clave_articulo = ClavesArticulos.objects.get(clave=clave)
         articulo_id = clave_articulo.articulo.id
         articulo_nombre = clave_articulo.articulo.nombre
-        
+        articulo_seguimiento = clave_articulo.articulo.seguimiento
     except ObjectDoesNotExist:
         articulo_id = 0
-        articulo_nombre =''
+        articulo_nombre = ''
+        articulo_seguimiento = ''
     
     #se devuelven las ciudades en formato json, solo nos interesa obtener como json
     #el id y el nombre de las ciudades.
 
-    return simplejson.dumps({'articulo_id':articulo_id,'articulo_nombre':articulo_nombre,})
+    return simplejson.dumps({'articulo_id':articulo_id, 'articulo_nombre':articulo_nombre, 'articulo_seguimiento':articulo_seguimiento, })
 
 
 @dajaxice_register(method='GET')

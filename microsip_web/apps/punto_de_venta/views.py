@@ -52,7 +52,7 @@ def create_facturageneral_dia(request, cliente_id=None):
 
 @login_required(login_url='/login/')
 def inicializar_puntos_clientes(request):
-    connection_name = get_conecctionname(request.user.userprofile)
+    connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
@@ -62,7 +62,7 @@ def inicializar_puntos_clientes(request):
 
 @login_required(login_url='/login/')
 def inicializar_puntos_articulos(request):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
+    basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
@@ -75,8 +75,8 @@ def inicializar_puntos_articulos(request):
 @detect_mobile
 @login_required(login_url='/login/')
 def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punto_de_venta/articulos/articulos/articulos.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
     articulos_porpagina = 20  
+    basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
@@ -275,7 +275,7 @@ def gruposgrupo_delete(request, categoria_padre=None, categoria_id=None, templat
 
 @login_required(login_url='/login/')
 def clientes_view(request, template_name='main/clientes/clientes/clientes.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
+    basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
@@ -320,7 +320,7 @@ def clientes_view(request, template_name='main/clientes/clientes/clientes.html')
 
 @login_required(login_url='/login/')
 def tipos_cliente_view(request, template_name='main/clientes/tipos_cliente/tipos_clientes.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
+    basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
@@ -428,7 +428,7 @@ def cliente_searchView(request, template_name='main/clientes/clientes/cliente_se
 
 @login_required(login_url='/login/')
 def lineas_articulos_view(request, template_name='punto_de_venta/articulos/lineas/lineas_articulos.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
+    basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
@@ -478,7 +478,7 @@ def linea_articulos_manageView(request, id = None, template_name='punto_de_venta
 
 @login_required(login_url='/login/')
 def grupos_lineas_view(request, template_name='punto_de_venta/articulos/grupos/grupos_lineas.html'):
-    basedatos_activa =  request.user.userprofile.basedatos_activa
+    basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
@@ -594,7 +594,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
 
 @login_required(login_url='/login/')
 def generar_polizas_View(request, template_name='punto_de_venta/herramientas/generar_polizas.html'):
-    connection_name = get_conecctionname(request.user.userprofile)
+    connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
@@ -730,7 +730,7 @@ def plantilla_poliza_manageView(request, id = None, template_name='punto_de_vent
 
 @login_required(login_url='/login/')
 def ventas_de_mostrador_view(request, template_name='punto_de_venta/documentos/ventas/ventas_de_mostrador.html'):
-    connection_name = get_conecctionname(request.user.userprofile)
+    connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
@@ -808,7 +808,7 @@ def venta_mostrador_manageView(request, id = None, template_name='punto_de_venta
 
 @login_required(login_url='/login/')
 def devoluciones_de_ventas_view(request, template_name='punto_de_venta/documentos/devoluciones/devoluciones_de_ventas.html'):
-    connection_name = get_conecctionname(request.user.userprofile)
+    connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 

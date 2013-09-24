@@ -58,12 +58,13 @@ def reiniciar_servidor(request):
 def inicializar_tablas(request):
     #ventas_inicializar_tablas()
     if request.user.is_superuser:
-        basedatos_activa = request.user.userprofile.basedatos_activa
+
+        basedatos_activa = request.session['selected_database']
         if basedatos_activa == '':
             return HttpResponseRedirect('/select_db/')
         else:
-            conexion_activa_id = request.user.userprofile.conexion_activa.id
-
+            conexion_activa_id = request.session['conexion_activa']
+            
         conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
         
         quitar = False

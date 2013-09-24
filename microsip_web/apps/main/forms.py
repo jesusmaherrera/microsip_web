@@ -15,5 +15,6 @@ class filtro_clientes_form(forms.Form):
     nombre  = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-medium', 'placeholder':'Filtro por nombre...'}),required=False)
 
 class ConexionManageForm(forms.ModelForm):
+    password =  forms.CharField(widget=forms.PasswordInput())
     class Meta:
         model = ConexionDB

@@ -70,14 +70,14 @@ class CustomAuthenticationForm(forms.Form):
                 usuario.save()
             
             #Se crea o se modifica perfil de usuario con conexion                
-            user_profile = UserProfile.objects.filter(usuario = usuario)
-            if conexion_db:
-                if user_profile.exists():
-                    user_profile.update(conexion_activa = conexion_db, basedatos_activa='')
-                else:
-                    UserProfile.objects.create(usuario= usuario, basedatos_activa='', conexion_activa= conexion_db)
-            elif usuario.username == 'SYSDBA' and not user_profile.exists():
-                UserProfile.objects.create(usuario= usuario, basedatos_activa='', conexion_activa=None)
+            # user_profile = UserProfile.objects.filter(usuario = usuario)
+            # if conexion_db:
+            #     if user_profile.exists():
+            #         user_profile.update(conexion_activa = conexion_db, basedatos_activa='')
+            #     else:
+            #         UserProfile.objects.create(usuario= usuario, basedatos_activa='', conexion_activa= conexion_db)
+            # elif usuario.username == 'SYSDBA' and not user_profile.exists():
+            #     UserProfile.objects.create(usuario= usuario, basedatos_activa='', conexion_activa=None)
 
 
         return cleaned_data
@@ -85,9 +85,14 @@ class CustomAuthenticationForm(forms.Form):
 class SelectDBForm(forms.Form):    
      def __init__(self,*args,**kwargs):
         usuario = kwargs.pop('usuario')
+        conexion_activa = kwargs.pop('conexion_activa')
         empresas = []
-        profile = UserProfile.objects.get(usuario=usuario)
-        if profile.conexion_activa:
+        if conexion_activa != '':
+            conexion_activa = ConexionDB.objects.get(pk=conexion_activa)
+        else:
+            conexion_activa = None
+
+        if conexion_activa:
             acceso_empresas = ''
             try:
                 acceso_empresas = Usuario.objects.get(nombre__exact=usuario.username).acceso_empresas
@@ -102,7 +107,7 @@ class SelectDBForm(forms.Form):
             elif acceso_empresas == 'L':
                 consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS_USUARIOS, EMPRESAS, USUARIOS WHERE USUARIOS.usuario_id = empresas_usuarios.usuario_id AND EMPRESAS.empresa_id = empresas_usuarios.empresa_id AND usuarios.nombre = '%s'"% usuario
             
-            db= fdb.connect(host=profile.conexion_activa.servidor, user= profile.conexion_activa.usuario, password=profile.conexion_activa.password, database="%s\System\CONFIG.FDB"%profile.conexion_activa.carpeta_datos)
+            db= fdb.connect(host=conexion_activa.servidor, user= conexion_activa.usuario, password=conexion_activa.password, database="%s\System\CONFIG.FDB"%conexion_activa.carpeta_datos)
             cur = db.cursor()
             cur.execute(consulta)
             empresas_rows = cur.fetchall()

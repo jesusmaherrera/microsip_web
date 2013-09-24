@@ -86,18 +86,21 @@ def ArticuloManageView(request, id, template_name='inventarios/articulos/articul
 
 @login_required(login_url='/login/')
 def select_db(request, template_name='main/select_db.html'):
-    form = SelectDBForm(request.POST or None, usuario= request.user )
+    form = SelectDBForm(request.POST or None, usuario= request.user, conexion_activa = request.session['conexion_activa'])
     message = ''
-    conexion_activa = request.user.userprofile.conexion_activa
+    conexion_activa = request.session['conexion_activa']
     
     if form.is_valid():
-        user_profile = UserProfile.objects.filter(usuario= request.user)
-        
         conexion = form.cleaned_data['conexion'].replace(' ','_')
-        user_profile.update(basedatos_activa = conexion)
+        request.session['selected_database'] = conexion
 
         return HttpResponseRedirect('/')
         call_command('runserver')
+    else:
+        request.session['selected_database'] = ''
+    
+    
+
     
     c =  {'form':form, 'message':message,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
@@ -111,6 +114,11 @@ def ingresar(request):
         
         if usuario.is_active:
             login(request, usuario)
+            conexion_db = request.POST['conexion_db']
+            request.session['conexion_activa'] = ''
+            if conexion_db != '':
+                request.session['conexion_activa'] = int(conexion_db)
+
             return HttpResponseRedirect('/select_db/')
         else:
             return render_to_response('noactivo.html', context_instance=RequestContext(request))
@@ -118,7 +126,12 @@ def ingresar(request):
     return render_to_response('main/login.html',{'form':formulario, 'message':message,}, context_instance=RequestContext(request))
 
 def logoutUser(request):
-    user_profile = UserProfile.objects.filter(usuario= request.user).update(basedatos_activa = "", conexion_activa= "")
+    try:
+        del request.session['selected_database']
+        del request.session['conexion_activa']
+    except KeyError:
+        pass
+    
     logout(request)
     return HttpResponseRedirect('/')
 
@@ -137,7 +150,7 @@ def c_get_next_key(connection_name = None ):
 @detect_mobile
 @login_required(login_url='/login/')
 def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisicos/inventarios_fisicos.html'):
-    connection_name = get_conecctionname(request.user.userprofile)
+    connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
     
@@ -165,7 +178,7 @@ def inventario_getnew_folio():
 @login_required(login_url='/login/')
 def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inventarios Fisicos/create_inventario_fisico_pa.html'):
     message = ''
-    connection_name = get_conecctionname(request.user.userprofile)
+    connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
@@ -199,14 +212,28 @@ def invetarioFisico_mobile_pa_manageView(request, id, template_name='inventarios
     c = {'detalleInvForm':detalleInvForm, 'InventarioFisico':InventarioFisico,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))    
 
+def invetarioFisico_mobile_series_manageView(request, id, no_series, template_name='inventarios/Inventarios Fisicos/inventario_fisico_mobile_ns.html'):
+    doc_det = DoctosInvfisDet.objects.filter(docto_invfis__id=21270, articulo__id=id)
+    
+    if doc_det.count() > 0:
+        articulos_discretos_actuales = DesgloseEnDiscretosInvfis.objects.filter(
+        docto_invfis_det=doc_det[0].id)
+
+    articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm, extra=int(no_series))
+    
+    articulos_discretos_formset = articulos_discretos_formset()
+
+    c = {'articulos_discretos_actuales':articulos_discretos_actuales, 'formset':articulos_discretos_formset, }
+    return render_to_response(template_name, c, context_instance=RequestContext(request))    
+
 @detect_mobile
 @login_required(login_url='/login/')
 def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa.html'):
-    basedatos_activa = request.user.userprofile.basedatos_activa
+    basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
     else:
-        conexion_activa_id = request.user.userprofile.conexion_activa.id
+        conexion_activa_id = request.session['conexion_activa']
 
     conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
 
@@ -217,6 +244,10 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
     movimiento = ''
 
     InventarioFisico = DoctosInvfis.objects.get(pk=id)
+    
+    if "Chrome" in request.META['HTTP_USER_AGENT']:
+       request.mobile = False
+
     if request.mobile:
         detallesInventario = []
     else:

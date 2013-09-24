@@ -1,0 +1,28 @@
+{% extends "base_mobile.html" %}
+{% block title %}Inventarios{% endblock %}
+
+<!-- CSS Code -->
+{% block modulestyle_css %}
+	
+{% endblock %}
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+{% block selected_module %}<a href="/inventarios/InventariosFisicos/"> <i class="msicon-inventarios"></i> <label class="small_screen"> Inventarios</label></a>{% endblock %}
+{% block btn_modulo_inventarios%}
+<li style='color: #555555; background-color: #e5e5e5;'><a href="/inventarios/InventariosFisicos/"> <i class="msicon-inventarios"></i> <label class='small_screen'> Inventarios</label></a> </li>
+{% endblock %}
+{% block breadcrumb %}{{ block.super }}{% endblock %}
+{% block tools-module %}
+<div class="navbar navbar-static">
+  <ul class="nav" role="navigation">
+    <li class="dropdown">
+      <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-barcode"></i> Articulos <b class="caret"></b></a>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+        <li><a tabindex="-1" href="/inventarios/articulos/"><i class="icon-barcode"></i> Articulos</a></li>
+      </ul>
+    </li>
+  </ul>
+</div>
+{% endblock %}
+{% block content %}
+{% endblock %}
