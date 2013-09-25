@@ -15,7 +15,8 @@ class MainRouter(object):
             model._meta.app_label == 'punto_de_venta' or model._meta.app_label == 'contabilidad':
 
             from middleware import my_local_global
-            return '%02d-%s'% (my_local_global.conexion_activa ,my_local_global.database_name)
+            if my_local_global.conexion_activa != None  and my_local_global.database_name != None:
+                return '%02d-%s'% (my_local_global.conexion_activa ,my_local_global.database_name)
 
         return None
 

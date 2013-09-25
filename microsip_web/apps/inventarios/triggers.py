@@ -305,6 +305,7 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'] = '''
     declare variable articulo_discreto_id integer;
     declare variable docto_invfis_fecha date;
     declare variable docto_in_fecha date;
+    declare variable existe integer;
 
     begin
 
@@ -321,7 +322,7 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'] = '''
 
         if (not invfis_id is null and docto_in_fecha >= docto_invfis_fecha) then
         begin
-
+            existe = 0;
             for
                 select doctos_invfis_det.docto_invfis_det_id, doctos_invfis_det.articulo_id, doctos_invfis_det.unidades
                 from doctos_invfis_det, articulos
@@ -334,6 +335,7 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'] = '''
 
                 if (articulo_id = old.articulo_id and old.tipo_movto = 'E') then
                 begin
+                existe = 1;
                     cantidad_articulos = cantidad_articulos - old.unidades;
 
                     /*Eliminar desgloses de inventario fisico*/
@@ -348,6 +350,7 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'] = '''
                 end
                 else if (articulo_id = old.articulo_id and old.tipo_movto = 'S') then
                 begin
+                existe = 1;
                     cantidad_articulos = cantidad_articulos + old.unidades;
 
                     for select desglose_en_discretos.art_discreto_id
@@ -366,6 +369,10 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'] = '''
                 update doctos_invfis_det set unidades= :cantidad_articulos where docto_invfis_det_id = :invfis_det_id;
 
             end
+
+            if (existe = 0) then
+                insert into doctos_invfis_det (docto_invfis_det_id, docto_invfis_id, clave_articulo, articulo_id, unidades)
+                        values(-1, :invfis_id, old.clave_articulo, old.articulo_id, old.unidades);
         end
     end
     '''
