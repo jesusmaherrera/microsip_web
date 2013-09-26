@@ -134,6 +134,7 @@ Desktop.ini
 *.py[co]
 microsip_web/settings/local_settings.py
 microsip_web/data/USERS.sqlite
+microsip_web/data/LOGIN.FDB
 # Packages
 *.egg
 *.egg-info
