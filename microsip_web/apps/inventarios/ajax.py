@@ -76,15 +76,17 @@ def add_aticulosinventario(request, inventario_id, articulo_id, unidades, ubicac
 @dajaxice_register(method='GET')
 def get_articulosen_inventario(request, inventario_id, articulo_id):
     detalle_modificaciones = ''
+    articulo_seguimiento = ''
     try:
         doc = DoctosInvfisDet.objects.get(docto_invfis__id=inventario_id, articulo_id=articulo_id)
         unidades = doc.unidades
         detalle_modificaciones = doc.detalle_modificaciones
+        articulo_seguimiento = doc.articulo.seguimiento
     except ObjectDoesNotExist:
         unidades = 0
     #se devuelven las ciudades en formato json, solo nos interesa obtener como json
     #el id y el nombre de las ciudades.
-    return simplejson.dumps({'unidades':str(unidades), 'detalle_modificaciones':detalle_modificaciones, })
+    return simplejson.dumps({'unidades':str(unidades), 'detalle_modificaciones':detalle_modificaciones, 'articulo_seguimiento':articulo_seguimiento,})
 
 @dajaxice_register(method='GET')
 def get_articulo_by_clave(request, clave):

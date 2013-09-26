@@ -14,7 +14,10 @@
 function enviar_unidades()
 {
   if ( $("#id_seguimiento").val() == 'S')
-    window.location.href = "/inventarios/inventarioFisico_mobile/articulo_serie/" + $('#id_articulo option:selected').val() + "/" + $("#id_unidades").val() + "/";
+  {
+    alert("La aplicacion no esta preparada para trabajar con articulos de lotes");
+    // window.location.href = "/inventarios/inventarioFisico_mobile/articulo_serie/" + $('#id_articulo option:selected').val() + "/" + $("#id_unidades").val() + "/";
+  }
   else
   {
     if ($('#id_ubicacion').val() != '' &&  $('#id_unidades').val() != '')
@@ -131,18 +134,25 @@ function mostrar_articulo(data){
 
 function mostrar_unidades(data) 
 {
-
-  if (data.unidades > 0 )
+  if ( data.articulo_seguimiento == "S" || data.articulo_seguimiento == "L"  || data.articulo_seguimiento == "" )
   {
-    $('#span_alerta_unidades').html(' Ya existen '+ data.unidades + ' en inventario.');
-    alert(' Ya existen '+ data.unidades + ' en inventario.\n Detalles:\n '+ data.detalle_modificaciones );
-  }
-  else
-    $('#span_alerta_unidades').html('');
+    alert("ARTICULOS TIPO [LOTE Ó SERIE] NO SOPORTADO POR APLICACION MOBIL");
+    limpiarForm();
+  }  
+  else if ( data.articulo_seguimiento == "N" )
+  {
+    if (data.unidades > 0 )
+    {
+      $('#span_alerta_unidades').html(' Ya existen '+ data.unidades + ' en inventario.');
+      alert(' Ya existen '+ data.unidades + ' en inventario.\n Detalles:\n '+ data.detalle_modificaciones );
+    }
+    else
+      $('#span_alerta_unidades').html('');
 
-  $("#cancelar_btn, #id_unidades, .span_unidades").show();
-  $("#buscar_btn").hide()
-  $("#id_unidades").focus();
+    $("#cancelar_btn, #id_unidades, .span_unidades").show();
+    $("#buscar_btn").hide()
+    $("#id_unidades").focus();
+  }
 }
 
 function deselecionarArticulo()
