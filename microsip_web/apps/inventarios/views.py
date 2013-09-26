@@ -65,9 +65,21 @@ def ArticuloManageView(request, id, template_name='inventarios/articulos/articul
     #Si los datos de los formularios son correctos
     if articulo_form.is_valid() and precio_articulo_form.is_valid() and impuesto_articulo_form.is_valid() and clave_articulo_form.is_valid():
         articulo_form.save()
-        precio_articulo_form.save()
+        
+        precio_form = precio_articulo_form.save(commit=False)
+        if not precio_form.id:
+            precio_form.id = -1
+            precio_form.articulo = articulo
+            precio_form.save()
+
         impuesto_articulo_form.save()
-        clave_articulo_form.save()
+        
+        clave_articulo_form = clave_articulo_form.save(commit=False)
+        if not clave_articulo_form.id:
+            clave_articulo_form.id = -1
+            clave_articulo_form.articulo = articulo
+            clave_articulo_form.save()
+
         return HttpResponseRedirect('/inventarios/articulos/')
 
     c = {
@@ -370,7 +382,14 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                             detalleInv.usuario_ult_modif = request.user.username
                             if detalleInv.detalle_modificaciones == None:
                                 detalleInv.detalle_modificaciones = ''
-                            detalleInv.detalle_modificaciones += '[%s/%s=%s],'%(request.user.username, ubicacion_form.cleaned_data['ubicacion'], detalleInvForm.cleaned_data['unidades'])
+                            nuevo_texto = detalleInv.detalle_modificaciones + '[%s/%s=%s],'%(request.user.username, ubicacion_form.cleaned_data['ubicacion'], detalleInvForm.cleaned_data['unidades'])
+                            tamano_detalles = len(nuevo_texto)
+                            
+                            if tamano_detalles < 400:
+                                detalleInv.detalle_modificaciones = nuevo_texto
+                            else:
+                                message = "El numero de caracteres para detalles del articulo fue excedido"
+
                             detalleInv.save()
 
                         return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s/'% id)

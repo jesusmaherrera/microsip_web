@@ -26,6 +26,12 @@ def add_aticulosinventario(request, inventario_id, articulo_id, unidades, ubicac
     error = 0
     inicio_form = False
     movimiento = ''
+    
+    articulo_clave = ''
+    articulos_claves =ClavesArticulos.objects.filter(articulo__id= articulo_id)
+    if articulos_claves.count() > 0:
+        articulo_clave = articulos_claves[0].clave
+
     try:
         doc = DoctosInvfisDet.objects.get(docto_invfis__id=inventario_id, articulo__id=articulo_id)
         str_unidades = unidades
@@ -38,18 +44,13 @@ def add_aticulosinventario(request, inventario_id, articulo_id, unidades, ubicac
         movimiento = 'actualizar'
     except:
         if unidades >= 0:
-            articulos_claves =ClavesArticulos.objects.filter(articulo__id= articulo_id)
-            if articulos_claves.count() < 1:
-                articulo_clave = ''
-            else:
-                articulo_clave = articulos_claves[0].clave
-
             movimiento = 'crear'
 
     if movimiento == 'crear':
         DoctosInvfisDet.objects.create(
             id = next_id('ID_DOCTOS', conexion_name),
             docto_invfis = DoctosInvfis.objects.get(pk=inventario_id),
+            clave = articulo_clave,
             unidades = unidades, 
             articulo = Articulos.objects.get(pk=articulo_id),
             usuario_ult_modif = request.user.username,
@@ -58,6 +59,7 @@ def add_aticulosinventario(request, inventario_id, articulo_id, unidades, ubicac
     elif movimiento == 'actualizar':
         doc.fechahora_ult_modif = datetime.now()
         doc.unidades = unidades
+        doc.clave = articulo_clave
         doc.usuario_ult_modif = request.user.username
         if doc.detalle_modificaciones == None:
             doc.detalle_modificaciones = ''
@@ -65,6 +67,8 @@ def add_aticulosinventario(request, inventario_id, articulo_id, unidades, ubicac
     
         if  tamano_detalles  < 400:
             doc.detalle_modificaciones += '[%s/%s=%s],'%(request.user.username, ubicacion, str_unidades)
+        else:
+            message = "El numero de caracteres para detalles del articulo fue excedido"
         doc.save()
 
     return simplejson.dumps({'message':'exito'})
