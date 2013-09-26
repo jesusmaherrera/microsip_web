@@ -12,6 +12,12 @@ from microsip_web.libs.custom_db.main import next_id
 from microsip_web.libs.tools import split_seq
 
 @dajaxice_register(method='GET')
+def get_detallesArticuloenInventario(request, detalle_invfis_id):
+    detalle_doc = DoctosInvfisDet.objects.get(pk=detalle_invfis_id)
+    detalle = detalle_doc.detalle_modificacionestime
+    return simplejson.dumps({'detalle':detalle,})
+
+@dajaxice_register(method='GET')
 def add_aticulosinventario(request, inventario_id, articulo_id, unidades, ubicacion):
     basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
@@ -63,12 +69,18 @@ def add_aticulosinventario(request, inventario_id, articulo_id, unidades, ubicac
         doc.usuario_ult_modif = request.user.username
         if doc.detalle_modificaciones == None:
             doc.detalle_modificaciones = ''
+        if doc.detalle_modificacionestime == None:
+            doc.detalle_modificacionestime = ''
+
         tamano_detalles = len(doc.detalle_modificaciones + '[%s/%s=%s],'%(request.user.username, ubicacion, str_unidades))
     
         if  tamano_detalles  < 400:
             doc.detalle_modificaciones += '[%s/%s=%s],'%(request.user.username, ubicacion, str_unidades)
         else:
             message = "El numero de caracteres para detalles del articulo fue excedido"
+
+        doc.detalle_modificacionestime += '[%s/%s=%s](%s),'%(request.user.username, ubicacion, str_unidades, datetime.now().strftime("%d-%m-%Y %H:%M"))
+
         doc.save()
 
     return simplejson.dumps({'message':'exito'})
