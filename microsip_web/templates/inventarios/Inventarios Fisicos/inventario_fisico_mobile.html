@@ -13,12 +13,7 @@
 <script type="text/javascript">  
 function enviar_unidades()
 {
-  if ( $("#id_seguimiento").val() == 'S')
-  {
-    alert("La aplicacion no esta preparada para trabajar con articulos de lotes");
-    // window.location.href = "/inventarios/inventarioFisico_mobile/articulo_serie/" + $('#id_articulo option:selected').val() + "/" + $("#id_unidades").val() + "/";
-  }
-  else
+  if ( $("#id_seguimiento").val() == 'N')
   {
     if ($('#id_ubicacion').val() != '' &&  $('#id_unidades').val() != '')
     { 
@@ -33,6 +28,12 @@ function enviar_unidades()
         alert("Por favor indica la cantidad de articulos");
     }
   }
+  else
+  {
+    alert("La aplicacion no esta preparada para trabajar con articulos de lotes");
+    // window.location.href = "/inventarios/inventarioFisico_mobile/articulo_serie/" + $('#id_articulo option:selected').val() + "/" + $("#id_unidades").val() + "/";
+  }
+  
 }
 
 function limpiarForm()
@@ -43,7 +44,7 @@ function limpiarForm()
   $(".span_unidades, #cancelar_btn").hide();
   if ($("#chbx_modorapido").is(':checked'))
   {
-    $(".span_articulo").hide();
+    $(".span_articulo, #span_nombre_articulo").hide();
     $(".span_clave").show();
     $("#id_clave").focus();
   }
@@ -53,7 +54,7 @@ function limpiarForm()
       deselecionarArticulo();
 
     $(".span_clave").hide();
-    $(".span_articulo, #id_articulo_text").show();
+    $(".span_articulo, #id_articulo_text, #span_nombre_articulo").show();
     $("#id_articulo-text").focus();
   }
 }
@@ -105,11 +106,10 @@ function buscar_clave()
   {
     Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});    
   }
+
 }
 
 function mostrar_articulo(data){
-  $("#id_seguimiento").val(data.articulo_seguimiento);
-  
   if (data.articulo_id != 0)
   {
     $('#id_articulo-deck').attr('style','');
@@ -134,7 +134,8 @@ function mostrar_articulo(data){
 
 function mostrar_unidades(data) 
 {
-  if ( data.articulo_seguimiento == "S" || data.articulo_seguimiento == "L"  || data.articulo_seguimiento == "" )
+  var articulo_seguimiento = $("#id_seguimiento").val(data.articulo_seguimiento);
+  if ( articulo_seguimiento == "S" || articulo_seguimiento == "L"  || articulo_seguimiento == "" )
   {
     alert("ARTICULOS TIPO [LOTE Ó SERIE] NO SOPORTADO POR APLICACION MOBIL");
     limpiarForm();
@@ -168,8 +169,7 @@ function deselecionarArticulo()
 
 $(document).ready(function(){
 
-  
-
+  $("#id_articulo_text").before("<span class='add-on' id='span_nombre_articulo' >Nombre</span>")
   $("#chbx_modorapido").attr('checked', true);
   limpiarForm();
 
@@ -198,9 +198,15 @@ $(document).ready(function(){
 
   $("#id_articulo").change(function(){
     if ($("#id_articulo").children().length > 0)
+    {
       Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});
+      $("#span_nombre_articulo").hide();
+    }
     else
+    {
+      $("#span_nombre_articulo").show();
       $('#span_alerta_unidades').html('');
+    }
 
     
   });
@@ -253,7 +259,7 @@ $(document).ready(function(){
   {{ detalleInvForm.errors }}
   <div class="span span_clave" >
     <div class="input-prepend input-append">
-      <span class="add-on ">#</span>
+      <span class="add-on ">Clave</span>
       {{ detalleInvForm.clave }}
     </div>
   </div>
@@ -267,7 +273,7 @@ $(document).ready(function(){
   <div class="span1 span_unidades" >
     <div class="input-prepend input-append">
       {{ detalleInvForm.unidades }}
-      <a class="btn btn-success " id="enviar_btn" onclick="enviar_unidades()" href="#">Enviar</a>
+      <a class="btn btn-success " id="enviar_btn" onclick="this.disabled=true, enviar_unidades(), this.value='Enviando...';" href="#">Enviar</a>
     </div>
   </div>
   <br>
