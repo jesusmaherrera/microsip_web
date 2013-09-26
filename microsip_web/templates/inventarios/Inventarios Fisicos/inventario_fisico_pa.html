@@ -48,6 +48,9 @@
   
   $(document).ready(function(){
     
+    $(".btn-info-inventario").on("click", function(){
+      Dajaxice.microsip_web.apps.inventarios.get_detallesArticuloenInventario(mostrar_detalle,{'detalle_invfis_id': $(this).parent().find("input[name='detalle_id']").val(),});
+    });
 
     $('#id_unidades, #id_articulo_text').focus(function() { 
       setTimeout(function(){
@@ -129,6 +132,11 @@
         $("#myModal input").first().focus();
     {% endif %}
   });
+
+  function mostrar_detalle(data)
+  {
+    alert(data.detalle);
+  }
 
   function mostrar_articulo(data){
     if (data.articulo_id != 0)
@@ -351,12 +359,14 @@
       <th class="hidden-phone">Clave</th>
       <th>Articulo</th>
       <th>Unidades</th>
+      <th></th>
     </tr>
     {% for detalle in detallesInventario %}
     <tr>
       <td class="hidden-phone"> {{ detalle.clave }} </td>
       <td> {{ detalle.articulo }} </td>
       <td> {{ detalle.unidades }} </td>
+      <td> <input type="hidden" name="detalle_id" value="{{ detalle.id }}"> <a href="#" class='btn btn-mini btn-info-inventario'> <i class="icon-info-sign"></i> </a> </td>
     </tr>
     {% endfor %}
   </table>

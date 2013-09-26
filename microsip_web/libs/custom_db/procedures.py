@@ -23,6 +23,11 @@ procedures['SIC_DOCTOINVFISDET_AT'] = '''
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'DOCTOS_INVFIS_DET' and rf.RDB$FIELD_NAME = 'SIC_DETALLE_MODIFICACIONES')) then
             execute statement 'ALTER TABLE DOCTOS_INVFIS_DET ADD SIC_DETALLE_MODIFICACIONES VARCHAR(400)';
+
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'DOCTOS_INVFIS_DET' and rf.RDB$FIELD_NAME = 'SIC_DETALLETIME_MODIFICACIONES')) then
+            execute statement 'ALTER TABLE DOCTOS_INVFIS_DET ADD SIC_DETALLETIME_MODIFICACIONES MEMO';
     END  
     '''
 

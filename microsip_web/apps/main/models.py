@@ -552,6 +552,7 @@ class DoctosInvfisDet(models.Model):
     fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='SIC_FECHAHORA_U')
     usuario_ult_modif = models.CharField(blank=True, null=True, max_length=31, db_column='SIC_USUARIO_ULT_MODIF')
     detalle_modificaciones = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLE_MODIFICACIONES')
+    detalle_modificacionestime = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLETIME_MODIFICACIONES')
 
     class Meta:
         db_table = u'doctos_invfis_det'
