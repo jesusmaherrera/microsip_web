@@ -109,8 +109,7 @@ function load_localstorage()
   });
 }
 
-function buscar_articulo()
-{
+function buscar_articulo(){
   if($(".span_articulo").is(":hidden"))
   {
     if($("#id_clave").val() != '')
@@ -146,6 +145,7 @@ function mostrar_articulo(data){
 
 function mostrar_unidades(data) 
 {
+
   $("#buscar_btn, #span_nombre_articulo").hide();
   var articulo_seguimiento = $("#id_seguimiento").val(data.articulo_seguimiento);
   if ( articulo_seguimiento == "S" || articulo_seguimiento == "L"  || articulo_seguimiento == "" )
@@ -153,7 +153,8 @@ function mostrar_unidades(data)
     alert("ARTICULOS TIPO [LOTE Ó SERIE] NO SOPORTADO POR APLICACION MOBIL");
     limpiarForm();
   }  
-  else if ( data.articulo_seguimiento == "N" )
+  
+  if ( data.articulo_seguimiento == "N" )
   {
     $("#enviar_btn").attr("disabled",false);
     $("#enviar_btn").text("Enviar");
@@ -275,11 +276,11 @@ $(document).ready(function(){
   <div class="span1 span_unidades" >
     <div class="input-prepend input-append">
       {{ detalleInvForm.unidades }}
-      <a class="btn btn-success " id="enviar_btn" onclick="enviar_unidades()" href="#">Enviar</a>
+      <a class="btn btn-success " id="enviar_btn" onclick="enviar_unidades();" href="#">Enviar</a>
     </div>
   </div>
   <br>
-  <a id="cancelar_btn" class= "btn btn-danger span12 " href="#" onclick="limpiarForm()" >Cancelar</a>
+  <a id="cancelar_btn" class= "btn btn-danger span12 " href="#" onclick="limpiarForm();" >Cancelar</a>
   <br style='clear:both;'>
 </form>
 

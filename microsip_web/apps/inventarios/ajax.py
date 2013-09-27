@@ -96,6 +96,7 @@ def get_articulosen_inventario(request, inventario_id, articulo_id):
         articulo_seguimiento = doc.articulo.seguimiento
     except ObjectDoesNotExist:
         unidades = 0
+        articulo_seguimiento = Articulos.objects.get(pk=articulo_id).seguimiento
     #se devuelven las ciudades en formato json, solo nos interesa obtener como json
     #el id y el nombre de las ciudades.
     return simplejson.dumps({'unidades':str(unidades), 'detalle_modificaciones':detalle_modificaciones, 'articulo_seguimiento':articulo_seguimiento,})
