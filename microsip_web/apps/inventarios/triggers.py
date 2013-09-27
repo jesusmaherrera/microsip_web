@@ -287,8 +287,8 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'] = '''
             else
             begin
                 if (NEW.tipo_movto = 'E') then
-                    insert into doctos_invfis_det (docto_invfis_det_id, docto_invfis_id, clave_articulo, articulo_id, unidades, SIC_USUARIO_ULT_MODIF)
-                        values(-1, :invfis_id, new.clave_articulo, new.articulo_id, new.unidades, '');
+                    insert into doctos_invfis_det (docto_invfis_det_id, docto_invfis_id, clave_articulo, articulo_id, unidades)
+                        values(-1, :invfis_id, new.clave_articulo, new.articulo_id, new.unidades);
             end
         end
     end
