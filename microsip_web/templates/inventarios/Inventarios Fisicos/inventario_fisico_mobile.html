@@ -186,8 +186,7 @@ function deselecionarArticulo()
 $(document).ready(function(){
   
   $("#id_articulo_text").before("<span class='add-on' id='span_nombre_articulo'>Nombre</span>")
-  $("#chbx_modorapido").attr('checked', true);
-  limpiarForm();
+  
 
   // $('#id_unidades, #id_articulo_text').focus(function() { 
   //   setTimeout(function(){
@@ -198,15 +197,20 @@ $(document).ready(function(){
   if (Modernizr.localstorage) {
     /* LOCAL STORAGE */
     load_localstorage();
-  } else {
-    $("#id_clave").on("keypress",function(){
-      buscar_articulo();
-    });
-
-    $("#id_unidades").on("keypress",function(){
-      enviar_unidades();
-    });
   }
+  else
+    $("#chbx_modorapido").attr('checked', true);
+  
+  limpiarForm();
+  // } else {
+  //   $("#id_clave").on("keypress",function(){
+  //     buscar_articulo();
+  //   });
+
+  //   $("#id_unidades").on("keypress",function(){
+  //     enviar_unidades();
+  //   });
+  // }
   
   //Busacar articulo por clave al precionar enter
   $('#id_clave').on( "keydown", function(e) { 

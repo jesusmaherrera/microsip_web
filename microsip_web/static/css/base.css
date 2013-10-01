@@ -205,10 +205,10 @@ right: 30px; /* Distancia desde la derecha */
 }
 
 #IrArriba span {
-width: 60px; /* Ancho del botón */
-height: 60px; /* Alto del botón */
-display: block;
-background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAAAACPI/ojfEGiaNmGw/s60/flecha-arriba.png) no-repeat center center;
+  width: 60px; /* Ancho del botón */
+  height: 60px; /* Alto del botón */
+  display: block;
+  background: url(../img/flecha-arriba.png) no-repeat center center;
 }
 
 .label_min 
@@ -236,4 +236,9 @@ background: url(http://lh5.googleusercontent.com/-luDGEoQ_WZE/T1Ak-gta5MI/AAAAAA
   {
     display: inline-block ;
   } 
+
+  td 
+  {
+    line-height: 3em;
+  }
 }

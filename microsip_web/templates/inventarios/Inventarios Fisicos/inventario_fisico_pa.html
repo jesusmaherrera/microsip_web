@@ -86,7 +86,6 @@
     });
 
 
-
     $('#id_clave').live('keydown', function(e) { 
       var keyCode = e.keyCode || e.which; 
 
@@ -155,7 +154,31 @@
       $('#id_articulo-deck').html('');
       $('#id_articulo').html('');
       $('#id_articulo_text').show(); 
-      alert('No existe ningun articulo con la clave ['+ $("#id_clave").val() +']');
+
+      var opciones = data.opciones
+      var html_var = "<table><tr><th>Clave</th><th>Articulo</td><tr/>"
+      var no_opciones = 0
+      for (art in opciones)
+      { 
+        no_opciones = no_opciones +  1;
+        html_var = html_var + "<tr><td><a href='#' class='clave_link'>" + art + "</a></td>" + "<td>" + opciones[art] + "</td></tr>"
+      }
+
+      html_var = html_var + "</table>"
+      if (no_opciones > 0)
+      {
+        $("#modal_opciones-claves > .modal-body").html(html_var);
+        $(".clave_link").on("click",function(){
+          $("#id_clave").val($(this).text());
+          $("#modal_opciones-claves").modal("hide");
+          Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_clave').val(),});
+        });
+
+        $("#modal_opciones-claves").modal();
+      }
+      else
+        alert('No existe ningun articulo con la clave ['+ $("#id_clave").val() +']');
+      
       $("#id_clave").focus();
       $("#id_clave").select();
 
@@ -186,7 +209,12 @@
       $("#id_unidades").val('');
       $(".span_clave").show();
       $(".span_articulo").hide();
-      $("#id_unidades").focus();
+      
+      $("#id_clave").val(""); 
+      if(localStorage.getItem("modo_rapido") == 'true')
+        $("#id_clave").focus();
+      else
+        $("#id_articulo_text").focus();
     });
 
   }
@@ -265,6 +293,16 @@
     <div class="modal-footer">
       <button class="btn" id='btnCancel' data-dismiss="modal">Cancelar</button>
       <a class='btn' href="#" onclick="agregar_articulos_porlineafn();" id='id_agregar_articulos_porlinea'>Aceptar</a>
+    </div>
+  </div>
+
+  <div id="modal_opciones-claves" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3 id="myModalLabel">Claves</h3>
+    </div>
+    <div class="modal-body">
+      
     </div>
   </div>
 

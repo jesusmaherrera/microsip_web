@@ -120,6 +120,7 @@ def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punt
         extend = 'punto_de_venta/base.html'
     elif '/inventarios/articulos/' in PATH:
         extend = 'inventarios/base.html'
+        url_articulo = '/inventarios/articulo/'
 
     paginator = Paginator(articulos_list, articulos_porpagina) # Muestra 10 ventas por pagina
     page = request.GET.get('page')

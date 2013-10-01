@@ -8,53 +8,101 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}
+<script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script type="text/javascript">
+  $(function() {
+    $('#id_claves tbody tr').formset({
+      prefix: '{{ formset.prefix }}',
+      addCssClass:'btn btn-success',
+      addText:'Nuevo Campo',
+      deleteText:'',
+    });
+  });
+  $(function() {
+    $('#id_precios tbody tr').formset({
+      prefix: '{{ formset.prefix }}',
+      addCssClass:'btn btn-success',
+      addText:'Nuevo Precio',
+      deleteText:'',
+    });
+  });
+</script>
 {% endblock %}
 {% block breadcrumb %}{% endblock %}
 {% block content %}
-<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
-  {% csrf_token %}
-  <fieldset>
-    {{ clave_articulo_form.errors }}
-    <legend>Clave:</legend>
-    {{ clave_articulo_form.rol }}
-    {{ clave_articulo_form.clave }}
-  </fieldset>
-  <fieldset>
-    {{articulo_form.errors }}
-    <legend>Datos generales:</legend>
-    <label>Nombre</label>
-    {{articulo_form.nombre }}
-    <label>Linea</label>
-    {{articulo_form.linea }}
-    <br>
-    <div class="input-prepend input-append mobile_inputdata">
-      <span class="add-on ">Unid vta</span>
-      {{articulo_form.unidad_venta}}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+
+<div class="form-actions" style="padding-left:0em;">
+  <ul id="myTab" class="nav nav-tabs ">
+    <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+    <li class=""><a href="#ventas" data-toggle="tab">Ventas</a></li>
+  </ul>
+  <div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="general">
+      {{articulo_form.errors }}
+      <label>Claves</label>
+      <table class="table" id="id_claves" border="0" cellpadding="0" cellspacing="5">
+          <tbody>
+            {% for form in formset.forms %}
+            <tr id="{{ form.prefix }}-row" class="form-container">
+             {% for hid in form.hidden_fields %} {{hid}}{% endfor %} 
+             {{ form.errors }}
+             <td>{{ form.rol }}</td>
+             <td>{{ form.clave }}
+             {% if form.instance.pk %}{{ form.DELETE }}{% endif %}</td>
+            </tr>
+            {% endfor %}
+         </tbody>
+       </table>
+      {{ formset.management_form }}
+      <br>
+      <label>Nombre</label>
+      {{articulo_form.nombre }}
+      <label>Linea</label>
+      {{articulo_form.linea }}
+      <br>
+      <div class="input-prepend input-append mobile_inputdata">
+        <span class="add-on ">Unid vta</span>
+        {{articulo_form.unidad_venta}}
+      </div>
+      <br>
+      <div class="input-prepend input-append mobile_inputdata">
+        <span class="add-on ">Unid com</span>
+        {{articulo_form.unidad_compra }}
+      </div>
     </div>
-    <br>
-    <div class="input-prepend input-append mobile_inputdata">
-      <span class="add-on ">Unid com</span>
-      {{articulo_form.unidad_compra }}
+    <div class="tab-pane fade" id="ventas">
+      <fieldset>
+        {{ impuesto_articulo_form.errors }}
+        <legend>Precio</legend>
+        <table class="table" id="id_precios" border="0" cellpadding="0" cellspacing="5">
+          <tbody>
+            {% for form in precios_formset.forms %}
+            <tr id="{{ form.prefix }}-row" class="form-container">
+             <td>
+             {% for hid in form.hidden_fields %} {{hid}}{% endfor %} 
+             {{ form.errors }}
+             {{ form.precio_empresa }}
+             {{ form.precio }}
+             {{ form.moneda }}
+             {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+             </td>
+            </tr>
+            {% endfor %}
+         </tbody>
+       </table>
+      {{ precios_formset.management_form }}
+        <div class="input-prepend input-append mobile_inputdata">
+          <span class="add-on ">Impuesto</span>
+          {{ impuesto_articulo_form.impuesto }}      
+        </div>
+      </fieldset>   
     </div>
-  </fieldset>
-  <fieldset>
-    {{ precio_articulo_form.errors }}
-    {{ impuesto_articulo_form.errors }}
-    <legend>Precio:</legend>
-    {{ precio_articulo_form.precio_empresa }}
-    <div class="input-prepend input-append mobile_inputdata">
-      <span class="add-on">Precio</span>
-      {{ precio_articulo_form.precio }}
-    </div>
-    <div class="input-prepend input-append mobile_inputdata">
-      <span class="add-on ">Moneda</span>
-      {{ precio_articulo_form.moneda }}
-    </div>
-    <div class="input-prepend input-append mobile_inputdata">
-      <span class="add-on ">Impuesto</span>
-      {{ impuesto_articulo_form.impuesto }}      
-    </div>
-  </fieldset>
+  </div>
+</div>
+
+  
+  
   <br>
   <div class="input-prepend input-append mobile_inputdata">
       <a class="btn btn-danger" href="/inventarios/articulos/">Cancelar</a>

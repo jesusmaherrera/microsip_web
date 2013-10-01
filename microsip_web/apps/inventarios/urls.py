@@ -18,6 +18,8 @@ urlpatterns = patterns('',
     (r'^inventarioFisico_mobile/articulo_serie/(?P<id>\d+)/(?P<no_series>\d+)/', views.invetarioFisico_mobile_series_manageView),
 
     (r'^articulos/$', pv_views.articulos_view),
+
+    (r'^articulo/(?P<id>\d+)/', pv_views.articulo_manageView),
     #(r'^InventarioFisico/Delete/(?P<id>\d+)/', views.invetarioFisico_delete),
     #ENTRADAS
     # (r'^Entradas/$', views.entradas_View),

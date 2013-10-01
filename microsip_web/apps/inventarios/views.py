@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.forms.formsets import formset_factory, BaseFormSet
 from django.forms.models import inlineformset_factory
+from django.forms.models import modelformset_factory
 
 #Paginacion
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -38,18 +39,8 @@ from microsip_web.libs.custom_db.main import get_conecctionname
 def ArticuloManageView(request, id, template_name='inventarios/articulos/articulo_mobile.html'):
     articulo = get_object_or_404(Articulos, pk=id)
 
-    #Claves articulo
-    claves_articulo = ClavesArticulos.objects.filter(articulo=articulo)
-    if claves_articulo.count() > 0:
-        clave_articulo = claves_articulo[0]
-    else:
-        clave_articulo = ClavesArticulos()
-
-    precios_articulo = PrecioArticulo.objects.filter(articulo=articulo)
-    if precios_articulo.count() > 0:
-        precio_articulo = precios_articulo[0]
-    else:
-        precio_articulo = PrecioArticulo()
+    clavesarticulos_fromset = modelformset_factory(ClavesArticulos, form= claves_articulos_form, can_delete=True,)
+    preciosarticulos_fromset = modelformset_factory(PrecioArticulo, form= precios_articulos_form, can_delete=True,)
 
     impuestos_articulo = ImpuestosArticulo.objects.filter(articulo=articulo)
     if impuestos_articulo.count() > 0:
@@ -57,36 +48,48 @@ def ArticuloManageView(request, id, template_name='inventarios/articulos/articul
     else:
         impuesto_articulo = ImpuestosArticulo()
     
-    clave_articulo_form = claves_articulos_form(request.POST or None, instance=clave_articulo)
+    if request.method == 'POST':
+        formset = clavesarticulos_fromset(request.POST, prefix="formset")
+        precios_formset = preciosarticulos_fromset(request.POST, prefix="precios_formset")
+    else:
+        formset = clavesarticulos_fromset(queryset=ClavesArticulos.objects.filter(articulo=articulo), prefix="formset")
+        precios_formset = preciosarticulos_fromset(queryset=PrecioArticulo.objects.filter(articulo=articulo), prefix="precios_formset")
+
     articulo_form = articulos_form(request.POST or None, instance= articulo)
-    precio_articulo_form = precios_articulos_form(request.POST or None, instance=precio_articulo)
+    # precio_articulo_form = precios_articulos_form(request.POST or None, instance=precio_articulo)
     impuesto_articulo_form = impuestos_articulos_form(request.POST or None, instance=impuesto_articulo)
 
     #Si los datos de los formularios son correctos
-    if articulo_form.is_valid() and precio_articulo_form.is_valid() and impuesto_articulo_form.is_valid() and clave_articulo_form.is_valid():
+    if articulo_form.is_valid()  and impuesto_articulo_form.is_valid() and formset.is_valid(): #and #precios_formset.is_valid()
         articulo_form.save()
-        
-        precio_form = precio_articulo_form.save(commit=False)
-        if not precio_form.id:
-            precio_form.id = -1
-            precio_form.articulo = articulo
-            precio_form.save()
+
+        for form in formset :
+            clave = form.save(commit = False)
+            #PARA CREAR UNO NUEVO
+            if not clave.id:
+                clave.id = -1
+                clave.articulo = articulo
+
+        formset.save()
+
+        for form in precios_formset :
+            precio = form.save(commit = False)
+            #PARA CREAR UNO NUEVO
+            if not precio.id:
+                precio.id = -1
+                precio.articulo = articulo
+
+        precios_formset.save()
 
         impuesto_articulo_form.save()
-        
-        clave_articulo_form = clave_articulo_form.save(commit=False)
-        if not clave_articulo_form.id:
-            clave_articulo_form.id = -1
-            clave_articulo_form.articulo = articulo
-            clave_articulo_form.save()
 
         return HttpResponseRedirect('/inventarios/articulos/')
 
     c = {
-        'clave_articulo_form': clave_articulo_form,
         'articulo_form':articulo_form,
-        'precio_articulo_form':precio_articulo_form,
+        'precios_formset':precios_formset,
         'impuesto_articulo_form':impuesto_articulo_form,
+        'formset':formset,
     } 
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
@@ -120,6 +123,9 @@ def select_db(request, template_name='main/select_db.html'):
 def ingresar(request):
     message = ''
     formulario = CustomAuthenticationForm(request.POST or None)
+    
+    if request.user.is_authenticated():
+        return HttpResponseRedirect('/')
 
     if formulario.is_valid():
         usuario = authenticate(username=request.POST['username'], password=request.POST['password'])

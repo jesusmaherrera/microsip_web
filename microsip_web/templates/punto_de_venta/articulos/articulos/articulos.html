@@ -140,24 +140,19 @@ $(function () {
     }
   });
 });
-
-$(document).ready(function() {
-  Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
-
-
-});
   
-  $(document).ready(function(){
-    $('#id_articulo_text').focus();
+Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
 
-    $('#select_article_all').change(function(){
-      if(this.checked)
-        $('[id^="select_article_"]').attr('checked',true);    
-      else
-        $('[id^="select_article_"]').attr('checked',false);    
-    });
+$('#id_articulo_text').focus();
 
-  });
+$('#select_article_all').change(function(){
+  if(this.checked)
+    $('[id^="select_article_"]').attr('checked',true);    
+  else
+    $('[id^="select_article_"]').attr('checked',false);    
+});
+
+  
 
 
 
@@ -231,7 +226,7 @@ $(document).ready(function() {
         {% for articulo in articulos%}
         <tr>
           <td class="hidden-phone"><input id="select_article_{{ articulo.id }}" value="" type="checkbox"/></td>
-          <td><a href="{{url_articulo}}{{ articulo.id }}/" target="_blank">{{ articulo.nombre }}</a></td>
+          <td><a href="{{url_articulo}}{{ articulo.id }}/">{{ articulo.nombre }}</a></td>
           <td class="hidden-phone">{{articulo.puntos }}|{{articulo.carpeta.id }}</td>
           <td class="hidden-phone">{{articulo.dinero_electronico }}</td>
         </tr>

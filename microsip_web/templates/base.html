@@ -93,11 +93,11 @@
       </div>
     </div>
   </div>
-  <div id="tools-module-bar" class="navbar-inner navbar-inner_min" style=" background-image: linear-gradient(to bottom, #e5e5e5, #e5e5e5); ">
+  <div id="tools-module-bar" class="navbar-inner navbar-inner_min " style=" background-image: linear-gradient(to bottom, #e5e5e5, #e5e5e5); ">
     {% block tools-module %}
     {% endblock %}
   </div>
-  <div id="span breadcrumbs" style="clear:both; margin-left: 35px;">
+  <div id="span breadcrumbs" style="clear:both; margin-left: 35px;" class="hidden-phone">
     <div id='breadcrumb' class='span6'>
     {% block breadcrumb %}<a href="/"><i class="icon-home"></i></a>{% endblock %}
     </div>
@@ -128,23 +128,23 @@
     <div>
       SIC &copy; 2013
     </div>
-    <script src="{{STATIC_URL}}js/modernizr2.js" ></script>
-    <script src="{{STATIC_URL}}js/jquery.min.js" ></script>
-    <script src='{{STATIC_URL}}js/bootstrap.min.js' ></script>
-    <script src='{{STATIC_URL}}js/jquery-ui.min.js'></script>
-    <script src='{{STATIC_URL}}js/jquery-ui-timepicker.js'></script>
-    <script src='{{STATIC_URL}}js/jquery.tablesorter.js'></script>
-    
-    <script src='{{STATIC_URL}}js/jquery.cookie.js'></script>
-    <script src='{{STATIC_URL}}js/jquery.hotkeys.js'></script>
-    <script src='{{STATIC_URL}}js/jquery.jstree.js'></script>
-
-    
-    {% block js_code %}
-      
-    {% endblock %}
   </footer>
+  
+  <script src="{{STATIC_URL}}js/modernizr2.js" ></script>
+  <script src="{{STATIC_URL}}js/jquery.min.js" ></script>
+  <script src='{{STATIC_URL}}js/bootstrap.min.js' ></script>
+  <script src='{{STATIC_URL}}js/jquery-ui.min.js'></script>
+  <script src='{{STATIC_URL}}js/jquery-ui-timepicker.js'></script>
+  <script src='{{STATIC_URL}}js/jquery.tablesorter.js'></script>
+  
+  <script src='{{STATIC_URL}}js/jquery.cookie.js'></script>
+  <script src='{{STATIC_URL}}js/jquery.hotkeys.js'></script>
+  <script src='{{STATIC_URL}}js/jquery.jstree.js'></script>
 
+  
+  {% block js_code %}
+    
+  {% endblock %}
   <div id="IrArriba" class="hidden-phone">
     <a href="#Arriba"><span></span></a>
   </div>
