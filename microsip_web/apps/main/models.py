@@ -553,6 +553,7 @@ class DoctosInvfisDet(models.Model):
     usuario_ult_modif = models.CharField(blank=True, null=True, max_length=31, db_column='SIC_USUARIO_ULT_MODIF')
     detalle_modificaciones = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLE_MODIFICACIONES')
     detalle_modificacionestime = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLETIME_MODIFICACIONES')
+    unidades_syn = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='SIC_UNIDADES_SYN')
     
     class Meta:
         db_table = u'doctos_invfis_det'
@@ -565,8 +566,8 @@ class DoctosInDet(models.Model):
     claveArticulo   = models.CharField(blank=True, null=True, max_length=20, db_column='CLAVE_ARTICULO')
     articulo        = models.ForeignKey(Articulos, db_column='ARTICULO_ID')
     tipo_movto      = models.CharField(default='E', max_length=1, db_column='TIPO_MOVTO')
-    unidades        = models.IntegerField(default=0, blank=True, null=True, db_column='UNIDADES')
-    costo_unitario  = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=2, db_column='COSTO_UNITARIO')
+    unidades        = models.DecimalField(default=0, max_digits=18, decimal_places=5, db_column='UNIDADES')
+    costo_unitario  = models.DecimalField(default=0, max_digits=18, decimal_places=2, db_column='COSTO_UNITARIO')
     costo_total     = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='COSTO_TOTAL')
     metodo_costeo   = models.CharField(default='C', max_length=1, db_column='METODO_COSTEO')
     cancelado       = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='CANCELADO')
@@ -574,7 +575,7 @@ class DoctosInDet(models.Model):
     costeo_pend     = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='COSTEO_PEND')
     pedimento_pend  = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='PEDIMENTO_PEND')
     rol             = models.CharField(default='N', max_length=1, db_column='ROL')
-    fecha           = models.DateField(blank=True, null=True, db_column='FECHA') 
+    fecha           = models.DateField(auto_now=True, blank=True, null=True, db_column='FECHA') 
     
 
     class Meta:

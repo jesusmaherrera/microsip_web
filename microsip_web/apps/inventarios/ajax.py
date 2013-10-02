@@ -10,12 +10,67 @@ from decimal import *
 from models import *
 from microsip_web.libs.custom_db.main import next_id
 from microsip_web.libs.tools import split_seq
+from django.db import connections
 
 @dajaxice_register(method='GET')
 def get_detallesArticuloenInventario(request, detalle_invfis_id):
     detalle_doc = DoctosInvfisDet.objects.get(pk=detalle_invfis_id)
     detalle = detalle_doc.detalle_modificacionestime
     return simplejson.dumps({'detalle':detalle,})
+
+@dajaxice_register(method='GET')
+def sincronizar_inventario(request, inventariofisico_id):
+    basedatos_activa = request.session['selected_database']
+    if basedatos_activa == '':
+        return HttpResponseRedirect('/select_db/')
+    else:
+        conexion_activa_id = request.session['conexion_activa']
+
+    conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
+    
+    InventarioFisico = DoctosInvfis.objects.get(pk=inventariofisico_id)
+
+    c = connections[conexion_name].cursor()
+    c.execute("""
+        SELECT A.ARTICULO_ID, B.inv_fin_unid FROM articulos A
+        LEFT JOIN orsp_in_aux_art( articulo_id, '%s', '10/02/2013','10/02/2013','S','N') B
+        ON A.articulo_id = B.articulo_id
+        where b.inv_fin_unid > 0
+        """% InventarioFisico.almacen.nombre)
+    unidades_rows = c.fetchall()
+    c.close() 
+
+    for unidades_row in unidades_rows:
+        if unidades_row[1] > 0:
+            try:
+                detalle = DoctosInvfisDet.objects.get(articulo=unidades_row[0], docto_invfis = inventariofisico_id )
+            except ObjectDoesNotExist:
+                articulo = Articulos.objects.get(pk=unidades_row[0])
+                if articulo.seguimiento == 'N':
+                    articulos_claves = ClavesArticulos.objects.filter(articulo= articulo)
+                    
+                    if articulos_claves.count() < 1:
+                        articulo_clave = ''
+                    else:
+                        articulo_clave = articulos_claves[0].clave
+
+                    detalle = DoctosInvfisDet(
+                        id=next_id('ID_DOCTOS', conexion_name),
+                        docto_invfis= InventarioFisico,
+                        clave= articulo_clave,
+                        articulo = articulo,
+                        unidades = unidades_row[1],
+                        usuario_ult_modif=request.user.username,
+                        unidades_syn = unidades_row[1],
+                        )
+                    detalle.save(force_insert=True)
+            else:
+                if detalle.articulo.seguimiento == 'N':
+                    detalle.unidades = detalle.unidades + unidades_row[1] - detalle.unidades_syn
+                    detalle.unidades_syn = unidades_row[1]
+                    detalle.save()
+
+    return simplejson.dumps({'articulos_count':len(unidades_rows)})
 
 @dajaxice_register(method='GET')
 def add_aticulosinventario(request, inventario_id, articulo_id, unidades, ubicacion):

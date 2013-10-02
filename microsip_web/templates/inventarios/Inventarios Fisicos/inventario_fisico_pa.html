@@ -12,6 +12,17 @@
 
 
 <script type="text/javascript">
+  function sincronizar_inventario()
+  {
+    $("#modal_cargando").modal();
+    Dajaxice.microsip_web.apps.inventarios.sincronizar_inventario(mostrar_articulos_sincronizados,{'inventariofisico_id': {{ inventario_id }},}); 
+  }
+
+  function mostrar_articulos_sincronizados(data)
+  {
+    alert("Se syncronizaron " + data.articulos_count + "Articulo.");
+    window.location = "/inventarios/InventarioFisico_pa/{{ inventario_id }}/";
+  }
 
   function agregar_articulos_porlineafn()
   {
@@ -231,7 +242,7 @@
     <img class= 'imagecenter' src="{{STATIC_URL}}img\ajax-loader.gif">  
     <br>
 </div>
-<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
   {% if message %}
   <div class="alert alert-block alert-error fade in">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -249,6 +260,7 @@
               <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
                 <li><a tabindex="-1" href="#articulosnocont_porlinea_Modal" role="button" data-toggle="modal"><i class="icon-tasks"></i> Agregar articulos no contabilizados Por linea</a></li>
                 <li><a tabindex="-1" href="#" onclick="agregar_articulosfn()"><i class="icon-align-justify"></i> Agregar todos los articulos no contabilizados</a></li>
+                <li><a tabindex="-1" href="#" onclick="sincronizar_inventario()"><i class="icon-refresh"></i>Sincronizar con entradas y salidas</a></li>
               </ul>
             </li>
           </ul>
@@ -280,7 +292,7 @@
       </div>  
     </div>
   </div>
-  {% csrf_token %}
+  
    <div id="articulosnocont_porlinea_Modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     
     <div class="modal-header">
@@ -397,6 +409,7 @@
       <th class="hidden-phone">Clave</th>
       <th>Articulo</th>
       <th>Unidades</th>
+      <th>Movimientos</th>
       <th></th>
     </tr>
     {% for detalle in detallesInventario %}
@@ -404,7 +417,8 @@
       <td class="hidden-phone"> {{ detalle.clave }} </td>
       <td> {{ detalle.articulo }} </td>
       <td> {{ detalle.unidades }} </td>
-      <td> <input type="hidden" name="detalle_id" value="{{ detalle.id }}"> <a href="#" class='btn btn-mini btn-info-inventario'> <i class="icon-info-sign"></i> </a> </td>
+      <td> {{ detalle.unidades_syn }} </td>
+      <td> <input type="hidden" name="detalle_id" value="{{ detalle.id }}"/> <a href="#" class='btn btn-mini btn-info-inventario'> <i class="icon-info-sign"></i> </a> </td>
     </tr>
     {% endfor %}
   </table>

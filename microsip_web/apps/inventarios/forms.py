@@ -164,9 +164,45 @@ class DoctosInManageForm(forms.ModelForm):
             'fechahora_ult_modif',
             )
 
-class DoctosInDetManageForm(forms.ModelForm):
+class DoctoInDetManageForm(forms.ModelForm):
+    articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
+    unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades'}),required=True)
+    costo_unitario = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'costo'}),required=True)
+
     class Meta:
-        widgets = autocomplete_light.get_widgets_dict(DoctosInDet)
+        model   = DoctosInDet
+        exclude = (
+            'doctosIn',
+            'tipo_movto',
+            'almacen',
+            'concepto',
+            'metodo_costeo',
+            'rol',
+            'cancelado',
+            'aplicado',
+            'costeo_pend',
+            'pedimento_pend',
+            'fecha',
+            'costo_total',)
+
+    def __init__(self, *args, **kwargs):
+        super(DoctoInDetManageForm, self).__init__(*args, **kwargs)
+        self.fields['claveArticulo'].widget.attrs['class'] = 'input-medium'
+        self.fields['claveArticulo'].widget.attrs['placeholder'] = "clave"
+        
+
+class DoctosInDetManageForm(forms.ModelForm):    
+    claveArticulo = forms.CharField(
+        max_length=100, 
+        widget=forms.TextInput(attrs={"class":"input-medium", "placeholder":"clave ...",}),
+        required=False
+        )
+
+    articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
+    unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades ...'}),required=True)
+
+    class Meta:
+        # widgets = autocomplete_light.get_widgets_dict(DoctosInDet)
         model = DoctosInDet
         exclude = (
             'tipo_movto',
