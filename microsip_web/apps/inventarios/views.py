@@ -311,49 +311,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
     error = 0
     inicio_form = False
     movimiento = ''
-    InventarioFisico = DoctosInvfis.objects.get(pk=id)
-
-    # c = connections[conexion_name].cursor()
-    # c.execute("""
-    #     SELECT A.ARTICULO_ID, B.inv_fin_unid FROM articulos A
-    #     LEFT JOIN orsp_in_aux_art( articulo_id, '%s', '10/02/2013','10/02/2013','S','N') B
-    #     ON A.articulo_id = B.articulo_id
-    #     where b.inv_fin_unid > 0
-    #     """% InventarioFisico.almacen.nombre)
-    # unidades_rows = c.fetchall()
-    # c.close() 
-
-    # for unidades_row in unidades_rows:
-    #     if unidades_row[1] > 0:
-    #         try:
-    #             detalle = DoctosInvfisDet.objects.get(articulo=unidades_row[0], docto_invfis = id )
-    #         except ObjectDoesNotExist:
-    #             articulo = Articulos.objects.get(pk=unidades_row[0])
-    #             if articulo.seguimiento == 'N':
-    #                 articulos_claves = ClavesArticulos.objects.filter(articulo= articulo)
-                    
-    #                 if articulos_claves.count() < 1:
-    #                     articulo_clave = ''
-    #                 else:
-    #                     articulo_clave = articulos_claves[0].clave
-
-    #                 detalle = DoctosInvfisDet(
-    #                     id=next_id('ID_DOCTOS', conexion_name),
-    #                     docto_invfis= InventarioFisico,
-    #                     clave= articulo_clave,
-    #                     articulo = articulo,
-    #                     unidades = unidades_row[1],
-    #                     usuario_ult_modif=request.user.username,
-    #                     unidades_syn = unidades_row[1],
-    #                     )
-    #                 detalle.save(force_insert=True)
-    #         else:
-    #             if detalle.articulo.seguimiento == 'N':
-    #                 detalle.unidades = detalle.unidades + unidades_row[1] - detalle.unidades_syn
-    #                 detalle.unidades_syn = unidades_row[1]
-    #                 detalle.save()
-
-    
+    InventarioFisico = DoctosInvfis.objects.get(pk=id)    
     
     if "Chrome" in request.META['HTTP_USER_AGENT']:
        request.mobile = False
@@ -377,8 +335,8 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
             if detalleInv.articulo.seguimiento == 'L':
                 message = 'La aplicacion no esta preparada para trabajar con articulos de lotes, porfavor introduce estos articulos directamente en microsip'
                 error = 1
-
-            #Para cargar por primera ves el formset de los nuemeros de serie del articulo
+            
+            #Para cargar por primera ves el formset de los numeros de serie del articulo
             if detalleInv.articulo.seguimiento == 'S':
                 if detalleInv != '':
                     doc_det = DoctosInvfisDet.objects.filter(docto_invfis=InventarioFisico, articulo=detalleInv.articulo)
@@ -453,13 +411,13 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                                     if movimiento == 'crear':
                                         detalleInv.save()
 
-                                    desglose = DesgloseEnDiscretosInvfis(
-                                        id = -1,
+                                    DesgloseEnDiscretosInvfis.objects.create(
+                                        id = -1, 
                                         docto_invfis_det = DoctosInvfisDet.objects.get(id=id_detalle),
                                         art_discreto = art_discreto,
                                         unidades = 1,
+                                        sic_nuevo = 'S',
                                         )
-                                    desglose.save()
                                 else:
                                     desgloses_a_eliminar = DesgloseEnDiscretosInvfis.objects.filter(art_discreto=art_discreto)
                                     
@@ -472,7 +430,20 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
                         if movimiento == 'crear':
                             detalleInv.usuario_ult_modif=request.user.username
                             detalleInv.detalle_modificaciones = '[%s/%s=%s], '%(request.user.username, ubicacion_form.cleaned_data['ubicacion'], detalleInvForm.cleaned_data['unidades'])
+                            c = connections[conexion_name].cursor()
+                            
+                            fecha_actual_str = datetime.now().strftime("%m/%d/%Y")
+                            fecha_inventario_str = InventarioFisico.fecha.strftime("%m/01/%Y")
+
+                            c.execute("""
+                                SELECT B.inv_fin_unid FROM orsp_in_aux_art( %s, '%s', '%s','%s','S','N') B
+                                """% (detalleInv.articulo.id , InventarioFisico.almacen.nombre, fecha_inventario_str, fecha_actual_str))
+                            unidades_rows = c.fetchall()
+                            unidades_mov = unidades_rows[0][0]
+                            c.close() 
                             detalleInv.unidades_syn = 0
+                            if unidades_mov < 0:
+                                detalleInv.unidades_syn = unidades_mov
                             detalleInv.save()
                         elif movimiento == 'actualizar':
                             detalleInv = DoctosInvfisDet.objects.get(id=id_detalle)

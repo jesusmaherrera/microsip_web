@@ -213,6 +213,19 @@ class ArticulosDiscretos(models.Model):
     class Meta:
         db_table = u'articulos_discretos'
 
+class ExistDiscreto(models.Model):
+    id = models.AutoField(primary_key=True, db_column='EXIS_DISCRETO_ID')
+    articulo_discreto = models.ForeignKey(ArticulosDiscretos, db_column='ART_DISCRETO_ID')
+    almacen = models.ForeignKey(Almacenes, db_column='ALMACEN_ID')
+    existencia = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='EXISTENCIA')
+    
+    def __unicode__(self):
+        return u'%s' % self.id
+        
+    class Meta:
+        db_table = u'exis_discretos'
+
+
 class Atributos(models.Model):
     class Meta:
         db_table = u'atributos'
@@ -540,6 +553,8 @@ class DoctosInvfis(models.Model):
     fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='FECHA_HORA_ULT_MODIF')
     usuario_aut_modif   = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_AUT_MODIF')
 
+    def __unicode__(self):
+        return u'%s' % self.id
     class Meta:
         db_table = u'doctos_invfis'
 
@@ -555,6 +570,9 @@ class DoctosInvfisDet(models.Model):
     detalle_modificacionestime = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLETIME_MODIFICACIONES')
     unidades_syn = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='SIC_UNIDADES_SYN')
     
+    def __unicode__(self):
+        return u'%s' % self.id
+
     class Meta:
         db_table = u'doctos_invfis_det'
 
@@ -577,6 +595,8 @@ class DoctosInDet(models.Model):
     rol             = models.CharField(default='N', max_length=1, db_column='ROL')
     fecha           = models.DateField(auto_now=True, blank=True, null=True, db_column='FECHA') 
     
+    def __unicode__(self):
+        return u'%s' % self.id
 
     class Meta:
         db_table = u'doctos_in_det'
@@ -602,7 +622,8 @@ class DesgloseEnDiscretosInvfis(models.Model):
     docto_invfis_det = models.ForeignKey(DoctosInvfisDet, db_column='DOCTO_INVFIS_DET_ID')
     art_discreto = models.ForeignKey(ArticulosDiscretos, db_column='ART_DISCRETO_ID')
     unidades = models.IntegerField(default=0, blank=True, null=True, db_column='UNIDADES')
-
+    sic_nuevo = models.CharField(default='N', max_length=1, db_column='SIC_NUEVO')
+    
     def __unicode__(self):
         return u'%s' % self.id
 

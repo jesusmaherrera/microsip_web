@@ -5,6 +5,17 @@ procedures = {}
 ####                                                        ####
 ################################################################
 
+procedures['SIC_DESGDISCINVFIS_AT'] = '''
+    CREATE OR ALTER PROCEDURE SIC_DESGDISCINVFIS_AT
+    as
+    BEGIN
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'DESGLOSE_EN_DISCRETOS_INVFIS' and rf.RDB$FIELD_NAME = 'SIC_NUEVO')) then
+            execute statement 'ALTER TABLE DESGLOSE_EN_DISCRETOS_INVFIS ADD SIC_NUEVO SI_NO_N';
+    END  
+    '''
+
 procedures['SIC_DOCTOINVFISDET_AT'] = '''
     CREATE OR ALTER PROCEDURE SIC_DOCTOINVFISDET_AT
     as

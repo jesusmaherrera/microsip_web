@@ -92,6 +92,9 @@ def inventario_actualizar_tablas( conexion_name = None ):
     ################## STRORE PROCEDURES ###################
     c.execute(procedures['SIC_DOCTOINVFISDET_AT'])
     c.execute("EXECUTE PROCEDURE SIC_DOCTOINVFISDET_AT;")
+    c.execute(procedures['SIC_DESGDISCINVFIS_AT'])
+    c.execute("EXECUTE PROCEDURE SIC_DESGDISCINVFIS_AT;")
+   
     ####################### TRIGGERS #######################
     c.execute(inventarios_triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'])
     c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'])

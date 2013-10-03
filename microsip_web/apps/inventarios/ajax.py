@@ -25,17 +25,21 @@ def sincronizar_inventario(request, inventariofisico_id):
         return HttpResponseRedirect('/select_db/')
     else:
         conexion_activa_id = request.session['conexion_activa']
-
     conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
     
-    InventarioFisico = DoctosInvfis.objects.get(pk=inventariofisico_id)
+    #Variables iniciales
+    articulos_modificados = 0
+    inventario_fisico = DoctosInvfis.objects.get(pk=inventariofisico_id)
+    fecha_actual_str = datetime.now().strftime("%m/%d/%Y")
+    fecha_inventario_str = inventario_fisico.fecha.strftime("%m/01/%Y")
 
     c = connections[conexion_name].cursor()
     c.execute("""
-        SELECT A.ARTICULO_ID, B.inv_fin_unid FROM articulos A
-        LEFT JOIN orsp_in_aux_art( articulo_id, '%s', '10/02/2013','10/02/2013','S','N') B
+        SELECT B.ARTICULO_ID, B.inv_fin_unid FROM articulos A
+        LEFT JOIN orsp_in_aux_art( articulo_id, '%s', '%s','%s','S','N') B
         ON A.articulo_id = B.articulo_id
-        """% InventarioFisico.almacen.nombre)
+        WHERE B.inv_fin_unid <> 0
+        """% (inventario_fisico.almacen.nombre, fecha_inventario_str, fecha_actual_str))
     unidades_rows = c.fetchall()
     c.close() 
 
@@ -44,33 +48,89 @@ def sincronizar_inventario(request, inventariofisico_id):
             detalle = DoctosInvfisDet.objects.get(articulo=unidades_row[0], docto_invfis = inventariofisico_id )
         except ObjectDoesNotExist:
             articulo = Articulos.objects.get(pk=unidades_row[0])
+            articulos_claves = ClavesArticulos.objects.filter(articulo= articulo)
+                        
+            if articulos_claves.count() < 1:
+                articulo_clave = ''
+            else:
+                articulo_clave = articulos_claves[0].clave
+
+            if articulo.seguimiento == 'S':
+                c = connections[conexion_name].cursor()
+                c.execute("""
+                    SELECT B.art_discreto_id, B.existencia FROM LISTA_ARTS_DISCRETOS('S', 'E', %s, NULL, NULL, %s, NULL) B
+                    """% (inventario_fisico.almacen.ALMACEN_ID, articulo.id))
+                series = c.fetchall()
+                c.close()
+
+                if len(series) > 0:
+                    detalle = DoctosInvfisDet(
+                        id=next_id('ID_DOCTOS', conexion_name),
+                        docto_invfis= inventario_fisico,
+                        clave= articulo_clave,
+                        articulo = articulo,
+                        unidades = len(series),
+                        usuario_ult_modif = request.user.username,
+                        unidades_syn = len(series),
+                        )
+
+                    detalle.save(force_insert=True)
+                    articulos_modificados += 1
+
+                    for articulo_discreto in series:
+                        DesgloseEnDiscretosInvfis.objects.create(id= -1, docto_invfis_det=detalle, art_discreto = ArticulosDiscretos.objects.get(pk=articulo_discreto[0]), unidades = articulo_discreto[1])
+                        
+
             if articulo.seguimiento == 'N':
                 if unidades_row[1] > 0:
-                articulos_claves = ClavesArticulos.objects.filter(articulo= articulo)
-                    
-                if articulos_claves.count() < 1:
-                    articulo_clave = ''
-                else:
-                    articulo_clave = articulos_claves[0].clave
+                    detalle = DoctosInvfisDet(
+                        id=next_id('ID_DOCTOS', conexion_name),
+                        docto_invfis= inventario_fisico,
+                        clave= articulo_clave,
+                        articulo = articulo,
+                        unidades = unidades_row[1],
+                        usuario_ult_modif=request.user.username,
+                        unidades_syn = unidades_row[1],
+                        )
 
-                detalle = DoctosInvfisDet(
-                    id=next_id('ID_DOCTOS', conexion_name),
-                    docto_invfis= InventarioFisico,
-                    clave= articulo_clave,
-                    articulo = articulo,
-                    unidades = unidades_row[1],
-                    usuario_ult_modif=request.user.username,
-                    unidades_syn = unidades_row[1],
-                    )
-                detalle.save(force_insert=True)
+                    detalle.save(force_insert=True)
+                    articulos_modificados += 1
         else:
+            if detalle.articulo.seguimiento == 'S':
+                c = connections[conexion_name].cursor()
+                c.execute("""
+                    SELECT B.art_discreto_id, B.existencia FROM LISTA_ARTS_DISCRETOS('S', 'E', %s, NULL, NULL, %s, NULL) B
+                    WHERE B.art_discreto_id NOT IN 
+                        (SELECT A.art_discreto_id FROM DESGLOSE_EN_DISCRETOS_INVFIS A where A.docto_invfis_det_id = %s)
+                    """% (inventario_fisico.almacen.ALMACEN_ID, detalle.articulo.id, detalle.id))
+                series = c.fetchall()
+                for articulo_discreto in series:
+                    DesgloseEnDiscretosInvfis.objects.create(id= -1, docto_invfis_det=detalle, art_discreto = ArticulosDiscretos.objects.get(pk=articulo_discreto[0]), unidades = articulo_discreto[1])
+                    articulos_modificados += 1
+                c.close()
+
+                
+                desgloses = DesgloseEnDiscretosInvfis.objects.filter(docto_invfis_det=detalle) 
+                desgloses_inv = DesgloseEnDiscretosInvfis.objects.filter(sic_nuevo='S').filter(docto_invfis_det=detalle) 
+                articulos_dis_invfis = desgloses.values_list('art_discreto__id', flat=True)
+                
+                articulos_a_eliminar = ExistDiscreto.objects.filter(articulo_discreto__id__in=articulos_dis_invfis, existencia=0).values_list('articulo_discreto__id', flat=True)
+                DesgloseEnDiscretosInvfis.objects.exclude(sic_nuevo='S').filter(docto_invfis_det=detalle, art_discreto_id__in =  articulos_a_eliminar).delete()
+
+                detalle.unidades = len(desgloses)
+                detalle.unidades_syn = len(desgloses) - len(desgloses_inv)
+                detalle.save()
+
             if detalle.articulo.seguimiento == 'N':
                 if unidades_row[1] != detalle.unidades_syn: 
-                    detalle.unidades = detalle.unidades + unidades_row[1] - detalle.unidades_syn
-                    detalle.unidades_syn = unidades_row[1]
-                    detalle.save()
+                    unidades = detalle.unidades + unidades_row[1] - detalle.unidades_syn
+                    if unidades >= 0:
+                        detalle.unidades = unidades
+                        detalle.unidades_syn = unidades_row[1]
+                        detalle.save()
+                        articulos_modificados += 1
 
-    return simplejson.dumps({'articulos_count':len(unidades_rows)})
+    return simplejson.dumps({'articulos_count':articulos_modificados})
 
 @dajaxice_register(method='GET')
 def add_aticulosinventario(request, inventario_id, articulo_id, unidades, ubicacion):

@@ -361,7 +361,7 @@ triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'] = '''
                     into :articulo_discreto_id
                     do
                     begin
-                        insert into desglose_en_discretos_invfis values(-1,:invfis_det_id, :articulo_discreto_id, 1);
+                        insert into desglose_en_discretos_invfis values(-1,:invfis_det_id, :articulo_discreto_id, 1,'N');
                     end
                 end
                 if (cantidad_articulos <0 ) then
