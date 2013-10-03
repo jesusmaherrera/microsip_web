@@ -35,37 +35,37 @@ def sincronizar_inventario(request, inventariofisico_id):
         SELECT A.ARTICULO_ID, B.inv_fin_unid FROM articulos A
         LEFT JOIN orsp_in_aux_art( articulo_id, '%s', '10/02/2013','10/02/2013','S','N') B
         ON A.articulo_id = B.articulo_id
-        where b.inv_fin_unid > 0
         """% InventarioFisico.almacen.nombre)
     unidades_rows = c.fetchall()
     c.close() 
 
     for unidades_row in unidades_rows:
-        if unidades_row[1] > 0:
-            try:
-                detalle = DoctosInvfisDet.objects.get(articulo=unidades_row[0], docto_invfis = inventariofisico_id )
-            except ObjectDoesNotExist:
-                articulo = Articulos.objects.get(pk=unidades_row[0])
-                if articulo.seguimiento == 'N':
-                    articulos_claves = ClavesArticulos.objects.filter(articulo= articulo)
+        try:
+            detalle = DoctosInvfisDet.objects.get(articulo=unidades_row[0], docto_invfis = inventariofisico_id )
+        except ObjectDoesNotExist:
+            articulo = Articulos.objects.get(pk=unidades_row[0])
+            if articulo.seguimiento == 'N':
+                if unidades_row[1] > 0:
+                articulos_claves = ClavesArticulos.objects.filter(articulo= articulo)
                     
-                    if articulos_claves.count() < 1:
-                        articulo_clave = ''
-                    else:
-                        articulo_clave = articulos_claves[0].clave
+                if articulos_claves.count() < 1:
+                    articulo_clave = ''
+                else:
+                    articulo_clave = articulos_claves[0].clave
 
-                    detalle = DoctosInvfisDet(
-                        id=next_id('ID_DOCTOS', conexion_name),
-                        docto_invfis= InventarioFisico,
-                        clave= articulo_clave,
-                        articulo = articulo,
-                        unidades = unidades_row[1],
-                        usuario_ult_modif=request.user.username,
-                        unidades_syn = unidades_row[1],
-                        )
-                    detalle.save(force_insert=True)
-            else:
-                if detalle.articulo.seguimiento == 'N':
+                detalle = DoctosInvfisDet(
+                    id=next_id('ID_DOCTOS', conexion_name),
+                    docto_invfis= InventarioFisico,
+                    clave= articulo_clave,
+                    articulo = articulo,
+                    unidades = unidades_row[1],
+                    usuario_ult_modif=request.user.username,
+                    unidades_syn = unidades_row[1],
+                    )
+                detalle.save(force_insert=True)
+        else:
+            if detalle.articulo.seguimiento == 'N':
+                if unidades_row[1] != detalle.unidades_syn: 
                     detalle.unidades = detalle.unidades + unidades_row[1] - detalle.unidades_syn
                     detalle.unidades_syn = unidades_row[1]
                     detalle.save()
