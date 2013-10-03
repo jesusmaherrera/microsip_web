@@ -96,10 +96,10 @@ def inventario_actualizar_tablas( conexion_name = None ):
     c.execute("EXECUTE PROCEDURE SIC_DESGDISCINVFIS_AT;")
    
     ####################### TRIGGERS #######################
-    c.execute(inventarios_triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'])
-    c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'])
-    c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'])
-    c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSIN_BU'])
+    # c.execute(inventarios_triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'])
+    # c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'])
+    # c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'])
+    # c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSIN_BU'])
 
     transaction.commit_unless_managed()
 
