@@ -53,70 +53,72 @@ def inicializar_tablas(request):
     #ventas_inicializar_tablas()
     if request.user.is_superuser:
 
-        basedatos_activa = request.session['selected_database']
+        basedatos_activa = request.session[ 'selected_database' ]
         if basedatos_activa == '':
-            return HttpResponseRedirect('/select_db/')
+            return HttpResponseRedirect( '/select_db/' )
         else:
-            conexion_activa_id = request.session['conexion_activa']
+            conexion_activa_id = request.session[ 'conexion_activa' ]
             
-        conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
+        conexion_name = "%02d-%s"%( conexion_activa_id, basedatos_activa )
         
         # Campos nuevos en tablas
-        sincronizar_tablas( conexion_name = None )
+        sincronizar_tablas( conexion_name = conexion_name )
         
         #Triggers
         if 'microsip_web.apps.punto_de_venta' in MICROSIP_MODULES:
-            punto_de_venta_actualizar_triggers( conexion_name = conexion_name )
+            actualizar_triggers_puntodeventa( conexion_name = conexion_name )
+        # elif 'microsip_web.apps.inventarios' in MICROSIP_MODULES:
+        #     actualizar_triggers_inventarios( conexion_name = conexion_name )
 
         #cuentas_por_pagar_inicializar_tablas()
         #cuentas_por_cobrar_inicializar_tablas()
 
-        management.call_command('syncdb', database=conexion_name)
+        management.call_command( 'syncdb', database = conexion_name )
 
     return HttpResponseRedirect('/')
 
 def sincronizar_tablas( conexion_name = None ):
     """ Modifica todas las tablas con campos nuevos para uso en aplicacion. """
 
-    c = connections[conexion_name].cursor()
+    c = connections[ conexion_name ].cursor()
     ################## STRORE PROCEDURES ###################
-    c.execute(procedures['SIC_PUNTOS_ARTICULOS_AT'])
+    c.execute( procedures[ 'SIC_PUNTOS_ARTICULOS_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_ARTICULOS_AT;')
 
-    c.execute(procedures['SIC_PUNTOS_LINEASARTICULOS_AT'])
+    c.execute( procedures[ 'SIC_PUNTOS_LINEASARTICULOS_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_LINEASARTICULOS_AT;')
     
-    c.execute(procedures['SIC_PUNTOS_GRUPOSLINEAS_AT'])
+    c.execute( procedures[ 'SIC_PUNTOS_GRUPOSLINEAS_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_GRUPOSLINEAS_AT;')
     
     #Clientes
-    c.execute(procedures['SIC_PUNTOS_CLIENTES_AT'])
+    c.execute( procedures[ 'SIC_PUNTOS_CLIENTES_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_CLIENTES_AT;')
 
-    c.execute(procedures['SIC_PUNTOS_LIBRESCLIENTES_AT'])
+    c.execute( procedures[ 'SIC_PUNTOS_LIBRESCLIENTES_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_LIBRESCLIENTES_AT;')
     
-    c.execute(procedures['SIC_PUNTOS_TIPOSCLIENTES_AT'])
+    c.execute( procedures[ 'SIC_PUNTOS_TIPOSCLIENTES_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_TIPOSCLIENTES_AT;')
 
-    c.execute(procedures['SIC_PUNTOS_DOCTOSPVDET_AT'])
+    c.execute( procedures[ 'SIC_PUNTOS_DOCTOSPVDET_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DOCTOSPVDET_AT;')
     
-    c.execute(procedures['SIC_PUNTOS_DOCTOS_PV_AT'])
+    c.execute( procedures[ 'SIC_PUNTOS_DOCTOS_PV_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DOCTOS_PV_AT;')
 
     #lbres clientes
-    c.execute(procedures['SIC_LIBRES_CLIENTES_AT']) 
+    c.execute( procedures[ 'SIC_LIBRES_CLIENTES_AT' ] ) 
     c.execute('EXECUTE PROCEDURE SIC_LIBRES_CLIENTES_AT;')
 
-    c.execute(procedures['SIC_FILTROS_ARTICULOS_AT'])
+    c.execute( procedures[ 'SIC_FILTROS_ARTICULOS_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_FILTROS_ARTICULOS_AT;')   
 
     #inventarios
-    c.execute(procedures['SIC_DOCTOINVFISDET_AT'])
+    c.execute( procedures['SIC_DOCTOINVFISDET_AT'] )
     c.execute("EXECUTE PROCEDURE SIC_DOCTOINVFISDET_AT;")
 
-    c.execute(procedures['SIC_DESGDISCINVFIS_AT'])
+    c.execute( procedures['SIC_DESGDISCINVFIS_AT'] )
     c.execute("EXECUTE PROCEDURE SIC_DESGDISCINVFIS_AT;")
 
     transaction.commit_unless_managed()
@@ -124,25 +126,35 @@ def sincronizar_tablas( conexion_name = None ):
 def ventas_inicializar_tablas( conexion_name = None ):
     """ Agrega campos particulares para segmentos """
 
-    c = connections[conexion_name].cursor()
-    c.execute(procedures['ventas_inicializar'])
-    c.execute("EXECUTE PROCEDURE ventas_inicializar;")
+    c = connections[ conexion_name ].cursor()
+    c.execute( procedures[ 'ventas_inicializar' ] )
+    c.execute( "EXECUTE PROCEDURE ventas_inicializar;" )
     transaction.commit_unless_managed()
 
-def punto_de_venta_actualizar_triggers( conexion_name = None ):
+# def actualizar_triggers_inventarios( conexion_name = None ):
+#     c = connections[ conexion_name ].cursor()
+#     ####################### TRIGGERS #######################
+#     # c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DESGLOSEDIS_AI' ] )
+#     # c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSINDET_BI' ] )
+#     # c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSINDET_BD' ] )
+#     #c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSIN_BU' ] )
+
+#     transaction.commit_unless_managed()
+
+def actualizar_triggers_puntodeventa( conexion_name = None ):
     """ Agrega trigger a base de datos para aplicacion punto de venta. """
 
     c = connections[conexion_name].cursor()
      
     ####################### TRIGGERS #######################
      #DETALLE DE VENTAS
-    c.execute(punto_de_venta_triggers['SIC_PUNTOS_PV_DOCTOSPVDET_BU'])
-    c.execute(punto_de_venta_triggers['SIC_PUNTOS_PV_DOCTOSPVDET_AD'])
+    c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_DOCTOSPVDET_BU' ] )
+    c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_DOCTOSPVDET_AD' ] )
     #VENTAS
-    c.execute(punto_de_venta_triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'])
-    c.execute(punto_de_venta_triggers['SIC_PUNTOS_PV_DOCTOSPV_AD'])
+    c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_DOCTOSPV_BU' ] )
+    c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_DOCTOSPV_AD' ] )
     #CLIENTES
-    c.execute(punto_de_venta_triggers['SIC_PUNTOS_PV_CLIENTES_BU'])
+    c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_CLIENTES_BU' ] )
     #EXCEPTION
     try:
         c.execute(

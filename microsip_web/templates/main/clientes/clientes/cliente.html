@@ -6,6 +6,7 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}
+{% include 'autocomplete_light/static.html' %}
 <script>
 
 
@@ -54,8 +55,15 @@ $(function() {
 {% block content %}
 {{ formset }}
 
-<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
-  {% csrf_token %}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+  <div class="ms-custom-form container-fluid hidden-phone">
+    <div class="row-fluid">
+      <div class="span3"><h3>Cliente</h3></div>
+      <div class="span8" style=" margin-top: 15px; ">
+        <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
+      </div>
+    </div>
+  </div>
   {{ form.errors }}
   <fieldset style='clear:both;'>
     <legend>Informacion General</legend>
@@ -105,7 +113,7 @@ $(function() {
       </div>
     </div>
   </fieldset>
-  <fieldset style='clear:both;'>
+  <!-- <fieldset style='clear:both;'>
     <legend>Cuentas contables de Ventas</legend>
     {% for key, value in cuentas.items %}
     <div class="span4" >
@@ -129,7 +137,7 @@ $(function() {
       </div>
     </div>  
     {% endfor %}
-  </fieldset>
+  </fieldset> -->
   {% if message %}
   <div class="alert alert-block alert-error fade in">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -137,14 +145,7 @@ $(function() {
     <p>{{ message }}</p>
   </div>
   {% endif %}
-  <br style='clear:both;'>
-  <br>
-  <div class="form-actions mainmenu" >
-    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
-  </div>
+  
 </form>
 
-
-
-{% include 'autocomplete_light/static.html' %}
 {% endblock %}

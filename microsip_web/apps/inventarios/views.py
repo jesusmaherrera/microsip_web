@@ -228,7 +228,7 @@ def invetariosfisicos_view(request, template_name='inventarios/Inventarios Fisic
     if request.mobile:
         url_inventario = '/inventarios/inventarioFisico_mobile/'
     else:
-        url_inventario = '/inventarios/InventarioFisico_pa/'
+        url_inventario = '/inventarios/inventariofisico/'
 
     c = {'inventarios_fisicos':inventarios_fisicos, 'url_inventario':url_inventario,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
@@ -242,7 +242,7 @@ def inventario_getnew_folio():
     return folio
 
 @login_required(login_url='/login/')
-def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inventarios Fisicos/create_inventario_fisico_pa.html'):
+def create_invetarioFisico_createView(request, template_name='inventarios/Inventarios Fisicos/create_inventario_fisico.html'):
     message = ''
     connection_name = get_conecctionname(request.session)
     if connection_name == '':
@@ -265,42 +265,19 @@ def create_invetarioFisico_pa_createView(request, template_name='inventarios/Inv
             inventario.usuario_ult_modif =request.user.username
             inventario.usuario_aut_modif =request.user.username
             inventario.save()
-            return HttpResponseRedirect('/inventarios/InventariosFisicos/')
+            return HttpResponseRedirect('/inventarios/inventariosfisicos/')
         
     c = {'message':message,'form':form}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
-@login_required(login_url='/login/')
-def invetarioFisico_mobile_pa_manageView(request, id, template_name='inventarios/Inventarios Fisicos/inventario_fisico_mobile.html'):
-    InventarioFisico = DoctosInvfis.objects.get(pk=id)
-    detalleInvForm = DoctosInvfisDetManageForm()
-
-    c = {'detalleInvForm':detalleInvForm, 'InventarioFisico':InventarioFisico,}
-    return render_to_response(template_name, c, context_instance=RequestContext(request))    
-
-def invetarioFisico_mobile_series_manageView(request, id, no_series, template_name='inventarios/Inventarios Fisicos/inventario_fisico_mobile_ns.html'):
-    doc_det = DoctosInvfisDet.objects.filter(docto_invfis__id=21270, articulo__id=id)
-    
-    if doc_det.count() > 0:
-        articulos_discretos_actuales = DesgloseEnDiscretosInvfis.objects.filter(
-        docto_invfis_det=doc_det[0].id)
-
-    articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm, extra=int(no_series))
-    
-    articulos_discretos_formset = articulos_discretos_formset()
-
-    c = {'articulos_discretos_actuales':articulos_discretos_actuales, 'formset':articulos_discretos_formset, }
-    return render_to_response(template_name, c, context_instance=RequestContext(request))    
-
 @detect_mobile
 @login_required(login_url='/login/')
-def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='inventarios/Inventarios Fisicos/inventario_fisico_pa.html'):
+def invetarioFisico_manageView(request, id = None, rapido=1, template_name='inventarios/Inventarios Fisicos/inventario_fisico.html'):
     basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
     else:
         conexion_activa_id = request.session['conexion_activa']
-
     conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
 
     message = ''
@@ -459,7 +436,7 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
 
                             detalleInv.save()
 
-                        return HttpResponseRedirect('/inventarios/InventarioFisico_pa/%s/'% id)
+                        return HttpResponseRedirect('/inventarios/inventariofisico/%s/'% id)
                            
     else:
         detalleInvForm = DoctosInvfisDetManageForm()
@@ -505,17 +482,8 @@ def invetarioFisico_pa_manageView(request, id = None, rapido=1, template_name='i
         'articulos_eninventario':articulos_eninventario,
         'articulos_discretos_actuales':articulos_discretos_actuales,
         }
-   
-    # if "Chrome" in request.META['HTTP_USER_AGENT']:
-    #    request.mobile = False
-       
-    # if request.mobile:
-    #     template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_pa_mobile.html'
-    # else:
-    #     template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_pa.html'
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))
-
 
 @login_required(login_url='/login/')
 def invetarioFisico_delete(request, id = None):
@@ -523,6 +491,31 @@ def invetarioFisico_delete(request, id = None):
     inventario_fisico.delete()
 
     return HttpResponseRedirect('/invenatrios/InventariosFisicos/')
+
+
+### INVENTARIO FISICO MOBILE
+
+@login_required(login_url='/login/')
+def invetarioFisico_mobile_pa_manageView(request, id, template_name='inventarios/Inventarios Fisicos/inventario_fisico_mobile.html'):
+    InventarioFisico = DoctosInvfis.objects.get(pk=id)
+    detalleInvForm = DoctosInvfisDetManageForm()
+
+    c = {'detalleInvForm':detalleInvForm, 'InventarioFisico':InventarioFisico,}
+    return render_to_response(template_name, c, context_instance=RequestContext(request))    
+
+def invetarioFisico_mobile_series_manageView(request, id, no_series, template_name='inventarios/Inventarios Fisicos/inventario_fisico_mobile_ns.html'):
+    doc_det = DoctosInvfisDet.objects.filter(docto_invfis__id=21270, articulo__id=id)
+    
+    if doc_det.count() > 0:
+        articulos_discretos_actuales = DesgloseEnDiscretosInvfis.objects.filter(
+        docto_invfis_det=doc_det[0].id)
+
+    articulos_discretos_formset = formset_factory(ArticulosDiscretos_ManageForm, extra=int(no_series))
+    
+    articulos_discretos_formset = articulos_discretos_formset()
+
+    c = {'articulos_discretos_actuales':articulos_discretos_actuales, 'formset':articulos_discretos_formset, }
+    return render_to_response(template_name, c, context_instance=RequestContext(request))    
 
 ##########################################
 ##                                      ##

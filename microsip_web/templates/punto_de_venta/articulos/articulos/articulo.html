@@ -68,9 +68,16 @@ $(document).ready(function() {
 
  {% endblock %}
 {% block content %}
-<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
-  {% csrf_token %}
-    {{ form.errors }}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+  <div class="ms-custom-form container-fluid hidden-phone">
+    <div class="row-fluid">
+      <div class="span3"><h3>Articulo</h3></div>
+      <div class="span8" style=" margin-top: 15px; ">
+        <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
+      </div>
+    </div>
+  </div>
+  {{ form.errors }}
   <div class="span4" >
     <label>Nombre</label>
     <div class="input-prepend input-append">
@@ -193,10 +200,6 @@ $(document).ready(function() {
   </div>
   {% endif %}
   <br style='clear:both;'>
-  <br>
-  <div class="form-actions mainmenu" >
-     <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
-  </div>
 </form>
 {% include 'autocomplete_light/static.html' %}
 {% endblock %}
