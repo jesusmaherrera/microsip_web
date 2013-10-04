@@ -17,7 +17,7 @@ al momento de seleccionar un articulo en el inventario si este articulo ya se a 
 
 Realizar busqueda de claves de articulo.
 
-Solo con introducir una parte de la clave y presionar [ENTER] se mostrara una pantalla con todas los articulos que tienen una clave parecida.
+Solo con **introducir una parte de la clave y presionar [ENTER]** se mostrara una pantalla con todas los articulos que tienen una clave parecida.
 
 ![clave_search](https://scontent-a-sjc.xx.fbcdn.net/hphotos-prn1/625534_594153823959690_463924809_n.png)
 
