@@ -15,6 +15,12 @@ al momento de seleccionar un articulo en el inventario si este articulo ya se a 
 
 ![detalles articulo](https://scontent-a-lax.xx.fbcdn.net/hphotos-ash3/598877_589449747763431_479784911_n.jpg)
 
+Realizar busqueda de claves de articulo.
+
+Solo con introducir una parte de la clave y presionar [ENTER] se mostrara una pantalla con todas los articulos que tienen una clave parecida.
+
+![clave_search](https://scontent-a-sjc.xx.fbcdn.net/hphotos-prn1/625534_594153823959690_463924809_n.png)
+
 El filtro por nombre de articulo es por medio de una auto-completado el cual conforme va escribiendo el nombre del articulo, los artículos de microsip se van filtrando.
 
 ![fIltro por articulo](https://scontent-b-lax.xx.fbcdn.net/hphotos-prn2/p480x480/1375691_589451821096557_570111113_n.jpg)
