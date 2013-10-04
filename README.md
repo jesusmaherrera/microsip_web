@@ -34,7 +34,7 @@ Dentro de la aplicación Microsip **cualquier** movimiento que tenga que ver con
 > Si posteriormente realizo una compra de 6 artículos(lápiz) como resultado en mi inventario tendré **11 artículos(lápiz)**
 
 ## Importante
-Para un mejor resultado al momento de realizar un inventario físico es de vital importancia tomar en cuanta los siguientes puntos.
+Para un mejor resultado al momento de realizar un inventario físico es de vital importancia tomar en cuenta los siguientes puntos.
 
 * En el periodo que se realice el inventario es necesario **separar las compras  y devoluciones**
 * En caso de tener el mismo articulo en varios estantes (**comunicar al personal de ventas para que tome los artículos del estante donde ya se contaron** si es el caso en que ya se contaron [si no se an contado no hay problema la aplicación ignorara estos])
