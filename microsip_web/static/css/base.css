@@ -12,6 +12,11 @@ body{
   background-color: rgb(231, 231, 231); 
 }
 
+p
+{
+  font-family: 'Arial', serif;
+}
+
 .navbar-inner
 {
   border-radius: 0px;
@@ -160,6 +165,8 @@ footer
 {
   background-position: -4px -230px;
 }
+
+
 
 .pagecontent
 {

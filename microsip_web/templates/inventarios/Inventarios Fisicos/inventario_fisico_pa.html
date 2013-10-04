@@ -14,7 +14,8 @@
 <script type="text/javascript">
   function sincronizar_inventario()
   {
-    $("#modal_cargando").modal();
+    $('#id_sincronizar_btns').hide();
+    $("#id_sincronizando_span").show();
     Dajaxice.microsip_web.apps.inventarios.sincronizar_inventario(mostrar_articulos_sincronizados,{'inventariofisico_id': {{ inventario_id }},}); 
   }
 
@@ -235,12 +236,40 @@
 
 
 {% endblock %}
-{% block breadcrumb %}{{ block.super }} <a href="/inventarios/InventariosFisicos/">Inventarios Fisico</a> <i class=" icon-play"></i>Inventario Fisico a apuerta abierta {% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/inventarios/inventariosfisicos/">Inventarios Fisico</a> <i class=" icon-play"></i>Inventario Fisico a apuerta abierta {% endblock %}
 {% block content %}
 <div id="modal_cargando" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <p class="text-center">Agregando articulos, Por favor espera.</p>
     <img class= 'imagecenter' src="{{STATIC_URL}}img\ajax-loader.gif">  
     <br>
+</div>
+<div id="modal_seguro_sync" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header ">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <p><h3>Sincronizar inventario con movimientos</h3></p>
+  </div>
+  <div class="modal-body">
+    <p>
+      Al sincronizar inventario con movimientos se sincronizaran todos los movimientos realizados de entradas y salidas en microsip con las entradas ya registradas en este inventario
+    </p>
+    <p>Ejemplo</p>
+    <blockquote>
+      <p><small>Se capturaron 5 articulos en inventarios pero se realizo la venta de 2 como resultado se tendra 3 articulos en inventario.</small></p>
+    </blockquote>
+    <p class="text-warning">
+        Esto pueder tardar unos minutos dependiendo del numero de articulos en la base de datos.
+    </p>  
+  </div>
+  <div class="modal-footer">
+    <span id='id_sincronizando_span' class='hide'>
+      <label class="span">Sincronizando </label>
+      <img class= 'imagecenter' src="{{STATIC_URL}}img\ajax-loader.gif">
+    </span>
+    <span id="id_sincronizar_btns">
+      <button class="btn" id='btnCancel' data-dismiss="modal">Cancelar</button>
+      <a onclick='sincronizar_inventario()' href="#" class="btn"> Aceptar</a>
+    </span>
+  </div>
 </div>
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
   {% if message %}
@@ -260,7 +289,8 @@
               <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
                 <li><a tabindex="-1" href="#articulosnocont_porlinea_Modal" role="button" data-toggle="modal"><i class="icon-tasks"></i> Agregar articulos no contabilizados Por linea</a></li>
                 <li><a tabindex="-1" href="#" onclick="agregar_articulosfn()"><i class="icon-align-justify"></i> Agregar todos los articulos no contabilizados</a></li>
-                <li><a tabindex="-1" href="#" onclick="sincronizar_inventario()"><i class="icon-refresh"></i>Sincronizar con entradas y salidas</a></li>
+                <li class='divider'></li>
+                <li><a tabindex="-1" href="#modal_seguro_sync" role="button" data-toggle="modal"><i class="icon-refresh"></i> Sincronizar con entradas y salidas</a></li>
               </ul>
             </li>
           </ul>

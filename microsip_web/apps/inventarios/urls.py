@@ -5,7 +5,7 @@ from microsip_web.apps.punto_de_venta import views as pv_views
 
 urlpatterns = patterns('',
     #INVENTARIOS FISICOS
-    (r'^InventariosFisicos/$', views.invetariosFisicos_View),
+    (r'^inventariosfisicos/$', views.invetariosfisicos_view),
     # (r'^InventarioFisico/$', views.invetarioFisico_manageView),
     # (r'^InventarioFisico/(?P<id>\d+)/', views.invetarioFisico_manageView),
     

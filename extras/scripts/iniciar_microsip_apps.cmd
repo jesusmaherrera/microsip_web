@@ -1,5 +1,5 @@
 echo off
-color 30
+color 7F
 echo 			==================================
 echo 			=                                =
 echo 			=     SERVIDOR DE PAGINA WEB     =

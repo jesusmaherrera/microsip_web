@@ -49,12 +49,6 @@ def conexion_manageView(request, id = None, template_name='main/conexiones/conex
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def reiniciar_servidor(request):
-    if request.user.is_superuser:
-        management.call_command("runserver", noreload=True)
-    return HttpResponseRedirect('/')
-
-@login_required(login_url='/login/')
 def inicializar_tablas(request):
     #ventas_inicializar_tablas()
     if request.user.is_superuser:
@@ -67,49 +61,23 @@ def inicializar_tablas(request):
             
         conexion_name = "%02d-%s"%(conexion_activa_id, basedatos_activa)
         
-        quitar = False
+        # Campos nuevos en tablas
+        sincronizar_tablas( conexion_name = None )
+        
+        #Triggers
         if 'microsip_web.apps.punto_de_venta' in MICROSIP_MODULES:
-            punto_de_venta_actualizar_tablas( conexion_name = conexion_name )
-        else:
-            quitar = True
-
-        if 'microsip_web.apps.inventarios' in MICROSIP_MODULES:
-            inventario_actualizar_tablas( conexion_name = conexion_name )
-        else:
-            quitar = True
+            punto_de_venta_actualizar_triggers( conexion_name = conexion_name )
 
         #cuentas_por_pagar_inicializar_tablas()
         #cuentas_por_cobrar_inicializar_tablas()
 
-        #Sincronizar todas las bases de datos de microsip con tablas de la aplicacion
-        
         management.call_command('syncdb', database=conexion_name)
 
     return HttpResponseRedirect('/')
 
-def inventario_actualizar_tablas( conexion_name = None ):
-    c = connections[conexion_name].cursor()
-    ################## STRORE PROCEDURES ###################
-    c.execute(procedures['SIC_DOCTOINVFISDET_AT'])
-    c.execute("EXECUTE PROCEDURE SIC_DOCTOINVFISDET_AT;")
-    c.execute(procedures['SIC_DESGDISCINVFIS_AT'])
-    c.execute("EXECUTE PROCEDURE SIC_DESGDISCINVFIS_AT;")
-   
-    ####################### TRIGGERS #######################
-    # c.execute(inventarios_triggers['SIC_PUERTA_INV_DESGLOSEDIS_AI'])
-    # c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSINDET_BI'])
-    # c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSINDET_BD'])
-    # c.execute(inventarios_triggers['SIC_PUERTA_INV_DOCTOSIN_BU'])
+def sincronizar_tablas( conexion_name = None ):
+    """ Modifica todas las tablas con campos nuevos para uso en aplicacion. """
 
-    transaction.commit_unless_managed()
-
-def ventas_inicializar_tablas( conexion_name = None ):
-    c = connections[conexion_name].cursor()
-    c.execute(procedures['ventas_inicializar'])
-    c.execute("EXECUTE PROCEDURE ventas_inicializar;")
-    transaction.commit_unless_managed()
-
-def punto_de_venta_actualizar_tablas( conexion_name = None ):
     c = connections[conexion_name].cursor()
     ################## STRORE PROCEDURES ###################
     c.execute(procedures['SIC_PUNTOS_ARTICULOS_AT'])
@@ -142,7 +110,30 @@ def punto_de_venta_actualizar_tablas( conexion_name = None ):
     c.execute('EXECUTE PROCEDURE SIC_LIBRES_CLIENTES_AT;')
 
     c.execute(procedures['SIC_FILTROS_ARTICULOS_AT'])
-    c.execute('EXECUTE PROCEDURE SIC_FILTROS_ARTICULOS_AT;')    
+    c.execute('EXECUTE PROCEDURE SIC_FILTROS_ARTICULOS_AT;')   
+
+    #inventarios
+    c.execute(procedures['SIC_DOCTOINVFISDET_AT'])
+    c.execute("EXECUTE PROCEDURE SIC_DOCTOINVFISDET_AT;")
+
+    c.execute(procedures['SIC_DESGDISCINVFIS_AT'])
+    c.execute("EXECUTE PROCEDURE SIC_DESGDISCINVFIS_AT;")
+
+    transaction.commit_unless_managed()
+
+def ventas_inicializar_tablas( conexion_name = None ):
+    """ Agrega campos particulares para segmentos """
+
+    c = connections[conexion_name].cursor()
+    c.execute(procedures['ventas_inicializar'])
+    c.execute("EXECUTE PROCEDURE ventas_inicializar;")
+    transaction.commit_unless_managed()
+
+def punto_de_venta_actualizar_triggers( conexion_name = None ):
+    """ Agrega trigger a base de datos para aplicacion punto de venta. """
+
+    c = connections[conexion_name].cursor()
+     
     ####################### TRIGGERS #######################
      #DETALLE DE VENTAS
     c.execute(punto_de_venta_triggers['SIC_PUNTOS_PV_DOCTOSPVDET_BU'])
@@ -164,12 +155,16 @@ def punto_de_venta_actualizar_tablas( conexion_name = None ):
     transaction.commit_unless_managed()
 
 def cuentas_por_pagar_inicializar_tablas( conexion_name = None ):
+    """ Agrega campos particulares para segmentos """
+
     c = connections[conexion_name].cursor()
     c.execute(procedures['cuentas_por_pagar_inicializar'])
     c.execute('EXECUTE PROCEDURE cuentas_por_pagar_inicializar;')
     transaction.commit_unless_managed()
 
 def cuentas_por_cobrar_inicializar_tablas( conexion_name = None ):
+    """ Agrega campos particulares para segmentos """
+
     c = connections[conexion_name].cursor()
     c.execute(procedures['cuentas_por_cobrar_inicializar'])
     c.execute("EXECUTE PROCEDURE cuentas_por_cobrar_inicializar;")

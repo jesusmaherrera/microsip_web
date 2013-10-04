@@ -114,9 +114,6 @@ def select_db(request, template_name='main/select_db.html'):
     else:
         request.session['selected_database'] = ''
     
-    
-
-    
     c =  {'form':form, 'message':message,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
@@ -218,7 +215,7 @@ def invetariofisicolive_manageview(request, template_name='inventarios/Inventari
 
 @detect_mobile
 @login_required(login_url='/login/')
-def invetariosFisicos_View(request, template_name='inventarios/Inventarios Fisicos/inventarios_fisicos.html'):
+def invetariosfisicos_view(request, template_name='inventarios/Inventarios Fisicos/inventarios_fisicos.html'):
     connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
