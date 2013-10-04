@@ -396,6 +396,7 @@ def cliente_manageView(request, id = None, template_name='main/clientes/clientes
     c = {'form':form, 'cuentas':cuentas,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
+@login_required(login_url='/login/')
 def cliente_searchView(request, template_name='main/clientes/clientes/cliente_search.html'):
     message = ''
     cliente =  Cliente()
