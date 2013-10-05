@@ -6,7 +6,13 @@
 <!-- JavaScript Code -->
 {% block js_code %}
 <script type="text/javascript">
-  
+  $(".inventario_link_inventarios").on("click",function(event){
+    event.preventDefault();
+    if (!Modernizr.localstorage) 
+      window.location = $(".inventario_link_inventarios").attr('href') + "1/";
+    else
+      window.location = $(".inventario_link_inventarios").attr('href') + localStorage.getItem("dua") + "/";
+  });
 </script>
 {% endblock %}
 
@@ -16,8 +22,8 @@
   <div class="row-fluid">
     <div class="span3"><h3>Inventarios Fisicos</h3></div>
     <div class="span8" style=" margin-top: 15px; ">
-      <a class="btn" href="/inventarios/inventariofisico/"><i class=" icon-plus"></i></a>
-      <a class="btn" href="/inventarios/inventariofisico_live/"> Inventario live </a>
+      <a class="btn link_inventario" href="/inventarios/inventariofisico/"><i class=" icon-plus"></i></a>
+      <!-- <a class="btn" href="/inventarios/inventariofisico_live/"> Inventario live </a> -->
     </div>
   </div>
 </div>
@@ -30,7 +36,7 @@
     </tr>
     {% for inventario_fisico in inventarios_fisicos %}
     <tr>
-      <td><a href="{{ url_inventario }}{{ inventario_fisico.id }}/">{{ inventario_fisico.folio }}</a></td>
+      <td><a class='inventario_link_inventarios' href="{{ url_inventario }}{{ inventario_fisico.id }}/">{{ inventario_fisico.folio }}</a></td>
       <td class="hidden-phone">{{ inventario_fisico.fecha }}</td>
       <td class="hidden-phone">{{ inventario_fisico.descripcion }}</td>
       <td>{{ inventario_fisico.almacen }}</td>

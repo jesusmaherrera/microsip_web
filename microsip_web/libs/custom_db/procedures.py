@@ -43,7 +43,7 @@ procedures['SIC_DOCTOINVFISDET_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'DOCTOS_INVFIS_DET' and rf.RDB$FIELD_NAME = 'SIC_UNIDADES_SYN')) then
-            execute statement 'ALTER TABLE DOCTOS_INVFIS_DET ADD SIC_UNIDADES_SYN NUMERICO_AMPLIO';
+            execute statement 'ALTER TABLE DOCTOS_INVFIS_DET ADD SIC_UNIDADES_SYN NUMERIC(18,5) DEFAULT 0';
     END  
     '''
 

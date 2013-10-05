@@ -23,33 +23,33 @@ from microsip_web.settings.common import MICROSIP_MODULES
 from microsip_web.apps.inventarios.triggers import triggers as inventarios_triggers
 from microsip_web.apps.punto_de_venta.triggers import triggers as punto_de_venta_triggers
 
-@login_required(login_url='/login/')
-def conexiones_View(request, template_name='main/conexiones/conexiones.html'):
-    c = {'conexiones':ConexionDB.objects.all()}
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
+@login_required( login_url = '/login/' )
+def conexiones_View( request, template_name = 'main/conexiones/conexiones.html' ):
+    c = { 'conexiones' : ConexionDB.objects.all() }
+    return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
 @login_required(login_url='/login/')
-def conexion_manageView(request, id = None, template_name='main/conexiones/conexion.html'):
+def conexion_manageView( request, id = None, template_name = 'main/conexiones/conexion.html' ):
     message = ''
 
     if id:
-        conexion = get_object_or_404( ConexionDB, pk=id)
+        conexion = get_object_or_404( ConexionDB, pk = id)
     else:
         conexion =  ConexionDB()
         
     if request.method == 'POST':
-        form = ConexionManageForm(request.POST, instance=  conexion)
+        form = ConexionManageForm( request.POST, instance =  conexion )
         if form.is_valid():
             grupo = form.save()
-            return HttpResponseRedirect('/conexiones/')
+            return HttpResponseRedirect( '/conexiones/' )
     else:
-        form = ConexionManageForm(instance= conexion)
+        form = ConexionManageForm( instance = conexion )
 
-    c = {'form':form,}
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
+    c = { 'form' : form, }
+    return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
-@login_required(login_url='/login/')
-def inicializar_tablas(request):
+@login_required( login_url = '/login/' )
+def inicializar_tablas( request ):
     #ventas_inicializar_tablas()
     if request.user.is_superuser:
 
@@ -67,8 +67,8 @@ def inicializar_tablas(request):
         #Triggers
         if 'microsip_web.apps.punto_de_venta' in MICROSIP_MODULES:
             actualizar_triggers_puntodeventa( conexion_name = conexion_name )
-        # elif 'microsip_web.apps.inventarios' in MICROSIP_MODULES:
-        #     actualizar_triggers_inventarios( conexion_name = conexion_name )
+        if 'microsip_web.apps.inventarios' in MICROSIP_MODULES:
+            actualizar_triggers_inventarios( conexion_name = conexion_name )
 
         #cuentas_por_pagar_inicializar_tablas()
         #cuentas_por_cobrar_inicializar_tablas()
@@ -131,15 +131,15 @@ def ventas_inicializar_tablas( conexion_name = None ):
     c.execute( "EXECUTE PROCEDURE ventas_inicializar;" )
     transaction.commit_unless_managed()
 
-# def actualizar_triggers_inventarios( conexion_name = None ):
-#     c = connections[ conexion_name ].cursor()
-#     ####################### TRIGGERS #######################
-#     # c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DESGLOSEDIS_AI' ] )
-#     # c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSINDET_BI' ] )
-#     # c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSINDET_BD' ] )
-#     #c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSIN_BU' ] )
+def actualizar_triggers_inventarios( conexion_name = None ):
+    c = connections[ conexion_name ].cursor()
+    ####################### TRIGGERS #######################
+    c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DESGLOSEDIS_AI' ] )
+    c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSINDET_BI' ] )
+    c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSINDET_BD' ] )
+    c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSIN_BU' ] )
 
-#     transaction.commit_unless_managed()
+    transaction.commit_unless_managed()
 
 def actualizar_triggers_puntodeventa( conexion_name = None ):
     """ Agrega trigger a base de datos para aplicacion punto de venta. """
@@ -182,7 +182,7 @@ def cuentas_por_cobrar_inicializar_tablas( conexion_name = None ):
     c.execute("EXECUTE PROCEDURE cuentas_por_cobrar_inicializar;")
     transaction.commit_unless_managed()
 
-@login_required(login_url='/login/')
-def index(request):
-    return render_to_response('main/index.html', {}, context_instance=RequestContext(request))
+@login_required( login_url = '/login/' )
+def index( request ):
+    return render_to_response( 'main/index.html', {}, context_instance = RequestContext( request ) )
     

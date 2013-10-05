@@ -13,11 +13,12 @@ urlpatterns = patterns('',
     (r'^articulo/(?P<id>\d+)/', views.ArticuloManageView),
     (r'^inventariofisico/$', views.create_invetarioFisico_createView),
     
-    (r'^inventariofisico/(?P<id>\d+)/', views.invetarioFisico_manageView),
+    # (r'^inventariofisico/(?P<id>\d+)/', views.invetarioFisico_manageView),
+    (r'^inventariofisico/(?P<id>\d+)/(?P<dua>\d+)/', views.invetarioFisico_manageView),
     (r'^inventarioFisico_mobile/(?P<id>\d+)/', views.invetarioFisico_mobile_pa_manageView),
     (r'^inventarioFisico_mobile/articulo_serie/(?P<id>\d+)/(?P<no_series>\d+)/', views.invetarioFisico_mobile_series_manageView),
     
-    (r'^inventariofisico_live/$', views.invetariofisicolive_manageview),
+    # (r'^inventariofisico_live/$', views.invetariofisicolive_manageview),
     (r'^articulos/$', pv_views.articulos_view),
 
     (r'^articulo/(?P<id>\d+)/', pv_views.articulo_manageView),

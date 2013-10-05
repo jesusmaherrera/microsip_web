@@ -7,6 +7,28 @@
 {% endblock %}
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
+{% block js_modulecode %}
+  <script type="text/javascript">
+    dua = localStorage.getItem("dua");
+    if (dua == null)
+      localStorage.setItem("dua", '1');
+    
+    if(localStorage.getItem("dua") == '1')
+      $("input[name='checkbox_mua']").attr('checked', true);
+    else
+      $("input[name='checkbox_mua']").attr('checked', false);
+
+    $("input[name='checkbox_mua']").on("click", function(){
+      if ($(this).is(':checked'))
+        localStorage.setItem("dua", '1');
+      else
+        localStorage.setItem("dua", '0');
+      
+      if (window.location.href.indexOf('/inventarios/inventariofisico/') > -1)
+		window.location = "/inventarios/inventariofisico/{{ inventario_id }}/" + localStorage.getItem("dua") + "/";
+    });
+</script>
+{% endblock %}
 {% block selected_module %}<a href="/inventarios/inventariosfisicos/"> <i class="msicon-inventarios"></i> <label class="small_screen"> Inventarios</label></a>{% endblock %}
 {% block btn_modulo_inventarios%}
 <li style='color: #555555; background-color: #e5e5e5;'><a href="/inventarios/inventariosfisicos/"> <i class="msicon-inventarios"></i> <label class='small_screen'> Inventarios</label></a> </li>
@@ -17,6 +39,14 @@
   <ul class="nav" role="navigation">
     <li><a tabindex="-1" href="/inventarios/inventariosfisicos/"><i class="icon-folder-close"></i> <span class=""> Documentos</span></a></li>
     <li><a tabindex="-1" href="/inventarios/articulos/"><i class="icon-barcode"></i> <span class="">Articulos</span></a></li>
+  </ul>
+  <ul id="menu_ver" class="nav pull-right hidden-phone">
+    <li class="dropdown">
+      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-eye-open"></i> Ver <b class="caret"></b></a>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+        <li><a href="#"> <input type="checkbox" name="checkbox_mua" value="unit-in-group" /> Movimientos del usuario activo</a></li>
+      </ul>
+    </li>
   </ul>
 </div>
 {% endblock %}
