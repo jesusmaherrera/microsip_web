@@ -22,7 +22,10 @@
   function mostrar_articulos_sincronizados(data)
   {
     alert("Se syncronizaron " + data.articulos_count + "Articulo.");
-    window.location = "/inventarios/inventariofisico/{{ inventario_id }}/";
+    if (!Modernizr.localstorage) 
+      window.location = "/inventarios/inventariofisico/{{ inventario_id }}/1/";
+    else
+      window.location = "/inventarios/inventariofisico/{{ inventario_id }}/" + localStorage.getItem("dua") + "/";
   }
 
   function agregar_articulos_porlineafn()
@@ -53,7 +56,10 @@
     else
       alert('No hay articulos por inicializar');
     
-    window.location = "/inventarios/inventariofisico/{{ inventario_id }}/";
+    if (!Modernizr.localstorage) 
+      window.location = "/inventarios/inventariofisico/{{ inventario_id }}/1/";
+    else
+      window.location = "/inventarios/inventariofisico/{{ inventario_id }}/" + localStorage.getItem("dua") + "/";
   }
   
   
