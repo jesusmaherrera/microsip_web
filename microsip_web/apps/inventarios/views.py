@@ -438,7 +438,7 @@ def invetarioFisico_manageView( request, id = None, dua = '1', template_name = '
                                 detalleInv.detalle_modificaciones = nuevo_texto
                             else:
                                 message = "El numero de caracteres para detalles del articulo fue excedido"
-                            detalleInv.detalle_modificacionestime = '[%s/%s=%s](%s),'%( request.user.username, ubicacion_form.cleaned_data[ 'ubicacion' ], detalleInvForm.cleaned_data[ 'unidades' ], datetime.now().strftime("%d-%m-%Y %H:%M") )
+                            detalleInv.detalle_modificacionestime += '[%s/%s=%s](%s),'%( request.user.username, ubicacion_form.cleaned_data[ 'ubicacion' ], detalleInvForm.cleaned_data[ 'unidades' ], datetime.now().strftime("%d-%m-%Y %H:%M") )
                             detalleInv.save()
 
                         return HttpResponseRedirect('/inventarios/inventariofisico/%s/%s/'% (id, dua))
