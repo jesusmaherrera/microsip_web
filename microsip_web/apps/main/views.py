@@ -25,11 +25,15 @@ from microsip_web.apps.punto_de_venta.triggers import triggers as punto_de_venta
 
 @login_required( login_url = '/login/' )
 def conexiones_View( request, template_name = 'main/conexiones/conexiones.html' ):
+    """ Lista de conexiones a carpetas ( Microsip Datos ). """
+
     c = { 'conexiones' : ConexionDB.objects.all() }
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
 @login_required(login_url='/login/')
 def conexion_manageView( request, id = None, template_name = 'main/conexiones/conexion.html' ):
+    """ Lista de conexiones """
+
     message = ''
 
     if id:
@@ -50,6 +54,8 @@ def conexion_manageView( request, id = None, template_name = 'main/conexiones/co
 
 @login_required( login_url = '/login/' )
 def inicializar_tablas( request ):
+    """ Agrega trigers y campos nuevos en tablas de base de datos. """
+
     #ventas_inicializar_tablas()
     if request.user.is_superuser:
 
@@ -132,6 +138,8 @@ def ventas_inicializar_tablas( conexion_name = None ):
     transaction.commit_unless_managed()
 
 def actualizar_triggers_inventarios( conexion_name = None ):
+    """ Agrega trigger a base de datos para aplicacion inventarios. """
+
     c = connections[ conexion_name ].cursor()
     ####################### TRIGGERS #######################
     c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DESGLOSEDIS_AI' ] )
