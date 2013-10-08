@@ -1,0 +1,77 @@
+{% extends "punto_de_venta/base.html" %}
+{% block title %}Inicio{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}
+{% endblock %}
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Generar lote de tarjetas {% endblock %}
+{% block content %}
+{% if msg %}
+<div class="alert alert-success fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Bien hecho!! </strong> {{ msg }}
+</div>
+{% endif %}
+<div class="ms-custom-form container-fluid hidden-phone">
+  <div class="row-fluid">
+    <div class="span3"><h3>Generar lote de tarjetas</h3></div>
+    <div class="span8" style=" margin-top: 15px; ">
+      
+    </div>
+  </div>
+</div>
+{{ form.errors }}
+<form method="post" id='formulario'class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+
+  <div  class="row">
+    <div class="span" >
+      <label>Tipo de tarjetas</label>
+      <div class="input-prepend input-append">
+        {{ form.tipo_tarjeta}}
+      </div>
+    </div>
+    <div class="span" >
+      <label>Puntos</label>
+      <div class="input-prepend input-append">
+        {{ form.puntos }}
+      </div>
+    </div>
+    <div class="span" >
+      <label>Dinero Electronico</label>
+      <div class="input-prepend input-append">
+        {{ form.dinero_electronico }}
+      </div>
+    </div>
+  </div>
+  <div  class="row">
+    <div class="span2" >
+      <label>Prefijo</label>
+      <div class="input-prepend input-append">
+        {{ form.prefijo }}
+      </div>
+    </div>
+    <div class="span2" >
+      <label>Iniciar en</label>
+      <div class="input-prepend input-append">
+        {{ form.iniciar_en }}
+      </div>
+    </div>
+    <div class="span2" >
+      <label>Cantidad</label>
+      <div class="input-prepend input-append">
+        {{ form.cantidad }}
+      </div>
+    </div>
+    <div class="span2" >
+      <label>.</label>
+      <div class="input-prepend input-append">
+        <input type="submit" class="btn" onclick="this.disabled=true,this.form.submit(), this.value='Generando tarjetas...';" value="Generar tarjetas" />
+      </div>
+    </div>
+  </div>
+</form>
+
+{% endblock %}

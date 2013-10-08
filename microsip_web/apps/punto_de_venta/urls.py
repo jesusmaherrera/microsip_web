@@ -12,6 +12,8 @@ urlpatterns = patterns('',
 
 	(r'^GenerarPolizas/$', views.generar_polizas_View),
 	(r'^PreferenciasEmpresa/$', views.preferenciasEmpresa_View),
+    (r'^generar_tarjetas/$', views.generar_tarjetas),
+    
 	#Plantilla Poliza
 	(r'^plantilla_poliza/$', views.plantilla_poliza_manageView),
     (r'^plantilla_poliza/(?P<id>\d+)/', views.plantilla_poliza_manageView),

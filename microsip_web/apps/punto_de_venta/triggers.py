@@ -45,7 +45,7 @@ triggers['SIC_PUNTOS_PV_DOCTOSPVDET_BU'] = '''
         FROM clientes, doctos_pv, doctos_pv_det, libres_clientes
         WHERE
             doctos_pv.docto_pv_id =  doctos_pv_det.docto_pv_id and
-            doctos_pv.cliente_id = clientes.cliente_id and
+            doctos_pv.sic_cliente_tarjeta = clientes.cliente_id and
             doctos_pv_det.docto_pv_det_id = new.docto_pv_det_id and
             clientes.cliente_id = libres_clientes.cliente_id
         INTO :cliente_id, :cliente_tipo_tarjeta, :cliente_total_puntos, :cliente_total_dinero_electronico, :documento_total_puntos, :documento_total_dinero_electronico, :cliente_heredar_puntos_a;
@@ -149,7 +149,7 @@ triggers['SIC_PUNTOS_PV_DOCTOSPVDET_AD'] = '''
         FROM clientes, doctos_pv
         WHERE
             doctos_pv.docto_pv_id = old.docto_pv_id and
-            doctos_pv.cliente_id = clientes.cliente_id
+            doctos_pv.sic_cliente_tarjeta = clientes.cliente_id
         INTO total_puntos, cliente_id, dinero_electronico;
         
         IF (dinero_electronico IS NULL) then
@@ -176,6 +176,8 @@ triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'] = '''
     ACTIVE BEFORE UPDATE POSITION 0
     AS
     declare variable cliente_id integer;
+    declare variable cliente_eventual_id integer;
+    declare variable tipo_cliente_nombre char(50);
     declare variable cliente_tipo_tarjeta char(1);
     declare variable cliente_total_puntos integer;
     declare variable cliente_total_dinero_electronico double PRECISION;
@@ -190,13 +192,27 @@ triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'] = '''
     declare variable dinero_electronico_pago double PRECISION;
 
     begin
-        
+        /*Datos del cliente tarjeta*/
+        SELECT tipos_clientes.nombre
+        FROM clientes, tipos_clientes
+        WHERE clientes.cliente_id = new.cliente_id and clientes.tipo_cliente_id = tipos_clientes.tipo_cliente_id
+        INTO :tipo_cliente_nombre;
+
+        /* Para manejo de tarjetas */
+        select valor from registry where nombre = 'CLIENTE_EVENTUAL_PV_ID'
+        into :cliente_eventual_id;
+        if ( new.sic_cliente_tarjeta is null ) then
+            new.sic_cliente_tarjeta = 0;
+        if ( new.cliente_id <> cliente_eventual_id ) then
+            new.sic_cliente_tarjeta = new.cliente_id;
+        if (tipo_cliente_nombre = 'TARJETA PROMOCION') then
+            new.cliente_id = cliente_eventual_id;
+
         /*Datos del cliente*/
         SELECT clientes.cliente_id, clientes.sic_tipo_tarjeta, clientes.sic_puntos, clientes.sic_dinero_electronico, clientes.sic_hereda_valorpuntos, clientes.sic_valor_puntos, tipos_clientes.sic_valor_puntos
         FROM clientes, tipos_clientes
-        WHERE clientes.cliente_id = new.cliente_id and clientes.tipo_cliente_id = tipos_clientes.tipo_cliente_id
+        WHERE clientes.cliente_id = new.sic_cliente_tarjeta and clientes.tipo_cliente_id = tipos_clientes.tipo_cliente_id
         INTO :cliente_id, :cliente_tipo_tarjeta, :cliente_total_puntos, :cliente_total_dinero_electronico, :cliente_hereda_valorpuntos, :cliente_valor_puntos, :tipo_cliente_valor_puntos;
-
 
         if(tipo_cliente_valor_puntos is null) then
             tipo_cliente_valor_puntos = 0;
@@ -283,7 +299,7 @@ triggers['SIC_PUNTOS_PV_DOCTOSPV_AD'] = '''
         FROM clientes, doctos_pv
         WHERE
         doctos_pv.docto_pv_id = old.docto_pv_id and
-        doctos_pv.cliente_id = clientes.cliente_id
+        doctos_pv.sic_cliente_tarjeta = clientes.cliente_id
         INTO total_puntos, cliente_id, dinero_electronico;
 
         IF (dinero_electronico IS NULL) then

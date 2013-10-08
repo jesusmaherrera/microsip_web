@@ -47,6 +47,9 @@
         <li><a tabindex="-1" href="/punto_de_venta/GenerarPolizas/"><i class="icon-share"></i> Generar Polizas Contables</a></li>
         <li role="presentation" class="divider"></li>
         <li><a tabindex="-1" href="/punto_de_venta/PreferenciasEmpresa/"><i class="icon-cog"></i> Preferencias de la empresa</a></li>
+        {% if request.user.username == 'SYSDBA' %}
+        <li role="presentation" class="divider"></li>
+        <li><a tabindex="-1" href="/punto_de_venta/generar_tarjetas/"><i class="icon-user"></i> Generar Lote de tarjetas</a></li>
         <li role="presentation" class="divider"></li>
         <li><a tabindex="-1" href="#myModal_inicializar_puntos_clientes" data-toggle="modal" >
           <i class='icon-warning-sign' style='margin-left: 0px;'></i> Inicializar puntos de clientes
@@ -56,6 +59,7 @@
           <i class='icon-warning-sign' style='margin-left: 0px;'></i> Inicializar puntos de Articulos
           </a>
         </li>
+        {% endif %}
       </ul>
     </li>
   </ul>

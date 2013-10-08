@@ -86,7 +86,7 @@ procedures['SIC_PUNTOS_LINEASARTICULOS_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD SIC_DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+            execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2) DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
@@ -107,7 +107,7 @@ procedures['SIC_PUNTOS_GRUPOSLINEAS_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'GRUPOS_LINEAS' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE GRUPOS_LINEAS ADD SIC_DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+            execute statement 'ALTER TABLE GRUPOS_LINEAS ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2) DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
@@ -128,7 +128,7 @@ procedures['SIC_PUNTOS_CLIENTES_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE CLIENTES ADD SIC_DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+            execute statement 'ALTER TABLE CLIENTES ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2) DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
@@ -148,7 +148,7 @@ procedures['SIC_PUNTOS_CLIENTES_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_VALOR_PUNTOS')) then
-            execute statement 'ALTER TABLE CLIENTES ADD SIC_VALOR_PUNTOS IMPORTE_MONETARIO DEFAULT 0';
+            execute statement 'ALTER TABLE CLIENTES ADD SIC_VALOR_PUNTOS NUMERIC(15,2) DEFAULT 0';
         
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
@@ -175,7 +175,7 @@ procedures['SIC_PUNTOS_TIPOSCLIENTES_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'TIPOS_CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_VALOR_PUNTOS')) then
-            execute statement 'ALTER TABLE TIPOS_CLIENTES ADD SIC_VALOR_PUNTOS IMPORTE_MONETARIO DEFAULT 0';
+            execute statement 'ALTER TABLE TIPOS_CLIENTES ADD SIC_VALOR_PUNTOS NUMERIC(15,2) DEFAULT 0';
     END  
     '''
 
@@ -186,7 +186,7 @@ procedures['SIC_PUNTOS_DOCTOSPVDET_AT'] = '''
          if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'DOCTOS_PV_DET' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE DOCTOS_PV_DET ADD SIC_DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+            execute statement 'ALTER TABLE DOCTOS_PV_DET ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2) DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
@@ -202,7 +202,7 @@ procedures['SIC_PUNTOS_DOCTOS_PV_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_DINERO_ELECTRONICO IMPORTE_MONETARIO DEFAULT 0';
+            execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2) DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
@@ -212,7 +212,7 @@ procedures['SIC_PUNTOS_DOCTOS_PV_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'SIC_VALOR_PUNTOS_PAGO')) then
-            execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_VALOR_PUNTOS_PAGO IMPORTE_MONETARIO DEFAULT 0';
+            execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_VALOR_PUNTOS_PAGO NUMERIC(15,2) DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
@@ -222,7 +222,7 @@ procedures['SIC_PUNTOS_DOCTOS_PV_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO_PAGO')) then
-            execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_DINERO_ELECTRONICO_PAGO IMPORTE_MONETARIO DEFAULT 0';
+            execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_DINERO_ELECTRONICO_PAGO NUMERIC(15,2) DEFAULT 0';
     END  
     '''
 

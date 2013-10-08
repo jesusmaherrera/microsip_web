@@ -161,6 +161,9 @@ class Articulos(models.Model):
     nota_ventas = models.TextField(db_column='NOTAS_VENTAS', blank=True, null=True)
     unidad_venta = models.CharField(default = 'PIEZA', max_length=20, blank=True, null=True, db_column='UNIDAD_VENTA')
     unidad_compra = models.CharField(default = 'PIEZA' , max_length=20, blank=True, null=True, db_column='UNIDAD_COMPRA')
+    usuario_ult_modif = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_ULT_MODIF')
+    fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='FECHA_HORA_ULT_MODIF')
+
     puntos = models.IntegerField(db_column='SIC_PUNTOS')
     dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
     hereda_puntos = models.BooleanField( db_column='SIC_HEREDA_PUNTOS')
@@ -408,7 +411,8 @@ class ConceptosNo(models.Model):
 class CondicionPago(models.Model):
     id = models.AutoField(primary_key=True, db_column='COND_PAGO_ID')
     nombre = models.CharField(max_length=50, db_column='NOMBRE')
-    
+    es_predet = models.CharField(default='N', max_length=1, db_column='ES_PREDET')
+
     def __unicode__(self):
         return self.nombre
     class Meta:
@@ -663,29 +667,35 @@ class Vendedor(models.Model):
 ####                                                        ####
 ################################################################
 
-class TipoCliente(models.Model):
-    id              = models.AutoField(primary_key=True, db_column='TIPO_CLIENTE_ID')
-    nombre          = models.CharField(max_length=100, db_column='NOMBRE')
-    valor_puntos    = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_VALOR_PUNTOS')
+class TipoCliente( models.Model ):
+    id              = models.AutoField( primary_key = True, db_column = 'TIPO_CLIENTE_ID' )
+    nombre          = models.CharField( max_length = 100, db_column = 'NOMBRE' )
+    valor_puntos    = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_VALOR_PUNTOS' )
 
-    def __unicode__(self):
+    def __unicode__( self ):
         return self.nombre
         
     class Meta:
         db_table = u'tipos_clientes'
 
-class Cliente(models.Model):
-    id                          = models.AutoField(primary_key=True, db_column='CLIENTE_ID')
-    nombre                      = models.CharField(max_length=100, db_column='NOMBRE')
-    cuenta_xcobrar              = models.CharField(max_length=9, db_column='CUENTA_CXC')
-    tipo_cliente                = models.ForeignKey(TipoCliente, db_column='TIPO_CLIENTE_ID')
-    TIPOS = (('N', 'No Aplica'),('P', 'Puntos'),('D', 'Dinero Electronico'),)
-    puntos                      = models.IntegerField(db_column='SIC_PUNTOS')
-    dinero_electronico          = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
-    tipo_tarjeta                = models.CharField(default='N', max_length=1, choices=TIPOS, db_column='SIC_TIPO_TARJETA')
-    hereda_valorpuntos          = models.BooleanField(db_column='SIC_HEREDA_VALORPUNTOS')
-    valor_puntos                = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_VALOR_PUNTOS')
-    hereda_puntos_a             = models.ForeignKey('self', db_column='SIC_HEREDAR_PUNTOS_A', related_name='hereda_puntos_a_cliente',blank=True, null=True)
+class Cliente( models.Model ):
+    id = models.AutoField( primary_key = True, db_column = 'CLIENTE_ID' )
+    nombre = models.CharField( max_length = 100, db_column = 'NOMBRE' )
+    estatus = models.CharField( default = 'A', max_length = 1, db_column = 'ESTATUS' )
+    cuenta_xcobrar = models.CharField( max_length = 9, db_column = 'CUENTA_CXC' )
+    tipo_cliente = models.ForeignKey( TipoCliente, db_column = 'TIPO_CLIENTE_ID' )
+    usuario_ult_modif = models.CharField( blank = True, null = True, max_length = 31, db_column = 'USUARIO_ULT_MODIF' )
+    fechahora_ult_modif = models.DateTimeField( auto_now = True, blank = True, null = True, db_column = 'FECHA_HORA_ULT_MODIF' )
+    moneda = models.ForeignKey(Moneda, db_column = 'MONEDA_ID' )
+    condicion_de_pago = models.ForeignKey(CondicionPago, db_column='COND_PAGO_ID')
+    
+    TIPOS = ( ( 'N', 'No Aplica' ),( 'P', 'Puntos' ),( 'D', 'Dinero Electronico' ), )
+    puntos = models.IntegerField( db_column = 'SIC_PUNTOS' )
+    dinero_electronico = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_DINERO_ELECTRONICO' )
+    tipo_tarjeta = models.CharField( default = 'N', max_length = 1, choices = TIPOS, db_column = 'SIC_TIPO_TARJETA' )
+    hereda_valorpuntos = models.BooleanField( db_column = 'SIC_HEREDA_VALORPUNTOS' )
+    valor_puntos = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_VALOR_PUNTOS' )
+    hereda_puntos_a = models.ForeignKey( 'self', db_column = 'SIC_HEREDAR_PUNTOS_A', related_name = 'hereda_puntos_a_cliente', blank = True, null = True )
     # cuenta_1 = models.ForeignKey(CuentaCo, db_column='CUENTA_1', blank=True, null=True, related_name='cuenta_1')
     # cuenta_2 = models.ForeignKey(CuentaCo, db_column='CUENTA_2', blank=True, null=True, related_name='cuenta_2')
     # cuenta_3 = models.ForeignKey(CuentaCo, db_column='CUENTA_3', blank=True, null=True, related_name='cuenta_3')
@@ -693,12 +703,11 @@ class Cliente(models.Model):
     # cuenta_5 = models.ForeignKey(CuentaCo, db_column='CUENTA_5', blank=True, null=True, related_name='cuenta_5')
 
 
-    def __unicode__(self):
+    def __unicode__( self ):
         return self.nombre
 
     class Meta:
         db_table = u'clientes'
-
 
 class RolClavesClientes(models.Model):
     id      = models.AutoField(primary_key=True, db_column='ROL_CLAVE_CLI_ID')

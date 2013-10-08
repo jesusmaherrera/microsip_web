@@ -8,6 +8,30 @@ from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from models import *
 
+class generartarjetas_form( forms.Form ):
+    prefijo = forms.CharField( max_length = 3, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
+    iniciar_en = forms.IntegerField( widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
+    cantidad = forms.IntegerField( max_value = 6000 , widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
+    TIPOS_TARJETA = ( ( 'P', 'Puntos' ),( 'D', 'Dinero Electronico' ), )
+    tipo_tarjeta = forms.ChoiceField( choices = TIPOS_TARJETA )
+    puntos = forms.IntegerField(widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
+    dinero_electronico = forms.DecimalField(max_value = 2000, decimal_places = 2, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        prefijo = cleaned_data.get("prefijo")
+        iniciar_en = cleaned_data.get("iniciar_en")
+        cantidad = cleaned_data.get("cantidad")
+
+        claves = []
+        for numero in range( iniciar_en, iniciar_en + cantidad ):
+            claves.append( '%s' % '%s%s'% ( prefijo, ( "%09d" % numero ) ) )
+
+        if ClavesClientes.objects.filter( clave__in = claves ).exists():
+            raise forms.ValidationError(u'Ya Existe una o mas claves en este rango')
+
+        return cleaned_data
+
 class ArticuloCompatibleArticulo_ManageForm(forms.Form):
     compatible_articulo = forms.ModelChoiceField(queryset=Articulos.objects.all(),
         widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
