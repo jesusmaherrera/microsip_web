@@ -681,7 +681,7 @@ class TipoCliente( models.Model ):
 class Cliente( models.Model ):
     id = models.AutoField( primary_key = True, db_column = 'CLIENTE_ID' )
     nombre = models.CharField( max_length = 100, db_column = 'NOMBRE' )
-    estatus = models.CharField( default = 'A', max_length = 1, db_column = 'ESTATUS' )
+    estatus = models.CharField( default = 'A',  max_length = 1, db_column = 'ESTATUS' )
     cuenta_xcobrar = models.CharField( max_length = 9, db_column = 'CUENTA_CXC' )
     tipo_cliente = models.ForeignKey( TipoCliente, db_column = 'TIPO_CLIENTE_ID' )
     usuario_ult_modif = models.CharField( blank = True, null = True, max_length = 31, db_column = 'USUARIO_ULT_MODIF' )

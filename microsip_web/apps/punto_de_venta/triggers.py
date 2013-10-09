@@ -41,13 +41,12 @@ triggers['SIC_PUNTOS_PV_DOCTOSPVDET_BU'] = '''
 
     BEGIN
         /*Datos del documento*/
-        SELECT clientes.cliente_id, clientes.sic_tipo_tarjeta, clientes.sic_puntos, clientes.sic_dinero_electronico, doctos_pv.sic_puntos, doctos_pv.sic_dinero_electronico, libres_clientes.heredar_puntos_a
-        FROM clientes, doctos_pv, doctos_pv_det, libres_clientes
+        SELECT clientes.cliente_id, clientes.sic_tipo_tarjeta, clientes.sic_puntos, clientes.sic_dinero_electronico, doctos_pv.sic_puntos, doctos_pv.sic_dinero_electronico, clientes.sic_heredar_puntos_a
+        FROM clientes, doctos_pv, doctos_pv_det
         WHERE
             doctos_pv.docto_pv_id =  doctos_pv_det.docto_pv_id and
             doctos_pv.sic_cliente_tarjeta = clientes.cliente_id and
-            doctos_pv_det.docto_pv_det_id = new.docto_pv_det_id and
-            clientes.cliente_id = libres_clientes.cliente_id
+            doctos_pv_det.docto_pv_det_id = new.docto_pv_det_id
         INTO :cliente_id, :cliente_tipo_tarjeta, :cliente_total_puntos, :cliente_total_dinero_electronico, :documento_total_puntos, :documento_total_dinero_electronico, :cliente_heredar_puntos_a;
 
 
@@ -58,10 +57,9 @@ triggers['SIC_PUNTOS_PV_DOCTOSPVDET_BU'] = '''
             where clientes.cliente_id = claves_clientes.cliente_id and claves_clientes.clave_cliente = :cliente_heredar_puntos_a
             into :cliente_id;
 
-            SELECT clientes.cliente_id, clientes.sic_tipo_tarjeta, clientes.sic_puntos, clientes.sic_dinero_electronico, libres_clientes.heredar_puntos_a
-            FROM clientes, libres_clientes
+            SELECT clientes.cliente_id, clientes.sic_tipo_tarjeta, clientes.sic_puntos, clientes.sic_dinero_electronico, clientes.sic_heredar_puntos_a
+            FROM clientes
             WHERE
-                clientes.cliente_id = libres_clientes.cliente_id and
                 clientes.cliente_id = :cliente_id
             INTO :cliente_id, :cliente_tipo_tarjeta, :cliente_total_puntos, :cliente_total_dinero_electronico, :cliente_heredar_puntos_a;
         end

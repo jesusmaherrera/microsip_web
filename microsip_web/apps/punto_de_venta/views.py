@@ -34,13 +34,21 @@ def generar_tarjetas( request, template_name = 'punto_de_venta/herramientas/gene
         tipo_tarjeta = form.cleaned_data[ 'tipo_tarjeta' ]
         puntos = form.cleaned_data[ 'puntos' ]
         dinero_electronico = form.cleaned_data[ 'dinero_electronico' ]
-        
+        hereda_valorpuntos = form.cleaned_data[ 'hereda_valorpuntos' ]
+        valor_puntos = form.cleaned_data[ 'valor_puntos' ]
+        hereda_puntos_a = form.cleaned_data[ 'hereda_puntos_a' ]
+
         claves = []
 
         #Datos para cliente
         rolclaves = RolClavesClientes.objects.get( es_ppal = 'S' )
         moneda_local = Moneda.objects.get( es_moneda_local = 'S' )
-        condicion_pago = CondicionPago.objects.get( pk = 242 )
+        
+        try:
+            condicion_pago = CondicionPago.objects.get( es_predet = 'S' )
+        except ObjectDoesNotExist:
+            condicion_pago = CondicionPago.objects.all()[0]
+
         tipo_cliente = TipoCliente.objects.get( nombre = 'TARJETA PROMOCION' )
 
         for numero in range( iniciar_en, iniciar_en + cantidad ):
@@ -54,7 +62,9 @@ def generar_tarjetas( request, template_name = 'punto_de_venta/herramientas/gene
                 tipo_tarjeta = tipo_tarjeta,
                 puntos = puntos,
                 dinero_electronico = dinero_electronico,
-                hereda_valorpuntos = 1,
+                hereda_valorpuntos = hereda_valorpuntos,
+                valor_puntos = valor_puntos,
+                hereda_puntos_a = hereda_puntos_a,
                 )
 
             ClavesClientes.objects.create( id = -1, clave = clave, cliente = cliente, rol =  rolclaves )

@@ -5,7 +5,57 @@
 {% block style_css %}
 {% endblock %}
 <!-- JavaScript Code -->
-{% block js_code %}{% endblock %}
+{% block js_code %}
+{% include 'autocomplete_light/static.html' %}
+<script>
+
+
+$(function() {
+
+  if ($('#id_hereda_valorpuntos').is(':checked'))
+    $('#id_valor_puntos').hide();
+  else
+  {
+    $('#id_valor_puntos').show();
+    if ($('#id_valor_puntos').val() == '') 
+      $('#id_valor_puntos').val(0);
+  }
+
+
+  $('#id_hereda_valorpuntos').click(function() {
+    if ($('#id_hereda_valorpuntos').is(':checked'))
+      $('#id_valor_puntos').hide();
+    else
+    {
+      $('#id_valor_puntos').show();
+      if ($('#id_valor_puntos').val() == '') 
+        $('#id_valor_puntos').val(0);
+    }
+  });
+  
+  if ($('#id_tipo_tarjeta').val()=='N')
+    $('#div_darpuntos_a').hide();
+
+  if ($('#id_tipo_tarjeta').val()=='P')
+    $('#div_valor_puntos').show();
+  else
+    $('#div_valor_puntos').hide();
+
+  $('#id_tipo_tarjeta').change(function(event){
+    if ($('#id_tipo_tarjeta').val()=='P')
+      $('#div_valor_puntos').show();
+    else
+      $('#div_valor_puntos').hide(); 
+
+    if ($('#id_tipo_tarjeta').val()=='N')
+      $('#div_darpuntos_a').hide();
+    else
+      $('#div_darpuntos_a').show();
+  });
+
+});
+</script>
+{% endblock %}
 
 {% block breadcrumb %}{{ block.super }} Generar lote de tarjetas {% endblock %}
 {% block content %}
@@ -45,27 +95,39 @@
         {{ form.dinero_electronico }}
       </div>
     </div>
+    <div class="span" id='div_valor_puntos'>
+      <label>Hereda valor de puntos {{ form.hereda_valorpuntos }}</label>
+      <div class="input-prepend input-append">
+        {{ form.valor_puntos }}
+      </div>
+    </div>
+    <div class="span" id="div_darpuntos_a">
+      <label>Dar puntos a</label>
+      <div class="input-prepend input-append">
+        {{ form.hereda_puntos_a }}
+      </div>
+    </div>
   </div>
   <div  class="row">
-    <div class="span2" >
+    <div class="span" >
       <label>Prefijo</label>
       <div class="input-prepend input-append">
         {{ form.prefijo }}
       </div>
     </div>
-    <div class="span2" >
+    <div class="span" >
       <label>Iniciar en</label>
       <div class="input-prepend input-append">
         {{ form.iniciar_en }}
       </div>
     </div>
-    <div class="span2" >
+    <div class="span" >
       <label>Cantidad</label>
       <div class="input-prepend input-append">
         {{ form.cantidad }}
       </div>
     </div>
-    <div class="span2" >
+    <div class="span" >
       <label>.</label>
       <div class="input-prepend input-append">
         <input type="submit" class="btn" onclick="this.disabled=true,this.form.submit(), this.value='Generando tarjetas...';" value="Generar tarjetas" />
