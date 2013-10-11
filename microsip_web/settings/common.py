@@ -87,7 +87,7 @@ try:
                         'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
                         'OPTIONS' : {'charset':'ISO8859_1'},
                     }
-            print MICROSIP_DATABASES
+            
 
 except sqlite3.Error, e:
     print "Error %s:" % e.args[0]
