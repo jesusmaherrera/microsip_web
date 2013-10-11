@@ -1,5 +1,5 @@
-# Django settings for libreria project.
 #encoding:utf-8
+
 # Identificando la ruta del proyecto
 import os
 import fdb
@@ -50,8 +50,8 @@ try:
             cur.execute("SELECT NOMBRE_CORTO FROM EMPRESAS")
             empresas_rows = cur.fetchall()
             db.close()
-
         if conexion_exitosa:
+
             DATABASES[ '%s-CONFIG'%conexion_id ] = {
                 'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
                 'NAME': '%s\System\CONFIG.FDB'% carpeta_datos,
@@ -62,26 +62,33 @@ try:
                 'OPTIONS' : {'charset':'ISO8859_1'},
             }
 
-            for empresa in empresas_rows:
-                MICROSIP_DATABASES['%s-%s'%(conexion_id, empresa[0].replace(' ','_'))] = {
-                    'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-                    'NAME': u'%s\%s.FDB'% (carpeta_datos, empresa[0]),
-                    'USER': user,                      # Not used with sqlite3.
-                    'PASSWORD': password,                  # Not used with sqlite3.
-                    'HOST': host,                      # Set to empty string for localhost. Not used with sqlite3.
-                    'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
-                    'OPTIONS' : {'charset':'ISO8859_1'},
-                }
+            for empresa in empresas_rows:                
+                try:
+                    name = '%s\%s.FDB'% (carpeta_datos, empresa[0])
+                except UnicodeDecodeError:
+                    pass
+                else:
+                    MICROSIP_DATABASES['%s-%s'%(conexion_id, empresa[0].replace(' ','_'))] = {
+                        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+                        'NAME': name,
+                        'USER': user,                      # Not used with sqlite3.
+                        'PASSWORD': password,                  # Not used with sqlite3.
+                        'HOST': host,                      # Set to empty string for localhost. Not used with sqlite3.
+                        'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
+                        'OPTIONS' : {'charset':'ISO8859_1'},
+                    }
 
-                DATABASES['%s-%s'%(conexion_id, empresa[0].replace(' ','_'))] = {
-                    'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-                    'NAME': u'%s\%s.FDB'% (carpeta_datos, empresa[0]),
-                    'USER': user,                      # Not used with sqlite3.
-                    'PASSWORD': password,                  # Not used with sqlite3.
-                    'HOST': host,                      # Set to empty string for localhost. Not used with sqlite3.
-                    'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
-                    'OPTIONS' : {'charset':'ISO8859_1'},
-                }
+                    DATABASES['%s-%s'%(conexion_id, empresa[0].replace(' ','_'))] = {
+                        'ENGINE': 'django.db.backends.firebird', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+                        'NAME': name,
+                        'USER': user,                      # Not used with sqlite3.
+                        'PASSWORD': password,                  # Not used with sqlite3.
+                        'HOST': host,                      # Set to empty string for localhost. Not used with sqlite3.
+                        'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
+                        'OPTIONS' : {'charset':'ISO8859_1'},
+                    }
+            print MICROSIP_DATABASES
+
 except sqlite3.Error, e:
     print "Error %s:" % e.args[0]
 # Local time zone for this installation. Choices can be found here:

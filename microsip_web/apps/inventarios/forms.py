@@ -131,12 +131,15 @@ class SelectDBForm(forms.Form):
             cur = db.cursor()
             cur.execute(consulta)
             empresas_rows = cur.fetchall()
-
             for empresa in empresas_rows:
-                empresa = empresa[0]
-                empresa_option = [empresa, empresa]
-                empresas.append(empresa_option)
-
+                try:
+                    empresa = u'%s'%empresa[0]
+                except UnicodeDecodeError:
+                    pass
+                else:
+                    empresa_option = [empresa, empresa]
+                    empresas.append(empresa_option)
+                    
         super(SelectDBForm,self).__init__(*args,**kwargs)
         self.fields['conexion'] = forms.ChoiceField(choices= empresas)
 
