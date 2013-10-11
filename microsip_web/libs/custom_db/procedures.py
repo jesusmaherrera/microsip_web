@@ -223,6 +223,11 @@ procedures['SIC_PUNTOS_DOCTOS_PV_AT'] = '''
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO_PAGO')) then
             execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_DINERO_ELECTRONICO_PAGO NUMERIC(15,2) DEFAULT 0';
+
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'SIC_CLIENTE_TARJETA')) then
+            execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_CLIENTE_TARJETA ENTERO_ID';
     END  
     '''
 

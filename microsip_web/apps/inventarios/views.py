@@ -165,20 +165,24 @@ def c_get_next_key(connection_name = None ):
 
 @login_required( login_url = '/login/' )
 def invetariofisicolive_manageview( request, template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_live.html' ):
-    connection_name = get_conecctionname( request.session )
-    if connection_name == '':
+    basedatos_activa = request.session[ 'selected_database' ]
+    if basedatos_activa == '':
         return HttpResponseRedirect( '/select_db/' )
-    # salida = DoctosIn.objects.get(folio='000000005', concepto = 38)
-    # entrada = DoctosIn.objects.get(folio='000000005', concepto = 27)
+    else:
+        conexion_activa_id = request.session[ 'conexion_activa' ]
+    conexion_name = "%02d-%s"%( conexion_activa_id, basedatos_activa )
 
-    detalles_inv = DoctosInDet.objects.filter( Q( doctosIn = 23 ) | Q( doctosIn = 23 ) )
+    salida = DoctosIn.objects.get(folio='000000001', concepto = 38)
+    entrada = DoctosIn.objects.get(folio='000000002', concepto = 27)
+
+    detalles_inv = DoctosInDet.objects.filter( Q( doctosIn = entrada ) | Q( doctosIn = salida ) )
     form = DoctoInDetManageForm( request.POST or None )
     
 
     if form.is_valid():
         detalle = form.save( commit = False )
 
-        detalle.id = next_id( 'ID_DOCTOS', connection_name )
+        detalle.id = next_id( 'ID_DOCTOS', conexion_name )
         if detalle.unidades > 0:
             detalle.doctosIn = entrada
             detalle.almacen = entrada.almacen
@@ -194,21 +198,16 @@ def invetariofisicolive_manageview( request, template_name = 'inventarios/Invent
         det_id=  detalle.id
         detalle.save()
 
-        c = connections[ connection_name ].cursor()
-        c.execute("""
-            SELECT A.nombre, B.inv_fin_valor FROM articulos A
-            LEFT JOIN orsp_in_aux_art( articulo_id, 'CONSOLIDADO', '10/02/1987','12/01/2013','S','N') B
-            ON A.articulo_id = B.articulo_id
-            """)
-        unidades_rows = c.fetchall()
-        objects.asdsad
-        if detalle.tipo_movto == 'E':
-            c.execute('EXECUTE PROCEDURE APLICA_DOCTO_IN (%s)'% entrada.id)
-        elif detalle.tipo_movto == 'S':
-            c.execute('EXECUTE PROCEDURE APLICA_DOCTO_IN (%s)'% salida.id)
+        # c = connections[ conexion_name ].cursor()
+        # c.execute("EXECUTE PROCEDURE APLICA_DOCTO_IN %s;"% detalle.id)
+        # transaction.commit_unless_managed()
+        # c.close()
+        # if detalle.tipo_movto == 'E':
+        #     c.execute('EXECUTE PROCEDURE APLICA_DOCTO_IN (%s)'% entrada.id)
+        # elif detalle.tipo_movto == 'S':
+        #     c.execute('EXECUTE PROCEDURE APLICA_DOCTO_IN (%s)'% salida.id)
 
-        transaction.commit_unless_managed()
-        c.close()
+
 
     c = { 'detalles_inv' : detalles_inv, 'form' : form, }
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
