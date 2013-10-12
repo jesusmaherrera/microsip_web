@@ -407,22 +407,26 @@ def invetarioFisico_manageView( request, id = None, dua = '1', template_name = '
                             detalleInv.usuario_ult_modif = request.user.username
                             detalleInv.detalle_modificaciones = '[%s/%s=%s], '%( request.user.username, ubicacion_form.cleaned_data[ 'ubicacion' ], detalleInvForm.cleaned_data[ 'unidades' ] )
                             detalleInv.detalle_modificacionestime = '[%s/%s=%s](%s),'%( request.user.username, ubicacion_form.cleaned_data[ 'ubicacion' ], detalleInvForm.cleaned_data[ 'unidades' ], datetime.now().strftime("%d-%m-%Y %H:%M") )
-                            # c = connections[conexion_name].cursor()
+                            c = connections[conexion_name].cursor()
                             
-                            # fecha_actual_str = datetime.now().strftime("%m/%d/%Y")
-                            # fecha_inventario_str = InventarioFisico.fecha.strftime("%m/01/%Y")
+                            fecha_actual_str = datetime.now().strftime("%m/%d/%Y")
+                            fecha_inventario_str = InventarioFisico.fecha.strftime("%m/%d/%Y")
 
-                            # c.execute("""
-                            #     SELECT B.inv_fin_unid FROM orsp_in_aux_art( %s, '%s', '%s','%s','S','N') B
-                            #     """% (detalleInv.articulo.id , InventarioFisico.almacen.nombre, fecha_inventario_str, fecha_actual_str))
-                            # unidades_rows = c.fetchall()
-                            # unidades_mov = unidades_rows[0][0]
-                            # c.close() 
-                            # detalleInv.unidades_syn = 0
-                            # if unidades_mov < 0:
-                            #     detalleInv.unidades_syn = unidades_mov
+                            c.execute("""
+                                SELECT B.ENTRADAS_UNID, B.SALIDAS_UNID FROM orsp_in_aux_art( %s, '%s', '%s','%s','S','N') B
+                                """% (detalleInv.articulo.id , InventarioFisico.almacen.nombre, fecha_inventario_str, fecha_actual_str))
+                            unidades_rows = c.fetchall()
+                            entradas = unidades_rows[0][0] 
+                            salidas = unidades_rows[0][1]
+                            unidades_mov = entradas - salidas
+                            c.close() 
 
+                            detalleInv.unidades =  detalleInv.unidades + entradas
+                            detalleInv.unidades_syn = unidades_mov
+                            detalleInv.unidades_margen = 1000000 + detalleInv.unidades
+                            
                             detalleInv.save()
+
                         elif movimiento == 'actualizar':
                             detalleInv = DoctosInvfisDet.objects.get( id = id_detalle )
                             detalleInv.fechahora_ult_modif = datetime.now()

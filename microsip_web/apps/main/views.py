@@ -142,10 +142,10 @@ def actualizar_triggers_inventarios( conexion_name = None ):
 
     c = connections[ conexion_name ].cursor()
     ####################### TRIGGERS #######################
-    c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DESGLOSEDIS_AI' ] )
-    c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSINDET_BI' ] )
-    c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSINDET_BD' ] )
-    c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSIN_BU' ] )
+    #c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DESGLOSEDIS_AI' ] )
+    #c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSINDET_BI' ] )
+    #c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSINDET_BD' ] )
+    #c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSIN_BU' ] )
 
     transaction.commit_unless_managed()
 

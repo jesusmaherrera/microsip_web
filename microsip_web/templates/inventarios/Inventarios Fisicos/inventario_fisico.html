@@ -296,8 +296,8 @@
               <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
                 <li><a tabindex="-1" href="#articulosnocont_porlinea_Modal" role="button" data-toggle="modal"><i class="icon-tasks"></i> Agregar articulos no contabilizados Por linea</a></li>
                 <li><a tabindex="-1" href="#" onclick="agregar_articulosfn()"><i class="icon-align-justify"></i> Agregar todos los articulos no contabilizados</a></li>
-                <!-- <li class='divider'></li>
-                <li><a tabindex="-1" href="#modal_seguro_sync" role="button" data-toggle="modal"><i class="icon-refresh"></i> Sincronizar con entradas y salidas</a></li> -->
+                <li class='divider'></li>
+                <li><a tabindex="-1" href="#modal_seguro_sync" role="button" data-toggle="modal"><i class="icon-refresh"></i> Sincronizar con movimientos</a></li>
               </ul>
             </li>
           </ul>
@@ -446,7 +446,7 @@
       <th class="hidden-phone">Clave</th>
       <th>Articulo</th>
       <th>Unidades</th>
-      <!-- <th>Movimientos</th> -->
+      <th>Movimientos</th>
       <th></th>
     </tr>
     {% for detalle in detallesInventario %}
@@ -454,7 +454,7 @@
       <td class="hidden-phone"> {{ detalle.clave }} </td>
       <td> {{ detalle.articulo }} </td>
       <td> {{ detalle.unidades }} </td>
-      <!-- <td> {{ detalle.unidades_syn }} </td> -->
+      <td> {{ detalle.unidades_syn }} </td>
       <td> <input type="hidden" name="detalle_id" value="{{ detalle.id }}"/> <a href="#" class='btn btn-mini btn-info-inventario'> <i class="icon-info-sign"></i> </a> </td>
     </tr>
     {% endfor %}

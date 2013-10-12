@@ -35,70 +35,73 @@ def sincronizar_inventario( request, inventariofisico_id ):
     articulos_modificados = 0
     inventario_fisico = DoctosInvfis.objects.get( pk = inventariofisico_id )
     fecha_actual_str = datetime.now().strftime( "%m/%d/%Y" )
-    fecha_inventario_str = inventario_fisico.fecha.strftime("%m/01/%Y")
+    fecha_inventario_str = inventario_fisico.fecha.strftime( "%m/%d/%Y" )
 
     c = connections[ conexion_name ].cursor()
     c.execute("""
-        SELECT B.ARTICULO_ID, B.inv_fin_unid FROM articulos A
+        SELECT B.ARTICULO_ID, B.ENTRADAS_UNID, B.SALIDAS_UNID FROM articulos A
         LEFT JOIN orsp_in_aux_art( articulo_id, '%s', '%s','%s','S','N') B
         ON A.articulo_id = B.articulo_id
-        WHERE B.inv_fin_unid <> 0
         """% ( inventario_fisico.almacen.nombre, fecha_inventario_str, fecha_actual_str ) )
     unidades_rows = c.fetchall()
     c.close() 
-
+    
     for unidades_row in unidades_rows:
+        articulo = Articulos.objects.get( pk = unidades_row[0] )
+        entradas = Decimal(unidades_row[1])
+        salidas = Decimal(unidades_row[2])
+        diferencia_unidades = entradas - salidas
         try:
-            detalle = DoctosInvfisDet.objects.get( articulo = unidades_row[0], docto_invfis = inventariofisico_id )
+            detalle = DoctosInvfisDet.objects.get( articulo = articulo, docto_invfis = inventariofisico_id )
         except ObjectDoesNotExist:
-            articulo = Articulos.objects.get( pk = unidades_row[0] )
-            articulos_claves = ClavesArticulos.objects.filter( articulo = articulo )
+            pass
+            # articulos_claves = ClavesArticulos.objects.filter( articulo = articulo )
                         
-            if articulos_claves.count() < 1:
-                articulo_clave = ''
-            else:
-                articulo_clave = articulos_claves[0].clave
+            # if articulos_claves.count() < 1:
+            #     articulo_clave = ''
+            # else:
+            #     articulo_clave = articulos_claves[0].clave
 
-            if articulo.seguimiento == 'S':
-                c = connections[ conexion_name ].cursor()
-                c.execute("""
-                    SELECT B.art_discreto_id, B.existencia FROM LISTA_ARTS_DISCRETOS('S', 'E', %s, NULL, NULL, %s, NULL) B
-                    """% ( inventario_fisico.almacen.ALMACEN_ID, articulo.id ) )
-                series = c.fetchall()
-                c.close()
+            # if articulo.seguimiento == 'S':
+            #     c = connections[ conexion_name ].cursor()
+            #     c.execute("""
+            #         SELECT B.art_discreto_id, B.existencia FROM LISTA_ARTS_DISCRETOS('S', 'E', %s, NULL, NULL, %s, NULL) B
+            #         """% ( inventario_fisico.almacen.ALMACEN_ID, articulo.id ) )
+            #     series = c.fetchall()
+            #     c.close()
 
-                if len(series) > 0:
-                    detalle = DoctosInvfisDet(
-                        id = next_id( 'ID_DOCTOS', conexion_name ),
-                        docto_invfis= inventario_fisico,
-                        clave= articulo_clave,
-                        articulo = articulo,
-                        unidades = len( series ),
-                        usuario_ult_modif = request.user.username,
-                        unidades_syn = len(series),
-                        )
+            #     if len(series) > 0:
+            #         detalle = DoctosInvfisDet(
+            #             id = next_id( 'ID_DOCTOS', conexion_name ),
+            #             docto_invfis= inventario_fisico,
+            #             clave= articulo_clave,
+            #             articulo = articulo,
+            #             unidades = len( series ),
+            #             usuario_ult_modif = request.user.username,
+            #             unidades_syn = len(series),
+            #             )
 
-                    detalle.save(force_insert=True)
-                    articulos_modificados += 1
+            #         detalle.save(force_insert=True)
+            #         articulos_modificados += 1
 
-                    for articulo_discreto in series:
-                        DesgloseEnDiscretosInvfis.objects.create( id = -1, docto_invfis_det = detalle, art_discreto = ArticulosDiscretos.objects.get( pk = articulo_discreto[0] ), unidades = articulo_discreto[1] )
+            #         for articulo_discreto in series:
+            #             DesgloseEnDiscretosInvfis.objects.create( id = -1, docto_invfis_det = detalle, art_discreto = ArticulosDiscretos.objects.get( pk = articulo_discreto[0] ), unidades = articulo_discreto[1] )
                         
 
-            if articulo.seguimiento == 'N':
-                if unidades_row[1] > 0:
-                    detalle = DoctosInvfisDet(
-                        id = next_id( 'ID_DOCTOS', conexion_name ),
-                        docto_invfis = inventario_fisico,
-                        clave = articulo_clave,
-                        articulo = articulo,
-                        unidades = unidades_row[1],
-                        usuario_ult_modif = request.user.username,
-                        unidades_syn = unidades_row[1],
-                        )
+            # if articulo.seguimiento == 'N':
+            #     if diferencia_unidades != 0:
+            #         detalle = DoctosInvfisDet(
+            #             id = next_id( 'ID_DOCTOS', conexion_name ),
+            #             docto_invfis = inventario_fisico,
+            #             clave = articulo_clave,
+            #             articulo = articulo,
+            #             unidades = unidades_row[1],
+            #             usuario_ult_modif = request.user.username,
+            #             unidades_syn = unidades_row[1],
+            #             )
 
-                    detalle.save( force_insert = True )
-                    articulos_modificados += 1
+            #         detalle.save( force_insert = True )
+            #         articulos_modificados += 1
         else:
             if detalle.articulo.seguimiento == 'S':
                 c = connections[conexion_name].cursor()
@@ -126,11 +129,13 @@ def sincronizar_inventario( request, inventariofisico_id ):
                 detalle.save()
 
             if detalle.articulo.seguimiento == 'N':
-                if unidades_row[1] != detalle.unidades_syn: 
-                    unidades = detalle.unidades + unidades_row[1] - detalle.unidades_syn
-                    if unidades >= 0:
-                        detalle.unidades = unidades
-                        detalle.unidades_syn = unidades_row[1]
+                if diferencia_unidades != detalle.unidades_syn: 
+                    detalle.unidades_syn = detalle.unidades_syn - diferencia_unidades
+                    detalle.unidades_margen = detalle.unidades_margen - detalle.unidades_syn
+
+                    if detalle.unidades_margen >= 1000000:
+                        detalle.unidades = detalle.unidades_margen - 1000000
+                        detalle.unidades_syn = - detalle.unidades_syn
                         detalle.save()
                         articulos_modificados += 1
 
