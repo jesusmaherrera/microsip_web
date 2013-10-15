@@ -19,7 +19,7 @@ from microsip_web.apps.punto_de_venta.models import *
 #libs
 from custom_db.main import next_id
 
-def agregarTotales(totales_cuentas, **kwargs):
+def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
 
     #Valores cuentas por pagar
     compras_16_credito  = kwargs.get('compras_16_credito', 0)
@@ -487,6 +487,7 @@ def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_po
         bancos              = total - descuento
     
     totales_cuentas, error, msg = agregarTotales(
+        connection_name     = connection_name,
         conceptos_poliza    = conceptos_poliza,
         totales_cuentas     = totales_cuentas, 
         ventas_0_credito    = ventas_0_credito,
@@ -587,6 +588,7 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
         bancos              = total - descuento
 
     totales_cuentas, error, msg = agregarTotales(
+        connection_name     = connection_name,
         conceptos_poliza    = conceptos_poliza,
         totales_cuentas     = totales_cuentas, 
         compras_16_credito  = compras_16_credito,
@@ -683,6 +685,7 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
         bancos              = total - descuento
 
     totales_cuentas, error, msg = agregarTotales(
+        connection_name     = connection_name,
         conceptos_poliza    = conceptos_poliza,
         totales_cuentas     = totales_cuentas, 
         ventas_0_credito    = ventas_0_credito,
@@ -792,6 +795,7 @@ def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_
         bancos              = total
 
     totales_cuentas, error, msg = agregarTotales(
+        connection_name     = connection_name,
         conceptos_poliza    = conceptos_poliza,
         totales_cuentas     = totales_cuentas, 
         ventas_0_credito    = ventas_0_credito,
