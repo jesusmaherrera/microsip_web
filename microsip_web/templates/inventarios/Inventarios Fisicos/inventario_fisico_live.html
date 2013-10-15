@@ -12,11 +12,11 @@
 </script>
 {% endblock %}
 
-{% block breadcrumb %}{{ block.super }}Inventarios fisicos en vivo{% endblock %}
+{% block breadcrumb %}{{ block.super }}Inventarios por ajustes{% endblock %}
 {% block content %}
 <div class="ms-custom-form container-fluid hidden-phone">
   <div class="row-fluid">
-    <div class="span3"><h3>Inventario Fisico en vivo</h3></div>
+    <div class="span3"><h3>Inventario por ajustes</h3></div>
     <div class="span8" style=" margin-top: 15px; ">
     </div>
   </div>
@@ -40,13 +40,11 @@
     <tr>
       <th class="hidden-phone">articulo</th>
       <th class="hidden-phone">unidades</th>
-      <th class="hidden-phone">Tipo</th>
     </tr>
     {% for detalle_inv in detalles_inv %}
     <tr>
       <td class="hidden-phone">{{ detalle_inv.articulo }}</td>
-      <td class="hidden-phone">{{ detalle_inv.unidades }}</td>
-      <td class="hidden-phone">{{ detalle_inv.tipo_movto }}</td>      
+      <td class="hidden-phone">{% if detalle_inv.tipo_movto = 'S' %}-{% endif %}  {{ detalle_inv.unidades }}</td>
     </tr>
     {% endfor %}
 </table>

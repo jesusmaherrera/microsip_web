@@ -130,12 +130,12 @@ def sincronizar_inventario( request, inventariofisico_id ):
 
             if detalle.articulo.seguimiento == 'N':
                 if diferencia_unidades != detalle.unidades_syn: 
-                    detalle.unidades_syn = detalle.unidades_syn - diferencia_unidades
+                    detalle.unidades_syn = detalle.unidades_syn
                     detalle.unidades_margen = detalle.unidades_margen - detalle.unidades_syn
 
                     if detalle.unidades_margen >= 1000000:
                         detalle.unidades = detalle.unidades_margen - 1000000
-                        detalle.unidades_syn = - detalle.unidades_syn
+                        detalle.unidades_syn = detalle.unidades_syn
                         detalle.save()
                         articulos_modificados += 1
 

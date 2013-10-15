@@ -5,7 +5,6 @@ from django.template import RequestContext
 from django.forms.formsets import formset_factory, BaseFormSet
 from django.forms.models import inlineformset_factory
 from django.forms.models import modelformset_factory
-
 #Paginacion
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # user autentication
@@ -165,24 +164,77 @@ def c_get_next_key(connection_name = None ):
 
 @login_required( login_url = '/login/' )
 def invetariofisicolive_manageview( request, template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_live.html' ):
-    basedatos_activa = request.session[ 'selected_database' ]
-    if basedatos_activa == '':
+    connection_name = get_conecctionname( request.session )
+    if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
-    else:
-        conexion_activa_id = request.session[ 'conexion_activa' ]
-    conexion_name = "%02d-%s"%( conexion_activa_id, basedatos_activa )
+    fecha_inicio = "2013-10-11"
+    fecha_actual = datetime.now()
+    try:
+        salida = DoctosIn.objects.get( esinventario = 'S', concepto = 38,  fecha = fecha_actual )
+    except ObjectDoesNotExist:
+        salida_inicio = DoctosIn.objects.get( esinventario = 'S', concepto = 38, fecha = fecha_inicio )
+        salida = DoctosIn(
+            id = -1, 
+            folio = 'fad45556',
+            almacen =  salida_inicio.almacen,
+            concepto = salida_inicio.concepto,
+            naturaleza_concepto = salida_inicio.naturaleza_concepto,
+            fecha = fecha_actual,
+            sistema_origen = 'IN',
+            usuario_creador = request.user.username,
+            esinventario = 'S',
+             )
+        salida.save()
 
-    salida = DoctosIn.objects.get(folio='000000001', concepto = 38)
-    entrada = DoctosIn.objects.get(folio='000000002', concepto = 27)
-
-    detalles_inv = DoctosInDet.objects.filter( Q( doctosIn = entrada ) | Q( doctosIn = salida ) )
+    try:
+        entrada = DoctosIn.objects.get( esinventario = 'S', concepto = 27, fecha = fecha_actual )
+    except ObjectDoesNotExist:
+        entrada_inicio = DoctosIn.objects.get( esinventario = 'S', concepto = 27, fecha = fecha_inicio )
+        entrada = DoctosIn(
+            id = -1, 
+            folio = 'fad455647',
+            almacen =  entrada_inicio.almacen,
+            concepto = entrada_inicio.concepto,
+            naturaleza_concepto = entrada_inicio.naturaleza_concepto,
+            fecha = fecha_actual,
+            sistema_origen = 'IN',
+            usuario_creador = request.user.username,
+            esinventario = 'S',
+             )
+        entrada.save()
+    
+    
+    detalles_inv = DoctosInDet.objects.filter( Q( doctosIn = entrada ) | Q( doctosIn = salida ) ).order_by('-id')
     form = DoctoInDetManageForm( request.POST or None )
     
 
     if form.is_valid():
         detalle = form.save( commit = False )
 
-        detalle.id = next_id( 'ID_DOCTOS', conexion_name )
+        detalle.id = next_id( 'ID_DOCTOS', connection_name )
+
+        c = connections[connection_name].cursor()
+        fecha_actual_str = datetime.now().strftime("%m/%d/%Y")
+        c.execute("""
+            SELECT B.ENTRADAS_UNID, B.SALIDAS_UNID FROM orsp_in_aux_art( %s, '%s', '%s','%s','S','N') B
+            """% (detalle.articulo.id , entrada.almacen.nombre,  fecha_inicio, fecha_actual_str))
+        unidades_rows = c.fetchall()
+        entradas = unidades_rows[0][0] 
+        salidas = unidades_rows[0][1]
+        unidades_mov = entradas - salidas
+        c.close() 
+
+
+        if not DoctosInDet.objects.filter(doctosIn = entrada, articulo = detalle.articulo ).exists():
+            if unidades_mov < 0:
+                DoctosInDet.objects.create( id = -1, doctosIn = salida, almacen = salida.almacen, concepto = salida.concepto,
+                    claveArticulo='', articulo = detalle.articulo, tipo_movto ='S', unidades = -unidades_mov, costo_unitario =1,
+                    costo_total =1,)
+            elif unidades_mov > 0:
+                DoctosInDet.objects.create( id = -1, doctosIn = entrada, almacen = entrada.almacen, concepto = entrada.concepto,
+                    claveArticulo='', articulo = detalle.articulo, tipo_movto ='E', unidades = unidades_mov, costo_unitario =1,
+                    costo_total =1,)
+
         if detalle.unidades > 0:
             detalle.doctosIn = entrada
             detalle.almacen = entrada.almacen
@@ -197,17 +249,12 @@ def invetariofisicolive_manageview( request, template_name = 'inventarios/Invent
         detalle.costo_total = detalle.unidades * detalle.costo_unitario
         det_id=  detalle.id
         detalle.save()
+        form = DoctoInDetManageForm()
 
-        # c = connections[ conexion_name ].cursor()
-        # c.execute("EXECUTE PROCEDURE APLICA_DOCTO_IN %s;"% detalle.id)
-        # transaction.commit_unless_managed()
-        # c.close()
-        # if detalle.tipo_movto == 'E':
-        #     c.execute('EXECUTE PROCEDURE APLICA_DOCTO_IN (%s)'% entrada.id)
-        # elif detalle.tipo_movto == 'S':
-        #     c.execute('EXECUTE PROCEDURE APLICA_DOCTO_IN (%s)'% salida.id)
-
-
+        c = connections[ connection_name ].cursor()
+        c.execute("EXECUTE PROCEDURE RECALC_SALDOS_IN")
+        transaction.commit_unless_managed()
+        c.close()
 
     c = { 'detalles_inv' : detalles_inv, 'form' : form, }
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )

@@ -13,6 +13,7 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}
+{% include 'autocomplete_light/static.html' %}
 <script src='{{STATIC_URL}}js/jquery.formset.js'></script>
 <script src='{{STATIC_URL}}js/plantillas.js'></script>
 <script type="text/javascript">
@@ -126,5 +127,5 @@ $(document).ready(function() {
   </div>
   {% endif %}
 </form>
-{% include 'autocomplete_light/static.html' %}
+
 {% endblock %}

@@ -538,7 +538,8 @@ class DoctosIn(models.Model):
     fechahora_creacion  = models.DateTimeField(auto_now_add=True, db_column='FECHA_HORA_CREACION')
     usuario_ult_modif   = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_ULT_MODIF')
     fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='FECHA_HORA_ULT_MODIF')
-    
+    esinventario        = models.CharField(default='N', max_length=1, db_column='SIC_ESINVENTARIO')
+
     class Meta:
         db_table = u'doctos_in'
 
