@@ -7,9 +7,10 @@ from django.core import serializers
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 import json
+import datetime, time
 from decimal import *
 from models import *
-from microsip_web.libs.custom_db.main import next_id
+from microsip_web.libs.custom_db.main import next_id, get_existencias_articulo
 from microsip_web.libs.tools import split_seq
 from django.db import connections
 from microsip_web.libs.custom_db.main import get_conecctionname
@@ -144,32 +145,18 @@ def sincronizar_inventario( request, inventariofisico_id ):
     return simplejson.dumps( { 'articulos_count' : articulos_modificados } )
 
 
-def runsql_onerow( sql = "", connection_name = "" ):
-    c = connections[connection_name].cursor()
-    c.execute(sql)
-    unidades_rows = c.fetchall()
-    c.close() 
-    return unidades_rows[0]
-
 @dajaxice_register( method = 'GET' )
-def get_existencias_articulo( request, articulo_id):
+def get_existencias_articulo_view( request, articulo_id):
     connection_name = get_conecctionname( request.session )
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
-    
-    fecha_actual_str = datetime.now().strftime("%m/%d/%Y")
-    fecha_inicio = fecha_actual_str
-    sql = """
-        SELECT B.ENTRADAS_UNID, B.SALIDAS_UNID FROM orsp_in_aux_art( %s, '%s', '%s','%s','S','N') B
-        """% ( articulo_id , "Almacen general",  fecha_inicio, fecha_actual_str )
+    articulo = Articulos.objects.get( pk = articulo_id )
+    entradas, salidas, existencias = get_existencias_articulo(
+        articulo_id = articulo_id , 
+        connection_name = connection_name, 
+        fecha_inicio = datetime.now().strftime( "%m/01/%Y" ), )
 
-    row = runsql_onerow( sql, connection_name )
-
-    entradas = row[0]
-    salidas = row[1]
-    existencias = entradas - salidas
-
-    return simplejson.dumps( { 'existencias' : int(existencias) } )
+    return simplejson.dumps( { 'existencias' : int( existencias ), 'costo_ultima_compra' : str(articulo.costo_ultima_compra) } )
 
 @dajaxice_register( method = 'GET' )
 def add_aticulosinventario( request, inventario_id, articulo_id, unidades, ubicacion ):

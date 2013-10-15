@@ -151,26 +151,28 @@ class LineaArticulos(models.Model):
     class Meta:
         db_table = u'lineas_articulos'
 
-class Articulos(models.Model):
-    id = models.AutoField(primary_key=True, db_column='ARTICULO_ID')
-    nombre = models.CharField(max_length=100, db_column='NOMBRE')
-    es_almacenable = models.CharField(default='S', max_length=1, db_column='ES_ALMACENABLE')
-    seguimiento = models.CharField(default='N', max_length=1, db_column='SEGUIMIENTO')
-    cuenta_ventas = models.CharField(max_length=30, blank=True, null=True, db_column='CUENTA_VENTAS')
-    linea = models.ForeignKey(LineaArticulos, db_column='LINEA_ARTICULO_ID')
-    nota_ventas = models.TextField(db_column='NOTAS_VENTAS', blank=True, null=True)
-    unidad_venta = models.CharField(default = 'PIEZA', max_length=20, blank=True, null=True, db_column='UNIDAD_VENTA')
-    unidad_compra = models.CharField(default = 'PIEZA' , max_length=20, blank=True, null=True, db_column='UNIDAD_COMPRA')
-    usuario_ult_modif = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_ULT_MODIF')
-    fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='FECHA_HORA_ULT_MODIF')
+class Articulos( models.Model ):
+    id = models.AutoField( primary_key = True, db_column = 'ARTICULO_ID' )
+    nombre = models.CharField( max_length = 100, db_column = 'NOMBRE' )
+    es_almacenable = models.CharField( default = 'S', max_length = 1, db_column = 'ES_ALMACENABLE' )
+    seguimiento = models.CharField( default = 'N', max_length = 1, db_column = 'SEGUIMIENTO' )
+    cuenta_ventas = models.CharField( max_length = 30, blank = True, null = True, db_column = 'CUENTA_VENTAS' )
+    linea = models.ForeignKey( LineaArticulos, db_column = 'LINEA_ARTICULO_ID' )
+    nota_ventas = models.TextField( db_column = 'NOTAS_VENTAS', blank = True, null = True )
+    unidad_venta = models.CharField( default = 'PIEZA', max_length = 20, blank = True, null = True, db_column = 'UNIDAD_VENTA' )
+    unidad_compra = models.CharField( default = 'PIEZA' , max_length = 20, blank = True, null = True, db_column = 'UNIDAD_COMPRA' )
+    costo_ultima_compra = models.DecimalField( default = 0, blank = True, null = True, max_digits = 18, decimal_places = 6, db_column = 'COSTO_ULTIMA_COMPRA' )
 
-    puntos = models.IntegerField(db_column='SIC_PUNTOS')
-    dinero_electronico  = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
-    hereda_puntos = models.BooleanField( db_column='SIC_HEREDA_PUNTOS')
-    carpeta = models.ForeignKey(Carpeta, blank=True, null=True,db_column='SIC_CARPETA_ID')
+    usuario_ult_modif = models.CharField( blank = True, null = True, max_length = 31, db_column = 'USUARIO_ULT_MODIF' )
+    fechahora_ult_modif = models.DateTimeField( auto_now = True, blank = True, null = True, db_column = 'FECHA_HORA_ULT_MODIF' )
 
-    def __unicode__(self):
-        return u'%s (%s)' % (self.nombre, self.unidad_venta)
+    puntos = models.IntegerField( db_column = 'SIC_PUNTOS' )
+    dinero_electronico  = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_DINERO_ELECTRONICO' )
+    hereda_puntos = models.BooleanField( db_column = 'SIC_HEREDA_PUNTOS' )
+    carpeta = models.ForeignKey( Carpeta, blank = True, null = True, db_column = 'SIC_CARPETA_ID' )
+
+    def __unicode__( self) :
+        return u'%s (%s)' % ( self.nombre, self.unidad_venta )
 
     class Meta:
         db_table = u'articulos'

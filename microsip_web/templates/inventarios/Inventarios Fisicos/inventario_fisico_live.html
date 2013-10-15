@@ -9,13 +9,14 @@
 {% include 'autocomplete_light/static.html' %}     
 <script type="text/javascript">
   $("#id_articulo").change(function(){
-    Dajaxice.microsip_web.apps.inventarios.get_existencias_articulo(mostrar_existencias,{'articulo_id': $("#id_articulo").val()[0],}); 
+    Dajaxice.microsip_web.apps.inventarios.get_existencias_articulo_view(mostrar_existencias,{'articulo_id': $("#id_articulo").val()[0],}); 
   });
 
   function mostrar_existencias(data) 
   {
-    alert( "ya existen " + data.existencias + " Articulos en existencia" );
-    $('#span_alerta_unidades').html(' Ya existen '+ data.existencias + ' en existencia.');
+    alert( "existen " + data.existencias + " Articulos en existencia" );
+    $('#span_alerta_unidades').html('existen '+ data.existencias + ' en existencia.');
+    $("#id_costo_unitario").val(data.costo_ultima_compra);
   }
 
   $('#id_claveArticulo').live('keydown', function(e) { 
@@ -119,10 +120,10 @@
       <th class="hidden-phone">articulo</th>
       <th class="hidden-phone">unidades</th>
     </tr>
-    {% for detalle_inv in detalles_inv %}
+    {% for articulo in articulos %}
     <tr>
-      <td class="hidden-phone">{{ detalle_inv.articulo }}</td>
-      <td class="hidden-phone">{% if detalle_inv.tipo_movto = 'S' %}-{% endif %}  {{ detalle_inv.unidades }}</td>
+      <td class="hidden-phone">{{ articulo }}</td>
+      <!-- <td class="hidden-phone">{% if detalle_inv.tipo_movto = 'S' %}-{% endif %}  {{ detalle_inv.unidades }}</td> -->
     </tr>
     {% endfor %}
 </table>
