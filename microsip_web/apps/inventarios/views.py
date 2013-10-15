@@ -167,8 +167,38 @@ def invetariofisicolive_manageview( request, template_name = 'inventarios/Invent
     connection_name = get_conecctionname( request.session )
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
-    fecha_inicio = "2013-10-11"
+    
+    fecha_inicio = datetime.now().strftime("%Y-%m-%d")
     fecha_actual = datetime.now()
+    
+    #Si no existen documentos creados los creo
+    if fecha_inicio == '':
+        fecha_inicio = fecha_actual
+        salida = DoctosIn(
+            id = -1, 
+            folio = 'fad45556',
+            almacen =  Almacenes.objects.get(pk=19),
+            concepto = ConceptosIn.objects.get(pk=38),
+            naturaleza_concepto = 'S',
+            fecha = fecha_actual,
+            sistema_origen = 'IN',
+            usuario_creador = request.user.username,
+            esinventario = 'S',
+             )
+        salida.save()
+        entrada = DoctosIn(
+            id = -1, 
+            folio = 'fad455647',
+            almacen =  Almacenes.objects.get(pk=19),
+            concepto = ConceptosIn.objects.get(pk=27),
+            naturaleza_concepto = 'E',
+            fecha = fecha_actual,
+            sistema_origen = 'IN',
+            usuario_creador = request.user.username,
+            esinventario = 'S',
+             )
+        entrada.save()
+
     try:
         salida = DoctosIn.objects.get( esinventario = 'S', concepto = 38,  fecha = fecha_actual )
     except ObjectDoesNotExist:
@@ -205,24 +235,14 @@ def invetariofisicolive_manageview( request, template_name = 'inventarios/Invent
     
     
     detalles_inv = DoctosInDet.objects.filter( Q( doctosIn = entrada ) | Q( doctosIn = salida ) ).order_by('-id')
-    form = DoctoInDetManageForm( request.POST or None )
     
-
+    form = DoctoInDetManageForm( request.POST or None )
     if form.is_valid():
         detalle = form.save( commit = False )
 
         detalle.id = next_id( 'ID_DOCTOS', connection_name )
 
-        c = connections[connection_name].cursor()
-        fecha_actual_str = datetime.now().strftime("%m/%d/%Y")
-        c.execute("""
-            SELECT B.ENTRADAS_UNID, B.SALIDAS_UNID FROM orsp_in_aux_art( %s, '%s', '%s','%s','S','N') B
-            """% (detalle.articulo.id , entrada.almacen.nombre,  fecha_inicio, fecha_actual_str))
-        unidades_rows = c.fetchall()
-        entradas = unidades_rows[0][0] 
-        salidas = unidades_rows[0][1]
-        unidades_mov = entradas - salidas
-        c.close() 
+        
 
 
         if not DoctosInDet.objects.filter(doctosIn = entrada, articulo = detalle.articulo ).exists():
@@ -253,7 +273,7 @@ def invetariofisicolive_manageview( request, template_name = 'inventarios/Invent
 
         c = connections[ connection_name ].cursor()
         c.execute("EXECUTE PROCEDURE RECALC_SALDOS_IN")
-        transaction.commit_unless_managed()
+        transaction.commit_manually()
         c.close()
 
     c = { 'detalles_inv' : detalles_inv, 'form' : form, }

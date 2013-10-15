@@ -1,3 +1,4 @@
+ #encoding:utf-8
 from django.utils import simplejson
 from dajaxice.decorators import dajaxice_register
 from django.core.exceptions import ObjectDoesNotExist
@@ -11,6 +12,7 @@ from models import *
 from microsip_web.libs.custom_db.main import next_id
 from microsip_web.libs.tools import split_seq
 from django.db import connections
+from microsip_web.libs.custom_db.main import get_conecctionname
 
 @dajaxice_register( method = 'GET' )
 def get_detallesArticuloenInventario( request, detalle_invfis_id ):
@@ -141,6 +143,34 @@ def sincronizar_inventario( request, inventariofisico_id ):
 
     return simplejson.dumps( { 'articulos_count' : articulos_modificados } )
 
+
+def runsql_onerow( sql = "", connection_name = "" ):
+    c = connections[connection_name].cursor()
+    c.execute(sql)
+    unidades_rows = c.fetchall()
+    c.close() 
+    return unidades_rows[0]
+
+@dajaxice_register( method = 'GET' )
+def get_existencias_articulo( request, articulo_id):
+    connection_name = get_conecctionname( request.session )
+    if connection_name == '':
+        return HttpResponseRedirect( '/select_db/' )
+    
+    fecha_actual_str = datetime.now().strftime("%m/%d/%Y")
+    fecha_inicio = fecha_actual_str
+    sql = """
+        SELECT B.ENTRADAS_UNID, B.SALIDAS_UNID FROM orsp_in_aux_art( %s, '%s', '%s','%s','S','N') B
+        """% ( articulo_id , "Almacen general",  fecha_inicio, fecha_actual_str )
+
+    row = runsql_onerow( sql, connection_name )
+
+    entradas = row[0]
+    salidas = row[1]
+    existencias = entradas - salidas
+
+    return simplejson.dumps( { 'existencias' : int(existencias) } )
+
 @dajaxice_register( method = 'GET' )
 def add_aticulosinventario( request, inventario_id, articulo_id, unidades, ubicacion ):
     """ Agrega articulo a inventario.  """
@@ -159,11 +189,8 @@ def add_aticulosinventario( request, inventario_id, articulo_id, unidades, ubica
     inicio_form = False
     movimiento = ''
     
-    articulo_clave = ''
-    articulos_claves =ClavesArticulos.objects.filter( articulo__id = articulo_id )
-    if articulos_claves.count() > 0:
-        articulo_clave = articulos_claves[0].clave
-
+    articulo_clave = ClavesArticulos.objects.filter( articulo__id = articulo_id ).first()
+    
     try:
         doc = DoctosInvfisDet.objects.get( docto_invfis__id = inventario_id, articulo__id = articulo_id )
         str_unidades = unidades

@@ -8,12 +8,90 @@
 {% block js_code %}
 {% include 'autocomplete_light/static.html' %}     
 <script type="text/javascript">
-  
+  $("#id_articulo").change(function(){
+    Dajaxice.microsip_web.apps.inventarios.get_existencias_articulo(mostrar_existencias,{'articulo_id': $("#id_articulo").val()[0],}); 
+  });
+
+  function mostrar_existencias(data) 
+  {
+    alert( "ya existen " + data.existencias + " Articulos en existencia" );
+    $('#span_alerta_unidades').html(' Ya existen '+ data.existencias + ' en existencia.');
+  }
+
+  $('#id_claveArticulo').live('keydown', function(e) { 
+    var keyCode = e.keyCode || e.which; 
+
+    if (keyCode == 13 || keyCode == 9) 
+    { 
+      if($("#id_claveArticulo").val() != '')
+        Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_claveArticulo').val(),});
+      else
+        $("#id_articulo_text").focus();
+      return false
+    }
+
+  });
+
+  function mostrar_articulo(data){
+    if (data.articulo_id != 0)
+    {
+      $('#id_articulo-deck').attr('style','');
+      $('#id_articulo-deck').html('<span class="div hilight" data-value="'+data.articulo_id+'"><span style="display: inline;" class="remove div">X</span>'+data.articulo_nombre+'</span>');
+      $('#id_articulo').html('<option selected="selected" value="'+data.articulo_id+'"></option>');
+      $('#id_articulo_text').hide();
+    }
+     else
+    {
+
+      $('#id_articulo_text').attr('style','');
+      $('#id_articulo-deck').html('');
+      $('#id_articulo').html('');
+      $('#id_articulo_text').show(); 
+
+      var opciones = data.opciones
+      var html_var = "<table><tr><th>Clave</th><th>Articulo</td><tr/>"
+      var no_opciones = 0
+      for (art in opciones)
+      { 
+        no_opciones = no_opciones +  1;
+        html_var = html_var + "<tr><td><a href='#' class='clave_link'>" + art + "</a></td>" + "<td>" + opciones[art] + "</td></tr>"
+      }
+
+      html_var = html_var + "</table>"
+      if (no_opciones > 0)
+      {
+        $("#modal_opciones-claves > .modal-body").html(html_var);
+        $(".clave_link").on("click",function(){
+          $("#id_claveArticulo").val($(this).text());
+          $("#modal_opciones-claves").modal("hide");
+          Dajaxice.microsip_web.apps.inventarios.get_articulo_by_clave(mostrar_articulo,{'clave': $('#id_claveArticulo').val(),});
+        });
+
+        $("#modal_opciones-claves").modal();
+      }
+      else
+        alert('No existe ningun articulo con la clave ['+ $("#id_claveArticulo").val() +']');
+      
+      $("#id_claveArticulo").focus();
+      $("#id_claveArticulo").select();
+
+    }
+  }
+
 </script>
 {% endblock %}
 
 {% block breadcrumb %}{{ block.super }}Inventarios por ajustes{% endblock %}
 {% block content %}
+<div id="modal_opciones-claves" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="myModalLabel">Claves</h3>
+  </div>
+  <div class="modal-body">
+    
+  </div>
+</div>
 <div class="ms-custom-form container-fluid hidden-phone">
   <div class="row-fluid">
     <div class="span3"><h3>Inventario por ajustes</h3></div>
