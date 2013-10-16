@@ -9,17 +9,17 @@ urlpatterns = patterns('',
     # (r'^InventarioFisico/$', views.invetarioFisico_manageView),
     # (r'^InventarioFisico/(?P<id>\d+)/', views.invetarioFisico_manageView),
     
-    
     (r'^articulo/(?P<id>\d+)/', views.ArticuloManageView),
-    (r'^inventariofisico/$', views.create_invetarioFisico_createView),
+    (r'^inventariofisico/$', views.new_inventariofisico_ajustes),
     
     # (r'^inventariofisico/(?P<id>\d+)/', views.invetarioFisico_manageView),
     (r'^inventariofisico/(?P<id>\d+)/(?P<dua>\d+)/', views.invetarioFisico_manageView),
     (r'^inventarioFisico_mobile/(?P<id>\d+)/', views.invetarioFisico_mobile_pa_manageView),
     (r'^inventarioFisico_mobile/articulo_serie/(?P<id>\d+)/(?P<no_series>\d+)/', views.invetarioFisico_mobile_series_manageView),
     
-    (r'^inventariofisico_live/$', views.invetariofisicolive_manageview),
+    (r'^inventariofisico_ajustes/(?P<almacen_id>\d+)/$', views.invetariofisicolive_manageview),
     (r'^articulos/$', pv_views.articulos_view),
+    (r'^almacenes/$', views.almacenes_view),
 
     (r'^articulo/(?P<id>\d+)/', pv_views.articulo_manageView),
     #(r'^InventarioFisico/Delete/(?P<id>\d+)/', views.invetarioFisico_delete),

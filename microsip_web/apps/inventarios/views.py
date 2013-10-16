@@ -8,13 +8,14 @@ from django.forms.models import modelformset_factory
 #Paginacion
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # user autentication
+from django.core import management
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, AdminPasswordChangeForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required
 
 from django.utils.encoding import smart_str, smart_unicode
-
+from microsip_web.libs.custom_db.procedures import procedures
 from django.db import connections, transaction
 from django.db.models import Q
 from django.db.models import F
@@ -33,6 +34,18 @@ import fdb
 from microsip_web.settings.common import MICROSIP_DATABASES, DATABASES
 from microsip_web.libs.custom_db.main import get_conecctionname
 from django.db.models import Sum
+
+
+@login_required( login_url = '/login/' )
+def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.html' ):
+    connection_name = get_conecctionname(request.session)
+    if connection_name == '':
+        return HttpResponseRedirect( '/select_db/' )
+
+    almacenes = Almacenes.objects.all()
+
+    c = { 'almacenes': almacenes, }
+    return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
 @login_required(login_url='/login/')
 def ArticuloManageView(request, id, template_name='inventarios/articulos/articulo_mobile.html'):
@@ -162,94 +175,76 @@ def c_get_next_key(connection_name = None ):
 ##                                      ##
 ##########################################
 
+def ajustes_get_or_create( almacen_id = None, connection_name = None, username = '' ):
+    fecha_actual = datetime.now()
+    almacen = Almacenes.objects.get( pk = almacen_id )
+    conecpto_ajuste_salida = ConceptosIn.objects.get( pk = 38 )
+    conecpto_ajuste_entrada = ConceptosIn.objects.get( pk = 27 )
+    folio = '' 
+
+    #salida
+    try:
+        salida = DoctosIn.objects.get( esinventario = 'S', concepto = 38, almacen = almacen )
+    except ObjectDoesNotExist:
+        if conecpto_ajuste_salida.folio_autom == 'S':
+            sig_folio = int(conecpto_ajuste_salida.sig_folio) + 1
+            folio = ("%09d" % int(conecpto_ajuste_salida.sig_folio))
+            conecpto_ajuste_salida.sig_folio = ("%09d" % sig_folio)
+            conecpto_ajuste_salida.save()
+
+        salida = DoctosIn(
+            id = -1, 
+            folio = folio,
+            almacen =  almacen,
+            concepto = conecpto_ajuste_salida,
+            naturaleza_concepto = 'S',
+            fecha = fecha_actual,
+            sistema_origen = 'IN',
+            usuario_creador = username,
+            esinventario = 'S',
+             )
+        salida.save()
+
+    #salida
+    try:
+        entrada = DoctosIn.objects.get( esinventario = 'S', concepto = 27, almacen = almacen)
+    except ObjectDoesNotExist:
+        if conecpto_ajuste_entrada.folio_autom == 'S':
+            sig_folio = int(conecpto_ajuste_entrada.sig_folio) + 1
+            folio = ("%09d" % int(conecpto_ajuste_entrada.sig_folio))
+            conecpto_ajuste_entrada.sig_folio = ("%09d" % sig_folio)
+            conecpto_ajuste_entrada.save()
+
+        entrada = DoctosIn(
+            id = -1, 
+            folio = folio,
+            almacen =  almacen,
+            concepto = conecpto_ajuste_entrada,
+            naturaleza_concepto = 'E',
+            fecha = fecha_actual,
+            sistema_origen = 'IN',
+            usuario_creador = username,
+            esinventario = 'S',
+             )
+
+        entrada.save()
+
+    return entrada, salida
+ 
 @login_required( login_url = '/login/' )
-def invetariofisicolive_manageview( request, template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_live.html' ):
+def invetariofisicolive_manageview( request, almacen_id = None, template_name = 'inventarios/Inventarios Fisicos/inventario_fisico_live.html' ):
     connection_name = get_conecctionname( request.session )
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
     
-    fecha_inicio = datetime.now().strftime("%Y-%m-14")
-    # fecha_inicio = ''
-    fecha_actual = datetime.now()
-    
-    #Si no existen documentos creados los creo
-    if fecha_inicio == '':
-        fecha_inicio = fecha_actual
-        salida = DoctosIn(
-            id = -1, 
-            folio = 'fad45556',
-            almacen =  Almacenes.objects.get(pk=19),
-            concepto = ConceptosIn.objects.get(pk=38),
-            naturaleza_concepto = 'S',
-            fecha = fecha_actual,
-            sistema_origen = 'IN',
-            usuario_creador = request.user.username,
-            esinventario = 'S',
-             )
-        salida.save()
-        entrada = DoctosIn(
-            id = -1, 
-            folio = 'fad455647',
-            almacen =  Almacenes.objects.get(pk=19),
-            concepto = ConceptosIn.objects.get(pk=27),
-            naturaleza_concepto = 'E',
-            fecha = fecha_actual,
-            sistema_origen = 'IN',
-            usuario_creador = request.user.username,
-            esinventario = 'S',
-             )
-        entrada.save()
+    entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, connection_name = connection_name, username = request.user.username)
 
-    try:
-        salida = DoctosIn.objects.get( esinventario = 'S', concepto = 38,  fecha = fecha_actual )
-    except ObjectDoesNotExist:
-        salida_inicio = DoctosIn.objects.get( esinventario = 'S', concepto = 38, fecha = fecha_inicio )
-        salida = DoctosIn(
-            id = -1, 
-            folio = 'fad45557',
-            almacen =  salida_inicio.almacen,
-            concepto = salida_inicio.concepto,
-            naturaleza_concepto = salida_inicio.naturaleza_concepto,
-            fecha = fecha_actual,
-            sistema_origen = 'IN',
-            usuario_creador = request.user.username,
-            esinventario = 'S',
-             )
-        salida.save()
-
-    try:
-        entrada = DoctosIn.objects.get( esinventario = 'S', concepto = 27, fecha = fecha_actual )
-    except ObjectDoesNotExist:
-        entrada_inicio = DoctosIn.objects.get( esinventario = 'S', concepto = 27, fecha = fecha_inicio )
-        entrada = DoctosIn(
-            id = -1, 
-            folio = 'fad455640',
-            almacen =  entrada_inicio.almacen,
-            concepto = entrada_inicio.concepto,
-            naturaleza_concepto = entrada_inicio.naturaleza_concepto,
-            fecha = fecha_actual,
-            sistema_origen = 'IN',
-            usuario_creador = request.user.username,
-            esinventario = 'S',
-             )
-        entrada.save()
-    
-    sql = """select articulos.nombre, doctos_in_det.sic_unidades_inv, doctos_in_det.tipo_movto from doctos_in_det, articulos
-        where doctos_in_det.articulo_id = articulos.articulo_id and  (doctos_in_det.docto_in_id = 18 or doctos_in_det.docto_in_id= 19)"""
-    articulos_rows = runsql_rows( sql, connection_name )
-    articulos = []
-    for articulo in articulos_rows:
-        unidades = articulo[1]
-        if articulo[2] == 'S':
-            unidades = -articulo[1]
-        articulos.append( { 'articulo' : articulo[0], 'unidades' : unidades } )
-
-    detalles_inv = DoctosInDet.objects.filter( Q( doctosIn = entrada ) | Q( doctosIn = salida ) ).values('articulo').annotate(score = Sum('unidades')).order_by('-unidades')
-    
     form = DoctoInDetManageForm( request.POST or None )
-    if form.is_valid():
-        detalle = form.save( commit = False )
+    ubicacion_form = UbicacionArticulosForm(request.POST or None)
 
+    if form.is_valid() and ubicacion_form.is_valid():
+        detalle = form.save( commit = False )
+        detalle_unidades = detalle.unidades
         #Entradas
         try:
             detalle_entradas = DoctosInDet.objects.filter( articulo = detalle.articulo, doctosIn = entrada )[0]
@@ -263,41 +258,26 @@ def invetariofisicolive_manageview( request, template_name = 'inventarios/Invent
             detalle_salidas = None
 
         
-        
+        unidades_a_insertar = 0
         if detalle_entradas == None and detalle_salidas == None:
             entradas, salidas, existencias = get_existencias_articulo(
                     articulo_id = detalle.articulo.id, 
                     connection_name = connection_name, 
-                    fecha_inicio = datetime.now().strftime( "%m/01/%Y" ) )
+                    fecha_inicio = datetime.now().strftime( "%m/01/%Y" ),
+                    almacen = entrada.almacen, )
             
-            if existencias > 0:
-                unidades_a_insertar = - existencias + detalle.unidades
-            else:
-                unidades_a_insertar = existencias + detalle.unidades
-            
+            unidades_a_insertar = -existencias + detalle.unidades
+            if existencias == 0:
+                unidades_a_insertar = detalle.unidades
+
             detalle.id = next_id( 'ID_DOCTOS', connection_name )
             detalle.unidades_inv = detalle.unidades
+            if detalle.unidades < 0:
+                detalle.unidades_inv = - detalle.unidades
+
             detalle.unidades = unidades_a_insertar
-
-
-        # Si es un numero positivo
-        if detalle.unidades > 0:
-            if detalle_entradas == None:
-                detalle.doctosIn = entrada
-                detalle.almacen = entrada.almacen
-                detalle.concepto = entrada.concepto
-                detalle.tipo_movto ='E'
-                detalle.id = next_id( 'ID_DOCTOS', connection_name )
-                detalle_entradas = detalle
-            else:
-                detalle_entradas.unidades_inv = detalle_entradas.unidades_inv + detalle.unidades
-                detalle_entradas.unidades = detalle_entradas.unidades + detalle.unidades
-
-            detalle_entradas.costo_total = detalle_entradas.unidades * detalle_entradas.costo_unitario
-            detalle_entradas.save()
-
-        # Si es un numero negativo
-        elif detalle.unidades < 0:
+        if detalle_unidades < 0 or unidades_a_insertar < 0:
+            # Si no existe un detalle de salida de ese articulo
             if detalle_salidas == None:
                 detalle.id = next_id( 'ID_DOCTOS', connection_name )
                 detalle.doctosIn = salida
@@ -305,23 +285,71 @@ def invetariofisicolive_manageview( request, template_name = 'inventarios/Invent
                 detalle.concepto = salida.concepto
                 detalle.tipo_movto ='S'
                 detalle_salidas = detalle
-            else:
-                detalle_salidas.unidades_inv = -(detalle_salidas.unidades_inv + ( detalle.unidades * -1 ))
-                detalle_salidas.unidades = -(detalle_salidas.unidades + ( detalle.unidades * -1 ))
+                detalle_salidas.unidades = -detalle_salidas.unidades
+                detalle_salidas.unidades_inv = 0
+            #si si existe
+            elif detalle_salidas:
+                detalle_salidas.unidades = (detalle_salidas.unidades + ( detalle.unidades * -1 ))
 
-            detalle_salidas.unidades_inv = detalle_salidas.unidades_inv * -1
-            detalle_salidas.unidades = detalle_salidas.unidades * -1
+            detalle_salidas_unidades_inv =  detalle_salidas.unidades_inv
+
+            if detalle_unidades < 0:
+                detalle_salidas.unidades_inv = detalle_salidas.unidades_inv + detalle_unidades
+            else:
+                detalle_salidas.unidades_inv = detalle_salidas.unidades_inv + detalle_unidades
+            
+
             detalle_salidas.costo_total = detalle_salidas.unidades * detalle_salidas.costo_unitario
             detalle_salidas.save();
-        
-        form = DoctoInDetManageForm()
+        if detalle_unidades > 0 and unidades_a_insertar >= 0:
+            # Si no existe un detalle de salida de ese articulo
+            if detalle_entradas == None:
+                detalle.id = next_id( 'ID_DOCTOS', connection_name )
+                detalle.doctosIn = entrada
+                detalle.almacen = entrada.almacen
+                detalle.concepto = entrada.concepto
+                detalle.tipo_movto ='E'
+                if unidades_a_insertar > 0:
+                    detalle.unidades = unidades_a_insertar
+                detalle_entradas = detalle
+                detalle_entradas.unidades_inv = 0
+            #si si existe
+            elif detalle_entradas:
+                detalle_entradas.unidades = detalle_entradas.unidades + detalle.unidades
 
+            detalle_entradas.unidades_inv = detalle_entradas.unidades_inv + detalle_unidades
+            detalle_entradas.costo_total = detalle_entradas.unidades * detalle_entradas.costo_unitario
+            detalle_entradas.save()
+    
+        
         c = connections[ connection_name ].cursor()
-        c.execute("EXECUTE PROCEDURE RECALC_SALDOS_IN")
-        transaction.commit_manually()
+        c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% detalle.articulo.id )
+        c.execute( "EXECUTE PROCEDURE RECALC_SALDOS_ART_IN %s;"% detalle.articulo.id )
+        transaction.commit_unless_managed()
         c.close()
 
-    c = { 'detalles_inv' : detalles_inv, 'form' : form, 'articulos': articulos,}
+        management.call_command( 'syncdb', database = connection_name )
+
+        form = DoctoInDetManageForm()
+
+    sql = """select C.nombre, (b.entradas_unid - b.salidas_unid) as existencia FROM (select FIRST 200 DISTINCT b.articulo_id, b.nombre from doctos_in_det a, articulos b
+        where (a.docto_in_id = %s or a.docto_in_id = %s) and b.articulo_id = a.articulo_id) C left JOIN
+         orsp_in_aux_art( articulo_id, '%s', '%s','%s','S','N') B
+         on C.articulo_id = b.articulo_id
+         """% (
+                entrada.id,
+                salida.id, 
+                entrada.almacen.nombre, 
+                datetime.now().strftime( "%m/01/%Y" ),
+                datetime.now().strftime( "%m/%d/%Y" ),
+                )
+    articulos_rows = runsql_rows( sql, connection_name )
+
+    articulos = []
+    for articulo in articulos_rows:
+        articulos.append( { 'articulo' : articulo[0], 'unidades' : articulo[1], } )
+
+    c = { 'form' : form, 'ubicacion_form' : ubicacion_form, 'articulos' : articulos, 'almacen' : entrada.almacen, 'entrada_fecha': entrada.fecha, 'folio_entrada': entrada.folio, 'folio_salida': salida.folio, }
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
 @detect_mobile
@@ -341,7 +369,7 @@ def invetariosfisicos_view( request, template_name = 'inventarios/Inventarios Fi
     else:
         url_inventario = '/inventarios/inventariofisico/'
 
-    c = { 'inventarios_fisicos' : inventarios_fisicos, 'url_inventario' : url_inventario, }
+    c = { 'inventarios_fisicos' : inventarios_fisicos, 'url_inventario' : url_inventario,}
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
 def inventario_getnew_folio():
@@ -351,6 +379,50 @@ def inventario_getnew_folio():
     registro_folioinventario.valor = siguiente_folio
     registro_folioinventario.save()
     return folio
+
+@login_required(login_url='/login/')
+def new_inventariofisico_ajustes( request, template_name = 'inventarios/Inventarios Fisicos/new_inventariofisico_ajustes.html' ):
+    message = ''
+    connection_name = get_conecctionname( request.session )
+    if connection_name == '':
+        return HttpResponseRedirect( '/select_db/' )
+
+    form = DoctoIn_CreateForm( request.POST or None )
+    
+    if form.is_valid():
+        docto_in = form.save( commit = False )
+
+        DoctosIn.objects.create(
+            id = -1, 
+            folio = 'fad455t',
+            almacen =  docto_in.almacen,
+            concepto = ConceptosIn.objects.get(pk=38),
+            naturaleza_concepto = 'S',
+            fecha = docto_in.fecha,
+            sistema_origen = 'IN',
+            descripcion =  docto_in.descripcion,
+            usuario_creador = request.user.username,
+            esinventario = 'S',
+             )
+
+        DoctosIn.objects.create(
+            id = -1, 
+            folio = 'fad455t40',
+            almacen =  docto_in.almacen,
+            concepto = ConceptosIn.objects.get(pk=27),
+            naturaleza_concepto = 'E',
+            fecha = docto_in.fecha,
+            sistema_origen = 'IN',
+            descripcion =  docto_in.descripcion,
+            usuario_creador = request.user.username,
+            esinventario = 'S',
+             )
+        # ultimofolio = Registry.objects.filter( nombre = 'SIG_FOLIO_INVFIS' )
+
+        return HttpResponseRedirect( '/inventarios/inventariosfisicos/' )
+        
+    c = { 'message' : message,'form' : form }
+    return render_to_response( template_name, c, context_instance=RequestContext( request ) )
 
 @login_required(login_url='/login/')
 def create_invetarioFisico_createView( request, template_name = 'inventarios/Inventarios Fisicos/create_inventario_fisico.html' ):

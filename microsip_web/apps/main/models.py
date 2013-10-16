@@ -397,8 +397,10 @@ class ConceptosEmp(models.Model):
         db_table = u'conceptos_emp'
 
 class ConceptosIn(models.Model):
-    CONCEPTO_IN_ID = models.AutoField(primary_key=True)
-    nombre_abrev = models.CharField(max_length=30, db_column='NOMBRE_ABREV')
+    CONCEPTO_IN_ID = models.AutoField( primary_key = True )
+    nombre_abrev = models.CharField( max_length = 30, db_column = 'NOMBRE_ABREV' )
+    folio_autom = models.CharField( default = 'N', max_length = 1, db_column = 'FOLIO_AUTOM' )
+    sig_folio = models.CharField( max_length = 9, db_column = 'SIG_FOLIO' )
 
     def __unicode__(self):
         return self.nombre_abrev

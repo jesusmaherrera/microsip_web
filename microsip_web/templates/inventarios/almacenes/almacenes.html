@@ -1,0 +1,33 @@
+{% extends "inventarios/base.html" %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+{% endblock %}
+
+{% block breadcrumb %}{{ block.super }}Almacenes{% endblock %}
+{% block content %}
+<div class="ms-custom-form container-fluid hidden-phone">
+  <div class="row-fluid">
+    <div class="span3"><h3>Almacenes</h3></div>
+    <div class="span8" style=" margin-top: 15px; ">
+    </div>
+  </div>
+</div>
+
+<table class="table table-striped table-hover">
+    <tr>
+      <th>Nombre</th>
+      <th></th>
+    </tr>
+    {% for almacen in almacenes %}
+    </tr>
+      <td>{{ almacen.nombre }}</td>
+      <td><a href="/inventarios/inventariofisico_ajustes/{{ almacen.ALMACEN_ID }}/">Inventario fisico</a></td>
+    </tr>
+    {% endfor %}
+</table>
+<br>
+{% endblock %}

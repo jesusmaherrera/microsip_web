@@ -219,6 +219,37 @@ class DoctosInDetManageForm(forms.ModelForm):
             'pedimento_pend',
             'fecha',)
 
+class DoctoIn_CreateForm(forms.ModelForm):
+    fecha = forms.DateField(widget=forms.TextInput(attrs={'class':'input-small'}))
+    almacen = forms.ModelChoiceField(queryset= Almacenes.objects.all(), widget=forms.Select(attrs={'class':'input-medium'}))
+    descripcion = forms.CharField(widget=forms.Textarea(attrs={'rows':'3', 'cols':'20',}))
+    
+    class Meta:
+        model = DoctosInvfis
+        exclude = (
+            'cancelado',
+            'aplicado',
+            'folio',
+            'usuario_creador',
+            'concepto',
+            'fechahora_creacion',
+            'forma_emitida',
+            'naturaleza_concepto',
+            'contabilizado',
+            'usuario_aut_creacion',
+            'usuario_ult_modif',
+            'fechahora_ult_modif',
+            'usuario_aut_modif',
+            'esinventario',
+            )
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        almacen = cleaned_data.get( "almacen" )
+        
+        if DoctosIn.objects.filter( esinventario = 'S', almacen = almacen, cancelado = 'N' ).exists():
+            raise forms.ValidationError(u'Ya existe un almenos un documento para el almacen [%s], porfavor crea uno que no sea de ese almacen.'% almacen)
+        return cleaned_data
+
 class DoctoInvfis_CreateForm(forms.ModelForm):
     fecha = forms.DateField(widget=forms.TextInput(attrs={'class':'input-small'}))
     almacen = forms.ModelChoiceField(queryset= Almacenes.objects.all(), widget=forms.Select(attrs={'class':'input-medium'}))

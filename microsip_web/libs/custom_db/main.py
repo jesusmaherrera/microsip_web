@@ -32,13 +32,12 @@ def runsql_rows( sql = "", connection_name = "" ):
     return unidades_rows
 
 
-def get_existencias_articulo( articulo_id = None, connection_name = '', fecha_inicio = None):
+def get_existencias_articulo( articulo_id = None, connection_name = '', fecha_inicio = None, almacen = '' ):
     """ Para obtener las existencias de un articulo determinado """
     fecha_actual_str = datetime.datetime.now().strftime("%m/%d/%Y")
     sql = """
         SELECT B.ENTRADAS_UNID, B.SALIDAS_UNID FROM orsp_in_aux_art( %s, '%s', '%s','%s','S','N') B
-        """% ( articulo_id , "Almacen general",  fecha_inicio, fecha_actual_str )
-
+        """% ( articulo_id , almacen,  fecha_inicio, fecha_actual_str )
     row = runsql_firstrow( sql, connection_name )
 
     entradas = row[0]

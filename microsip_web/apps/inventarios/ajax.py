@@ -146,7 +146,7 @@ def sincronizar_inventario( request, inventariofisico_id ):
 
 
 @dajaxice_register( method = 'GET' )
-def get_existencias_articulo_view( request, articulo_id):
+def get_existencias_articulo_view( request, articulo_id, almacen = '' ):
     connection_name = get_conecctionname( request.session )
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
@@ -154,7 +154,8 @@ def get_existencias_articulo_view( request, articulo_id):
     entradas, salidas, existencias = get_existencias_articulo(
         articulo_id = articulo_id , 
         connection_name = connection_name, 
-        fecha_inicio = datetime.now().strftime( "%m/01/%Y" ), )
+        fecha_inicio = datetime.now().strftime( "%m/01/%Y" ),
+        almacen = almacen, )
 
     return simplejson.dumps( { 'existencias' : int( existencias ), 'costo_ultima_compra' : str(articulo.costo_ultima_compra) } )
 

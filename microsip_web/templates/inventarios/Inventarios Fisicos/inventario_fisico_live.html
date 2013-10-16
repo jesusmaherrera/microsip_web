@@ -9,7 +9,7 @@
 {% include 'autocomplete_light/static.html' %}     
 <script type="text/javascript">
   $("#id_articulo").change(function(){
-    Dajaxice.microsip_web.apps.inventarios.get_existencias_articulo_view(mostrar_existencias,{'articulo_id': $("#id_articulo").val()[0],}); 
+    Dajaxice.microsip_web.apps.inventarios.get_existencias_articulo_view(mostrar_existencias,{'articulo_id': $("#id_articulo").val()[0], 'almacen' : 'Almacen General', }); 
   });
 
   function mostrar_existencias(data) 
@@ -79,6 +79,30 @@
     }
   }
 
+
+  $(document).ready(function(){
+    modo_rapido_ajustes = localStorage.getItem("modo_rapido_ajustes");
+    if (modo_rapido_ajustes == null)
+      localStorage.setItem("modo_rapido_ajustes", 'false');
+    
+    if(localStorage.getItem("modo_rapido_ajustes") == 'true')
+      $("#id_claveArticulo").focus();
+    else
+      $("#id_articulo_text").focus();
+
+    $('#id_claveArticulo').focusin(function(){
+      if (localStorage.getItem("modo_rapido_ajustes") == 'false')
+        localStorage.setItem("modo_rapido_ajustes", 'true');
+
+    });
+
+    $('#id_articulo_text').focusin(function(){
+      if (localStorage.getItem("modo_rapido_ajustes") == 'true')
+        localStorage.setItem("modo_rapido_ajustes", 'false');
+    });
+    
+  });
+
 </script>
 {% endblock %}
 
@@ -90,17 +114,53 @@
     <h3 id="myModalLabel">Claves</h3>
   </div>
   <div class="modal-body">
-    
   </div>
 </div>
-<div class="ms-custom-form container-fluid hidden-phone">
-  <div class="row-fluid">
-    <div class="span3"><h3>Inventario por ajustes</h3></div>
-    <div class="span8" style=" margin-top: 15px; ">
+<div class="ms-custom-form">
+    <div id="ms-custom-form-header">
+      <div class='span ' >
+        <h3 class='span'>Inventario fisico por ajustes 
+          <ul class="nav btn btn-mini" style=" margin: 0px; ">
+            <li class="dropdown">
+              <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i></a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+                <li><a tabindex="-1" href="#" role="button" data-toggle="modal"><i class="icon-tasks"></i> Agregar articulos no contabilizados Por linea</a></li>
+                <li><a tabindex="-1" href="#"><i class="icon-align-justify"></i> Agregar todos los articulos no contabilizados</a></li>
+              </ul>
+            </li>
+          </ul>
+        </h3>
+      </div>
+      <div class="pull-right ms-form-right-detail">
+        <div class="span2" >
+          <label>Fecha</label>
+          <div >
+            {{ entrada_fecha }} 
+          </div>
+        </div> 
+        <div class="span2" >
+          <label>Folios</label>
+          <div >
+            Ent {{ folio_entrada }}
+            <br>
+            Sal {{ folio_salida }}
+          </div>
+        </div>  
+      </div>
+    </div>
+    <div id="ms-custom-form-footer">
+      <div class='span all_screen' >
+        {{ ubicacion_form.ubicacion }}
+      </div>
+      <div  class=" pull-right ">
+        <div class="span4">
+          <strong>Alamacen: </strong> {{ almacen }}
+        </div>
+      </div>  
     </div>
   </div>
-</div>
 {{ form.errors }}
+{{ ubicacion_form.errors }} 
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
   <div class="input-prepend input-append">
     {{ form.claveArticulo }}
