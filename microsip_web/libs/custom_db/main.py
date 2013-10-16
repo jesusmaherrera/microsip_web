@@ -37,7 +37,7 @@ def get_existencias_articulo( articulo_id = None, connection_name = '', fecha_in
     fecha_actual_str = datetime.datetime.now().strftime("%m/%d/%Y")
     sql = """
         SELECT B.ENTRADAS_UNID, B.SALIDAS_UNID FROM orsp_in_aux_art( %s, '%s', '%s','%s','S','N') B
-        """% ( articulo_id , "Almacen General",  fecha_inicio, fecha_actual_str )
+        """% ( articulo_id , "Almacen general",  fecha_inicio, fecha_actual_str )
 
     row = runsql_firstrow( sql, connection_name )
 

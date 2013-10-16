@@ -1,3 +1,13 @@
+
+select b.articulo_id, b.entradas, c.salidas from doctos_in_det a INNER JOIN
+        (select sum(doctos_in_det.unidades) as entradas, doctos_in_det.articulo_id from doctos_in_det
+            where doctos_in_det.tipo_movto = 'E' group by doctos_in_det.articulo_id) b
+            on a.articulo_id = b.articulo_id
+            inner join
+        (select sum(doctos_in_det.unidades) as salidas, doctos_in_det.articulo_id from doctos_in_det
+            where doctos_in_det.tipo_movto = 'S' group by doctos_in_det.articulo_id) c
+            on a.articulo_id = c.articulo_id
+
 ## Descripción
 **Inventario físico a puerta abierta** es una herramienta para el apoyo a la hora de realizar un inventario físico **en Microsip** sin necesidad de cerrar la empresa.
 

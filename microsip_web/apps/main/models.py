@@ -602,7 +602,9 @@ class DoctosInDet(models.Model):
     pedimento_pend  = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='PEDIMENTO_PEND')
     rol             = models.CharField(default='N', max_length=1, db_column='ROL')
     fecha           = models.DateField(auto_now=True, blank=True, null=True, db_column='FECHA') 
+    unidades_inv = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='SIC_UNIDADES_INV')
     
+
     def __unicode__(self):
         return u'%s' % self.id
 

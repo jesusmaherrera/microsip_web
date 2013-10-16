@@ -168,7 +168,7 @@ def invetariofisicolive_manageview( request, template_name = 'inventarios/Invent
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
     
-    fecha_inicio = datetime.now().strftime("%Y-%m-%d")
+    fecha_inicio = datetime.now().strftime("%Y-%m-14")
     # fecha_inicio = ''
     fecha_actual = datetime.now()
     
@@ -234,11 +234,16 @@ def invetariofisicolive_manageview( request, template_name = 'inventarios/Invent
              )
         entrada.save()
     
-    sql = """select articulos.nombre, sum(doctos_in_det.unidades) as suma from doctos_in_det, articulos
-        where doctos_in_det.articulo_id = articulos.articulo_id and  (doctos_in_det.docto_in_id = 20390 or doctos_in_det.docto_in_id= 20404)
-        group by articulos.nombre"""
-    articulos = runsql_rows( sql, connection_name )
-    
+    sql = """select articulos.nombre, doctos_in_det.sic_unidades_inv, doctos_in_det.tipo_movto from doctos_in_det, articulos
+        where doctos_in_det.articulo_id = articulos.articulo_id and  (doctos_in_det.docto_in_id = 18 or doctos_in_det.docto_in_id= 19)"""
+    articulos_rows = runsql_rows( sql, connection_name )
+    articulos = []
+    for articulo in articulos_rows:
+        unidades = articulo[1]
+        if articulo[2] == 'S':
+            unidades = -articulo[1]
+        articulos.append( { 'articulo' : articulo[0], 'unidades' : unidades } )
+
     detalles_inv = DoctosInDet.objects.filter( Q( doctosIn = entrada ) | Q( doctosIn = salida ) ).values('articulo').annotate(score = Sum('unidades')).order_by('-unidades')
     
     form = DoctoInDetManageForm( request.POST or None )
@@ -271,7 +276,9 @@ def invetariofisicolive_manageview( request, template_name = 'inventarios/Invent
                 unidades_a_insertar = existencias + detalle.unidades
             
             detalle.id = next_id( 'ID_DOCTOS', connection_name )
+            detalle.unidades_inv = detalle.unidades
             detalle.unidades = unidades_a_insertar
+
 
         # Si es un numero positivo
         if detalle.unidades > 0:
@@ -283,6 +290,7 @@ def invetariofisicolive_manageview( request, template_name = 'inventarios/Invent
                 detalle.id = next_id( 'ID_DOCTOS', connection_name )
                 detalle_entradas = detalle
             else:
+                detalle_entradas.unidades_inv = detalle_entradas.unidades_inv + detalle.unidades
                 detalle_entradas.unidades = detalle_entradas.unidades + detalle.unidades
 
             detalle_entradas.costo_total = detalle_entradas.unidades * detalle_entradas.costo_unitario
@@ -298,8 +306,10 @@ def invetariofisicolive_manageview( request, template_name = 'inventarios/Invent
                 detalle.tipo_movto ='S'
                 detalle_salidas = detalle
             else:
+                detalle_salidas.unidades_inv = -(detalle_salidas.unidades_inv + ( detalle.unidades * -1 ))
                 detalle_salidas.unidades = -(detalle_salidas.unidades + ( detalle.unidades * -1 ))
 
+            detalle_salidas.unidades_inv = detalle_salidas.unidades_inv * -1
             detalle_salidas.unidades = detalle_salidas.unidades * -1
             detalle_salidas.costo_total = detalle_salidas.unidades * detalle_salidas.costo_unitario
             detalle_salidas.save();

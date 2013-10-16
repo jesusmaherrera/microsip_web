@@ -122,8 +122,9 @@
     </tr>
     {% for articulo in articulos %}
     <tr>
-      <td class="hidden-phone">{{ articulo }}</td>
-      <!-- <td class="hidden-phone">{% if detalle_inv.tipo_movto = 'S' %}-{% endif %}  {{ detalle_inv.unidades }}</td> -->
+      <td class="hidden-phone">{{ articulo.articulo }}</td>
+      <td class="hidden-phone"> {{ articulo.unidades}}</td> 
+      <!-- {% if detalle_inv.tipo_movto = 'S' %}-{% endif %}  -->
     </tr>
     {% endfor %}
 </table>
