@@ -8,6 +8,8 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}
+{% include 'autocomplete_light/static.html' %}
+<script src="{{STATIC_URL}}js/inventarios.ajustes.js" ></script>
 <script type="text/javascript">
 function limpiarForm()
 {
@@ -32,128 +34,10 @@ function limpiarForm()
   }
 }
 
-function load_localstorage()
-{
-  modo_rapido = localStorage.getItem("modo_rapido");
-  if (modo_rapido == null)
-    localStorage.setItem("modo_rapido", 'false');
-  
-  if(localStorage.getItem("modo_rapido") == 'true')
-    $("#id_clave").focus();
-  else
-  {
-    $("#id_articulo_text").focus();
-    $("#chbx_modorapido").attr('checked', true);
-  }
-
-  $('#id_clave').focusin(function(){
-    if (localStorage.getItem("modo_rapido") == 'false')
-      localStorage.setItem("modo_rapido", 'true');
-  });
-
-  $('#id_articulo_text').focusin(function(){
-    if (localStorage.getItem("modo_rapido") == 'true')
-      localStorage.setItem("modo_rapido", 'false');
-  });
-
-  ubicacion = localStorage.getItem("ubicacion");
-  if (ubicacion == null)
-    localStorage.setItem("ubicacion", '');
-  
-  $("#id_ubicacion").val(localStorage.getItem("ubicacion"));
-  $("#id_ubicacion").change(function() {
-    localStorage.setItem("ubicacion",$("#id_ubicacion").val());
-  });
-}
-
-function buscar_articulo(){
-  //if($(".span_articulo").is(":hidden"))
-  //{
-  if($("#id_claveArticulo").val() != '')
-    Dajaxice.microsip_web.apps.inventarios.get_existenciasarticulo_byclave(cargar_art,{'articulo_clave': $('#id_claveArticulo').val(), 'almacen': $("#almacen_nombre").val(), });
-  else
-    $("#id_claveArticulo").focus();
-  //}
-  //else
-  //{
-    //Dajaxice.microsip_web.apps.inventarios.get_articulosen_inventario(mostrar_unidades,{'inventario_id': {{ InventarioFisico.id }},'articulo_id':$('#id_articulo option:selected').val()});    
-  //}
-
-}
-
-function cargar_art(data)
-{
-  if (data.error_msg == "no_existe_clave")
-  {
-    var opciones = data.opciones_clave
-    var html_var = "<table><tr><th>Clave</th><th>Articulo</td><tr/>"
-    var no_opciones = 0
-    for (art in opciones)
-    { 
-      no_opciones = no_opciones +  1;
-      html_var = html_var + "<tr><td><a href='#' class='clave_link'>" + art + "</a></td>" + "<td>" + opciones[art] + "</td></tr>"
-    }
-    html_var = html_var + "</table>"
-    if (no_opciones > 0)
-    {
-      $("#modal_opciones-claves > .modal-body").html(html_var);
-      $(".clave_link").on("click",function(){
-        $("#id_claveArticulo").val($(this).text());
-        $("#modal_opciones-claves").modal("hide");
-        Dajaxice.microsip_web.apps.inventarios.get_existenciasarticulo_byclave(cargar_art,{'articulo_clave': $('#id_claveArticulo').val(), 'almacen': $("#almacen_nombre").val(), });
-      });
-
-      $("#modal_opciones-claves").modal();
-    }
-    else
-      alert('No existe ningun articulo con la clave ['+ $("#id_claveArticulo").val() +']');
-  } 
-  else
-  {
-    cargar_articulo( data.articulo_id, data.articulo_nombre, data.existencias, data.costo_ultima_compra  );
-  }
-}
-
-function cargar_articulo( articulo_id, articulo_nombre, existencias, costo_ultima_compra )
-{
-  $('#id_articulo-deck').attr('style','');
-  $('#id_articulo-deck').html('<span class="div hilight" data-value="'+articulo_id+'"><span style="display: inline;" class="remove div">X</span>'+articulo_nombre+'</span>');
-  $('#id_articulo').html('<option selected="selected" value="'+articulo_id+'"></option>');
-  $('#id_articulo_text').hide();
-  $('#span_alerta_unidades').html(existencias + ' en existencia.');
-  $("#id_costo_unitario").val(costo_ultima_compra);
-
-  $(".remove").on('click', function(){
-    $('#span_alerta_unidades').html('');
-    $("#id_unidades").val('');
-    $(".span_clave").show();
-    $(".span_articulo").hide();
-    
-    $("#id_claveArticulo").val(""); 
-    if(localStorage.getItem("modo_rapido") == 'true')
-      $("#id_claveArticulo").focus();
-    else
-      $("#id_articulo_text").focus();
-  });
-
-  $("#id_unidades").focus();
-  alert( existencias + " Articulos en existencia" );
-
-}
-
 $(document).ready(function(){
   
   $("#id_articulo_text").before("<span class='add-on' id='span_nombre_articulo'>Nombre</span>")
-
-  if (Modernizr.localstorage) 
-  {
-    /* LOCAL STORAGE */
-    load_localstorage();
-  }
-  else
-    $("#chbx_modorapido").attr('checked', true);
-    
-  limpiarForm();
+  //limpiarForm();
 });
 
 </script>
@@ -205,13 +89,16 @@ $(document).ready(function(){
   <div class="span1 span_unidades" >
     <div class="input-prepend input-append">
       {{ form.unidades }}
-      <a class="btn btn-success " id="enviar_btn" onclick="enviar_unidades();" href="#">Enviar</a>
+      {{ form.costo_unitario }}
+      <a class="btn btn-success " id="enviar_btn" onclick="add_existenciasarticulo_byajuste()" href="#">Enviar</a>
     </div>
   </div>
   <br>
   <a id="cancelar_btn" class= "btn btn-danger span12 " href="#" onclick="limpiarForm();" >Cancelar</a>
   <br style='clear:both;'>
   <input type="hidden" id="almacen_nombre" value="{{ almacen.nombre }}"/>
+  <input type="hidden" id="entrada_id" value="{{ entrada_id }}"/>
+  <input type="hidden" id="salida_id" value="{{ salida_id }}"/>
 </form>
 
 {% endblock %}

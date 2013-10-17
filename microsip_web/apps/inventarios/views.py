@@ -364,8 +364,20 @@ def invetariofisico_ajustes_manageview( request, almacen_id = None, template_nam
 
 @login_required( login_url = '/login/' )
 def invetariofisico_ajustesmobile_manageView( request, almacen_id = None, template_name = 'inventarios/Inventarios Fisicos/mobile/inventariofisico.html' ):
+    connection_name = get_conecctionname(request.session)
     form = DoctoInDetManageForm( request.POST or None )
-    c = { 'form' : form,}
+
+    entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, connection_name = connection_name, username = request.user.username)
+    
+    c = { 
+        'form' : form,
+        'almacen' : entrada.almacen, 
+        'entrada_fecha': entrada.fecha, 
+        'folio_entrada': entrada.folio, 
+        'folio_salida': salida.folio, 
+        'entrada_id' : entrada.id,
+        'salida_id' : salida.id,
+        }
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )    
 
 @detect_mobile
