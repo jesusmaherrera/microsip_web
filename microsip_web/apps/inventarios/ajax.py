@@ -151,13 +151,13 @@ def get_existencias_articulo_view( request, articulo_id, almacen = '' ):
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
     articulo = Articulos.objects.get( pk = articulo_id )
-    entradas, salidas, existencias = get_existencias_articulo(
+    entradas, salidas, existencias, inv_fin = get_existencias_articulo(
         articulo_id = articulo_id , 
         connection_name = connection_name, 
         fecha_inicio = datetime.now().strftime( "%m/01/%Y" ),
         almacen = almacen, )
 
-    return simplejson.dumps( { 'existencias' : int( existencias ), 'costo_ultima_compra' : str(articulo.costo_ultima_compra) } )
+    return simplejson.dumps( { 'existencias' : int( inv_fin ), 'costo_ultima_compra' : str(articulo.costo_ultima_compra) } )
 
 @dajaxice_register( method = 'GET' )
 def add_aticulosinventario( request, inventario_id, articulo_id, unidades, ubicacion ):

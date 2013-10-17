@@ -242,7 +242,7 @@ def invetariofisicolive_manageview( request, almacen_id = None, template_name = 
     form = DoctoInDetManageForm( request.POST or None )
     ubicacion_form = UbicacionArticulosForm(request.POST or None)
 
-    if form.is_valid() and ubicacion_form.is_valid():
+    if form.is_valid():
         detalle = form.save( commit = False )
         detalle_unidades = detalle.unidades
         #Entradas
@@ -260,14 +260,14 @@ def invetariofisicolive_manageview( request, almacen_id = None, template_name = 
         
         unidades_a_insertar = 0
         if detalle_entradas == None and detalle_salidas == None:
-            entradas, salidas, existencias = get_existencias_articulo(
+            entradas, salidas, existencias, inv_fin = get_existencias_articulo(
                     articulo_id = detalle.articulo.id, 
                     connection_name = connection_name, 
                     fecha_inicio = datetime.now().strftime( "%m/01/%Y" ),
                     almacen = entrada.almacen, )
             
-            unidades_a_insertar = -existencias + detalle.unidades
-            if existencias == 0:
+            unidades_a_insertar = -inv_fin + detalle.unidades
+            if inv_fin == 0:
                 unidades_a_insertar = detalle.unidades
 
             detalle.id = next_id( 'ID_DOCTOS', connection_name )
@@ -332,7 +332,7 @@ def invetariofisicolive_manageview( request, almacen_id = None, template_name = 
 
         form = DoctoInDetManageForm()
 
-    sql = """select C.nombre, (b.entradas_unid - b.salidas_unid) as existencia FROM (select FIRST 200 DISTINCT b.articulo_id, b.nombre from doctos_in_det a, articulos b
+    sql = """select C.nombre, b.inv_fin_unid as existencia FROM (select FIRST 200 DISTINCT b.articulo_id, b.nombre from doctos_in_det a, articulos b
         where (a.docto_in_id = %s or a.docto_in_id = %s) and b.articulo_id = a.articulo_id) C left JOIN
          orsp_in_aux_art( articulo_id, '%s', '%s','%s','S','N') B
          on C.articulo_id = b.articulo_id
@@ -349,7 +349,7 @@ def invetariofisicolive_manageview( request, almacen_id = None, template_name = 
     for articulo in articulos_rows:
         articulos.append( { 'articulo' : articulo[0], 'unidades' : articulo[1], } )
 
-    c = { 'form' : form, 'ubicacion_form' : ubicacion_form, 'articulos' : articulos, 'almacen' : entrada.almacen, 'entrada_fecha': entrada.fecha, 'folio_entrada': entrada.folio, 'folio_salida': salida.folio, }
+    c = { 'form' : form, 'ubicacion_form' : ubicacion_form, 'articulos' : articulos, 'almacen' : entrada.almacen.nombre, 'entrada_fecha': entrada.fecha, 'folio_entrada': entrada.folio, 'folio_salida': salida.folio, }
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
 @detect_mobile
