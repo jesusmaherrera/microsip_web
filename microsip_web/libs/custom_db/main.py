@@ -31,7 +31,12 @@ def runsql_rows( sql = "", connection_name = "" ):
     c.close() 
     return unidades_rows
 
-
+def first_or_none(query):  
+    try:  
+        return query.all()[0]  
+    except:  
+        return None
+        
 def get_existencias_articulo( articulo_id = None, connection_name = '', fecha_inicio = None, almacen = '' ):
     """ Para obtener las existencias de un articulo determinado """
     fecha_actual_str = datetime.datetime.now().strftime("%m/%d/%Y")

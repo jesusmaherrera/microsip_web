@@ -21,6 +21,7 @@ from django.core import management
 import fdb
 from microsip_web.settings.common import MICROSIP_MODULES
 from microsip_web.apps.inventarios.triggers import triggers as inventarios_triggers
+from microsip_web.apps.inventarios.triggers_salidas import triggers_salidas as inventarios_triggers_salidas
 from microsip_web.apps.punto_de_venta.triggers import triggers as punto_de_venta_triggers
 
 @login_required( login_url = '/login/' )
@@ -74,7 +75,7 @@ def inicializar_tablas( request ):
         if 'microsip_web.apps.punto_de_venta' in MICROSIP_MODULES:
             actualizar_triggers_puntodeventa( conexion_name = conexion_name )
         if 'microsip_web.apps.inventarios' in MICROSIP_MODULES:
-            actualizar_triggers_inventarios( conexion_name = conexion_name )
+             actualizar_triggers_inventarios( conexion_name = conexion_name )
 
         #cuentas_por_pagar_inicializar_tablas()
         #cuentas_por_cobrar_inicializar_tablas()
@@ -127,6 +128,13 @@ def sincronizar_tablas( conexion_name = None ):
     c.execute( procedures['SIC_DESGDISCINVFIS_AT'] )
     c.execute("EXECUTE PROCEDURE SIC_DESGDISCINVFIS_AT;")
 
+    c.execute( procedures['SIC_DOCTOSINDET_AT'] )
+    c.execute("EXECUTE PROCEDURE SIC_DOCTOSINDET_AT;")
+
+    c.execute( procedures['SIC_DOCTOSIN_AT'] )
+    c.execute("EXECUTE PROCEDURE SIC_DOCTOSIN_AT;")
+
+
     transaction.commit_unless_managed()
 
 def ventas_inicializar_tablas( conexion_name = None ):
@@ -142,6 +150,11 @@ def actualizar_triggers_inventarios( conexion_name = None ):
 
     c = connections[ conexion_name ].cursor()
     ####################### TRIGGERS #######################
+    c.execute( inventarios_triggers_salidas[ 'SIC_PUERTA_INV_DESGLOSEDIS_AI' ] )
+    c.execute( inventarios_triggers_salidas[ 'SIC_PUERTA_INV_DOCTOSINDET_BI' ] )
+    c.execute( inventarios_triggers_salidas[ 'SIC_PUERTA_INV_DOCTOSINDET_BD' ] )
+    c.execute( inventarios_triggers_salidas[ 'SIC_PUERTA_INV_DOCTOSIN_BU' ] )
+
     #c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DESGLOSEDIS_AI' ] )
     #c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSINDET_BI' ] )
     #c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSINDET_BD' ] )

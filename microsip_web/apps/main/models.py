@@ -605,6 +605,8 @@ class DoctosInDet(models.Model):
     rol             = models.CharField(default='N', max_length=1, db_column='ROL')
     fecha           = models.DateField(auto_now=True, blank=True, null=True, db_column='FECHA') 
     unidades_inv = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='SIC_UNIDADES_INV')
+    fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='SIC_FECHAHORA_U')
+    usuario_ult_modif = models.CharField(blank=True, null=True, max_length=31, db_column='SIC_USUARIO_ULT_MODIF')
     
 
     def __unicode__(self):

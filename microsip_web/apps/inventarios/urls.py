@@ -17,7 +17,9 @@ urlpatterns = patterns('',
     (r'^inventarioFisico_mobile/(?P<id>\d+)/', views.invetarioFisico_mobile_pa_manageView),
     (r'^inventarioFisico_mobile/articulo_serie/(?P<id>\d+)/(?P<no_series>\d+)/', views.invetarioFisico_mobile_series_manageView),
     
-    (r'^inventariofisico_ajustes/(?P<almacen_id>\d+)/$', views.invetariofisicolive_manageview),
+    (r'^inventariofisico_ajustes/(?P<almacen_id>\d+)/$', views.invetariofisico_ajustes_manageview),
+    (r'^inventariofisico_ajustesmobile/(?P<almacen_id>\d+)/$', views.invetariofisico_ajustesmobile_manageView),
+    
     (r'^articulos/$', pv_views.articulos_view),
     (r'^almacenes/$', views.almacenes_view),
 
