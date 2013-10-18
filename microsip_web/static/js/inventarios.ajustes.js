@@ -1,18 +1,33 @@
 function add_existenciasarticulo_byajuste()
 {
-  if ( $("#enviar_btn").attr("disabled") == "disabled")
-    return false
-  
-  if ( $('#id_unidades').val() != '' && $.isNumeric($('#id_unidades').val()) && $('#id_articulo option:selected').val() != undefined && $('#id_costo_unitario').val() != '' && $.isNumeric($('#id_costo_unitario').val()))
+
+  if ( $('#puede_modificar_costos').val() == 'True' )
+  {
+    if ($('#id_costo_unitario').val() == '')
+    { 
+      alert("El campo costo unitario es obligatorio");
+      $("#id_costo_unitario").focus();
+    }
+    else if ($.isNumeric($('#id_costo_unitario').val()) == false )
+    {
+      alert("Costo unitario incorrectO");
+      $("#id_costo_unitario").focus();
+    }
+  } 
+  else 
+
+  if ( $('#id_unidades').val() != '' && $.isNumeric($('#id_unidades').val()) && $('#id_articulo option:selected').val() != undefined )
   { 
+    var costo_unitario = 0
+    if ( $('#puede_modificar_costos').val() == 'True' )
+      costo_unitario = $("#id_costo_unitario").val()
     Dajaxice.microsip_web.apps.inventarios.add_existenciasarticulo_byajustes_view(resultado,{
       'ubicacion' : $("#id_ubicacion").val(),
       'articulo_id' : $("#id_articulo").val()[0],
       'entrada_id' : $("#entrada_id").val(),
       'salida_id' : $("#salida_id").val(),
       'detalle_unidades' : $("#id_unidades").val(),
-      'detalle_costo_unitario' : $("#id_costo_unitario").val(),
-
+      'detalle_costo_unitario' :costo_unitario,
       }
     ); 
     
@@ -36,16 +51,6 @@ function add_existenciasarticulo_byajuste()
       alert("Unidades incorrectas");
       $("#id_unidades").focus();
     }
-    else if ($('#id_costo_unitario').val() == '')
-    { 
-      alert("El campo costo unitario es obligatorio");
-      $("#id_costo_unitario").focus();
-    }
-    else if ($.isNumeric($('#id_costo_unitario').val()) == false )
-    {
-      alert("Costo unitario incorrectas");
-      $("#id_costo_unitario").focus();
-    } 
     
   }
 }
@@ -204,11 +209,11 @@ function cargar_art(data)
   } 
   else
   {
-    cargar_articulo( data.articulo_id, data.articulo_nombre, data.existencias, data.costo_ultima_compra  );
+    cargar_articulo( data.articulo_id, data.articulo_nombre, data.existencias, data.costo_ultima_compra, data.detalle_modificacionestime );
   }
 }
 
-function cargar_articulo( articulo_id, articulo_nombre, existencias, costo_ultima_compra )
+function cargar_articulo( articulo_id, articulo_nombre, existencias, costo_ultima_compra, detalle_modificacionestime )
 {
   $('#id_articulo-deck').attr('style','');
   $('#id_articulo-deck').html('<span class="div hilight" data-value="'+articulo_id+'"><span style="display: inline;" class="remove div">X</span>'+articulo_nombre+'</span>');
@@ -216,7 +221,7 @@ function cargar_articulo( articulo_id, articulo_nombre, existencias, costo_ultim
   $('#id_articulo_text').hide();
   $('#span_alerta_unidades').show();
   $('#span_alerta_unidades').html(existencias + " en existencia. <a tabindex='-1' href='#modal_movimientos_articulo' role='button' data-toggle='modal'><i class='icon-info-sign icon-white'></i></a> ");
-  var entradas = data.detalle_modificacionestime.split(',')
+  var entradas = detalle_modificacionestime.split(',')
   var entradas_html = ''
   $.each(entradas, function(key, entrada) {
     numero = key + 1

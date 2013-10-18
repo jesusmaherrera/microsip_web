@@ -16,6 +16,7 @@ from microsip_web.libs.custom_db.main import next_id, get_existencias_articulo, 
 from microsip_web.libs.tools import split_seq
 from django.db import connections, transaction
 from microsip_web.libs.custom_db.main import get_conecctionname
+from microsip_web.apps.config.models import DerechoUsuario
 
 @dajaxice_register( method = 'GET' )
 def get_detallesArticuloenInventario( request, detalle_invfis_id ):
@@ -170,6 +171,9 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     detalle_unidades = kwargs.get( 'detalle_unidades', 0 )
     detalle_costo_unitario = kwargs.get( 'detalle_costo_unitario', articulo.costo_ultima_compra )
 
+    if not DerechoUsuario.objects.filter(usuario__nombre = request_user.username, clave_objeto = 469).exists() and request_user.username != 'SYSDBA':
+        detalle_costo_unitario = articulo.costo_ultima_compra
+
     detalle_entradas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn = entrada ) )
     detalle_salidas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn = salida ) )
     articulo_clave = first_or_none( ClavesArticulos.objects.filter( articulo = articulo ) )
@@ -321,7 +325,7 @@ def add_articulossinexistencia_bylinea( request, **kwargs ):
     linea = LineaArticulos.objects.get( pk = linea_id )
 
     articulos_endocumentos = DoctosInDet.objects.filter( Q( doctosIn = entrada ) | Q( doctosIn = salida ) ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True )
-    articulos_sinexistencia = Articulos.objects.filter( es_almacenable = 'S', linea = linea ).exclude( pk__in = articulos_endocumentos ).order_by( '-id' ).values_list( 'id', flat = True )
+    articulos_sinexistencia = Articulos.objects.filter( es_almacenable = 'S', seguimiento='N', linea = linea ).exclude( pk__in = articulos_endocumentos ).order_by( '-id' ).values_list( 'id', flat = True )
     
     total_articulos_sinexistencia = articulos_sinexistencia.count()
     articulos_sinexistencia = articulos_sinexistencia[0:9000]
@@ -367,9 +371,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     clave_articulo = first_or_none( ClavesArticulos.objects.filter( clave = articulo_clave ) )
     opciones_clave = {}
     
-    detalle_modificaciones = ''
-    detalle_modificacionestime = ''
-    detalle_entradas_id = ''
+    detalle_modificaciones, detalle_modificacionestime, detalle_entradas_id = '', '', ''
 
     if clave_articulo:
         articulo = Articulos.objects.get( pk = clave_articulo.articulo.id )
@@ -388,13 +390,19 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
             detalle_modificaciones = detalle_entradas.detalle_modificaciones
             detalle_modificacionestime = detalle_entradas.detalle_modificacionestime
             detalle_entradas_id =  detalle_entradas.id
-
     else:
         error = "no_existe_clave"
         claves = ClavesArticulos.objects.filter( clave__contains = articulo_clave )
         for c in claves:
             opciones_clave[ str( c.clave ) ] = c.articulo.nombre
     
+    if not detalle_modificaciones:
+        detalle_modificaciones = ''
+    if not detalle_modificacionestime:
+        detalle_modificacionestime = ''
+    if not detalle_entradas_id:
+        detalle_entradas_id = ''
+
     datos = { 
         'error_msg' : error,
         'articulo_id' : articulo_id,
@@ -416,7 +424,8 @@ def get_existenciasarticulo_byid( request, **kwargs ):
     articulo_id = kwargs.get( 'articulo_id', None)
     entrada_id = kwargs.get( 'entrada_id', None )
     connection_name = get_conecctionname( request.session )
-    
+    detalle_modificaciones, detalle_modificacionestime, detalle_entradas_id = '', '', ''
+
     articulo = Articulos.objects.get( pk = articulo_id )
     entradas, salidas, existencias, inv_fin = get_existencias_articulo(
         articulo_id = articulo_id , 
@@ -426,14 +435,17 @@ def get_existenciasarticulo_byid( request, **kwargs ):
  
     detalle_entradas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn__id = entrada_id ) )
     
-    detalle_modificaciones = ''
-    detalle_modificacionestime = ''
-    detalle_entradas_id = ''
-
     if detalle_entradas:
         detalle_modificaciones = detalle_entradas.detalle_modificaciones
         detalle_modificacionestime = detalle_entradas.detalle_modificacionestime
         detalle_entradas_id =  detalle_entradas.id
+
+    if not detalle_modificaciones:
+        detalle_modificaciones = ''
+    if not detalle_modificacionestime:
+        detalle_modificacionestime = ''
+    if not detalle_entradas_id:
+        detalle_entradas_id = ''
 
     return simplejson.dumps( { 
         'existencias' : int( inv_fin ), 

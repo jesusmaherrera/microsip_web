@@ -12,6 +12,23 @@ class Usuario(models.Model):
     class Meta:
         db_table = u'usuarios'
 
+class DerechoUsuarioManager(models.Manager):
+    def get_by_natural_key(self, usuario,  clave_objeto):
+        return self.get(usuario=usuario, clave_objeto=clave_objeto)
+        
+class DerechoUsuario(models.Model):
+    objects = DerechoUsuarioManager()
+    
+    usuario = models.ForeignKey(Usuario, db_column='USUARIO_ID')
+    clave_objeto = nombre = models.CharField(max_length=3, db_column='CLAVE_OBJETO')
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.usuario, self.clave_objeto)
+
+    class Meta:
+        db_table = u'derechos_usuarios'
+        unique_together = (('usuario', 'clave_objeto'),)
+
 class Empresa(models.Model):
     id = models.AutoField(primary_key=True, db_column='EMPRESA_ID')
     nombre = models.CharField(max_length=30, db_column='NOMBRE_CORTO')

@@ -25,7 +25,7 @@ class precios_articulos_form(forms.ModelForm):
 class articulos_form(forms.ModelForm):
     class Meta:
         model = Articulos
-        exclude = ('seguimiento', 'puntos','es_almacenable',)
+        exclude = ('seguimiento', 'puntos','es_almacenable', 'costo_ultima_compra')
 
 class claves_articulos_form(forms.ModelForm):
     class Meta:

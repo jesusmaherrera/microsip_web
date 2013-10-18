@@ -101,6 +101,7 @@
           <input type="hidden" id="almacen_id" value="{{ almacen_id }}"/>
           <input type="hidden" id="entrada_id" value="{{ entrada_id }}"/>
           <input type="hidden" id="salida_id" value="{{ salida_id }}"/>
+          <input type="hidden" id="puede_modificar_costos" value="{{ puede_modificar_costos }}"/>
           <strong>Alamacen: </strong> {{ almacen }}
         </div>
       </div>  
@@ -118,10 +119,13 @@
   </div>
   <div class="input-prepend input-append">
     {{ form.unidades }} 
-    {{ form.costo_unitario }}
+    {% if puede_modificar_costos %}
+      {{ form.costo_unitario }}
+    {% endif %}
     <a class="btn" id="enviar_btn" onclick="add_existenciasarticulo_byajuste()" href="#">Enviar</a>
   </div>
 </form>
+<h5 style="text-align: center; "> Ultimos 20 cambios</h5>
 <table class="table table-striped table-hover">
     <tr>
       <th class="hidden-phone">articulo</th>

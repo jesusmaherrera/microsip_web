@@ -26,15 +26,14 @@ import xlrd
 from mobi.decorators import detect_mobile
 from models import *
 from forms import *
-from microsip_web.libs.custom_db.main import next_id, get_existencias_articulo, runsql_rows
+from microsip_web.libs.custom_db.main import next_id, get_existencias_articulo, runsql_rows, get_conecctionname
 from microsip_web.libs.tools import split_seq
 from triggers import triggers
 from microsip_web.apps.config.models import *
 import fdb
 from microsip_web.settings.common import MICROSIP_DATABASES, DATABASES
-from microsip_web.libs.custom_db.main import get_conecctionname
 from django.db.models import Sum
-
+from microsip_web.apps.config.models import DerechoUsuario
 
 @login_required( login_url = '/login/' )
 def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.html' ):
@@ -230,19 +229,24 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
         entrada.save()
 
     return entrada, salida
- 
+
+def allow_microsipuser( username = None, connection_name = None, clave_objeto=  None ):
+    return DerechoUsuario.objects.filter(usuario__nombre = username, clave_objeto = clave_objeto).exists() or username == 'SYSDBA'
+    
 @login_required( login_url = '/login/' )
 def invetariofisico_ajustes_manageview( request, almacen_id = None, template_name = 'inventarios/Inventarios Fisicos/inventariofisico_ajustes.html' ):
     connection_name = get_conecctionname( request.session )
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
-    
+
     entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, connection_name = connection_name, username = request.user.username)
+    
+    puede_modificar_costos = allow_microsipuser( username = request.user.username, clave_objeto = 469, connection_name = connection_name)
 
     form = DoctoInDetManageForm( request.POST or None )
     ubicacion_form = UbicacionArticulosForm(request.POST or None)
 
-    sql = """select DISTINCT C.nombre, b.inv_fin_unid as existencia FROM (select FIRST 100 DISTINCT b.articulo_id, b.nombre, a.sic_fechahora_u from doctos_in_det a, articulos b
+    sql = """select DISTINCT C.nombre, b.inv_fin_unid as existencia FROM (select FIRST 20 DISTINCT b.articulo_id, b.nombre, a.sic_fechahora_u from doctos_in_det a, articulos b
         where (a.docto_in_id = %s or a.docto_in_id = %s) and b.articulo_id = a.articulo_id order by a.sic_fechahora_u DESC) C left JOIN
          orsp_in_aux_art( articulo_id, '%s', '%s','%s','S','N') B
          on C.articulo_id = b.articulo_id
@@ -263,6 +267,7 @@ def invetariofisico_ajustes_manageview( request, almacen_id = None, template_nam
     c = { 
         'form' : form, 
         'lineas_form': lineas_form,
+        'puede_modificar_costos': puede_modificar_costos,
         'ubicacion_form' : ubicacion_form, 
         'articulos' : articulos, 
         'almacen' : entrada.almacen, 
