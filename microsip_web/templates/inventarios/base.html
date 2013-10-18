@@ -31,20 +31,20 @@
 {% endblock %}
 {% block selected_module %}<a href="/inventarios/inventariosfisicos/"> <i class="msicon-inventarios"></i> <label class="small_screen"> Inventarios</label></a>{% endblock %}
 {% block btn_modulo_inventarios%}
-<li style='color: #555555; background-color: #e5e5e5;'><a href="/inventarios/inventariosfisicos/"> <i class="msicon-inventarios"></i> <label class='small_screen'> Inventarios</label></a> </li>
+<li style='color: #555555; background-color: #e5e5e5;'><a href="/inventarios/almacenes/"> <i class="msicon-inventarios"></i> <label class='small_screen'> Inventarios</label></a> </li>
 {% endblock %}
 {% block breadcrumb %}{{ block.super }}{% endblock %}
 {% block tools-module %}
 <div class="navbar navbar-static">
   <ul class="nav" role="navigation">
-    <li><a tabindex="-1" href="/inventarios/inventariosfisicos/"><i class="icon-folder-close"></i> <span class=""> Documentos</span></a></li>
-    <li class="dropdown">
+    <!-- <li><a tabindex="-1" href="/inventarios/inventariosfisicos/"><i class="icon-folder-close"></i> <span class=""> Documentos</span></a></li> -->
+    <li><a tabindex="-1" href="/inventarios/almacenes/"><i class="icon-hdd"></i> <span class="">Almacenes</span></a></li>
+    <li><a tabindex="-1" href="/inventarios/articulos/"><i class="icon-barcode"></i> <span class="">Articulos</span></a></li>
+    <!-- <li class="dropdown">
       <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-barcode"></i> Articulos <b class="caret"></b></a>
-      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
-        <li><a tabindex="-1" href="/inventarios/articulos/"><i class="icon-barcode"></i> <span class="">Articulos</span></a></li>
-        <li><a tabindex="-1" href="/inventarios/almacenes/"><i class="icon-hdd"></i> <span class="">Almacenes</span></a></li>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>    
       </ul>
-    </li>
+    </li> -->
     
   </ul>
   <ul id="menu_ver" class="nav pull-right hidden-phone">

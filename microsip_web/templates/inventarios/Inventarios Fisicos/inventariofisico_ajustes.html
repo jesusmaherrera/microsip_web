@@ -12,6 +12,16 @@
 
 {% block breadcrumb %}{{ block.super }}Inventarios por ajustes{% endblock %}
 {% block content %}
+<!-- MODALES -->
+<div id="modal_movimientos_articulo" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="myModalLabel">Movimientos</h3>
+  </div>
+  <div class="modal-body">
+  </div>
+</div>
+
 <div id="modal_opciones-claves" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -20,6 +30,36 @@
   <div class="modal-body">
   </div>
 </div>
+
+ <div id="articulosnocont_porlinea_Modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    Agregar articulos no contabilizados por linea <br>
+  </div>
+  <div class="modal-body">
+    <p>
+      Al agregar articulos no contabilizados por linea las existencias de los articulos no contabilizados en este documento se pondran en cero [0]
+    </p>
+    <p>Ejemplo</p>
+    <blockquote>
+      <p><small>El articulo lapiz tiene existencias de -7 como resultado se tendra el articulo lapiz con existencia de [0].</small></p>
+    </blockquote>
+    <p class="text-warning">
+        Esto pueder tardar unos minutos dependiendo del numero de articulos en la base de datos.
+    </p>  
+    Seleciona una linea por favor {{ lineas_form.linea }}
+  </div>
+  <div class="modal-footer">
+    <span id='id_agregando_span' class='hide'>
+      <label class="span">Agregando articulos </label>
+      <img class= 'imagecenter' src="{{STATIC_URL}}img\ajax-loader.gif">
+    </span>
+    <button class="btn" id='btnCancel' data-dismiss="modal">Cancelar</button>
+    <a class='btn' href="#" onclick="agregar_articulos_porlineafn();" id='btn_agregar_articulosinexistencia_bylinea' >Aceptar</a>
+  </div>
+</div>
+<!-- END MODALES -->
+
 <div class="ms-custom-form">
     <div id="ms-custom-form-header">
       <div class='span ' >
@@ -28,8 +68,7 @@
             <li class="dropdown">
               <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i></a>
               <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
-                <li><a tabindex="-1" href="#" role="button" data-toggle="modal"><i class="icon-tasks"></i> Agregar articulos no contabilizados Por linea</a></li>
-                <li><a tabindex="-1" href="#"><i class="icon-align-justify"></i> Agregar todos los articulos no contabilizados</a></li>
+                <li><a tabindex="-1" href="#articulosnocont_porlinea_Modal" role="button" data-toggle="modal"><i class="icon-tasks"></i> Agregar articulos no contabilizados Por linea</a></li>
               </ul>
             </li>
           </ul>
@@ -59,6 +98,7 @@
       <div  class=" pull-right ">
         <div class="span4">
           <input type="hidden" id="almacen_nombre" value="{{ almacen.nombre }}"/>
+          <input type="hidden" id="almacen_id" value="{{ almacen_id }}"/>
           <input type="hidden" id="entrada_id" value="{{ entrada_id }}"/>
           <input type="hidden" id="salida_id" value="{{ salida_id }}"/>
           <strong>Alamacen: </strong> {{ almacen }}
@@ -74,14 +114,12 @@
   </div>
   <div class="input-prepend input-append">
     {{ form.articulo }}
-    <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 0, 0); color: white;"> </span>
+    <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 0, 0); color: white; padding: .2em 2em;"> </span>
   </div>
   <div class="input-prepend input-append">
     {{ form.unidades }} 
     {{ form.costo_unitario }}
     <a class="btn" id="enviar_btn" onclick="add_existenciasarticulo_byajuste()" href="#">Enviar</a>
-
-    <!-- <button type="submit" class="btn _block" onclick="this.disabled=true,this.form.submit(), this.value='Enviando...';" id='btn_submit_articulos' name='add_button'>Enviar</button> -->
   </div>
 </form>
 <table class="table table-striped table-hover">
@@ -92,8 +130,7 @@
     {% for articulo in articulos %}
     <tr>
       <td class="hidden-phone">{{ articulo.articulo }}</td>
-      <td class="hidden-phone"> {{ articulo.unidades}}</td> 
-      <!-- {% if detalle_inv.tipo_movto = 'S' %}-{% endif %}  -->
+      <td class="hidden-phone"> {{ articulo.unidades}}</td>
     </tr>
     {% endfor %}
 </table>

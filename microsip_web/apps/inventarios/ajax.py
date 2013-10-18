@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.core import management
 import json
 import datetime, time
+from django.db.models import Q
 from decimal import *
 from models import *
 from microsip_web.libs.custom_db.main import next_id, get_existencias_articulo, first_or_none
@@ -145,45 +146,42 @@ def sincronizar_inventario( request, inventariofisico_id ):
 
     return simplejson.dumps( { 'articulos_count' : articulos_modificados } )
 
-@dajaxice_register( method = 'GET' )
-def add_existenciasarticulo_byajuste( request, **kwargs ):
-    """ Para agregar existencia a un articulo por ajuste"""
-    #Paramentros
-    articulo_id = kwargs.get( 'articulo_id', None )
-    entrada_id = kwargs.get( 'entrada_id', None )
-    salida_id = kwargs.get( 'salida_id', None )
-    detalle_unidades = Decimal( kwargs.get( 'detalle_unidades', None ) )
-    detalle_costo_unitario = Decimal( kwargs.get( 'detalle_costo_unitario', None ) )
+def add_existenciasarticulo_byajustes( **kwargs ):
+    """ Para agregar existencia a un articulo por ajuste 
+        En caso de que el articulo no tenga costo indicado [se le aplica el de la ultima compra]
+    """
 
+    #Paramentros
+    ubicacion = kwargs.get( 'ubicacion', None )
+    articulo_id = kwargs.get( 'articulo_id', None )
     articulo = Articulos.objects.get( pk = articulo_id )
-    salida = DoctosIn.objects.get( pk = salida_id )
+
+    entrada_id = kwargs.get( 'entrada_id', None )
     entrada = DoctosIn.objects.get( pk = entrada_id )
+    almacen = entrada.almacen
+
+    salida_id = kwargs.get( 'salida_id', None )
+    salida = DoctosIn.objects.get( pk = salida_id )
+
+    request_session = kwargs.get( 'request_session', 0 )
+    request_user = kwargs.get( 'request_user', 0 )
+    connection_name = get_conecctionname( request_session )
+    
+    detalle_unidades = kwargs.get( 'detalle_unidades', 0 )
+    detalle_costo_unitario = kwargs.get( 'detalle_costo_unitario', articulo.costo_ultima_compra )
+
+    detalle_entradas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn = entrada ) )
+    detalle_salidas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn = salida ) )
+    articulo_clave = first_or_none( ClavesArticulos.objects.filter( articulo = articulo ) )
 
     detalle = DoctosInDet(
         articulo = articulo,
-        almacen = entrada.almacen,
+        claveArticulo = articulo_clave,
+        almacen = almacen,
         unidades = detalle_unidades,
         costo_unitario = detalle_costo_unitario,
         )
-    
-    connection_name = get_conecctionname( request.session )
-   
-    #detalle_entradas = first_or_none( DoctosInDet.objects.filter( articulo__id = articulo_id, doctosIn__id = entrada_id ) )
-    #detalle_salidas = first_or_none( DoctosInDet.objects.filter( articulo__id = articulo_id, doctosIn__id = salida_id ) )
 
-    #Entradas
-    try:
-        detalle_entradas = DoctosInDet.objects.filter( articulo = detalle.articulo, doctosIn = entrada )[0]
-    except IndexError:
-        detalle_entradas = None
-
-    #Salidas
-    try:            
-        detalle_salidas = DoctosInDet.objects.filter( articulo = detalle.articulo, doctosIn = salida )[0]
-    except IndexError:
-        detalle_salidas = None
-
-    
     unidades_a_insertar = 0
     if detalle_entradas == None and detalle_salidas == None:
         entradas, salidas, existencias, inv_fin = get_existencias_articulo(
@@ -203,7 +201,7 @@ def add_existenciasarticulo_byajuste( request, **kwargs ):
 
         detalle.unidades = unidades_a_insertar
     es_nuevo = False
-    if detalle_unidades < 0 or unidades_a_insertar < 0:
+    if detalle_unidades <= 0 or unidades_a_insertar < 0:
         # Si no existe un detalle de salida de ese articulo
         if detalle_salidas == None:
             es_nuevo = True
@@ -233,7 +231,7 @@ def add_existenciasarticulo_byajuste( request, **kwargs ):
         else:    
             detalle_salidas.save( update_fields=[ 'unidades', 'unidades_inv', 'costo_total', 'fechahora_ult_modif',] );
 
-    if detalle_unidades > 0 and unidades_a_insertar >= 0:
+    if detalle_unidades >= 0 and unidades_a_insertar >= 0:
         # Si no existe un detalle de salida de ese articulo
         if detalle_entradas == None:
             es_nuevo = True
@@ -252,10 +250,26 @@ def add_existenciasarticulo_byajuste( request, **kwargs ):
         detalle_entradas.unidades_inv = detalle_entradas.unidades_inv + detalle_unidades
         detalle_entradas.costo_total = detalle_entradas.unidades * detalle_entradas.costo_unitario
         detalle_entradas.fechahora_ult_modif = datetime.now()
+
+        # Para historial de modificaciones
+        if detalle_entradas.detalle_modificaciones == None:
+            detalle_entradas.detalle_modificaciones = ''
+        if detalle_entradas.detalle_modificacionestime == None:
+            detalle_entradas.detalle_modificacionestime = ''
+
+        nuevo_texto = detalle_entradas.detalle_modificaciones + '[%s/%s=%s:%s],'%( request_user.username, ubicacion, detalle_unidades, detalle_costo_unitario )
+        tamano_detalles = len( nuevo_texto )
+        
+        if tamano_detalles < 400:
+            detalle_entradas.detalle_modificaciones = nuevo_texto
+        else:
+            message = "El numero de caracteres para detalles del articulo fue excedido"
+        detalle_entradas.detalle_modificacionestime += '[%s/%s=%s:%s](%s),'%( request_user.username, ubicacion, detalle_unidades, detalle_costo_unitario, datetime.now().strftime("%d-%m-%Y %H:%M") )
+
         if es_nuevo:
             detalle_entradas.save()
         else:
-            detalle_entradas.save( update_fields=[ 'unidades', 'unidades_inv', 'costo_total', 'fechahora_ult_modif', ] )
+            detalle_entradas.save( update_fields=[ 'unidades', 'unidades_inv', 'costo_total', 'fechahora_ult_modif', 'detalle_modificaciones', 'detalle_modificacionestime'] )
 
     c = connections[ connection_name ].cursor()
     c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% articulo.id )
@@ -266,13 +280,81 @@ def add_existenciasarticulo_byajuste( request, **kwargs ):
     management.call_command( 'syncdb', database = connection_name )
 
     datos = {'error_message': '', 'alamcen_id': entrada.almacen.ALMACEN_ID, }
+    
+    return datos
+
+@dajaxice_register( method = 'GET' )
+def add_existenciasarticulo_byajustes_view( request, **kwargs ):
+    """ Para agregar existencia a un articulo por ajuste"""
+    #Paramentros
+    ubicacion = kwargs.get( 'ubicacion', None )
+    articulo_id = kwargs.get( 'articulo_id', None )
+    entrada_id = kwargs.get( 'entrada_id', None )
+    salida_id = kwargs.get( 'salida_id', None )
+    detalle_unidades = Decimal( kwargs.get( 'detalle_unidades', None ) )
+    detalle_costo_unitario = Decimal( kwargs.get( 'detalle_costo_unitario', None ) )
+
+    datos = add_existenciasarticulo_byajustes(
+        articulo_id = articulo_id,
+        entrada_id = entrada_id,
+        salida_id = salida_id,
+        detalle_unidades = detalle_unidades,
+        detalle_costo_unitario = detalle_costo_unitario,
+        request_session = request.session,
+        request_user = request.user,
+        ubicacion = ubicacion,
+        )
+
     return HttpResponse( json.dumps( datos ), mimetype = "application/javascript" )
+
+@dajaxice_register( method = 'GET' )
+def add_articulossinexistencia_bylinea( request, **kwargs ):
+    """ Agrega articulos almacenables de la linea indicada faltantes en los documentos de ajustes indicados.  """
+    #Paramentros
+    ubicacion = kwargs.get( 'ubicacion', None )
+    linea_id = kwargs.get( 'linea_id', None )
+    entrada_id = kwargs.get( 'entrada_id', None )
+    salida_id = kwargs.get( 'salida_id', None )
+
+    salida = DoctosIn.objects.get( pk = salida_id )
+    entrada = DoctosIn.objects.get( pk = entrada_id )
+    linea = LineaArticulos.objects.get( pk = linea_id )
+
+    articulos_endocumentos = DoctosInDet.objects.filter( Q( doctosIn = entrada ) | Q( doctosIn = salida ) ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True )
+    articulos_sinexistencia = Articulos.objects.filter( es_almacenable = 'S', linea = linea ).exclude( pk__in = articulos_endocumentos ).order_by( '-id' ).values_list( 'id', flat = True )
+    
+    total_articulos_sinexistencia = articulos_sinexistencia.count()
+    articulos_sinexistencia = articulos_sinexistencia[0:9000]
+
+    articulos_sinexistencia_list = split_seq( articulos_sinexistencia, 2000 )
+    articulos_agregados = 0
+
+    for articulos_sinexistencia_sublist in articulos_sinexistencia_list:
+        detalles_en_ceros = 0
+        for articulo_id in articulos_sinexistencia_sublist:
+            
+            add_existenciasarticulo_byajustes(
+                    articulo_id = articulo_id ,
+                    entrada_id = entrada_id,
+                    salida_id = salida_id,
+                    detalle_unidades = 0,
+                    request_session = request.session,
+                    request_user = request.user,
+                    ubicacion = ubicacion,
+                    )
+            detalles_en_ceros = detalles_en_ceros + 1
+            
+        articulos_agregados = articulos_agregados + detalles_en_ceros
+
+    articulos_pendientes = total_articulos_sinexistencia -  articulos_agregados
+    return simplejson.dumps( { 'articulos_agregados' : articulos_agregados, 'articulo_pendientes' : articulos_pendientes, } )
 
 @dajaxice_register( method = 'GET' )
 def get_existenciasarticulo_byclave( request, **kwargs ):
     """ Para obterner existencia de un articulo segun clave del articulo """
     #Paramentros
     almacen = kwargs.get( 'almacen', None )
+    entrada_id = kwargs.get( 'entrada_id', None )
     articulo_clave = kwargs.get( 'articulo_clave', None)
     connection_name = get_conecctionname( request.session )
     
@@ -284,6 +366,10 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     articulo_nombre = ''
     clave_articulo = first_or_none( ClavesArticulos.objects.filter( clave = articulo_clave ) )
     opciones_clave = {}
+    
+    detalle_modificaciones = ''
+    detalle_modificacionestime = ''
+    detalle_entradas_id = ''
 
     if clave_articulo:
         articulo = Articulos.objects.get( pk = clave_articulo.articulo.id )
@@ -295,12 +381,20 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
         costo_ultima_compra = str(articulo.costo_ultima_compra)
         articulo_id = articulo.id
         articulo_nombre = articulo.nombre
+        
+        detalle_entradas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn__id = entrada_id ) )
+
+        if detalle_entradas:
+            detalle_modificaciones = detalle_entradas.detalle_modificaciones
+            detalle_modificacionestime = detalle_entradas.detalle_modificacionestime
+            detalle_entradas_id =  detalle_entradas.id
+
     else:
         error = "no_existe_clave"
         claves = ClavesArticulos.objects.filter( clave__contains = articulo_clave )
         for c in claves:
             opciones_clave[ str( c.clave ) ] = c.articulo.nombre
-
+    
     datos = { 
         'error_msg' : error,
         'articulo_id' : articulo_id,
@@ -308,6 +402,9 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
         'existencias' : str(inv_fin), 
         'costo_ultima_compra' : costo_ultima_compra,
         'opciones_clave': opciones_clave,
+        'detalle_entradas_id' : detalle_entradas_id,
+        'detalle_modificaciones' : detalle_modificaciones, 
+        'detalle_modificacionestime': detalle_modificacionestime,
         }
     return HttpResponse( json.dumps( datos ), mimetype = "application/javascript" )
 
@@ -317,6 +414,7 @@ def get_existenciasarticulo_byid( request, **kwargs ):
     #Paramentros
     almacen = kwargs.get( 'almacen', None)
     articulo_id = kwargs.get( 'articulo_id', None)
+    entrada_id = kwargs.get( 'entrada_id', None )
     connection_name = get_conecctionname( request.session )
     
     articulo = Articulos.objects.get( pk = articulo_id )
@@ -325,10 +423,24 @@ def get_existenciasarticulo_byid( request, **kwargs ):
         connection_name = connection_name, 
         fecha_inicio = datetime.now().strftime( "%m/01/%Y" ),
         almacen = almacen, )
+ 
+    detalle_entradas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn__id = entrada_id ) )
+    
+    detalle_modificaciones = ''
+    detalle_modificacionestime = ''
+    detalle_entradas_id = ''
+
+    if detalle_entradas:
+        detalle_modificaciones = detalle_entradas.detalle_modificaciones
+        detalle_modificacionestime = detalle_entradas.detalle_modificacionestime
+        detalle_entradas_id =  detalle_entradas.id
 
     return simplejson.dumps( { 
         'existencias' : int( inv_fin ), 
         'costo_ultima_compra' : str(articulo.costo_ultima_compra),
+        'detalle_entradas_id' : detalle_entradas_id,
+        'detalle_modificaciones' : detalle_modificaciones, 
+        'detalle_modificacionestime': detalle_modificacionestime,
         })
 
 @dajaxice_register( method = 'GET' )

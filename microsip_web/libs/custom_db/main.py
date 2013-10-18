@@ -34,7 +34,7 @@ def runsql_rows( sql = "", connection_name = "" ):
 def first_or_none(query):  
     try:  
         return query.all()[0]  
-    except:  
+    except IndexError:
         return None
         
 def get_existencias_articulo( articulo_id = None, connection_name = '', fecha_inicio = None, almacen = '' ):

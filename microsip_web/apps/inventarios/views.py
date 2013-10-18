@@ -242,97 +242,7 @@ def invetariofisico_ajustes_manageview( request, almacen_id = None, template_nam
     form = DoctoInDetManageForm( request.POST or None )
     ubicacion_form = UbicacionArticulosForm(request.POST or None)
 
-    # if form.is_valid():
-    #     detalle = form.save( commit = False )
-    #     detalle_unidades = detalle.unidades
-    #     #Entradas
-    #     try:
-    #         detalle_entradas = DoctosInDet.objects.filter( articulo = detalle.articulo, doctosIn = entrada )[0]
-    #     except IndexError:
-    #         detalle_entradas = None
-
-    #     #Salidas
-    #     try:            
-    #         detalle_salidas = DoctosInDet.objects.filter( articulo = detalle.articulo, doctosIn = salida )[0]
-    #     except IndexError:
-    #         detalle_salidas = None
-
-        
-    #     unidades_a_insertar = 0
-    #     if detalle_entradas == None and detalle_salidas == None:
-    #         entradas, salidas, existencias, inv_fin = get_existencias_articulo(
-    #                 articulo_id = detalle.articulo.id, 
-    #                 connection_name = connection_name, 
-    #                 fecha_inicio = datetime.now().strftime( "%m/01/%Y" ),
-    #                 almacen = entrada.almacen, )
-            
-    #         unidades_a_insertar = -inv_fin + detalle.unidades
-    #         if inv_fin == 0:
-    #             unidades_a_insertar = detalle.unidades
-
-    #         detalle.id = next_id( 'ID_DOCTOS', connection_name )
-    #         detalle.unidades_inv = detalle.unidades
-    #         if detalle.unidades < 0:
-    #             detalle.unidades_inv = - detalle.unidades
-
-    #         detalle.unidades = unidades_a_insertar
-    #     if detalle_unidades < 0 or unidades_a_insertar < 0:
-    #         # Si no existe un detalle de salida de ese articulo
-    #         if detalle_salidas == None:
-    #             detalle.id = next_id( 'ID_DOCTOS', connection_name )
-    #             detalle.doctosIn = salida
-    #             detalle.almacen = salida.almacen
-    #             detalle.concepto = salida.concepto
-    #             detalle.tipo_movto ='S'
-    #             detalle_salidas = detalle
-    #             detalle_salidas.unidades = -detalle_salidas.unidades
-    #             detalle_salidas.unidades_inv = 0
-    #         #si si existe
-    #         elif detalle_salidas:
-    #             detalle_salidas.unidades = (detalle_salidas.unidades + ( detalle.unidades * -1 ))
-
-    #         detalle_salidas_unidades_inv =  detalle_salidas.unidades_inv
-
-    #         if detalle_unidades < 0:
-    #             detalle_salidas.unidades_inv = detalle_salidas.unidades_inv + detalle_unidades
-    #         else:
-    #             detalle_salidas.unidades_inv = detalle_salidas.unidades_inv + detalle_unidades
-            
-
-    #         detalle_salidas.costo_total = detalle_salidas.unidades * detalle_salidas.costo_unitario
-    #         detalle_salidas.save();
-    #     if detalle_unidades > 0 and unidades_a_insertar >= 0:
-    #         # Si no existe un detalle de salida de ese articulo
-    #         if detalle_entradas == None:
-    #             detalle.id = next_id( 'ID_DOCTOS', connection_name )
-    #             detalle.doctosIn = entrada
-    #             detalle.almacen = entrada.almacen
-    #             detalle.concepto = entrada.concepto
-    #             detalle.tipo_movto ='E'
-    #             if unidades_a_insertar > 0:
-    #                 detalle.unidades = unidades_a_insertar
-    #             detalle_entradas = detalle
-    #             detalle_entradas.unidades_inv = 0
-    #         #si si existe
-    #         elif detalle_entradas:
-    #             detalle_entradas.unidades = detalle_entradas.unidades + detalle.unidades
-
-    #         detalle_entradas.unidades_inv = detalle_entradas.unidades_inv + detalle_unidades
-    #         detalle_entradas.costo_total = detalle_entradas.unidades * detalle_entradas.costo_unitario
-    #         detalle_entradas.save()
-    
-        
-    #     c = connections[ connection_name ].cursor()
-    #     c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% detalle.articulo.id )
-    #     c.execute( "EXECUTE PROCEDURE RECALC_SALDOS_ART_IN %s;"% detalle.articulo.id )
-    #     transaction.commit_unless_managed()
-    #     c.close()
-
-    #     management.call_command( 'syncdb', database = connection_name )
-
-    #form = DoctoInDetManageForm()
-
-    sql = """select C.nombre, b.inv_fin_unid as existencia FROM (select FIRST 100 DISTINCT b.articulo_id, b.nombre, a.sic_fechahora_u from doctos_in_det a, articulos b
+    sql = """select DISTINCT C.nombre, b.inv_fin_unid as existencia FROM (select FIRST 100 DISTINCT b.articulo_id, b.nombre, a.sic_fechahora_u from doctos_in_det a, articulos b
         where (a.docto_in_id = %s or a.docto_in_id = %s) and b.articulo_id = a.articulo_id order by a.sic_fechahora_u DESC) C left JOIN
          orsp_in_aux_art( articulo_id, '%s', '%s','%s','S','N') B
          on C.articulo_id = b.articulo_id
@@ -349,11 +259,14 @@ def invetariofisico_ajustes_manageview( request, almacen_id = None, template_nam
     for articulo in articulos_rows:
         articulos.append( { 'articulo' : articulo[0], 'unidades' : articulo[1], } )
 
+    lineas_form = linea_articulos_form()
     c = { 
         'form' : form, 
+        'lineas_form': lineas_form,
         'ubicacion_form' : ubicacion_form, 
         'articulos' : articulos, 
         'almacen' : entrada.almacen, 
+        'almacen_id' : almacen_id,
         'entrada_fecha': entrada.fecha, 
         'folio_entrada': entrada.folio, 
         'folio_salida': salida.folio, 
@@ -407,50 +320,6 @@ def inventario_getnew_folio():
     registro_folioinventario.valor = siguiente_folio
     registro_folioinventario.save()
     return folio
-
-@login_required(login_url='/login/')
-def new_inventariofisico_ajustes( request, template_name = 'inventarios/Inventarios Fisicos/new_inventariofisico_ajustes.html' ):
-    message = ''
-    connection_name = get_conecctionname( request.session )
-    if connection_name == '':
-        return HttpResponseRedirect( '/select_db/' )
-
-    form = DoctoIn_CreateForm( request.POST or None )
-    
-    if form.is_valid():
-        docto_in = form.save( commit = False )
-
-        DoctosIn.objects.create(
-            id = -1, 
-            folio = 'fad455t',
-            almacen =  docto_in.almacen,
-            concepto = ConceptosIn.objects.get(pk=38),
-            naturaleza_concepto = 'S',
-            fecha = docto_in.fecha,
-            sistema_origen = 'IN',
-            descripcion =  docto_in.descripcion,
-            usuario_creador = request.user.username,
-            esinventario = 'S',
-             )
-
-        DoctosIn.objects.create(
-            id = -1, 
-            folio = 'fad455t40',
-            almacen =  docto_in.almacen,
-            concepto = ConceptosIn.objects.get(pk=27),
-            naturaleza_concepto = 'E',
-            fecha = docto_in.fecha,
-            sistema_origen = 'IN',
-            descripcion =  docto_in.descripcion,
-            usuario_creador = request.user.username,
-            esinventario = 'S',
-             )
-        # ultimofolio = Registry.objects.filter( nombre = 'SIG_FOLIO_INVFIS' )
-
-        return HttpResponseRedirect( '/inventarios/inventariosfisicos/' )
-        
-    c = { 'message' : message,'form' : form }
-    return render_to_response( template_name, c, context_instance=RequestContext( request ) )
 
 @login_required(login_url='/login/')
 def create_invetarioFisico_createView( request, template_name = 'inventarios/Inventarios Fisicos/create_inventario_fisico.html' ):

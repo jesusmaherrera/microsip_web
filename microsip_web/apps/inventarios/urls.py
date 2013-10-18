@@ -9,9 +9,7 @@ urlpatterns = patterns('',
     # (r'^InventarioFisico/$', views.invetarioFisico_manageView),
     # (r'^InventarioFisico/(?P<id>\d+)/', views.invetarioFisico_manageView),
     
-    (r'^articulo/(?P<id>\d+)/', views.ArticuloManageView),
-    (r'^inventariofisico/$', views.new_inventariofisico_ajustes),
-    
+    (r'^articulo/(?P<id>\d+)/', views.ArticuloManageView), 
     # (r'^inventariofisico/(?P<id>\d+)/', views.invetarioFisico_manageView),
     (r'^inventariofisico/(?P<id>\d+)/(?P<dua>\d+)/', views.invetarioFisico_manageView),
     (r'^inventarioFisico_mobile/(?P<id>\d+)/', views.invetarioFisico_mobile_pa_manageView),
