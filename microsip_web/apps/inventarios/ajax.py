@@ -174,9 +174,13 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     if not DerechoUsuario.objects.filter(usuario__nombre = request_user.username, clave_objeto = 469).exists() and request_user.username != 'SYSDBA':
         detalle_costo_unitario = articulo.costo_ultima_compra
     
-    detalles_entradas_existe = DoctosInDet.objects.filter( articulo = articulo, doctosIn__concepto = 27, esinventario = 'S',  almacen = almacen).exists()
-    detalles_salidas_existe = DoctosInDet.objects.filter( articulo = articulo, doctosIn__concepto = 38, esinventario = 'S',  almacen = almacen).exists()
-    
+    existe_en_detalle = DoctosInDet.objects.filter( 
+        Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
+        articulo = articulo,
+        almacen = almacen,
+        doctosIn__esinventario = 'S'
+        ).count() > 0
+
     detalle_entradas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn = entrada ) )
     detalle_salidas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn = salida ) )
     articulo_clave = first_or_none( ClavesArticulos.objects.filter( articulo = articulo ) )
@@ -197,14 +201,20 @@ def add_existenciasarticulo_byajustes( **kwargs ):
                 fecha_inicio = datetime.now().strftime( "%m/01/%Y" ),
                 almacen = detalle.almacen, )
         
-        unidades_a_insertar = -inv_fin + detalle.unidades
-        if inv_fin == 0:
+        if existe_en_detalle:
             unidades_a_insertar = detalle.unidades
+            detalle_unidades = detalle.unidades
+        else: 
+            unidades_a_insertar = -inv_fin + detalle.unidades
+            if inv_fin == 0:
+                unidades_a_insertar = detalle.unidades
 
-        detalle.id = next_id( 'ID_DOCTOS', connection_name )
-        
-        detalle.unidades = unidades_a_insertar
+            detalle.id = next_id( 'ID_DOCTOS', connection_name )
+            
+            detalle.unidades = unidades_a_insertar
+
     es_nuevo = False
+
     if detalle_unidades <= 0 or unidades_a_insertar < 0:
         # Si no existe un detalle de salida de ese articulo
         if detalle_salidas == None:
