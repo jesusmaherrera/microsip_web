@@ -89,7 +89,9 @@ $(document).ready(function(){
   <div class="span1 span_unidades" >
     <div class="input-prepend input-append">
       {{ form.unidades }}
-      {{ form.costo_unitario }}
+      {% if puede_modificar_costos %}
+        {{ form.costo_unitario }}
+      {% endif %} 
       <a class="btn btn-success " id="enviar_btn" onclick="add_existenciasarticulo_byajuste()" href="#">Enviar</a>
     </div>
   </div>
@@ -99,6 +101,8 @@ $(document).ready(function(){
   <input type="hidden" id="almacen_nombre" value="{{ almacen.nombre }}"/>
   <input type="hidden" id="entrada_id" value="{{ entrada_id }}"/>
   <input type="hidden" id="salida_id" value="{{ salida_id }}"/>
+  <input type="hidden" id="almacen_id" value="{{ almacen_id }}"/>
+  <input type="hidden" id="puede_modificar_costos" value="{{ puede_modificar_costos }}"/>
 </form>
 
 {% endblock %}

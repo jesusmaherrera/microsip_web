@@ -183,7 +183,7 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
 
     #salida
     try:
-        salida = DoctosIn.objects.get( esinventario = 'S', concepto = 38, almacen = almacen )
+        salida = DoctosIn.objects.get( esinventario = 'S', concepto = 38, almacen = almacen,  fecha =  fecha_actual )
     except ObjectDoesNotExist:
         if conecpto_ajuste_salida.folio_autom == 'S':
             sig_folio = int(conecpto_ajuste_salida.sig_folio) + 1
@@ -206,7 +206,7 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
 
     #salida
     try:
-        entrada = DoctosIn.objects.get( esinventario = 'S', concepto = 27, almacen = almacen)
+        entrada = DoctosIn.objects.get( esinventario = 'S', concepto = 27, almacen = almacen, fecha = fecha_actual )
     except ObjectDoesNotExist:
         if conecpto_ajuste_entrada.folio_autom == 'S':
             sig_folio = int(conecpto_ajuste_entrada.sig_folio) + 1
@@ -258,6 +258,7 @@ def invetariofisico_ajustes_manageview( request, almacen_id = None, template_nam
                 datetime.now().strftime( "%m/%d/%Y" ),
                 )
     articulos_rows = runsql_rows( sql, connection_name )
+    articulos_contados = DoctosInDet.objects.filter( almacen = entrada.almacen).filter( Q( doctosIn = entrada ) | Q( doctosIn = entrada ) ).count()
 
     articulos = []
     for articulo in articulos_rows:
@@ -266,6 +267,7 @@ def invetariofisico_ajustes_manageview( request, almacen_id = None, template_nam
     lineas_form = linea_articulos_form()
     c = { 
         'form' : form, 
+        'articulos_contados': articulos_contados,
         'lineas_form': lineas_form,
         'puede_modificar_costos': puede_modificar_costos,
         'ubicacion_form' : ubicacion_form, 
@@ -286,10 +288,13 @@ def invetariofisico_ajustesmobile_manageView( request, almacen_id = None, templa
     form = DoctoInDetManageForm( request.POST or None )
 
     entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, connection_name = connection_name, username = request.user.username)
-    
+    puede_modificar_costos = allow_microsipuser( username = request.user.username, clave_objeto = 469, connection_name = connection_name)
+
     c = { 
         'form' : form,
+        'puede_modificar_costos':puede_modificar_costos,
         'almacen' : entrada.almacen, 
+        'almacen_id' : almacen_id,
         'entrada_fecha': entrada.fecha, 
         'folio_entrada': entrada.folio, 
         'folio_salida': salida.folio, 

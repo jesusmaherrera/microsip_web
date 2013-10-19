@@ -20,10 +20,6 @@ procedures['SIC_DOCTOSINDET_AT'] = '''
     CREATE OR ALTER PROCEDURE SIC_DOCTOSINDET_AT
     as
     BEGIN
-        if (not exists(
-        select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'DOCTOS_IN_DET' and rf.RDB$FIELD_NAME = 'SIC_UNIDADES_INV')) then
-            execute statement 'ALTER TABLE DOCTOS_IN_DET ADD SIC_UNIDADES_INV NUMERIC(15,2) DEFAULT 0';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf

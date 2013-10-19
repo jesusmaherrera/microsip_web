@@ -173,7 +173,10 @@ def add_existenciasarticulo_byajustes( **kwargs ):
 
     if not DerechoUsuario.objects.filter(usuario__nombre = request_user.username, clave_objeto = 469).exists() and request_user.username != 'SYSDBA':
         detalle_costo_unitario = articulo.costo_ultima_compra
-
+    
+    detalles_entradas_existe = DoctosInDet.objects.filter( articulo = articulo, doctosIn__concepto = 27, esinventario = 'S',  almacen = almacen).exists()
+    detalles_salidas_existe = DoctosInDet.objects.filter( articulo = articulo, doctosIn__concepto = 38, esinventario = 'S',  almacen = almacen).exists()
+    
     detalle_entradas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn = entrada ) )
     detalle_salidas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn = salida ) )
     articulo_clave = first_or_none( ClavesArticulos.objects.filter( articulo = articulo ) )
@@ -199,10 +202,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
             unidades_a_insertar = detalle.unidades
 
         detalle.id = next_id( 'ID_DOCTOS', connection_name )
-        detalle.unidades_inv = detalle.unidades
-        if detalle.unidades < 0:
-            detalle.unidades_inv = - detalle.unidades
-
+        
         detalle.unidades = unidades_a_insertar
     es_nuevo = False
     if detalle_unidades <= 0 or unidades_a_insertar < 0:
@@ -215,25 +215,16 @@ def add_existenciasarticulo_byajustes( **kwargs ):
             detalle.tipo_movto ='S'
             detalle_salidas = detalle
             detalle_salidas.unidades = -detalle_salidas.unidades
-            detalle_salidas.unidades_inv = 0
         #si si existe
         elif detalle_salidas:
             detalle_salidas.unidades = (detalle_salidas.unidades + ( detalle.unidades * -1 ))
-
-        detalle_salidas_unidades_inv =  detalle_salidas.unidades_inv
-
-        if detalle_unidades < 0:
-            detalle_salidas.unidades_inv = detalle_salidas.unidades_inv + detalle_unidades
-        else:
-            detalle_salidas.unidades_inv = detalle_salidas.unidades_inv + detalle_unidades
-        
 
         detalle_salidas.costo_total = detalle_salidas.unidades * detalle_salidas.costo_unitario
         detalle_salidas.fechahora_ult_modif = datetime.now()
         if es_nuevo:
             detalle_salidas.save()
         else:    
-            detalle_salidas.save( update_fields=[ 'unidades', 'unidades_inv', 'costo_total', 'fechahora_ult_modif',] );
+            detalle_salidas.save( update_fields = [ 'unidades', 'costo_total', 'fechahora_ult_modif', ] );
 
     if detalle_unidades >= 0 and unidades_a_insertar >= 0:
         # Si no existe un detalle de salida de ese articulo
@@ -246,12 +237,10 @@ def add_existenciasarticulo_byajustes( **kwargs ):
             if unidades_a_insertar > 0:
                 detalle.unidades = unidades_a_insertar
             detalle_entradas = detalle
-            detalle_entradas.unidades_inv = 0
         #si si existe
         elif detalle_entradas:
             detalle_entradas.unidades = detalle_entradas.unidades + detalle.unidades
 
-        detalle_entradas.unidades_inv = detalle_entradas.unidades_inv + detalle_unidades
         detalle_entradas.costo_total = detalle_entradas.unidades * detalle_entradas.costo_unitario
         detalle_entradas.fechahora_ult_modif = datetime.now()
 
@@ -273,7 +262,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
         if es_nuevo:
             detalle_entradas.save()
         else:
-            detalle_entradas.save( update_fields=[ 'unidades', 'unidades_inv', 'costo_total', 'fechahora_ult_modif', 'detalle_modificaciones', 'detalle_modificacionestime'] )
+            detalle_entradas.save( update_fields=[ 'unidades', 'costo_total', 'fechahora_ult_modif', 'detalle_modificaciones', 'detalle_modificacionestime'] )
 
     c = connections[ connection_name ].cursor()
     c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% articulo.id )
