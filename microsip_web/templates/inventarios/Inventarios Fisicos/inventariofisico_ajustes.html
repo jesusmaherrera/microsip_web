@@ -16,7 +16,7 @@
 <div id="modal_movimientos_articulo" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 id="myModalLabel">Movimientos</h3>
+    <h3 id="myModalLabel">Detalle deMovimientos</h3>
   </div>
   <div class="modal-body">
   </div>
@@ -58,20 +58,65 @@
     <a class='btn' href="#" onclick="agregar_articulos_porlineafn();" id='btn_agregar_articulosinexistencia_bylinea' >Aceptar</a>
   </div>
 </div>
+
+<div id="articulosnocont_Modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    Agregar TODOS los articulos no contabilizados <br>
+  </div>
+  <div class="modal-body">
+    <p class="text-error">Seguro que desas agregar todos los articulos no contabilizados, al realizar esta accion todos los articulos que no esten en este inventarios se pondran en ceros </p>
+    <p>Importante</p>
+    <blockquote>
+      <p><small>Si el conteo de alguna linea ya se realizo en otroinventario anterior mente estos articulos se pondran en ceros</small></p>
+    </blockquote>
+    <p class="text-warning">
+        Esto pueder tardar unos minutos dependiendo del numero de articulos en la base de datos.
+    </p>  
+  </div>
+  <div class="modal-footer">
+    <span id='id_agregando_span' class='hide'>
+      <label class="span">Agregando articulos </label>
+      <img class= 'imagecenter' src="{{STATIC_URL}}img\ajax-loader.gif">
+    </span>
+    <button class="btn" id='btnCancel' data-dismiss="modal">Cancelar</button>
+    <a class='btn' href="#" onclick="" id='btn_agregar_articulosinexistencia' >Aceptar</a>
+  </div>
+</div>
+
+<div id="cerrarinventario_Modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    Cerrar inventario <br>
+  </div>
+  <div class="modal-body">
+    <p class="text-warning">Seguro que desas cerrar el inventario? </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" id='btnCancel' data-dismiss="modal">Cancelar</button>
+    <a class='btn' href="#" onclick="">Aceptar</a>
+  </div>
+</div>
 <!-- END MODALES -->
 
 <div class="ms-custom-form">
     <div id="ms-custom-form-header">
       <div class='span ' >
         <h3 class='span'>Inventario fisico por ajustes 
+          {% if request.user.username = 'SYSDBA' %}
           <ul class="nav btn btn-mini" style=" margin: 0px; ">
             <li class="dropdown">
               <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i></a>
               <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
                 <li><a tabindex="-1" href="#articulosnocont_porlinea_Modal" role="button" data-toggle="modal"><i class="icon-tasks"></i> Agregar articulos no contabilizados Por linea</a></li>
+                <li class='divider'></li> 
+                <li><a tabindex="-1" href="#articulosnocont_Modal" role="button" data-toggle="modal"><i class="icon-align-justify"></i> Agregar todos los articulos no contabilizados</a></li>
+                <li class='divider'></li> 
+                <li><a tabindex="-1" href="#cerrarinventario_Modal" role="button" data-toggle="modal"><i class="icon-folder-close"></i> Cerrar inventario </a></li>
               </ul>
             </li>
           </ul>
+          {% endif %}
         </h3>
       </div>
       <div class="pull-right ms-form-right-detail">
@@ -116,6 +161,8 @@
   <div class="input-prepend input-append">
     {{ form.articulo }}
     <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 0, 0); color: white; padding: .2em 2em;"> </span>
+    <span id='span_ya_ajustado' class="text-error" style=" background-color: rgb(20, 122, 11); color: white; padding: .2em 2em;"> ya ajustado </span>
+    <span id='span_sin_ajustado' class="text-error" style=" background-color: rgb(224, 132, 14); color: white; padding: .2em 2em;"> sin ajustar </span>
   </div>
   <div class="input-prepend input-append">
     {{ form.unidades }} 

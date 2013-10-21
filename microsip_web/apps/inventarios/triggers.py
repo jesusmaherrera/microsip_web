@@ -1,79 +1,91 @@
 triggers = {}
 
-
 triggers['SIC_PUERTA_INV_DOCTOSIN_BU'] = '''
-    CREATE OR ALTER TRIGGER SIC_PUERTA_INV_DOCTOSIN_BU FOR DOCTOS_IN
-    ACTIVE BEFORE UPDATE POSITION 0
-    AS
-    declare variable invfis_id integer;
-
-    declare variable invfis_det_id integer;
-    declare variable invfis_articulo_unidades double PRECISION;
-
-    declare variable inv_articulo_id integer;
-    declare variable inv_articulo_unidades double PRECISION;
-
-    declare variable almacen_id integer;
-    declare variable seguimiento char(1);
-    declare variable inv_detalle_tipomovto char(1);
-
-    declare variable docto_invfis_fecha date;
-    declare variable docto_in_fecha date;
-
+CREATE OR ALTER TRIGGER DOCTOS_IN_BU0 FOR DOCTOS_IN
+ACTIVE BEFORE UPDATE POSITION 0
+AS
+begin
+    if(new.sic_esinventario = 'S') then
     begin
-        /*exception ex_saldo_cargo_excedido 'saldo';*/
-        /* Este triger sirve para cuando se cancela un documento */
-        if (new.cancelado='S') then
-        begin
-            /*Datos de documento in*/
-            select first 1  doctos_in.fecha
-            from doctos_in
-            where doctos_in.docto_in_id = new.docto_in_id
-            INTO :docto_in_fecha;
-        
-            /*Se recorren todos los detalles del documento[entrada/salida]*/
-            for select articulo_id, unidades, tipo_movto, almacen_id
-            from doctos_in_det
-            where docto_in_id = new.docto_in_id
-            into :inv_articulo_id, :inv_articulo_unidades, :inv_detalle_tipomovto, :almacen_id
-            do
-            begin
-                /*Datos de inventario fisico abierto*/
-                select first 1 doctos_invfis.docto_invfis_id, doctos_invfis.fecha
-                from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= :almacen_id
-                INTO :invfis_id, :docto_invfis_fecha;
-        
-                /*Si existe un inventario fisico [abierto] del almacen del cual es este documento*/
-                if (not invfis_id is null and docto_in_fecha >= docto_invfis_fecha) then
-                begin
-                    select docto_invfis_det_id, unidades
-                    from doctos_invfis_det
-                    where docto_invfis_id = :invfis_id and articulo_id =:inv_articulo_id
-                    into :invfis_det_id, :invfis_articulo_unidades;
-
-                    if (not invfis_det_id is null) then
-                    begin
-                        if(inv_detalle_tipomovto = 'E') then
-                            invfis_articulo_unidades = invfis_articulo_unidades - inv_articulo_unidades;
-                        else if (inv_detalle_tipomovto = 'S') then
-                        begin
-                            select seguimiento from articulos where articulo_id = :inv_articulo_id
-                            into :seguimiento;
-                            
-                            if (seguimiento <> 'S') then
-                                invfis_articulo_unidades = invfis_articulo_unidades + inv_articulo_unidades;
-                        end
-                        if (invfis_articulo_unidades < 0 ) then
-                            invfis_articulo_unidades = 0;
-                        update doctos_invfis_det set unidades= :invfis_articulo_unidades where docto_invfis_det_id = :invfis_det_id;
-                    end
-                end
-            end
-
-
-        end
+        exception ex_saldo_cargo_excedido;
     end
-    '''
+
+end'''
+
+
+# triggers['SIC_PUERTA_INV_DOCTOSIN_BU'] = '''
+#     CREATE OR ALTER TRIGGER SIC_PUERTA_INV_DOCTOSIN_BU FOR DOCTOS_IN
+#     ACTIVE BEFORE UPDATE POSITION 0
+#     AS
+#     declare variable invfis_id integer;
+
+#     declare variable invfis_det_id integer;
+#     declare variable invfis_articulo_unidades double PRECISION;
+
+#     declare variable inv_articulo_id integer;
+#     declare variable inv_articulo_unidades double PRECISION;
+
+#     declare variable almacen_id integer;
+#     declare variable seguimiento char(1);
+#     declare variable inv_detalle_tipomovto char(1);
+
+#     declare variable docto_invfis_fecha date;
+#     declare variable docto_in_fecha date;
+
+#     begin
+#         /*exception ex_saldo_cargo_excedido 'saldo';*/
+#         /* Este triger sirve para cuando se cancela un documento */
+#         if (new.cancelado='S') then
+#         begin
+#             /*Datos de documento in*/
+#             select first 1  doctos_in.fecha
+#             from doctos_in
+#             where doctos_in.docto_in_id = new.docto_in_id
+#             INTO :docto_in_fecha;
+        
+#             /*Se recorren todos los detalles del documento[entrada/salida]*/
+#             for select articulo_id, unidades, tipo_movto, almacen_id
+#             from doctos_in_det
+#             where docto_in_id = new.docto_in_id
+#             into :inv_articulo_id, :inv_articulo_unidades, :inv_detalle_tipomovto, :almacen_id
+#             do
+#             begin
+#                 /*Datos de inventario fisico abierto*/
+#                 select first 1 doctos_invfis.docto_invfis_id, doctos_invfis.fecha
+#                 from doctos_invfis where doctos_invfis.aplicado ='N' and doctos_invfis.almacen_id= :almacen_id
+#                 INTO :invfis_id, :docto_invfis_fecha;
+        
+#                 /*Si existe un inventario fisico [abierto] del almacen del cual es este documento*/
+#                 if (not invfis_id is null and docto_in_fecha >= docto_invfis_fecha) then
+#                 begin
+#                     select docto_invfis_det_id, unidades
+#                     from doctos_invfis_det
+#                     where docto_invfis_id = :invfis_id and articulo_id =:inv_articulo_id
+#                     into :invfis_det_id, :invfis_articulo_unidades;
+
+#                     if (not invfis_det_id is null) then
+#                     begin
+#                         if(inv_detalle_tipomovto = 'E') then
+#                             invfis_articulo_unidades = invfis_articulo_unidades - inv_articulo_unidades;
+#                         else if (inv_detalle_tipomovto = 'S') then
+#                         begin
+#                             select seguimiento from articulos where articulo_id = :inv_articulo_id
+#                             into :seguimiento;
+                            
+#                             if (seguimiento <> 'S') then
+#                                 invfis_articulo_unidades = invfis_articulo_unidades + inv_articulo_unidades;
+#                         end
+#                         if (invfis_articulo_unidades < 0 ) then
+#                             invfis_articulo_unidades = 0;
+#                         update doctos_invfis_det set unidades= :invfis_articulo_unidades where docto_invfis_det_id = :invfis_det_id;
+#                     end
+#                 end
+#             end
+
+
+#         end
+#     end
+#     '''
 
 
 #############################

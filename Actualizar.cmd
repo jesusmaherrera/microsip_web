@@ -1,5 +1,5 @@
 echo off
-color 30
+color 7F
 echo 			==================================
 echo 			=                                =
 echo 			=     ACTUALIZANDO APLICACION    =
@@ -10,10 +10,6 @@ echo 			==================================
 echo.
 echo.
 
-
-cd /d %0\..
-cd..
-cd..
 git reset --hard
 git pull origin master
 git gc

@@ -5,7 +5,9 @@ class Usuario(models.Model):
     nombre = models.CharField(max_length=100, db_column='NOMBRE')
     tipo = models.CharField(max_length=1, db_column='TIPO')
     acceso_empresas = models.CharField(max_length=1, db_column='ACCESO_EMPRESAS')
-
+    usar_rol = models.CharField(default= 'N', max_length=1, db_column='USAR_ROL')
+    # rol = models.ForeignKey( 'self', db_column = 'ROL_ID', related_name = 'rol_id', blank = True, null = True )
+    
     def __unicode__(self):
         return u'%s' % self.nombre
 

@@ -230,7 +230,7 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
 
     return entrada, salida
 
-def allow_microsipuser( username = None, connection_name = None, clave_objeto=  None ):
+def allow_microsipuser( username = None, clave_objeto=  None ):
     return DerechoUsuario.objects.filter(usuario__nombre = username, clave_objeto = clave_objeto).exists() or username == 'SYSDBA'
     
 @login_required( login_url = '/login/' )
@@ -241,7 +241,8 @@ def invetariofisico_ajustes_manageview( request, almacen_id = None, template_nam
 
     entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, connection_name = connection_name, username = request.user.username)
     
-    puede_modificar_costos = allow_microsipuser( username = request.user.username, clave_objeto = 469, connection_name = connection_name)
+    
+    puede_modificar_costos = allow_microsipuser( username = request.user.username, clave_objeto = 469)
 
     form = DoctoInDetManageForm( request.POST or None )
     ubicacion_form = UbicacionArticulosForm(request.POST or None)

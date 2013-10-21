@@ -7,7 +7,7 @@ autocomplete_light.register(ClavesArticulos, search_fields=('clave',),
     autocomplete_js_attributes={'placeholder': 'Clave ..'})
 
 autocomplete_light.register(Articulos, autocomplete_js_attributes = {'placeholder':'Articulo'},
-        search_fields = ('nombre',), choices= Articulos.objects.all())
+        search_fields = ('nombre',), choices= Articulos.objects.exclude(estatus='B'))
 
 autocomplete_light.register(Cliente, autocomplete_js_attributes={'placeholder': 'Busca un cliente ..'}, 
         search_fields=('nombre',), choices= Cliente.objects.all(), name='ClienteAutocomplete')

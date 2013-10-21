@@ -8,7 +8,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
  
 from django.contrib.sessions.models import Session
- 
+from microsip_web.apps.config.models import Usuario
+
 @receiver(post_save)
 def clear_cache(sender, **kwargs):
     if sender != Session:
@@ -155,6 +156,7 @@ class Articulos( models.Model ):
     id = models.AutoField( primary_key = True, db_column = 'ARTICULO_ID' )
     nombre = models.CharField( max_length = 100, db_column = 'NOMBRE' )
     es_almacenable = models.CharField( default = 'S', max_length = 1, db_column = 'ES_ALMACENABLE' )
+    estatus = models.CharField( default = 'A', max_length = 1, db_column = 'ESTATUS' )
     seguimiento = models.CharField( default = 'N', max_length = 1, db_column = 'SEGUIMIENTO' )
     cuenta_ventas = models.CharField( max_length = 30, blank = True, null = True, db_column = 'CUENTA_VENTAS' )
     linea = models.ForeignKey( LineaArticulos, db_column = 'LINEA_ARTICULO_ID' )
