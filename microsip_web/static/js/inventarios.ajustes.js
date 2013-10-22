@@ -234,7 +234,7 @@ function cargar_art(data)
   } 
   else
   {
-    cargar_articulo( data.articulo_id, data.articulo_nombre, data.existencias, data.costo_ultima_compra, data.detalle_modificacionestime, data.ya_ajustado );
+    cargar_articulo( data.articulo_id, data.articulo_nombre, data.existencias, data.costo_ultima_compra, data.detalle_modificacionestime, data.ya_ajustado, data.detalle_modificacionestime_salidas);
   }
 }
 
@@ -252,7 +252,7 @@ function mostrar_spans(ya_ajustado)
   }
 }
 
-function cargar_articulo( articulo_id, articulo_nombre, existencias, costo_ultima_compra, detalle_modificacionestime, ya_ajustado )
+function cargar_articulo( articulo_id, articulo_nombre, existencias, costo_ultima_compra, detalle_modificacionestime, ya_ajustado, detalle_modificacionestime_salidas )
 {
   $('#id_articulo-deck').attr('style','');
   $('#id_articulo-deck').html('<span class="div hilight" data-value="'+articulo_id+'"><span style="display: inline;" class="remove div">X</span>'+articulo_nombre+'</span>');
@@ -263,12 +263,23 @@ function cargar_articulo( articulo_id, articulo_nombre, existencias, costo_ultim
 
   $('#span_alerta_unidades').html(existencias + " en existencia. <a tabindex='-1' href='#modal_movimientos_articulo' role='button' data-toggle='modal'><i class='icon-info-sign icon-white'></i></a> ");
   
-  var entradas = detalle_modificacionestime.split(',')
-  var entradas_html = ''
+  var entradas = detalle_modificacionestime.split(',');
+  var salidas = detalle_modificacionestime_salidas.split(',');
+  
+  var entradas_html = '<h5> ENTRADAS: </h5>';
+  
   $.each(entradas, function(key, entrada) {
-    numero = key + 1
+    numero = key + 1;
     if (entrada != "")
       entradas_html = entradas_html + numero + ") " + entrada + '<br>';
+  });
+
+  entradas_html = entradas_html + '<h5> SALIDAS: </h5>';
+  
+  $.each(salidas, function(key, salida) {
+    numero = key + 1;
+    if (salida != "")
+      entradas_html = entradas_html + numero + ") " + salida + '<br>';
   });
   $("#modal_movimientos_articulo > .modal-body").html(entradas_html);
 

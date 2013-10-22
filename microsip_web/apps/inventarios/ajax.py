@@ -452,6 +452,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     opciones_clave = {}
     
     detalle_modificaciones, detalle_modificacionestime = '', ''
+    detalle_modificaciones_salidas, detalle_modificacionestime_salidas = '', ''
     ya_ajustado = False
     if clave_articulo:
         articulo = Articulos.objects.get( pk = clave_articulo.articulo.id )
@@ -478,10 +479,26 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
             doctosIn__esinventario = 'S'
             ).order_by('fechahora_ult_modif')
 
+        detalles_salidas = DoctosInDet.objects.filter(
+            Q( doctosIn__concepto = 38 ),
+            articulo = articulo,
+            almacen = almacen,
+            doctosIn__esinventario = 'S').order_by('fechahora_ult_modif')
+
         for detalle_entradas in detalles_entradas:
             detalle_modificaciones = detalle_modificaciones + detalle_entradas.detalle_modificaciones
             detalle_modificacionestime = detalle_modificacionestime + detalle_entradas.detalle_modificacionestime
             costo_ultima_compra = detalle_entradas.costo_unitario
+        
+        for detalle_salidas in detalles_salidas:
+            if not detalle_salidas.detalle_modificaciones:
+                detalle_salidas.detalle_modificaciones = ''
+            if not detalle_salidas.detalle_modificacionestime:
+                detalle_salidas.detalle_modificacionestime = ''
+
+            detalle_modificaciones_salidas = detalle_modificaciones_salidas + detalle_salidas.detalle_modificaciones
+            detalle_modificacionestime_salidas = detalle_modificacionestime_salidas + detalle_salidas.detalle_modificacionestime
+            #costo_ultima_compra = detalle_salidas.costo_unitario
         
         if detalles_all:
             ya_ajustado = True
@@ -506,10 +523,11 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
         'articulo_id' : articulo_id,
         'articulo_nombre' : articulo_nombre,
         'existencias' : str(inv_fin), 
-        'costo_ultima_compra' : costo_ultima_compra,
+        'costo_ultima_compra' : str(costo_ultima_compra),
         'opciones_clave': opciones_clave,
         'detalle_modificaciones' : detalle_modificaciones, 
         'detalle_modificacionestime': detalle_modificacionestime,
+        'detalle_modificacionestime_salidas': detalle_modificacionestime_salidas,
         }
     return HttpResponse( json.dumps( datos ), mimetype = "application/javascript" )
 
