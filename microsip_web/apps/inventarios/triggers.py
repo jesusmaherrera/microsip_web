@@ -1,16 +1,19 @@
 triggers = {}
 
 triggers['SIC_PUERTA_INV_DOCTOSIN_BU'] = '''
-CREATE OR ALTER TRIGGER DOCTOS_IN_BU0 FOR DOCTOS_IN
-ACTIVE BEFORE UPDATE POSITION 0
-AS
-begin
-    if(new.sic_esinventario = 'S' and new.cancelado = 'N' ) then
+    CREATE OR ALTER TRIGGER SIC_PUERTA_INV_DOCTOSIN_BU FOR DOCTOS_IN
+    ACTIVE BEFORE UPDATE POSITION 0
+    AS
     begin
-        exception ex_saldo_cargo_excedido;
-    end
+        if (old.cancelado <> new.cancelado and new.cancelado = 'S') then
+            new.sic_esinventario = 'N';
+        else
+            new.sic_esinventario = 'S';
 
-end'''
+        if (old.sic_esinventario <> new.sic_esinventario and new.sic_esinventario is null) then
+            exception ex_modificacion_prohibida;
+    end
+    '''
 
 
 # triggers['SIC_PUERTA_INV_DOCTOSIN_BU'] = '''

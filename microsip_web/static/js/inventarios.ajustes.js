@@ -3,7 +3,6 @@ function add_existenciasarticulo_byajuste()
 
   if ( $('#id_unidades').val() != '' && $.isNumeric($('#id_unidades').val()) && $('#id_articulo option:selected').val() != undefined && ( ( $('#puede_modificar_costos').val() == 'True'  && $('#id_costo_unitario').val() != '' && $.isNumeric($('#id_costo_unitario').val()) == true)  || ($('#puede_modificar_costos').val() == 'False') ) ) 
   { 
-    debugger;
     var costo_unitario = 0
     if ( $('#puede_modificar_costos').val() == 'True' )
       costo_unitario = $("#id_costo_unitario").val()
@@ -121,13 +120,25 @@ function mostrar_existencias(data)
   mostrar_spans(data.ya_ajustado);
   $('#span_alerta_unidades').html(data.existencias + " en existencia. <a tabindex='-1' href='#modal_movimientos_articulo' role='button' data-toggle='modal'><i class='icon-info-sign icon-white'></i></a> ");
 
-  var entradas = data.detalle_modificacionestime.split(',')
-  var entradas_html = ''
+  var entradas = data.detalle_modificacionestime.split(',');
+  var salidas = data.detalle_modificacionestime_salidas.split(',');
+  
+  var entradas_html = '<h5> ENTRADAS: </h5>';
+  
   $.each(entradas, function(key, entrada) {
-    numero = key + 1
+    numero = key + 1;
     if (entrada != "")
       entradas_html = entradas_html + numero + ") " + entrada + '<br>';
   });
+
+  entradas_html = entradas_html + '<h5> SALIDAS: </h5>';
+  
+  $.each(salidas, function(key, salida) {
+    numero = key + 1;
+    if (salida != "")
+      entradas_html = entradas_html + numero + ") " + salida + '<br>';
+  });
+
   $("#modal_movimientos_articulo > .modal-body").html(entradas_html);
 
   $("#id_costo_unitario").val(data.costo_ultima_compra);

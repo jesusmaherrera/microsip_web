@@ -192,7 +192,7 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
             conecpto_ajuste_salida.save()
 
         salida = DoctosIn(
-            id = -1, 
+            id = next_id( 'ID_DOCTOS', connection_name ), 
             folio = folio,
             almacen =  almacen,
             concepto = conecpto_ajuste_salida,
@@ -215,7 +215,7 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
             conecpto_ajuste_entrada.save()
 
         entrada = DoctosIn(
-            id = -1, 
+            id = next_id( 'ID_DOCTOS', connection_name ), 
             folio = folio,
             almacen =  almacen,
             concepto = conecpto_ajuste_entrada,
@@ -247,19 +247,28 @@ def invetariofisico_ajustes_manageview( request, almacen_id = None, template_nam
     form = DoctoInDetManageForm( request.POST or None )
     ubicacion_form = UbicacionArticulosForm(request.POST or None)
 
-    sql = """select DISTINCT C.nombre, b.inv_fin_unid as existencia FROM (select FIRST 20 DISTINCT b.articulo_id, b.nombre, a.sic_fechahora_u from doctos_in_det a, articulos b
-        where (a.docto_in_id = %s or a.docto_in_id = %s) and b.articulo_id = a.articulo_id order by a.sic_fechahora_u DESC) C left JOIN
+    sql = """select DISTINCT C.nombre, b.inv_fin_unid as existencia FROM 
+            (select FIRST 20 DISTINCT b.articulo_id, b.nombre, a.sic_fechahora_u
+            from doctos_in_det a, articulos b, doctos_in c
+            where (b.articulo_id = a.articulo_id and c.docto_in_id = a.docto_in_id) and
+                (c.almacen_id = %s and (c.concepto_in_id = 38 or c.concepto_in_id = 27 ) and c.cancelado = 'N' and c.sic_esinventario = 'S')
+            order by a.sic_fechahora_u DESC) C 
+        left JOIN
          orsp_in_aux_art( articulo_id, '%s', '%s','%s','S','N') B
          on C.articulo_id = b.articulo_id
          """% (
-                entrada.id,
-                salida.id, 
+                entrada.almacen.ALMACEN_ID, 
                 entrada.almacen.nombre, 
                 datetime.now().strftime( "%m/01/%Y" ),
                 datetime.now().strftime( "%m/%d/%Y" ),
                 )
+    
     articulos_rows = runsql_rows( sql, connection_name )
-    articulos_contados = DoctosInDet.objects.filter( almacen = entrada.almacen).filter( Q( doctosIn = entrada ) | Q( doctosIn = entrada ) ).count()
+    articulos_contados = DoctosInDet.objects.filter( Q(doctosIn__concepto = 27) | Q(doctosIn__concepto = 38) ).filter( 
+        doctosIn__esinventario = 'S', 
+        doctosIn__cancelado= 'N',
+        doctosIn__almacen = entrada.almacen
+        ).count()
 
     articulos = []
     for articulo in articulos_rows:
@@ -289,7 +298,7 @@ def invetariofisico_ajustesmobile_manageView( request, almacen_id = None, templa
     form = DoctoInDetManageForm( request.POST or None )
 
     entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, connection_name = connection_name, username = request.user.username)
-    puede_modificar_costos = allow_microsipuser( username = request.user.username, clave_objeto = 469, connection_name = connection_name)
+    puede_modificar_costos = allow_microsipuser( username = request.user.username, clave_objeto = 469)
 
     c = { 
         'form' : form,

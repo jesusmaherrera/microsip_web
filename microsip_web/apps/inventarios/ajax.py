@@ -149,6 +149,25 @@ def sincronizar_inventario( request, inventariofisico_id ):
 def allow_microsipuser( username = None, clave_objeto=  None ):
     return DerechoUsuario.objects.filter(usuario__nombre = username, clave_objeto = clave_objeto).exists() or username == 'SYSDBA'
 
+def ajustar_existencias( **kwargs ):
+    ''' Para ajustar un articulo a las unidades indicadas sin importar su existencia actual '''
+    #Paramentros
+    articulo_id = kwargs.get( 'articulo_id', None )
+    ajustar_a = kwargs.get( 'ajustar_a', None )
+    almacen = kwargs.get( 'almacen', None )
+    connection_name = kwargs.get( 'connection_name', None )
+
+    entradas, salidas, existencias, inv_fin = get_existencias_articulo(
+        articulo_id = articulo_id, 
+        connection_name = connection_name, 
+        fecha_inicio = datetime.now().strftime( "%m/01/%Y" ),
+        almacen = almacen, 
+        )
+
+    unidades_a_insertar = -inv_fin + ajustar_a
+
+    return unidades_a_insertar
+
 def add_existenciasarticulo_byajustes( **kwargs ):
     """ Para agregar existencia a un articulo por ajuste 
         En caso de que el articulo no tenga costo indicado [se le aplica el de la ultima compra]
@@ -161,11 +180,10 @@ def add_existenciasarticulo_byajustes( **kwargs ):
 
     entrada_id = kwargs.get( 'entrada_id', None )
     entrada = DoctosIn.objects.get( pk = entrada_id )
-    almacen = entrada.almacen
-
     salida_id = kwargs.get( 'salida_id', None )
     salida = DoctosIn.objects.get( pk = salida_id )
 
+    almacen = entrada.almacen
     request_session = kwargs.get( 'request_session', 0 )
     request_user = kwargs.get( 'request_user', 0 )
     connection_name = get_conecctionname( request_session )
@@ -178,7 +196,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     if not puede_modificar_costos:        
         detalle_costo_unitario = articulo.costo_ultima_compra
     
-    existe_en_detalle = DoctosInDet.objects.filter( 
+    existe_en_detalles = DoctosInDet.objects.filter( 
         Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
         articulo = articulo,
         almacen = almacen,
@@ -196,67 +214,68 @@ def add_existenciasarticulo_byajustes( **kwargs ):
         unidades = detalle_unidades,
         costo_unitario = detalle_costo_unitario,
         )
+    
+    #Logica
 
-    unidades_a_insertar = 0
-    if detalle_entradas == None and detalle_salidas == None:
-        entradas, salidas, existencias, inv_fin = get_existencias_articulo(
-                articulo_id = articulo.id, 
-                connection_name = connection_name, 
-                fecha_inicio = datetime.now().strftime( "%m/01/%Y" ),
-                almacen = detalle.almacen, )
-        
-        if existe_en_detalle:
-            unidades_a_insertar = detalle.unidades
-            detalle_unidades = detalle.unidades
-        else: 
-            unidades_a_insertar = -inv_fin + detalle.unidades
-            if inv_fin == 0:
-                unidades_a_insertar = detalle.unidades
-
-            detalle.id = next_id( 'ID_DOCTOS', connection_name )
-            
-            detalle.unidades = unidades_a_insertar
+    #Si no se existe arituclo en documentos se ajustan unidades
+    if not existe_en_detalles:
+        detalle.unidades = ajustar_existencias( articulo_id = articulo.id, ajustar_a = detalle.unidades ,almacen = almacen , connection_name = connection_name )
 
     es_nuevo = False
 
-    if detalle_unidades <= 0 or unidades_a_insertar < 0:
-        # Si no existe un detalle de salida de ese articulo
-        if detalle_salidas == None:
+    #SALIDA
+    if detalle.unidades <= 0:
+        #si no existe detalle salidas
+        if not detalle_salidas:
             es_nuevo = True
-            detalle.id = next_id( 'ID_DOCTOS', connection_name )
-            detalle.doctosIn = salida
-            detalle.concepto = salida.concepto
-            detalle.tipo_movto ='S'
             detalle_salidas = detalle
+            detalle_salidas.id = next_id( 'ID_DOCTOS', connection_name )
+            detalle_salidas.doctosIn = salida
+            detalle_salidas.concepto = salida.concepto
+            detalle_salidas.tipo_movto ='S'
             detalle_salidas.unidades = -detalle_salidas.unidades
-        #si si existe
-        elif detalle_salidas:
-            detalle_salidas.unidades = (detalle_salidas.unidades + ( detalle.unidades * -1 ))
 
-        detalle_salidas.costo_unitario = detalle_costo_unitario
+        #Si exitse detalle salidas
+        elif detalle_salidas:
+            detalle_salidas.unidades = detalle_salidas.unidades + ( -detalle.unidades ) 
+
         detalle_salidas.costo_total = detalle_salidas.unidades * detalle_salidas.costo_unitario
         detalle_salidas.fechahora_ult_modif = datetime.now()
+
+        # Para historial de modificaciones
+        if detalle_salidas.detalle_modificaciones == None:
+            detalle_salidas.detalle_modificaciones = ''
+        if detalle_salidas.detalle_modificacionestime == None:
+            detalle_salidas.detalle_modificacionestime = ''
+
+        nuevo_texto = detalle_salidas.detalle_modificaciones + '%s/%s=%s $%s,'%( request_user.username, ubicacion, detalle_unidades, detalle_salidas.costo_unitario)
+        tamano_detalles = len( nuevo_texto )
+        
+        if tamano_detalles < 400:
+            detalle_salidas.detalle_modificaciones = nuevo_texto
+        else:
+            message = "El numero de caracteres para detalles del articulo fue excedido"
+
+        detalle_salidas.detalle_modificacionestime += '%s %s/%s=%s $%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_user.username, ubicacion, detalle_unidades, detalle_salidas.costo_unitario )
+
         if es_nuevo:
             detalle_salidas.save()
         else:    
             detalle_salidas.save( update_fields = [ 'unidades', 'costo_unitario', 'costo_total', 'fechahora_ult_modif', ] );
-
-    if detalle_unidades >= 0 and unidades_a_insertar >= 0:
-        # Si no existe un detalle de salida de ese articulo
-        if detalle_entradas == None:
+    
+    #ENTRADA
+    elif detalle.unidades > 0:
+        if not detalle_entradas:
             es_nuevo = True
-            detalle.id = next_id( 'ID_DOCTOS', connection_name )
-            detalle.doctosIn = entrada
-            detalle.concepto = entrada.concepto
-            detalle.tipo_movto ='E'
-            if unidades_a_insertar > 0:
-                detalle.unidades = unidades_a_insertar
             detalle_entradas = detalle
-        #si si existe
+            detalle_entradas.id = next_id( 'ID_DOCTOS', connection_name )
+            detalle_entradas.doctosIn = entrada
+            detalle_entradas.concepto = entrada.concepto
+            detalle_entradas.tipo_movto ='E'
+
         elif detalle_entradas:
             detalle_entradas.unidades = detalle_entradas.unidades + detalle.unidades
-        
-        detalle_entradas.costo_unitario = detalle_costo_unitario
+
         detalle_entradas.costo_total = detalle_entradas.unidades * detalle_entradas.costo_unitario
         detalle_entradas.fechahora_ult_modif = datetime.now()
 
@@ -266,7 +285,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
         if detalle_entradas.detalle_modificacionestime == None:
             detalle_entradas.detalle_modificacionestime = ''
 
-        nuevo_texto = detalle_entradas.detalle_modificaciones + '[%s/%s=%s:%s],'%( request_user.username, ubicacion, detalle_unidades, detalle_costo_unitario )
+        nuevo_texto = detalle_entradas.detalle_modificaciones + '%s/%s=%s $%s,'%( request_user.username, ubicacion, detalle_unidades, detalle_entradas.costo_unitario)
         tamano_detalles = len( nuevo_texto )
         
         if tamano_detalles < 400:
@@ -274,7 +293,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
         else:
             message = "El numero de caracteres para detalles del articulo fue excedido"
 
-        detalle_entradas.detalle_modificacionestime += '[%s/%s=%s:%s](%s),'%( request_user.username, ubicacion, detalle_unidades, detalle_costo_unitario, datetime.now().strftime("%d-%m-%Y %H:%M") )
+        detalle_entradas.detalle_modificacionestime += '%s %s/%s=%s $%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_user.username, ubicacion, detalle_unidades, detalle_entradas.costo_unitario)
 
         if es_nuevo:
             detalle_entradas.save()
@@ -445,6 +464,13 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
         articulo_id = articulo.id
         articulo_nombre = articulo.nombre
         costo_ultima_compra = None
+
+        detalles_all = DoctosInDet.objects.filter(
+            Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
+            articulo = articulo,
+            almacen = almacen,
+            doctosIn__esinventario = 'S').order_by('fechahora_ult_modif')
+
         detalles_entradas = DoctosInDet.objects.filter(
             Q( doctosIn__concepto = 27 ),
             articulo = articulo,
@@ -456,7 +482,8 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
             detalle_modificaciones = detalle_modificaciones + detalle_entradas.detalle_modificaciones
             detalle_modificacionestime = detalle_modificacionestime + detalle_entradas.detalle_modificacionestime
             costo_ultima_compra = detalle_entradas.costo_unitario
-        if detalles_entradas:
+        
+        if detalles_all:
             ya_ajustado = True
 
         #Si no existe un costo ya asignado se asigna el del articulo    
@@ -496,6 +523,7 @@ def get_existenciasarticulo_byid( request, **kwargs ):
     entrada_id = kwargs.get( 'entrada_id', None )
     connection_name = get_conecctionname( request.session )
     detalle_modificaciones, detalle_modificacionestime = '', ''
+    detalle_modificaciones_salidas, detalle_modificacionestime_salidas = '', ''
     ya_ajustado = False
     costo_ultima_compra = None
     
@@ -512,12 +540,38 @@ def get_existenciasarticulo_byid( request, **kwargs ):
         almacen = almacen,
         doctosIn__esinventario = 'S').order_by('fechahora_ult_modif')
 
+    detalles_salidas = DoctosInDet.objects.filter(
+        Q( doctosIn__concepto = 38 ),
+        articulo = articulo,
+        almacen = almacen,
+        doctosIn__esinventario = 'S').order_by('fechahora_ult_modif')
+
+    detalles_all = DoctosInDet.objects.filter(
+        Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
+        articulo = articulo,
+        almacen = almacen,
+        doctosIn__esinventario = 'S').order_by('fechahora_ult_modif')
+
     for detalle_entradas in detalles_entradas:
+        if not detalle_entradas.detalle_modificaciones:
+            detalle_entradas.detalle_modificaciones = ''
+        if not detalle_entradas.detalle_modificacionestime:
+            detalle_entradas.detalle_modificacionestime = ''
+
         detalle_modificaciones = detalle_modificaciones + detalle_entradas.detalle_modificaciones
         detalle_modificacionestime = detalle_modificacionestime + detalle_entradas.detalle_modificacionestime
         costo_ultima_compra = detalle_entradas.costo_unitario
 
-    if detalles_entradas:
+    for detalle_salidas in detalles_salidas:
+        if not detalle_salidas.detalle_modificaciones:
+            detalle_salidas.detalle_modificaciones = ''
+        if not detalle_salidas.detalle_modificacionestime:
+            detalle_salidas.detalle_modificacionestime = ''
+
+        detalle_modificaciones_salidas = detalle_modificaciones_salidas + detalle_salidas.detalle_modificaciones
+        detalle_modificacionestime_salidas = detalle_modificacionestime_salidas + detalle_salidas.detalle_modificacionestime
+        #costo_ultima_compra = detalle_salidas.costo_unitario
+    if detalles_all:
         ya_ajustado = True
 
     #Si no existe un costo ya asignado se asigna el del articulo    
@@ -535,6 +589,7 @@ def get_existenciasarticulo_byid( request, **kwargs ):
         'costo_ultima_compra' : str(costo_ultima_compra),
         'detalle_modificaciones' : detalle_modificaciones, 
         'detalle_modificacionestime': detalle_modificacionestime,
+        'detalle_modificacionestime_salidas': detalle_modificacionestime_salidas,
         })
 
 @dajaxice_register( method = 'GET' )

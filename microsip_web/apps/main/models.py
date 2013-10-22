@@ -784,7 +784,7 @@ class Impuesto(models.Model):
 class ImpuestosArticulo(models.Model):
     id          = models.AutoField(primary_key=True, db_column='IMPUESTO_ART_ID')
     articulo    = models.ForeignKey(Articulos, on_delete= models.SET_NULL, blank=True, null=True, db_column='ARTICULO_ID')
-    impuesto    = models.ForeignKey(Impuesto, on_delete= models.SET_NULL, blank=True, null=True, db_column='IMPUESTO_ID')
+    impuesto    = models.ForeignKey(Impuesto, db_column='IMPUESTO_ID')
 
     def __unicode__(self):
         return self.impuesto

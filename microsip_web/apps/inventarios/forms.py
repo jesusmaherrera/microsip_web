@@ -25,7 +25,7 @@ class precios_articulos_form(forms.ModelForm):
 class articulos_form(forms.ModelForm):
     class Meta:
         model = Articulos
-        exclude = ('seguimiento', 'puntos','es_almacenable', 'costo_ultima_compra')
+        exclude = ('seguimiento', 'estatus', 'puntos','es_almacenable', 'costo_ultima_compra')
 
 class claves_articulos_form(forms.ModelForm):
     class Meta:
@@ -147,7 +147,7 @@ class linea_articulos_form(forms.Form):
     linea = forms.ModelChoiceField(queryset= LineaArticulos.objects.all())
 
 class UbicacionArticulosForm(forms.Form):
-    ubicacion = forms.CharField(widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'Ubicacion..'}))
+    ubicacion = forms.CharField(widget=forms.TextInput(attrs={'class':'input-small',}))
 
 class DoctosInManageForm(forms.ModelForm):
     file_inventario = forms.CharField(widget=forms.FileInput, required = False)
