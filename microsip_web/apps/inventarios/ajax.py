@@ -243,25 +243,15 @@ def add_existenciasarticulo_byajustes( **kwargs ):
         detalle_salidas.fechahora_ult_modif = datetime.now()
 
         # Para historial de modificaciones
-        if detalle_salidas.detalle_modificaciones == None:
-            detalle_salidas.detalle_modificaciones = ''
         if detalle_salidas.detalle_modificacionestime == None:
             detalle_salidas.detalle_modificacionestime = ''
 
-        nuevo_texto = detalle_salidas.detalle_modificaciones + '%s/%s=%s $%s,'%( request_user.username, ubicacion, detalle_unidades, detalle_salidas.costo_unitario)
-        tamano_detalles = len( nuevo_texto )
-        
-        if tamano_detalles < 400:
-            detalle_salidas.detalle_modificaciones = nuevo_texto
-        else:
-            message = "El numero de caracteres para detalles del articulo fue excedido"
-
-        detalle_salidas.detalle_modificacionestime += '%s %s/%s=%s $%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_user.username, ubicacion, detalle_unidades, detalle_salidas.costo_unitario )
+        detalle_salidas.detalle_modificacionestime += '%s %s/%s=%s $%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_user.username, ubicacion, detalle_unidades, articulo.costo_ultima_compra )
 
         if es_nuevo:
             detalle_salidas.save()
         else:    
-            detalle_salidas.save( update_fields = [ 'unidades', 'costo_unitario', 'costo_total', 'fechahora_ult_modif', ] );
+            detalle_salidas.save( update_fields = [ 'unidades', 'costo_unitario', 'costo_total', 'fechahora_ult_modif','detalle_modificacionestime', ] );
     
     #ENTRADA
     elif detalle.unidades > 0:
@@ -280,25 +270,15 @@ def add_existenciasarticulo_byajustes( **kwargs ):
         detalle_entradas.fechahora_ult_modif = datetime.now()
 
         # Para historial de modificaciones
-        if detalle_entradas.detalle_modificaciones == None:
-            detalle_entradas.detalle_modificaciones = ''
         if detalle_entradas.detalle_modificacionestime == None:
             detalle_entradas.detalle_modificacionestime = ''
-
-        nuevo_texto = detalle_entradas.detalle_modificaciones + '%s/%s=%s $%s,'%( request_user.username, ubicacion, detalle_unidades, detalle_entradas.costo_unitario)
-        tamano_detalles = len( nuevo_texto )
-        
-        if tamano_detalles < 400:
-            detalle_entradas.detalle_modificaciones = nuevo_texto
-        else:
-            message = "El numero de caracteres para detalles del articulo fue excedido"
 
         detalle_entradas.detalle_modificacionestime += '%s %s/%s=%s $%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_user.username, ubicacion, detalle_unidades, detalle_entradas.costo_unitario)
 
         if es_nuevo:
             detalle_entradas.save()
         else:
-            detalle_entradas.save( update_fields=[ 'unidades', 'costo_total', 'costo_unitario', 'fechahora_ult_modif', 'detalle_modificaciones', 'detalle_modificacionestime'] )
+            detalle_entradas.save( update_fields=[ 'unidades', 'costo_total', 'costo_unitario', 'fechahora_ult_modif', 'detalle_modificacionestime'] )
 
     c = connections[ connection_name ].cursor()
     c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% articulo.id )
