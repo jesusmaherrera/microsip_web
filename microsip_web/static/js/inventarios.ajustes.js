@@ -75,6 +75,23 @@ function agregar_articulos_porlineafn()
   }
 }
 
+function agregar_articulos_fn()
+{
+  if ( $("#btn_agregar_articulosinexistencia").attr("disabled") == "disabled")
+    return false
+
+  Dajaxice.microsip_web.apps.inventarios.add_articulossinexistencia(mostrar_articulos_agregados,{
+    'ubicacion' : $("#id_ubicacion").val(),
+    'entrada_id' : $("#entrada_id").val(),
+    'salida_id' : $("#salida_id").val(),
+  });
+
+  $('#btn_agregar_articulosinexistencia').hide();
+  $('#btnCancel').hide();
+  $("#btn_agregar_articulosinexistencia").attr("disabled",true);
+  $("#id_agregando_span_all").show();
+}
+
 function mostrar_articulos_agregados(data)
 {
   if (data.articulos_agregados > 0)
@@ -284,11 +301,20 @@ function mostrar_articulo(data){
 
 
 $("#id_articulo").change(function(){
-  Dajaxice.microsip_web.apps.inventarios.get_existenciasarticulo_byid(mostrar_existencias,{
-    'articulo_id': $("#id_articulo").val()[0],
-    'almacen': $("#almacen_nombre").val(), 
-    'entrada_id' : $("#entrada_id").val(),
-  }); 
+  if( $("#id_articulo").val() == null )
+  {
+    $('#span_alerta_unidades, #span_ya_ajustado, #span_sin_ajustado').hide();
+    $('#id_costo_unitario').val('');
+    $("#id_articulo_text").focus();
+  }
+  else
+  {
+    Dajaxice.microsip_web.apps.inventarios.get_existenciasarticulo_byid(mostrar_existencias,{
+      'articulo_id': $("#id_articulo").val()[0],
+      'almacen': $("#almacen_nombre").val(), 
+      'entrada_id' : $("#entrada_id").val(),
+    }); 
+  }
 });
 
 $('#span_alerta_unidades, #span_ya_ajustado, #span_sin_ajustado').hide();

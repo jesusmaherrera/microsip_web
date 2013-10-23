@@ -175,7 +175,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     
     puede_modificar_costos = allow_microsipuser( username = request_user.username, clave_objeto = 469)
 
-    if puede_modificar_costos:        
+    if not puede_modificar_costos:        
         detalle_costo_unitario = articulo.costo_ultima_compra
     
     existe_en_detalle = DoctosInDet.objects.filter( 
@@ -233,12 +233,13 @@ def add_existenciasarticulo_byajustes( **kwargs ):
         elif detalle_salidas:
             detalle_salidas.unidades = (detalle_salidas.unidades + ( detalle.unidades * -1 ))
 
+        detalle_salidas.costo_unitario = detalle_costo_unitario
         detalle_salidas.costo_total = detalle_salidas.unidades * detalle_salidas.costo_unitario
         detalle_salidas.fechahora_ult_modif = datetime.now()
         if es_nuevo:
             detalle_salidas.save()
         else:    
-            detalle_salidas.save( update_fields = [ 'unidades', 'costo_total', 'fechahora_ult_modif', ] );
+            detalle_salidas.save( update_fields = [ 'unidades', 'costo_unitario', 'costo_total', 'fechahora_ult_modif', ] );
 
     if detalle_unidades >= 0 and unidades_a_insertar >= 0:
         # Si no existe un detalle de salida de ese articulo
@@ -254,7 +255,8 @@ def add_existenciasarticulo_byajustes( **kwargs ):
         #si si existe
         elif detalle_entradas:
             detalle_entradas.unidades = detalle_entradas.unidades + detalle.unidades
-
+        
+        detalle_entradas.costo_unitario = detalle_costo_unitario
         detalle_entradas.costo_total = detalle_entradas.unidades * detalle_entradas.costo_unitario
         detalle_entradas.fechahora_ult_modif = datetime.now()
 
@@ -277,7 +279,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
         if es_nuevo:
             detalle_entradas.save()
         else:
-            detalle_entradas.save( update_fields=[ 'unidades', 'costo_total', 'fechahora_ult_modif', 'detalle_modificaciones', 'detalle_modificacionestime'] )
+            detalle_entradas.save( update_fields=[ 'unidades', 'costo_total', 'costo_unitario', 'fechahora_ult_modif', 'detalle_modificaciones', 'detalle_modificacionestime'] )
 
     c = connections[ connection_name ].cursor()
     c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% articulo.id )
@@ -323,45 +325,45 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
 
     return HttpResponse( json.dumps( datos ), mimetype = "application/javascript" )
 
-# @dajaxice_register( method = 'GET' )
-# def add_articulossinexistencia( request, **kwargs ):
-#     """ Agrega articulos almacenables de la linea indicada faltantes en los documentos de ajustes indicados.  """
-#     #Paramentros
-#     ubicacion = kwargs.get( 'ubicacion', None )
-#     entrada_id = kwargs.get( 'entrada_id', None )
-#     salida_id = kwargs.get( 'salida_id', None )
+@dajaxice_register( method = 'GET' )
+def add_articulossinexistencia( request, **kwargs ):
+    """ Agrega articulos almacenables de la linea indicada faltantes en los documentos de ajustes indicados.  """
+    #Paramentros
+    ubicacion = kwargs.get( 'ubicacion', None )
+    entrada_id = kwargs.get( 'entrada_id', None )
+    salida_id = kwargs.get( 'salida_id', None )
 
-#     salida = DoctosIn.objects.get( pk = salida_id )
-#     entrada = DoctosIn.objects.get( pk = entrada_id )
+    salida = DoctosIn.objects.get( pk = salida_id )
+    entrada = DoctosIn.objects.get( pk = entrada_id )
 
-#     articulos_endocumentos = DoctosInDet.objects.filter( Q( doctosIn = entrada ) | Q( doctosIn = salida ) ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True )
-#     articulos_sinexistencia = Articulos.objects.filter( es_almacenable = 'S', seguimiento='N', linea = linea ).exclude( estatus = 'B', pk__in = articulos_endocumentos ).order_by( '-id' ).values_list( 'id', flat = True )
+    articulos_endocumentos = DoctosInDet.objects.filter( Q( doctosIn = entrada ) | Q( doctosIn = salida ) ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True )
+    articulos_sinexistencia = Articulos.objects.exclude( estatus = 'B').filter( es_almacenable = 'S', seguimiento='N').exclude(pk__in = articulos_endocumentos ).order_by( '-id' ).values_list( 'id', flat = True )
     
-#     total_articulos_sinexistencia = articulos_sinexistencia.count()
-#     articulos_sinexistencia = articulos_sinexistencia[0:9000]
+    total_articulos_sinexistencia = articulos_sinexistencia.count()
+    articulos_sinexistencia = articulos_sinexistencia[0:9000]
 
-#     articulos_sinexistencia_list = split_seq( articulos_sinexistencia, 2000 )
-#     articulos_agregados = 0
+    articulos_sinexistencia_list = split_seq( articulos_sinexistencia, 2000 )
+    articulos_agregados = 0
 
-#     for articulos_sinexistencia_sublist in articulos_sinexistencia_list:
-#         detalles_en_ceros = 0
-#         for articulo_id in articulos_sinexistencia_sublist:
+    for articulos_sinexistencia_sublist in articulos_sinexistencia_list:
+        detalles_en_ceros = 0
+        for articulo_id in articulos_sinexistencia_sublist:
             
-#             add_existenciasarticulo_byajustes(
-#                     articulo_id = articulo_id ,
-#                     entrada_id = entrada_id,
-#                     salida_id = salida_id,
-#                     detalle_unidades = 0,
-#                     request_session = request.session,
-#                     request_user = request.user,
-#                     ubicacion = ubicacion,
-#                     )
-#             detalles_en_ceros = detalles_en_ceros + 1
+            add_existenciasarticulo_byajustes(
+                    articulo_id = articulo_id ,
+                    entrada_id = entrada_id,
+                    salida_id = salida_id,
+                    detalle_unidades = 0,
+                    request_session = request.session,
+                    request_user = request.user,
+                    ubicacion = ubicacion,
+                    )
+            detalles_en_ceros = detalles_en_ceros + 1
             
-#         articulos_agregados = articulos_agregados + detalles_en_ceros
+        articulos_agregados = articulos_agregados + detalles_en_ceros
 
-#     articulos_pendientes = total_articulos_sinexistencia -  articulos_agregados
-#     return simplejson.dumps( { 'articulos_agregados' : articulos_agregados, 'articulo_pendientes' : articulos_pendientes, } )
+    articulos_pendientes = total_articulos_sinexistencia -  articulos_agregados
+    return simplejson.dumps( { 'articulos_agregados' : articulos_agregados, 'articulo_pendientes' : articulos_pendientes, } )
 
 @dajaxice_register( method = 'GET' )
 def add_articulossinexistencia_bylinea( request, **kwargs ):

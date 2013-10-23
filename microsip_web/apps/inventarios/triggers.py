@@ -5,7 +5,7 @@ CREATE OR ALTER TRIGGER DOCTOS_IN_BU0 FOR DOCTOS_IN
 ACTIVE BEFORE UPDATE POSITION 0
 AS
 begin
-    if(new.sic_esinventario = 'S') then
+    if(new.sic_esinventario = 'S' and new.cancelado = 'N' ) then
     begin
         exception ex_saldo_cargo_excedido;
     end

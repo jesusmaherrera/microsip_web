@@ -183,7 +183,7 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
 
     #salida
     try:
-        salida = DoctosIn.objects.get( esinventario = 'S', concepto = 38, almacen = almacen,  fecha =  fecha_actual )
+        salida = DoctosIn.objects.get( esinventario = 'S', cancelado= 'N', concepto = 38, almacen = almacen,  fecha =  fecha_actual )
     except ObjectDoesNotExist:
         if conecpto_ajuste_salida.folio_autom == 'S':
             sig_folio = int(conecpto_ajuste_salida.sig_folio) + 1
@@ -206,7 +206,7 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
 
     #salida
     try:
-        entrada = DoctosIn.objects.get( esinventario = 'S', concepto = 27, almacen = almacen, fecha = fecha_actual )
+        entrada = DoctosIn.objects.get( esinventario = 'S', cancelado= 'N', concepto = 27, almacen = almacen, fecha = fecha_actual )
     except ObjectDoesNotExist:
         if conecpto_ajuste_entrada.folio_autom == 'S':
             sig_folio = int(conecpto_ajuste_entrada.sig_folio) + 1
