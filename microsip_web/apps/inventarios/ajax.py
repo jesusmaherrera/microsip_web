@@ -442,7 +442,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     costo_ultima_compra = 0
     articulo_id = ''
     articulo_nombre = ''
-    clave_articulo = first_or_none( ClavesArticulos.objects.exclude(articulo__estatus='B').filter( clave = articulo_clave ) )
+    clave_articulo = first_or_none( ClavesArticulos.objects.exclude( articulo__estatus = 'B').filter( clave = articulo_clave, articulo__seguimiento = 'N' ) )
     opciones_clave = {}
     
     detalle_modificacionestime = ''
@@ -498,7 +498,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
             costo_ultima_compra = str(articulo.costo_ultima_compra)
     else:
         error = "no_existe_clave"
-        claves = ClavesArticulos.objects.exclude(articulo__estatus='B').filter( clave__contains = articulo_clave)
+        claves = ClavesArticulos.objects.exclude(articulo__estatus='B').filter( clave__contains = articulo_clave, articulo__seguimiento = 'N' )
         for c in claves:
             opciones_clave[ str( c.clave ) ] = c.articulo.nombre
     
