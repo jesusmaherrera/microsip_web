@@ -544,7 +544,6 @@ class DoctosIn(models.Model):
     fechahora_creacion  = models.DateTimeField(auto_now_add=True, db_column='FECHA_HORA_CREACION')
     usuario_ult_modif   = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_ULT_MODIF')
     fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='FECHA_HORA_ULT_MODIF')
-    esinventario        = models.CharField(default='N', max_length=1, db_column='SIC_ESINVENTARIO')
 
     class Meta:
         db_table = u'doctos_in'
@@ -577,7 +576,6 @@ class DoctosInvfisDet(models.Model):
     unidades    = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='UNIDADES')
     fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='SIC_FECHAHORA_U')
     usuario_ult_modif = models.CharField(blank=True, null=True, max_length=31, db_column='SIC_USUARIO_ULT_MODIF')
-    detalle_modificaciones = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLE_MODIFICACIONES')
     detalle_modificacionestime = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLETIME_MODIFICACIONES')
     unidades_syn = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='SIC_UNIDADES_SYN')
     unidades_margen = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='SIC_UNIDADESMARGEN')

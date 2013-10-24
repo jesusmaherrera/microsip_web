@@ -160,7 +160,7 @@ def ajustar_existencias( **kwargs ):
     entradas, salidas, existencias, inv_fin = get_existencias_articulo(
         articulo_id = articulo_id, 
         connection_name = connection_name, 
-        fecha_inicio = datetime.now().strftime( "%m/01/%Y" ),
+        fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
         almacen = almacen, 
         )
 
@@ -193,14 +193,21 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     
     puede_modificar_costos = allow_microsipuser( username = request_user.username, clave_objeto = 469)
 
-    if not puede_modificar_costos:        
-        detalle_costo_unitario = articulo.costo_ultima_compra
-    
+    detalles_entradas_ultimocosto = first_or_none( DoctosInDet.objects.filter(
+            Q( doctosIn__concepto = 27 ),
+            articulo = articulo,
+            almacen = almacen,
+            doctosIn__descripcion = 'ES INVENTARIO'
+            ).order_by('-fechahora_ult_modif').values_list( 'costo_unitario', flat = True ) )
+
+    if not detalles_entradas_ultimocosto:
+         detalles_entradas_ultimocosto = articulo.costo_ultima_compra
+
     existe_en_detalles = DoctosInDet.objects.filter( 
         Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
         articulo = articulo,
         almacen = almacen,
-        doctosIn__esinventario = 'S',
+        doctosIn__descripcion = 'ES INVENTARIO',
         ).count() > 0
 
     detalle_entradas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn = entrada ) )
@@ -212,7 +219,6 @@ def add_existenciasarticulo_byajustes( **kwargs ):
         claveArticulo = articulo_clave,
         almacen = almacen,
         unidades = detalle_unidades,
-        costo_unitario = detalle_costo_unitario,
         )
     
     #Logica
@@ -234,24 +240,13 @@ def add_existenciasarticulo_byajustes( **kwargs ):
             detalle_salidas.concepto = salida.concepto
             detalle_salidas.tipo_movto ='S'
             detalle_salidas.unidades = -detalle_salidas.unidades
-
         #Si exitse detalle salidas
         elif detalle_salidas:
             detalle_salidas.unidades = detalle_salidas.unidades + ( -detalle.unidades ) 
 
-        detalle_salidas.costo_total = detalle_salidas.unidades * detalle_salidas.costo_unitario
-        detalle_salidas.fechahora_ult_modif = datetime.now()
-
-        # Para historial de modificaciones
-        if detalle_salidas.detalle_modificacionestime == None:
-            detalle_salidas.detalle_modificacionestime = ''
-
-        detalle_salidas.detalle_modificacionestime += '%s %s/%s=%s $%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_user.username, ubicacion, detalle_unidades, articulo.costo_ultima_compra )
-
-        if es_nuevo:
-            detalle_salidas.save()
-        else:    
-            detalle_salidas.save( update_fields = [ 'unidades', 'costo_unitario', 'costo_total', 'fechahora_ult_modif','detalle_modificacionestime', ] );
+        #Desde salida no se permite cambiar costo unitario
+        detalle_salidas.costo_unitario = detalles_entradas_ultimocosto
+        detalle = detalle_salidas
     
     #ENTRADA
     elif detalle.unidades > 0:
@@ -265,20 +260,39 @@ def add_existenciasarticulo_byajustes( **kwargs ):
 
         elif detalle_entradas:
             detalle_entradas.unidades = detalle_entradas.unidades + detalle.unidades
+            
+        detalle = detalle_entradas
+    
+    #MODIFICA COSTOS
+    #Si es entrada y tiene pribilegios modifica el costo unitario
+    if puede_modificar_costos and detalle.tipo_movto == 'E':
+       detalle.costo_unitario = detalle_costo_unitario 
+    else:
+        detalle_costo_unitario = first_or_none( DoctosInDet.objects.filter(
+            Q( doctosIn__concepto = 27 ),
+            articulo = articulo,
+            almacen = almacen,
+            doctosIn__descripcion = 'ES INVENTARIO'
+            ).order_by('-fechahora_ult_modif').values_list( 'costo_unitario', flat = True ) )      
+        
+        if not detalle_costo_unitario:
+            detalle_costo_unitario = articulo.costo_ultima_compra
+    
+    detalle.costo_total = detalle.unidades * detalle.costo_unitario
+    detalle.fechahora_ult_modif = datetime.now()
 
-        detalle_entradas.costo_total = detalle_entradas.unidades * detalle_entradas.costo_unitario
-        detalle_entradas.fechahora_ult_modif = datetime.now()
+    # HISTORIAL DE MODIFICACIONES
+    if detalle.detalle_modificacionestime == None:
+        detalle.detalle_modificacionestime = ''
+    detalle_ajuste = '' 
+    if not existe_en_detalles:   
+        detalle_ajuste = '(AJ.=%s)'%detalle.unidades
+    detalle.detalle_modificacionestime += '%s %s/%s=%s%s $%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_user.username, ubicacion, detalle_unidades, detalle_ajuste, detalle.costo_unitario )
 
-        # Para historial de modificaciones
-        if detalle_entradas.detalle_modificacionestime == None:
-            detalle_entradas.detalle_modificacionestime = ''
-
-        detalle_entradas.detalle_modificacionestime += '%s %s/%s=%s $%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_user.username, ubicacion, detalle_unidades, detalle_entradas.costo_unitario)
-
-        if es_nuevo:
-            detalle_entradas.save()
-        else:
-            detalle_entradas.save( update_fields=[ 'unidades', 'costo_total', 'costo_unitario', 'fechahora_ult_modif', 'detalle_modificacionestime'] )
+    if es_nuevo:
+        detalle.save()
+    else:    
+        detalle.save( update_fields = [ 'unidades', 'costo_unitario', 'costo_total', 'fechahora_ult_modif','detalle_modificacionestime', ] );
 
     c = connections[ connection_name ].cursor()
     c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% articulo.id )
@@ -297,8 +311,8 @@ def close_inventario_byalmacen_view( request, **kwargs ):
     """ Para agregar existencia a un articulo por ajuste"""
     #Paramentros
     almacen_id = kwargs.get( 'almacen_id', None )
-    DoctosIn.objects.filter(almacen__id = almacen_id, esinventario='S').update(esinventario='N')
-    return HttpResponse( json.dumps( datos ), mimetype = "application/javascript" )
+    DoctosIn.objects.filter(almacen__ALMACEN_ID = almacen_id, descripcion='ES INVENTARIO').update(descripcion= 'INVENTARIO CERRADO')
+    return simplejson.dumps( { 'mensaje' : 'Inventario cerrado', } ) 
 
 @dajaxice_register( method = 'GET' )
 def add_existenciasarticulo_byajustes_view( request, **kwargs ):
@@ -381,7 +395,7 @@ def add_articulossinexistencia_bylinea( request, **kwargs ):
     articulos_endocumentos = list( set( DoctosInDet.objects.filter(
         Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
         almacen = almacen,
-        doctosIn__esinventario = 'S'
+        doctosIn__descripcion = 'ES INVENTARIO'
         ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True ) ) )
 
     articulos_sinexistencia = Articulos.objects.exclude(estatus = 'B').filter( es_almacenable = 'S', seguimiento='N', linea = linea ).exclude(pk__in = articulos_endocumentos ).order_by( '-id' ).values_list( 'id', flat = True )
@@ -431,15 +445,15 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     clave_articulo = first_or_none( ClavesArticulos.objects.exclude(articulo__estatus='B').filter( clave = articulo_clave ) )
     opciones_clave = {}
     
-    detalle_modificaciones, detalle_modificacionestime = '', ''
-    detalle_modificaciones_salidas, detalle_modificacionestime_salidas = '', ''
+    detalle_modificacionestime = ''
+    detalle_modificacionestime_salidas = ''
     ya_ajustado = False
     if clave_articulo:
         articulo = Articulos.objects.get( pk = clave_articulo.articulo.id )
         entradas, salidas, existencias, inv_fin = get_existencias_articulo(
             articulo_id = articulo.id,
             connection_name = connection_name, 
-            fecha_inicio = datetime.now().strftime( "%m/01/%Y" ),
+            fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
             almacen = almacen_nombre, )
         
         articulo_id = articulo.id
@@ -450,33 +464,29 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
             Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
             articulo = articulo,
             almacen = almacen,
-            doctosIn__esinventario = 'S').order_by('fechahora_ult_modif')
+            doctosIn__descripcion = 'ES INVENTARIO').order_by('fechahora_ult_modif')
 
         detalles_entradas = DoctosInDet.objects.filter(
             Q( doctosIn__concepto = 27 ),
             articulo = articulo,
             almacen = almacen,
-            doctosIn__esinventario = 'S'
+            doctosIn__descripcion = 'ES INVENTARIO'
             ).order_by('fechahora_ult_modif')
 
         detalles_salidas = DoctosInDet.objects.filter(
             Q( doctosIn__concepto = 38 ),
             articulo = articulo,
             almacen = almacen,
-            doctosIn__esinventario = 'S').order_by('fechahora_ult_modif')
+            doctosIn__descripcion = 'ES INVENTARIO').order_by('fechahora_ult_modif')
 
         for detalle_entradas in detalles_entradas:
-            detalle_modificaciones = detalle_modificaciones + detalle_entradas.detalle_modificaciones
             detalle_modificacionestime = detalle_modificacionestime + detalle_entradas.detalle_modificacionestime
             costo_ultima_compra = detalle_entradas.costo_unitario
         
         for detalle_salidas in detalles_salidas:
-            if not detalle_salidas.detalle_modificaciones:
-                detalle_salidas.detalle_modificaciones = ''
             if not detalle_salidas.detalle_modificacionestime:
                 detalle_salidas.detalle_modificacionestime = ''
 
-            detalle_modificaciones_salidas = detalle_modificaciones_salidas + detalle_salidas.detalle_modificaciones
             detalle_modificacionestime_salidas = detalle_modificacionestime_salidas + detalle_salidas.detalle_modificacionestime
             #costo_ultima_compra = detalle_salidas.costo_unitario
         
@@ -492,8 +502,6 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
         for c in claves:
             opciones_clave[ str( c.clave ) ] = c.articulo.nombre
     
-    if not detalle_modificaciones:
-        detalle_modificaciones = ''
     if not detalle_modificacionestime:
         detalle_modificacionestime = ''
 
@@ -505,7 +513,6 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
         'existencias' : str(inv_fin), 
         'costo_ultima_compra' : str(costo_ultima_compra),
         'opciones_clave': opciones_clave,
-        'detalle_modificaciones' : detalle_modificaciones, 
         'detalle_modificacionestime': detalle_modificacionestime,
         'detalle_modificacionestime_salidas': detalle_modificacionestime_salidas,
         }
@@ -520,8 +527,8 @@ def get_existenciasarticulo_byid( request, **kwargs ):
     articulo_id = kwargs.get( 'articulo_id', None)
     entrada_id = kwargs.get( 'entrada_id', None )
     connection_name = get_conecctionname( request.session )
-    detalle_modificaciones, detalle_modificacionestime = '', ''
-    detalle_modificaciones_salidas, detalle_modificacionestime_salidas = '', ''
+    detalle_modificacionestime = ''
+    detalle_modificacionestime_salidas = ''
     ya_ajustado = False
     costo_ultima_compra = None
     
@@ -529,34 +536,31 @@ def get_existenciasarticulo_byid( request, **kwargs ):
     entradas, salidas, existencias, inv_fin = get_existencias_articulo(
         articulo_id = articulo_id , 
         connection_name = connection_name, 
-        fecha_inicio = datetime.now().strftime( "%m/01/%Y" ),
+        fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
         almacen = almacen_nombre, )
  
     detalles_entradas = DoctosInDet.objects.filter(
         Q( doctosIn__concepto = 27 ),
         articulo = articulo,
         almacen = almacen,
-        doctosIn__esinventario = 'S').order_by('fechahora_ult_modif')
+        doctosIn__descripcion = 'ES INVENTARIO').order_by('fechahora_ult_modif')
 
     detalles_salidas = DoctosInDet.objects.filter(
         Q( doctosIn__concepto = 38 ),
         articulo = articulo,
         almacen = almacen,
-        doctosIn__esinventario = 'S').order_by('fechahora_ult_modif')
+        doctosIn__descripcion = 'ES INVENTARIO').order_by('fechahora_ult_modif')
 
     detalles_all = DoctosInDet.objects.filter(
         Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
         articulo = articulo,
         almacen = almacen,
-        doctosIn__esinventario = 'S').order_by('fechahora_ult_modif')
+        doctosIn__descripcion = 'ES INVENTARIO').order_by('fechahora_ult_modif')
 
     for detalle_entradas in detalles_entradas:
-        if not detalle_entradas.detalle_modificaciones:
-            detalle_entradas.detalle_modificaciones = ''
         if not detalle_entradas.detalle_modificacionestime:
             detalle_entradas.detalle_modificacionestime = ''
 
-        detalle_modificaciones = detalle_modificaciones + detalle_entradas.detalle_modificaciones
         detalle_modificacionestime = detalle_modificacionestime + detalle_entradas.detalle_modificacionestime
         costo_ultima_compra = detalle_entradas.costo_unitario
 
@@ -566,7 +570,6 @@ def get_existenciasarticulo_byid( request, **kwargs ):
         if not detalle_salidas.detalle_modificacionestime:
             detalle_salidas.detalle_modificacionestime = ''
 
-        detalle_modificaciones_salidas = detalle_modificaciones_salidas + detalle_salidas.detalle_modificaciones
         detalle_modificacionestime_salidas = detalle_modificacionestime_salidas + detalle_salidas.detalle_modificacionestime
         #costo_ultima_compra = detalle_salidas.costo_unitario
     if detalles_all:
@@ -576,8 +579,6 @@ def get_existenciasarticulo_byid( request, **kwargs ):
     if not costo_ultima_compra:
         costo_ultima_compra = str(articulo.costo_ultima_compra)
     
-    if not detalle_modificaciones:
-        detalle_modificaciones = ''
     if not detalle_modificacionestime:
         detalle_modificacionestime = ''
 
@@ -585,7 +586,6 @@ def get_existenciasarticulo_byid( request, **kwargs ):
         'existencias' : int( inv_fin ), 
         'ya_ajustado': ya_ajustado,
         'costo_ultima_compra' : str(costo_ultima_compra),
-        'detalle_modificaciones' : detalle_modificaciones, 
         'detalle_modificacionestime': detalle_modificacionestime,
         'detalle_modificacionestime_salidas': detalle_modificacionestime_salidas,
         })

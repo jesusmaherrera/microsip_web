@@ -74,6 +74,19 @@ function agregar_articulos_porlineafn()
   }
 }
 
+function alert_resultado(data)
+{
+  alert(data.mensaje);
+  window.location = "/inventarios/almacenes/";
+}
+
+function cerrar_inventario()
+{
+  Dajaxice.microsip_web.apps.inventarios.close_inventario_byalmacen_view(alert_resultado,{
+    'almacen_id' : $("#almacen_id").val(),
+  });
+}
+
 function agregar_articulos_fn()
 {
   if ( $("#btn_agregar_articulosinexistencia").attr("disabled") == "disabled")

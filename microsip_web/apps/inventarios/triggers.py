@@ -5,13 +5,8 @@ triggers['SIC_PUERTA_INV_DOCTOSIN_BU'] = '''
     ACTIVE BEFORE UPDATE POSITION 0
     AS
     begin
-        if (old.cancelado <> new.cancelado and new.cancelado = 'S') then
-            new.sic_esinventario = 'N';
-        else
-            new.sic_esinventario = 'S';
-
-        if (old.sic_esinventario <> new.sic_esinventario and new.sic_esinventario is null) then
-            exception ex_modificacion_prohibida;
+        if (old.cancelado <> new.cancelado and new.cancelado ='S' and old.descripcion = 'ES INVENTARIO') then
+            new.descripcion = 'DOCUMENTO INVENTARIO CANCELADO';
     end
     '''
 

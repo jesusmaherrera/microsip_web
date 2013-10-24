@@ -240,13 +240,12 @@ class DoctoIn_CreateForm(forms.ModelForm):
             'usuario_ult_modif',
             'fechahora_ult_modif',
             'usuario_aut_modif',
-            'esinventario',
             )
     def clean(self):
         cleaned_data = self.cleaned_data
         almacen = cleaned_data.get( "almacen" )
         
-        if DoctosIn.objects.filter( esinventario = 'S', almacen = almacen, cancelado = 'N' ).exists():
+        if DoctosIn.objects.filter( descripcion = 'ES INVENTARIO', almacen = almacen, cancelado = 'N' ).exists():
             raise forms.ValidationError(u'Ya existe un almenos un documento para el almacen [%s], porfavor crea uno que no sea de ese almacen.'% almacen)
         return cleaned_data
 

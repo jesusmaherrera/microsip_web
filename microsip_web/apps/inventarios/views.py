@@ -183,7 +183,7 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
 
     #salida
     try:
-        salida = DoctosIn.objects.get( esinventario = 'S', cancelado= 'N', concepto = 38, almacen = almacen,  fecha =  fecha_actual )
+        salida = DoctosIn.objects.get( descripcion = 'ES INVENTARIO', cancelado= 'N', concepto = 38, almacen = almacen,  fecha =  fecha_actual )
     except ObjectDoesNotExist:
         if conecpto_ajuste_salida.folio_autom == 'S':
             sig_folio = int(conecpto_ajuste_salida.sig_folio) + 1
@@ -200,13 +200,13 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
             fecha = fecha_actual,
             sistema_origen = 'IN',
             usuario_creador = username,
-            esinventario = 'S',
+            descripcion = 'ES INVENTARIO',
              )
         salida.save()
 
     #salida
     try:
-        entrada = DoctosIn.objects.get( esinventario = 'S', cancelado= 'N', concepto = 27, almacen = almacen, fecha = fecha_actual )
+        entrada = DoctosIn.objects.get( descripcion = 'ES INVENTARIO', cancelado= 'N', concepto = 27, almacen = almacen, fecha = fecha_actual )
     except ObjectDoesNotExist:
         if conecpto_ajuste_entrada.folio_autom == 'S':
             sig_folio = int(conecpto_ajuste_entrada.sig_folio) + 1
@@ -223,7 +223,7 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
             fecha = fecha_actual,
             sistema_origen = 'IN',
             usuario_creador = username,
-            esinventario = 'S',
+            descripcion = 'ES INVENTARIO',
              )
 
         entrada.save()
@@ -251,7 +251,7 @@ def invetariofisico_ajustes_manageview( request, almacen_id = None, template_nam
             (select FIRST 20 DISTINCT b.articulo_id, b.nombre, a.sic_fechahora_u
             from doctos_in_det a, articulos b, doctos_in c
             where (b.articulo_id = a.articulo_id and c.docto_in_id = a.docto_in_id) and
-                (c.almacen_id = %s and (c.concepto_in_id = 38 or c.concepto_in_id = 27 ) and c.cancelado = 'N' and c.sic_esinventario = 'S')
+                (c.almacen_id = %s and (c.concepto_in_id = 38 or c.concepto_in_id = 27 ) and c.cancelado = 'N' and c.descripcion = 'ES INVENTARIO')
             order by a.sic_fechahora_u DESC) C 
         left JOIN
          orsp_in_aux_art( articulo_id, '%s', '%s','%s','S','N') B
@@ -259,13 +259,13 @@ def invetariofisico_ajustes_manageview( request, almacen_id = None, template_nam
          """% (
                 entrada.almacen.ALMACEN_ID, 
                 entrada.almacen.nombre, 
-                datetime.now().strftime( "%m/01/%Y" ),
-                datetime.now().strftime( "%m/%d/%Y" ),
+                datetime.now().strftime( "01/01/%Y" ),
+                datetime.now().strftime( "12/31/%Y" ),
                 )
     
     articulos_rows = runsql_rows( sql, connection_name )
     articulos_contados = DoctosInDet.objects.filter( Q(doctosIn__concepto = 27) | Q(doctosIn__concepto = 38) ).filter( 
-        doctosIn__esinventario = 'S', 
+        doctosIn__descripcion = 'ES INVENTARIO', 
         doctosIn__cancelado= 'N',
         doctosIn__almacen = entrada.almacen
         ).count()

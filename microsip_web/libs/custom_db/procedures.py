@@ -5,17 +5,6 @@ procedures = {}
 ####                                                        ####
 ################################################################
 
-procedures['SIC_DOCTOSIN_AT'] = '''
-    CREATE OR ALTER PROCEDURE SIC_DOCTOSIN_AT
-    as
-    BEGIN
-        if (not exists(
-        select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'DOCTOS_IN' and rf.RDB$FIELD_NAME = 'SIC_ESINVENTARIO')) then
-            execute statement 'ALTER TABLE DOCTOS_IN ADD SIC_ESINVENTARIO CHAR(1)';
-    END  
-    '''
-
 procedures['SIC_DOCTOSINDET_AT'] = '''
     CREATE OR ALTER PROCEDURE SIC_DOCTOSINDET_AT
     as
@@ -30,11 +19,6 @@ procedures['SIC_DOCTOSINDET_AT'] = '''
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'DOCTOS_IN_DET' and rf.RDB$FIELD_NAME = 'SIC_USUARIO_ULT_MODIF')) then
             execute statement 'ALTER TABLE DOCTOS_IN_DET ADD SIC_USUARIO_ULT_MODIF USUARIO_TYPE';
-
-        if (not exists(
-        select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'DOCTOS_IN_DET' and rf.RDB$FIELD_NAME = 'SIC_DETALLE_MODIFICACIONES')) then
-            execute statement 'ALTER TABLE DOCTOS_IN_DET ADD SIC_DETALLE_MODIFICACIONES VARCHAR(400)';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
