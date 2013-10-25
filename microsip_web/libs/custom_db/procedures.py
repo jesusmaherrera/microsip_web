@@ -5,6 +5,17 @@ procedures = {}
 ####                                                        ####
 ################################################################
 
+procedures[ 'SIC_PUERTA_DEL_TRIGGERS' ] = '''
+    CREATE OR ALTER PROCEDURE SIC_PUERTA_DEL_TRIGGERS 
+    as
+    begin
+        if (exists(
+            select 1 from RDB$Triggers
+            where RDB$Trigger_name = 'SIC_PUERTA_INV_DOCTOSIN_BU')) then
+            execute statement 'drop trigger SIC_PUERTA_INV_DOCTOSIN_BU';
+    end
+    '''
+
 procedures['SIC_DOCTOSINDET_AT'] = '''
     CREATE OR ALTER PROCEDURE SIC_DOCTOSINDET_AT
     as
@@ -74,6 +85,38 @@ procedures['SIC_DOCTOINVFISDET_AT'] = '''
 ####              PROCEDIMIENTOS PUNTO DE VENTA             ####
 ####                                                        ####
 ################################################################
+
+
+procedures[ 'SIC_PUNTOS_DEL_TRIGGERS' ] = '''
+    CREATE OR ALTER PROCEDURE SIC_PUNTOS_DEL_TRIGGERS 
+    as
+    begin
+        if (exists(
+            select 1 from RDB$Triggers
+            where RDB$Trigger_name = 'SIC_PUNTOS_PV_CLIENTES_BU')) then
+            execute statement 'drop trigger SIC_PUNTOS_PV_CLIENTES_BU';
+
+        if (exists(
+            select 1 from RDB$Triggers
+            where RDB$Trigger_name = 'SIC_PUNTOS_PV_DOCTOSPVDET_AD')) then
+            execute statement 'drop trigger SIC_PUNTOS_PV_DOCTOSPVDET_AD';
+
+        if (exists(
+            select 1 from RDB$Triggers
+            where RDB$Trigger_name = 'SIC_PUNTOS_PV_DOCTOSPVDET_BU')) then
+            execute statement 'drop trigger SIC_PUNTOS_PV_DOCTOSPVDET_BU';
+
+        if (exists(
+            select 1 from RDB$Triggers
+            where RDB$Trigger_name = 'SIC_PUNTOS_PV_DOCTOSPV_AD')) then
+            execute statement 'drop trigger SIC_PUNTOS_PV_DOCTOSPV_AD';
+
+        if (exists(
+            select 1 from RDB$Triggers
+            where RDB$Trigger_name = 'SIC_PUNTOS_PV_DOCTOSPV_BU')) then
+            execute statement 'drop trigger SIC_PUNTOS_PV_DOCTOSPV_BU';
+    end
+    '''
 
 procedures['SIC_PUNTOS_ARTICULOS_AT'] = '''
     CREATE OR ALTER PROCEDURE SIC_PUNTOS_ARTICULOS_AT

@@ -74,8 +74,13 @@ def inicializar_tablas( request ):
         #Triggers
         if 'microsip_web.apps.punto_de_venta' in MICROSIP_MODULES:
             actualizar_triggers_puntodeventa( conexion_name = conexion_name )
+        else:
+            borrar_triggers_puntodeventa( conexion_name = conexion_name )
+
         if 'microsip_web.apps.inventarios' in MICROSIP_MODULES:
              actualizar_triggers_inventarios( conexion_name = conexion_name )
+        else:
+            borrar_triggers_inventarios( conexion_name = conexion_name )
 
         #cuentas_por_pagar_inicializar_tablas()
         #cuentas_por_cobrar_inicializar_tablas()
@@ -84,6 +89,7 @@ def inicializar_tablas( request ):
 
     return HttpResponseRedirect('/')
 
+
 def sincronizar_tablas( conexion_name = None ):
     """ Modifica todas las tablas con campos nuevos para uso en aplicacion. """
 
@@ -91,49 +97,58 @@ def sincronizar_tablas( conexion_name = None ):
     ################## STRORE PROCEDURES ###################
     c.execute( procedures[ 'SIC_PUNTOS_ARTICULOS_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_ARTICULOS_AT;')
+    c.execute('DROP PROCEDURE SIC_PUNTOS_ARTICULOS_AT;')
 
     c.execute( procedures[ 'SIC_PUNTOS_LINEASARTICULOS_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_LINEASARTICULOS_AT;')
+    c.execute('DROP PROCEDURE SIC_PUNTOS_LINEASARTICULOS_AT;')
     
     c.execute( procedures[ 'SIC_PUNTOS_GRUPOSLINEAS_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_GRUPOSLINEAS_AT;')
+    c.execute('DROP PROCEDURE SIC_PUNTOS_GRUPOSLINEAS_AT;')
     
     #Clientes
     c.execute( procedures[ 'SIC_PUNTOS_CLIENTES_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_CLIENTES_AT;')
+    c.execute('DROP PROCEDURE SIC_PUNTOS_CLIENTES_AT;')
 
     c.execute( procedures[ 'SIC_PUNTOS_LIBRESCLIENTES_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_LIBRESCLIENTES_AT;')
+    c.execute('DROP PROCEDURE SIC_PUNTOS_LIBRESCLIENTES_AT;')
     
     c.execute( procedures[ 'SIC_PUNTOS_TIPOSCLIENTES_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_TIPOSCLIENTES_AT;')
+    c.execute('DROP PROCEDURE SIC_PUNTOS_TIPOSCLIENTES_AT;')
 
     c.execute( procedures[ 'SIC_PUNTOS_DOCTOSPVDET_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DOCTOSPVDET_AT;')
+    c.execute('DROP PROCEDURE SIC_PUNTOS_DOCTOSPVDET_AT;')
     
     c.execute( procedures[ 'SIC_PUNTOS_DOCTOS_PV_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DOCTOS_PV_AT;')
+    c.execute('DROP PROCEDURE SIC_PUNTOS_DOCTOS_PV_AT;')
 
     #lbres clientes
     c.execute( procedures[ 'SIC_LIBRES_CLIENTES_AT' ] ) 
     c.execute('EXECUTE PROCEDURE SIC_LIBRES_CLIENTES_AT;')
+    c.execute('DROP PROCEDURE SIC_LIBRES_CLIENTES_AT;')
 
     c.execute( procedures[ 'SIC_FILTROS_ARTICULOS_AT' ] )
     c.execute('EXECUTE PROCEDURE SIC_FILTROS_ARTICULOS_AT;')   
+    c.execute('DROP PROCEDURE SIC_FILTROS_ARTICULOS_AT;')   
 
     #inventarios
     c.execute( procedures['SIC_DOCTOINVFISDET_AT'] )
     c.execute("EXECUTE PROCEDURE SIC_DOCTOINVFISDET_AT;")
+    c.execute("DROP PROCEDURE SIC_DOCTOINVFISDET_AT;")
 
     c.execute( procedures['SIC_DESGDISCINVFIS_AT'] )
     c.execute("EXECUTE PROCEDURE SIC_DESGDISCINVFIS_AT;")
+    c.execute("DROP PROCEDURE SIC_DESGDISCINVFIS_AT;")
 
     c.execute( procedures['SIC_DOCTOSINDET_AT'] )
     c.execute("EXECUTE PROCEDURE SIC_DOCTOSINDET_AT;")
-
-    c.execute( procedures['SIC_DOCTOSIN_AT'] )
-    c.execute("EXECUTE PROCEDURE SIC_DOCTOSIN_AT;")
-
+    c.execute("DROP PROCEDURE SIC_DOCTOSINDET_AT;")
 
     transaction.commit_unless_managed()
 
@@ -151,6 +166,28 @@ def actualizar_triggers_inventarios( conexion_name = None ):
     c = connections[ conexion_name ].cursor()
     ####################### TRIGGERS #######################
     c.execute( inventarios_triggers[ 'SIC_PUERTA_INV_DOCTOSIN_BU' ] )
+    transaction.commit_unless_managed()
+
+def borrar_triggers_inventarios( conexion_name = None ):
+    """ Borra los triggers de inventarios """
+
+    c = connections[conexion_name].cursor()
+
+    c.execute( procedures[ 'SIC_PUERTA_DEL_TRIGGERS' ] )
+    c.execute('EXECUTE PROCEDURE SIC_PUERTA_DEL_TRIGGERS;')
+    c.execute('drop PROCEDURE SIC_PUERTA_DEL_TRIGGERS;')
+
+    transaction.commit_unless_managed()
+
+def borrar_triggers_puntodeventa( conexion_name = None ):
+    """ Borra los triggers de punto de venta """
+
+    c = connections[conexion_name].cursor()
+
+    c.execute( procedures[ 'SIC_PUNTOS_DEL_TRIGGERS' ] )
+    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DEL_TRIGGERS;')
+    c.execute('drop PROCEDURE SIC_PUNTOS_DEL_TRIGGERS;')
+
     transaction.commit_unless_managed()
 
 def actualizar_triggers_puntodeventa( conexion_name = None ):
