@@ -565,8 +565,6 @@ def get_existenciasarticulo_byid( request, **kwargs ):
         costo_ultima_compra = detalle_entradas.costo_unitario
 
     for detalle_salidas in detalles_salidas:
-        if not detalle_salidas.detalle_modificaciones:
-            detalle_salidas.detalle_modificaciones = ''
         if not detalle_salidas.detalle_modificacionestime:
             detalle_salidas.detalle_modificacionestime = ''
 
