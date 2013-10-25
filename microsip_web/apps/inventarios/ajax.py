@@ -10,6 +10,7 @@ from django.core import management
 import json
 import datetime, time
 from django.db.models import Q
+from mobi.decorators import detect_mobile
 from decimal import *
 from models import *
 from microsip_web.libs.custom_db.main import next_id, get_existencias_articulo, first_or_none
@@ -314,6 +315,7 @@ def close_inventario_byalmacen_view( request, **kwargs ):
     DoctosIn.objects.filter(almacen__ALMACEN_ID = almacen_id, descripcion='ES INVENTARIO').update(descripcion= 'INVENTARIO CERRADO')
     return simplejson.dumps( { 'mensaje' : 'Inventario cerrado', } ) 
 
+@detect_mobile
 @dajaxice_register( method = 'GET' )
 def add_existenciasarticulo_byajustes_view( request, **kwargs ):
     """ Para agregar existencia a un articulo por ajuste"""
@@ -324,6 +326,10 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
     salida_id = kwargs.get( 'salida_id', None )
     detalle_unidades = Decimal( kwargs.get( 'detalle_unidades', None ) )
     detalle_costo_unitario = Decimal( kwargs.get( 'detalle_costo_unitario', None ) )
+
+
+    if "Chrome" in request.META[ 'HTTP_USER_AGENT' ]:
+       request.mobile = False
 
     datos = add_existenciasarticulo_byajustes(
         articulo_id = articulo_id,
@@ -336,6 +342,8 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
         ubicacion = ubicacion,
         )
 
+    # datos['is_mobile'] = request.mobile
+    
     return HttpResponse( json.dumps( datos ), mimetype = "application/javascript" )
 
 @dajaxice_register( method = 'GET' )
@@ -442,6 +450,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     costo_ultima_compra = 0
     articulo_id = ''
     articulo_nombre = ''
+    articulo_seguimiento = ''
     clave_articulo = first_or_none( ClavesArticulos.objects.exclude( articulo__estatus = 'B').filter( clave = articulo_clave, articulo__seguimiento = 'N' ) )
     opciones_clave = {}
     
@@ -458,6 +467,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
         
         articulo_id = articulo.id
         articulo_nombre = articulo.nombre
+        articulo_seguimiento = articulo.seguimiento
         costo_ultima_compra = None
 
         detalles_all = DoctosInDet.objects.filter(
@@ -509,6 +519,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
         'error_msg' : error,
         'ya_ajustado': ya_ajustado,
         'articulo_id' : articulo_id,
+        'articulo_seguimiento': articulo_seguimiento,
         'articulo_nombre' : articulo_nombre,
         'existencias' : str(inv_fin), 
         'costo_ultima_compra' : str(costo_ultima_compra),
@@ -583,6 +594,7 @@ def get_existenciasarticulo_byid( request, **kwargs ):
     return simplejson.dumps( { 
         'existencias' : int( inv_fin ), 
         'ya_ajustado': ya_ajustado,
+        'articulo_seguimiento' : articulo.seguimiento,
         'costo_ultima_compra' : str(costo_ultima_compra),
         'detalle_modificacionestime': detalle_modificacionestime,
         'detalle_modificacionestime_salidas': detalle_modificacionestime_salidas,

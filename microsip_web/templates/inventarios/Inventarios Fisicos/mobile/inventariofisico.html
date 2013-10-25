@@ -10,45 +10,15 @@
 {% block js_code %}
 {% include 'autocomplete_light/static.html' %}
 <script src="{{STATIC_URL}}js/inventarios.ajustes.js" ></script>
-<script type="text/javascript">
-function limpiarForm()
-{
-  $("#id_unidades, #id_claveArticulo, #id_articulo_text").val('');
-  $("#span_alerta_unidades").html("");
-  $("#buscar_btn, .span_clave").show();
-  $(".span_unidades, #cancelar_btn").hide();
-  if ($("#chbx_modorapido").is(':checked'))
-  {
-    $(".span_articulo, #span_nombre_articulo").hide();
-    $(".span_clave").show();
-    $("#id_claveArticulo").focus();
-  }
-  else
-  {
-    if ( $("#id_articulo-deck").children().length != 0) 
-      deselecionarArticulo();
-
-    $(".span_clave").hide();
-    $(".span_articulo, #id_articulo_text, #span_nombre_articulo").show();
-    $("#id_articulo-text").focus();
-  }
-}
-
-$(document).ready(function(){
-  
-  $("#id_articulo_text").before("<span class='add-on' id='span_nombre_articulo'>Nombre</span>")
-  //limpiarForm();
-});
-
-</script>
+<script src="{{STATIC_URL}}js/inventarios.ajustes.mobile.js" ></script>
 {% endblock %}
 
 {% block breadcrumb %}{% endblock %}
 {% block content %}
-<div id="modal_opciones-claves" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div id="modal_movimientos_articulo" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 id="myModalLabel">Claves</h3>
+    <h3 id="myModalLabel">Detalle de Movimientos</h3>
   </div>
   <div class="modal-body">
   </div>
@@ -60,7 +30,7 @@ $(document).ready(function(){
       <div class='span all_screen' >
         <label class="small_screen"> Ubicacion</label> 
         <input class="input-small" id="id_ubicacion" name="ubicacion" placeholder="Ubicacion.." type="text">  
-        <input type="checkbox" id="chbx_modorapido" value="ham" onclick="" /><div class="small_screen" style="font-size: .8em;">Rapido</div>
+        <input type="checkbox" id="chbx_modorapido" value="ham" onclick="limpiarForm();" /><div class="small_screen" style="font-size: .8em;">Rapido</div>
       </div>
     </div>
   </div>
@@ -83,7 +53,11 @@ $(document).ready(function(){
     <div class="input-prepend input-append">
       {{ form.articulo }}
     </div>
-    <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 0, 0); color: white;"> </span>
+    <div>
+      <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 0, 0); color: white;"> </span>
+      <span id='span_ya_ajustado' class="text-error" style=" background-color: rgb(20, 122, 11); color: white; padding: .2em 2em;"> ya ajustado </span>
+      <span id='span_sin_ajustado' class="text-error" style=" background-color: rgb(224, 132, 14); color: white; padding: .2em 2em;"> sin ajustar </span>
+    </div>
   </div>
   <a id="buscar_btn" class= "btn btn-primary span12 " href="#" onclick="buscar_articulo()" ><i class="icon-search icon-white"></i> <br>Buscar</a>
   <div class="span1 span_unidades" >

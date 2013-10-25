@@ -13,6 +13,34 @@
 {% block breadcrumb %}{{ block.super }}Inventarios por ajustes{% endblock %}
 {% block content %}
 <!-- MODALES -->
+
+<div id="modal_series" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="myModalLabel">Numeros de serie</h3>
+  </div>
+  <div class="modal-body">
+    <table class="table tableCell table-hover tablesorter" id='table_numeros_serie' border="0" cellpadding="0" cellspacing="1">
+      <thead>
+        <tr>
+          <th >Numeros de series</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="sortable">
+
+     </tbody>
+   </table>
+  </div>
+  <div><h5>Numeros de serie actuales</h5></div>
+  <div id="div_numeroserie_actuales">
+  </div>
+  <div class="modal-footer">
+    <button class="btn" id='btnCancel' data-dismiss="modal">Cancelar</button>
+    <button type="submit" class="btn" name='add_seies_btn'>Aceptar</button>
+  </div>
+</div>
+
 <div id="modal_movimientos_articulo" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -164,6 +192,7 @@
     <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 0, 0); color: white; padding: .2em 2em;"> </span>
     <span id='span_ya_ajustado' class="text-error" style=" background-color: rgb(20, 122, 11); color: white; padding: .2em 2em;"> ya ajustado </span>
     <span id='span_sin_ajustado' class="text-error" style=" background-color: rgb(224, 132, 14); color: white; padding: .2em 2em;"> sin ajustar </span>
+    <input type="hidden" id="articulo_seguimiento" value=""/>
   </div>
   <div class="input-prepend input-append">
     {{ form.unidades }} 
