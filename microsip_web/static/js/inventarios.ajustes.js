@@ -77,7 +77,6 @@ function mostrar_articulos_agregados(data)
 /* Modificar existencias */
 function add_existenciasarticulo_byajuste()
 {
-
   if ( $("#articulo_seguimiento").val() == 'S' )
   {
     var inputs_html = ''
@@ -87,12 +86,13 @@ function add_existenciasarticulo_byajuste()
     }   
     $("#table_numeros_serie > tbody").html(inputs_html);
     $("#modal_series").modal();
+
     return;
   }
 
   if ( $('#id_unidades').val() != '' && $.isNumeric($('#id_unidades').val()) && $('#id_articulo option:selected').val() != undefined && ( ( $('#puede_modificar_costos').val() == 'True'  && $('#id_costo_unitario').val() != '' && $.isNumeric($('#id_costo_unitario').val()) == true)  || ($('#puede_modificar_costos').val() == 'False') ) ) 
   { 
-    var costo_unitario = 0
+    var costo_unitario = 0;
     if ( $('#puede_modificar_costos').val() == 'True' )
       costo_unitario = $("#id_costo_unitario").val()
     Dajaxice.microsip_web.apps.inventarios.add_existenciasarticulo_byajustes_view(resultado,{
@@ -141,8 +141,10 @@ function add_existenciasarticulo_byajuste()
 
 function resultado(data)
 {
-  if (data.is_mobile == 'False' )
+  if (data.is_mobile == false )
     window.location = "/inventarios/inventariofisico_ajustes/"+data.alamcen_id+"/";
+  else
+    limpiarForm();
 }
 
 /* Mostrar articulo */
@@ -176,6 +178,9 @@ function cargar_articulo( articulo_id, articulo_nombre, existencias, costo_ultim
 /* Mostrar articulo > detalles*/
 function cargar_detallesmovimientos_articulo(entradas_detalles, salidas_detalles, existencias, ya_ajustado, seguimiento)
 {
+  $(".span_clave").hide();
+  $(".span_articulo, #span_nombre_articulo").show();
+
   $("#articulo_seguimiento").val(seguimiento);
   if (ya_ajustado == true)
   {
@@ -217,17 +222,18 @@ function cargar_detallesmovimientos_articulo(entradas_detalles, salidas_detalles
 /* Buscar articulo */
 function mostrar_articulo_byclave(data)
 {
+  
   if (data.error_msg == "no_existe_clave")
   {
-    var opciones = data.opciones_clave
-    var html_var = "<table><tr><th>Clave</th><th>Articulo</td><tr/>"
-    var no_opciones = 0
+    var opciones = data.opciones_clave;
+    var html_var = "<table><tr><th>Clave</th><th>Articulo</td><tr/>";
+    var no_opciones = 0;
     for (art in opciones)
     { 
       no_opciones = no_opciones +  1;
       html_var = html_var + "<tr><td><a href='#' class='clave_link'>" + art + "</a></td>" + "<td>" + opciones[art] + "</td></tr>"
     }
-    html_var = html_var + "</table>"
+    html_var = html_var + "</table>";
     if (no_opciones > 0)
     {
       $("#modal_opciones-claves > .modal-body").html(html_var);
@@ -240,7 +246,6 @@ function mostrar_articulo_byclave(data)
           'entrada_id' : $("#entrada_id").val(),
         });
       });
-
       $("#modal_opciones-claves").modal();
     }
     else
@@ -294,20 +299,26 @@ function load_localstorage()
   });
 }
 
+function buscarClave()
+{
+  if( $("#id_claveArticulo").val() != '' )
+    Dajaxice.microsip_web.apps.inventarios.get_existenciasarticulo_byclave(mostrar_articulo_byclave,{
+      'articulo_clave': $("#id_claveArticulo").val(), 
+      'almacen': $("#almacen_nombre").val(), 
+      'entrada_id' : $("#entrada_id").val(),
+    });
+  else
+    $("#id_articulo_text").focus();
+}
+
 $('#id_claveArticulo').live('keydown', function(e) { 
   var keyCode = e.keyCode || e.which; 
 
   if (keyCode == 13 || keyCode == 9) 
   { 
-    if($("#id_claveArticulo").val() != '')
-      Dajaxice.microsip_web.apps.inventarios.get_existenciasarticulo_byclave(mostrar_articulo_byclave,{
-        'articulo_clave': $('#id_claveArticulo').val(), 
-        'almacen': $("#almacen_nombre").val(), 
-        'entrada_id' : $("#entrada_id").val(),
-      });
-    else
-      $("#id_articulo_text").focus();
-    return false
+
+    buscarClave();
+    /*return false*/
   }
 
 });

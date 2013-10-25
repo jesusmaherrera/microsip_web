@@ -34,7 +34,7 @@ import fdb
 from microsip_web.settings.common import MICROSIP_DATABASES, DATABASES
 from django.db.models import Sum
 from microsip_web.apps.config.models import DerechoUsuario
-
+@detect_mobile
 @login_required( login_url = '/login/' )
 def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.html' ):
     connection_name = get_conecctionname(request.session)
@@ -43,7 +43,15 @@ def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.ht
 
     almacenes = Almacenes.objects.all()
 
-    c = { 'almacenes': almacenes, }
+    if "Chrome" in request.META[ 'HTTP_USER_AGENT' ]:
+       request.mobile = False
+       
+    if request.mobile:
+        url_inventario = '/inventarios/inventariofisico_ajustesmobile/'
+    else:
+        url_inventario = '/inventarios/inventariofisico_ajustes/'
+
+    c = { 'almacenes': almacenes, 'url_inventario': url_inventario, }
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
 @login_required(login_url='/login/')
@@ -326,7 +334,7 @@ def invetariosfisicos_view( request, template_name = 'inventarios/Inventarios Fi
        request.mobile = False
        
     if request.mobile:
-        url_inventario = '/inventarios/inventarioFisico_mobile/'
+        url_inventario = '/inventarios/inventariofisicomobile/'
     else:
         url_inventario = '/inventarios/inventariofisico/'
 

@@ -342,7 +342,8 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
         ubicacion = ubicacion,
         )
 
-    # datos['is_mobile'] = request.mobile
+    #datos['is_mobile'] = request.mobile
+    datos['is_mobile'] = True
     
     return HttpResponse( json.dumps( datos ), mimetype = "application/javascript" )
 

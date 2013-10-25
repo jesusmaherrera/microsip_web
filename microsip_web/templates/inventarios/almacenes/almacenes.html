@@ -25,7 +25,7 @@
     {% for almacen in almacenes %}
     </tr>
       <td>{{ almacen.nombre }}</td>
-      <td><a href="/inventarios/inventariofisico_ajustes/{{ almacen.ALMACEN_ID }}/">Inventario fisico</a></td>
+      <td><a href="{{ url_inventario }}{{ almacen.ALMACEN_ID }}/">Inventario fisico</a></td>
     </tr>
     {% endfor %}
 </table>
