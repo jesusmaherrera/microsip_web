@@ -37,6 +37,8 @@ from microsip_web.apps.config.models import DerechoUsuario
 @detect_mobile
 @login_required( login_url = '/login/' )
 def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.html' ):
+    ''' Muestra almacenes con link para entrar a hacer inventario en cada uno de ellos  '''
+
     connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
@@ -56,6 +58,8 @@ def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.ht
 
 @login_required(login_url='/login/')
 def ArticuloManageView(request, id, template_name='inventarios/articulos/articulo_mobile.html'):
+    ''' Modificacion de datos de un articulo '''
+
     articulo = get_object_or_404(Articulos, pk=id)
 
     clavesarticulos_fromset = modelformset_factory(ClavesArticulos, form= claves_articulos_form, can_delete=True,)
@@ -120,6 +124,8 @@ def ArticuloManageView(request, id, template_name='inventarios/articulos/articul
 
 @login_required(login_url='/login/')
 def select_db(request, template_name='main/select_db.html'):
+    ''' Para seleccionar base de datos con la que se desea trabjar '''
+
     form = SelectDBForm(request.POST or None, usuario= request.user, conexion_activa = request.session['conexion_activa'])
     message = ''
     conexion_activa = request.session['conexion_activa']
@@ -137,6 +143,8 @@ def select_db(request, template_name='main/select_db.html'):
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 def ingresar(request):
+    ''' logea un usuario '''
+
     message = ''
     formulario = CustomAuthenticationForm(request.POST or None)
     
@@ -160,6 +168,8 @@ def ingresar(request):
     return render_to_response('main/login.html',{'form':formulario, 'message':message,}, context_instance=RequestContext(request))
 
 def logoutUser(request):
+    ''' Deslogea un usuario '''
+    
     try:
         del request.session['selected_database']
         del request.session['conexion_activa']
@@ -183,6 +193,8 @@ def c_get_next_key(connection_name = None ):
 ##########################################
 
 def ajustes_get_or_create( almacen_id = None, connection_name = None, username = '' ):
+    ''' Funcion obtener o crear documentos de entrada y salida para trabajar ccon inventario por ajustes'''
+
     fecha_actual = datetime.now()
     almacen = Almacenes.objects.get( pk = almacen_id )
     conecpto_ajuste_salida = ConceptosIn.objects.get( pk = 38 )
@@ -239,10 +251,14 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
     return entrada, salida
 
 def allow_microsipuser( username = None, clave_objeto=  None ):
+    ''' Checa si el usuario indicado tiene el pribilegio indicado '''
+
     return DerechoUsuario.objects.filter(usuario__nombre = username, clave_objeto = clave_objeto).exists() or username == 'SYSDBA'
     
 @login_required( login_url = '/login/' )
 def invetariofisico_manageview( request, almacen_id = None, template_name = 'inventarios/inventarios_fisicos/inventariofisico.html' ):
+    ''' Crea una vista de la pantalla para inventarios fisicos a puerta abierta por medio de ajustes '''
+
     connection_name = get_conecctionname( request.session )
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
@@ -301,6 +317,7 @@ def invetariofisico_manageview( request, almacen_id = None, template_name = 'inv
 
 @login_required( login_url = '/login/' )
 def invetariofisicomobile_manageView( request, almacen_id = None, template_name = 'inventarios/inventarios_fisicos/mobile/inventariofisico.html' ):
+    ''' Crea vista de panttalla para un inventario fisico a puerta abiera por ajustes pero con un diseño para un mobile '''
     connection_name = get_conecctionname(request.session)
     form = DoctoInDetManageForm( request.POST or None )
 
@@ -323,6 +340,8 @@ def invetariofisicomobile_manageView( request, almacen_id = None, template_name 
 @detect_mobile
 @login_required( login_url = '/login/' )
 def invetariosfisicos_view( request, template_name = 'inventarios/inventarios_fisicos/inventariosfisicos.html' ):
+    ''' Muestra inventarios fisicos abiertos  '''
+
     connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
@@ -341,6 +360,8 @@ def invetariosfisicos_view( request, template_name = 'inventarios/inventarios_fi
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
 def inventario_getnew_folio():
+    ''' Obtiene el siguente folio automatico de un inventario '''
+
     registro_folioinventario = Registry.objects.get( nombre = 'SIG_FOLIO_INVFIS' )
     folio = registro_folioinventario.valor 
     siguiente_folio = "%09d" % ( int( folio ) +1 )
@@ -350,6 +371,8 @@ def inventario_getnew_folio():
 
 @login_required( login_url = '/login/' )
 def invetarioFisico_delete( request, id = None ):
+    ''' Borra un inventario fisico '''
+
     inventario_fisico = get_object_or_404(DoctosInvfis, pk=id)
     inventario_fisico.delete()
 
