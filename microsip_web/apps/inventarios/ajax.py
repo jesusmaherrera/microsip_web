@@ -361,6 +361,24 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     ya_ajustado = False
     if clave_articulo:
         articulo = Articulos.objects.get( pk = clave_articulo.articulo.id )
+
+        detalles_all = DoctosInDet.objects.filter(
+            Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
+            articulo = articulo,
+            almacen = almacen,
+            doctosIn__descripcion = 'ES INVENTARIO').order_by('fechahora_ult_modif')
+        
+        if detalles_all:
+            ya_ajustado = True
+        else:
+            c = connections[ connection_name ].cursor()
+            c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% articulo.id )
+            c.execute( "EXECUTE PROCEDURE RECALC_SALDOS_ART_IN %s;"% articulo.id )
+            transaction.commit_unless_managed()
+            c.close()
+
+            management.call_command( 'syncdb', database = connection_name )
+
         entradas, salidas, existencias, inv_fin = get_existencias_articulo(
             articulo_id = articulo.id,
             connection_name = connection_name, 
@@ -371,12 +389,6 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
         articulo_nombre = articulo.nombre
         articulo_seguimiento = articulo.seguimiento
         costo_ultima_compra = None
-
-        detalles_all = DoctosInDet.objects.filter(
-            Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
-            articulo = articulo,
-            almacen = almacen,
-            doctosIn__descripcion = 'ES INVENTARIO').order_by('fechahora_ult_modif')
 
         detalles_entradas = DoctosInDet.objects.filter(
             Q( doctosIn__concepto = 27 ),
@@ -402,8 +414,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
             detalle_modificacionestime_salidas = detalle_modificacionestime_salidas + detalle_salidas.detalle_modificacionestime
             #costo_ultima_compra = detalle_salidas.costo_unitario
         
-        if detalles_all:
-            ya_ajustado = True
+
 
         #Si no existe un costo ya asignado se asigna el del articulo    
         if not costo_ultima_compra:
@@ -446,6 +457,24 @@ def get_existenciasarticulo_byid( request, **kwargs ):
     costo_ultima_compra = None
     
     articulo = Articulos.objects.get( pk = articulo_id )
+
+    detalles_all = DoctosInDet.objects.filter(
+        Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
+        articulo = articulo,
+        almacen = almacen,
+        doctosIn__descripcion = 'ES INVENTARIO').order_by('fechahora_ult_modif')
+
+    if detalles_all:
+        ya_ajustado = True
+    else:
+        c = connections[ connection_name ].cursor()
+        c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% articulo.id )
+        c.execute( "EXECUTE PROCEDURE RECALC_SALDOS_ART_IN %s;"% articulo.id )
+        transaction.commit_unless_managed()
+        c.close()
+
+        management.call_command( 'syncdb', database = connection_name )
+
     entradas, salidas, existencias, inv_fin = get_existencias_articulo(
         articulo_id = articulo_id , 
         connection_name = connection_name, 
@@ -464,12 +493,6 @@ def get_existenciasarticulo_byid( request, **kwargs ):
         almacen = almacen,
         doctosIn__descripcion = 'ES INVENTARIO').order_by('fechahora_ult_modif')
 
-    detalles_all = DoctosInDet.objects.filter(
-        Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
-        articulo = articulo,
-        almacen = almacen,
-        doctosIn__descripcion = 'ES INVENTARIO').order_by('fechahora_ult_modif')
-
     for detalle_entradas in detalles_entradas:
         if not detalle_entradas.detalle_modificacionestime:
             detalle_entradas.detalle_modificacionestime = ''
@@ -483,8 +506,6 @@ def get_existenciasarticulo_byid( request, **kwargs ):
 
         detalle_modificacionestime_salidas = detalle_modificacionestime_salidas + detalle_salidas.detalle_modificacionestime
         #costo_ultima_compra = detalle_salidas.costo_unitario
-    if detalles_all:
-        ya_ajustado = True
 
     #Si no existe un costo ya asignado se asigna el del articulo    
     if not costo_ultima_compra:
