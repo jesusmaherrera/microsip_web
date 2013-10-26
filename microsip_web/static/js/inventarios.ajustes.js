@@ -119,7 +119,6 @@ function add_existenciasarticulo_byajuste()
 
   if ( ( $('#puede_modificar_costos').val() == 'True'  && $('#id_costo_unitario').val() != '' && $.isNumeric($('#id_costo_unitario').val()) == true)  || ($('#puede_modificar_costos').val() == 'False') )
   { 
-
     var costo_unitario = 0;
     if ( $('#puede_modificar_costos').val() == 'True' )
       costo_unitario = $("#id_costo_unitario").val()

@@ -210,7 +210,7 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
     entrada2_id = kwargs.get( 'entrada2_id', None )
     salida2_id = kwargs.get( 'salida2_id', None )
     almacen_sinventas = first_or_none( Almacenes.objects.filter( nombre = 'Almacen sin ventas' ))
-    if almacen_sinventas:
+    if almacen_sinventas and entrada2_id and salida2_id:
 
         add_existenciasarticulo_byajustes(
         articulo_id = articulo_id,
