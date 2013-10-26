@@ -78,6 +78,32 @@ function mostrar_articulos_agregados(data)
 /* Modificar existencias */
 function add_existenciasarticulo_byajuste()
 {
+  if ($('#id_ubicacion').val() == '')
+  {
+    alert("El campo ubicacion es obligatorio");
+    $("#id_ubicacion").focus();
+    return;
+  }
+  else if ($('#id_articulo option:selected').val() == undefined)
+  {
+    alert("El campo articulo es obligatorio");
+    $("#id_articulo_text").focus();
+    return;
+  }
+  else if ($('#id_unidades').val() == '')
+  { 
+    alert("El campo unidades es obligatorio");
+    $("#id_unidades").focus();
+    return;
+  }
+  else if ($.isNumeric($('#id_unidades').val()) == false )
+  {
+    alert("Unidades incorrectas");
+    $("#id_unidades").focus();
+    return;
+  }
+  
+
   if ( $("#articulo_seguimiento").val() == 'S' )
   {
     var inputs_html = ''
@@ -91,8 +117,9 @@ function add_existenciasarticulo_byajuste()
     return;
   }
 
-  if ( $('#id_unidades').val() != '' && $.isNumeric($('#id_unidades').val()) && $('#id_articulo option:selected').val() != undefined && ( ( $('#puede_modificar_costos').val() == 'True'  && $('#id_costo_unitario').val() != '' && $.isNumeric($('#id_costo_unitario').val()) == true)  || ($('#puede_modificar_costos').val() == 'False') ) ) 
+  if ( ( $('#puede_modificar_costos').val() == 'True'  && $('#id_costo_unitario').val() != '' && $.isNumeric($('#id_costo_unitario').val()) == true)  || ($('#puede_modificar_costos').val() == 'False') )
   { 
+
     var costo_unitario = 0;
     if ( $('#puede_modificar_costos').val() == 'True' )
       costo_unitario = $("#id_costo_unitario").val()
@@ -113,32 +140,18 @@ function add_existenciasarticulo_byajuste()
   }
   else
   {
-    if ($('#id_articulo option:selected').val() == undefined)
-    {
-      alert("El campo articulo es obligatorio");
-      $("#id_articulo_text").focus();
-    }
-    else if ($('#id_unidades').val() == '')
-    { 
-      alert("El campo unidades es obligatorio");
-      $("#id_unidades").focus();
-    }
-    else if ($.isNumeric($('#id_unidades').val()) == false )
-    {
-      alert("Unidades incorrectas");
-      $("#id_unidades").focus();
-    }
-    else if ($('#id_costo_unitario').val() == '')
+    if ($('#id_costo_unitario').val() == '')
     { 
       alert("El campo costo unitario es obligatorio");
       $("#id_costo_unitario").focus();
+      return;
     }
     else if ($.isNumeric($('#id_costo_unitario').val()) == false )
     {
-      alert("Costo unitario incorrectO");
+      alert("Costo unitario incorrecto");
       $("#id_costo_unitario").focus();
+      return;
     }
-    
   }
 }
 
