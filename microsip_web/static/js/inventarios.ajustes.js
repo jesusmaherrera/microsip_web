@@ -67,7 +67,7 @@ function mostrar_articulos_agregados(data)
   else
     alert('No hay articulos por inicializar');
 
-  window.location = "/inventarios/inventariofisico_ajustes/" + $( "#almacen_id" ).val() + "/";
+  window.location = "/inventarios/inventariofisico/" + $( "#almacen_id" ).val() + "/";
   
   // if (!Modernizr.localstorage) 
   //   window.location = "/inventarios/inventariofisico/{{ inventario_id }}/1/";
@@ -143,7 +143,7 @@ function add_existenciasarticulo_byajuste()
 function resultado(data)
 {
   if (data.is_mobile == false )
-    window.location = "/inventarios/inventariofisico_ajustes/"+data.alamcen_id+"/";
+    window.location = "/inventarios/inventariofisico/"+data.alamcen_id+"/";
   else
     limpiarForm();
 }
