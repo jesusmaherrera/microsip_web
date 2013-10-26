@@ -63,10 +63,11 @@ function mostrar_articulos_agregados(data)
     if (data.articulo_pendientes > 0)
       mensaje = 'La aplicacion solo genero ' + data.articulos_agregados+ ' Articulos, faltaron de generar '+data.articulo_pendientes + ' Articulos.'
     alert(mensaje);
-    window.location = "/inventarios/inventariofisico_ajustes/" + $( "#almacen_id" ).val() + "/";
   }
   else
     alert('No hay articulos por inicializar');
+
+  window.location = "/inventarios/inventariofisico_ajustes/" + $( "#almacen_id" ).val() + "/";
   
   // if (!Modernizr.localstorage) 
   //   window.location = "/inventarios/inventariofisico/{{ inventario_id }}/1/";
