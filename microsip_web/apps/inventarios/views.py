@@ -82,8 +82,8 @@ def ArticuloManageView(request, id, template_name='inventarios/articulos/articul
     # precio_articulo_form = precios_articulos_form(request.POST or None, instance=precio_articulo)
     impuesto_articulo_form = impuestos_articulos_form(request.POST or None, instance=impuesto_articulo)
 
-    #Si los datos de los formularios son correctos
-    if articulo_form.is_valid()  and impuesto_articulo_form.is_valid() and formset.is_valid(): #and #precios_formset.is_valid()
+    #Si los datos de los formularios son correctos # and 
+    if articulo_form.is_valid() and formset.is_valid() and impuesto_articulo_form.is_valid(): #and #precios_formset.is_valid()
         articulo_form.save()
 
         for form in formset :
@@ -104,7 +104,11 @@ def ArticuloManageView(request, id, template_name='inventarios/articulos/articul
 
         precios_formset.save()
 
-        impuesto_articulo_form.save()
+        impuesto_articulo_form.save(commit = False)
+        if not impuesto_articulo.id:
+            impuesto_articulo.id = -1
+        impuesto_articulo.articulo = articulo
+        impuesto_articulo.save()
 
         return HttpResponseRedirect('/inventarios/articulos/')
 
