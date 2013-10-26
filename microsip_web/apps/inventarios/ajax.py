@@ -55,8 +55,10 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     entrada = DoctosIn.objects.get( pk = entrada_id )
     salida_id = kwargs.get( 'salida_id', None )
     salida = DoctosIn.objects.get( pk = salida_id )
+    
+    almacen_id = kwargs.get( 'almacen_id', None )
+    almacen = Almacenes.objects.get( pk = almacen_id)
 
-    almacen = entrada.almacen
     request_session = kwargs.get( 'request_session', 0 )
     request_user = kwargs.get( 'request_user', 0 )
     connection_name = get_conecctionname( request_session )
@@ -175,7 +177,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
 
     management.call_command( 'syncdb', database = connection_name )
 
-    datos = {'error_message': '', 'alamcen_id': entrada.almacen.ALMACEN_ID, }
+    datos = {'error_message': '', 'alamcen_id': almacen.ALMACEN_ID, }
     
     return datos
 
@@ -198,10 +200,28 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
     salida_id = kwargs.get( 'salida_id', None )
     detalle_unidades = Decimal( kwargs.get( 'detalle_unidades', None ) )
     detalle_costo_unitario = Decimal( kwargs.get( 'detalle_costo_unitario', None ) )
-
+    entrada = DoctosIn.objects.get( pk = entrada_id )
+    almacen_id = entrada.almacen.ALMACEN_ID
 
     if "Chrome" in request.META[ 'HTTP_USER_AGENT' ]:
        request.mobile = False
+
+    #Para dos almacenes
+    entrada2_id = kwargs.get( 'entrada2_id', None )
+    salida2_id = kwargs.get( 'salida2_id', None )
+    almacen_sinventas = first_or_none( Almacenes.objects.filter( nombre = 'Almacen sin ventas' ))
+    if almacen_sinventas:
+
+        add_existenciasarticulo_byajustes(
+        articulo_id = articulo_id,
+        entrada_id = entrada2_id,
+        salida_id = salida2_id,
+        detalle_unidades = detalle_unidades,
+        request_session = request.session,
+        request_user = request.user,
+        ubicacion = ubicacion,
+        almacen_id = almacen_sinventas.ALMACEN_ID,
+        )
 
     datos = add_existenciasarticulo_byajustes(
         articulo_id = articulo_id,
@@ -212,7 +232,9 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
         request_session = request.session,
         request_user = request.user,
         ubicacion = ubicacion,
+        almacen_id = almacen_id,
         )
+
 
     datos['is_mobile'] = request.mobile
     
@@ -224,12 +246,19 @@ def add_articulossinexistencia( request, **kwargs ):
     #Paramentros
     ubicacion = kwargs.get( 'ubicacion', None )
     entrada_id = kwargs.get( 'entrada_id', None )
+    entrada = DoctosIn.objects.get( pk = entrada_id )
+    almacen = entrada.almacen
+
     salida_id = kwargs.get( 'salida_id', None )
 
     salida = DoctosIn.objects.get( pk = salida_id )
     entrada = DoctosIn.objects.get( pk = entrada_id )
 
-    articulos_endocumentos = DoctosInDet.objects.filter( Q( doctosIn = entrada ) | Q( doctosIn = salida ) ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True )
+    articulos_endocumentos = list( set( DoctosInDet.objects.filter(
+        Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
+        almacen = almacen,
+        doctosIn__descripcion = 'ES INVENTARIO'
+        ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True ) ) )
     articulos_sinexistencia = Articulos.objects.exclude( estatus = 'B').filter( es_almacenable = 'S', seguimiento='N').exclude(pk__in = articulos_endocumentos ).order_by( '-id' ).values_list( 'id', flat = True )
     
     total_articulos_sinexistencia = articulos_sinexistencia.count()
@@ -250,6 +279,7 @@ def add_articulossinexistencia( request, **kwargs ):
                     request_session = request.session,
                     request_user = request.user,
                     ubicacion = ubicacion,
+                    almacen_id = almacen.ALMACEN_ID,
                     )
             detalles_en_ceros = detalles_en_ceros + 1
             
@@ -267,7 +297,6 @@ def add_articulossinexistencia_bylinea( request, **kwargs ):
     entrada_id = kwargs.get( 'entrada_id', None )
     salida_id = kwargs.get( 'salida_id', None )
 
-    salida = DoctosIn.objects.get( pk = salida_id )
     entrada = DoctosIn.objects.get( pk = entrada_id )
     linea = LineaArticulos.objects.get( pk = linea_id )
     almacen = entrada.almacen
@@ -298,6 +327,7 @@ def add_articulossinexistencia_bylinea( request, **kwargs ):
                     request_session = request.session,
                     request_user = request.user,
                     ubicacion = ubicacion,
+                    almacen_id = almacen.ALMACEN_ID
                     )
             detalles_en_ceros = detalles_en_ceros + 1
             

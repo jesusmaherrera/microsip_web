@@ -26,7 +26,7 @@ import xlrd
 from mobi.decorators import detect_mobile
 from models import *
 from forms import *
-from microsip_web.libs.custom_db.main import next_id, get_existencias_articulo, runsql_rows, get_conecctionname
+from microsip_web.libs.custom_db.main import next_id, get_existencias_articulo, runsql_rows, get_conecctionname, first_or_none
 from microsip_web.libs.tools import split_seq
 from triggers import triggers
 from microsip_web.apps.config.models import *
@@ -268,7 +268,14 @@ def invetariofisico_manageview( request, almacen_id = None, template_name = 'inv
         return HttpResponseRedirect( '/select_db/' )
 
     entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, connection_name = connection_name, username = request.user.username)
-    
+
+    almacen_sinventas = first_or_none( Almacenes.objects.filter( nombre = 'Almacen sin ventas' ))
+
+    entrada2_id, salida2_id = None, None
+    if almacen_sinventas:
+        entrada2, salida2 = ajustes_get_or_create(almacen_id = almacen_sinventas.ALMACEN_ID, connection_name = connection_name, username = request.user.username)
+        entrada2_id = entrada2.id 
+        salida2_id = salida2.id
     
     puede_modificar_costos = allow_microsipuser( username = request.user.username, clave_objeto = 469)
 
@@ -316,6 +323,8 @@ def invetariofisico_manageview( request, almacen_id = None, template_name = 'inv
         'folio_salida': salida.folio, 
         'entrada_id' : entrada.id,
         'salida_id' : salida.id,
+        'entrada2_id' : entrada2_id,
+        'salida2_id' : salida2_id,
         }
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
