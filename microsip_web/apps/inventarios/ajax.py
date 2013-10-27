@@ -162,7 +162,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     detalle_ajuste = '' 
     if not existe_en_detalles:   
         detalle_ajuste = '(AJ.=%s)'%detalle.unidades
-    detalle.detalle_modificacionestime += '%s %s/%s=%s%s $%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_user.username, ubicacion, detalle_unidades, detalle_ajuste, detalle.costo_unitario )
+    detalle.detalle_modificacionestime += '%s %s/%s=%s%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_user.username, ubicacion, detalle_unidades, detalle_ajuste)
 
     if es_nuevo:
         detalle.save()
