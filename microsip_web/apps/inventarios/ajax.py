@@ -140,19 +140,19 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     
     #MODIFICA COSTOS
     #Si es entrada y tiene pribilegios modifica el costo unitario
-    if puede_modificar_costos and detalle.tipo_movto == 'E':
-       detalle.costo_unitario = detalle_costo_unitario 
-    else:
-        detalle_costo_unitario = first_or_none( DoctosInDet.objects.filter(
-            Q( doctosIn__concepto = 27 ),
-            articulo = articulo,
-            almacen = almacen,
-            doctosIn__descripcion = 'ES INVENTARIO'
-            ).order_by('-fechahora_ult_modif').values_list( 'costo_unitario', flat = True ) )      
-        
-        if not detalle_costo_unitario:
-            detalle_costo_unitario = articulo.costo_ultima_compra
+    # if puede_modificar_costos and detalle.tipo_movto == 'E':
+    #    detalle.costo_unitario = detalle_costo_unitario 
+    # else:
+    # detalle_costo_unitario = first_or_none( DoctosInDet.objects.filter(
+    #     Q( doctosIn__concepto = 27 ),
+    #     articulo = articulo,
+    #     almacen = almacen,
+    #     doctosIn__descripcion = 'ES INVENTARIO'
+    #     ).order_by('-fechahora_ult_modif').values_list( 'costo_unitario', flat = True ) )      
     
+    # if not detalle_costo_unitario:
+    detalle_costo_unitario = articulo.costo_ultima_compra
+    detalle.costo_unitario = detalle_costo_unitario
     detalle.costo_total = detalle.unidades * detalle.costo_unitario
     detalle.fechahora_ult_modif = datetime.now()
 
