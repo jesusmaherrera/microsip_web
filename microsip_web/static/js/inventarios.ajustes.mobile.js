@@ -22,6 +22,7 @@ function limpiarForm()
     $(".span_articulo, #id_articulo_text, #span_nombre_articulo").show();
     $("#id_articulo-text").focus();
   }
+  $("#label_linea").html("");
 }
 
 function deselecionarArticulo()

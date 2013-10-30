@@ -38,7 +38,6 @@ def ajustar_existencias( **kwargs ):
         )
 
     unidades_a_insertar = -inv_fin + ajustar_a
-
     return unidades_a_insertar
 
 def add_existenciasarticulo_byajustes( **kwargs ):
@@ -178,7 +177,14 @@ def add_existenciasarticulo_byajustes( **kwargs ):
 
     management.call_command( 'syncdb', database = connection_name )
 
-    datos = {'error_message': '', 'alamcen_id': almacen.ALMACEN_ID, }
+    entradasx, salidasx, existenciasx, exitencia = get_existencias_articulo(
+        articulo_id = articulo.id, 
+        connection_name = connection_name, 
+        fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
+        almacen = almacen, 
+        )
+
+    datos = {'error_message': '', 'alamcen_id': almacen.ALMACEN_ID, 'articulo_nombre': articulo.nombre, 'existencia_actual': str(exitencia) }
     
     return datos
 
@@ -352,6 +358,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     #variables de salida
     error = ""
     inv_fin = 0
+    articulo_linea = ''
     costo_ultima_compra = 0
     articulo_id = ''
     articulo_nombre = ''
@@ -390,6 +397,11 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
         
         articulo_id = articulo.id
         articulo_nombre = articulo.nombre
+        try:
+            articulo_linea = articulo.linea.nombre
+        except ObjectDoesNotExist:
+            articulo_linea = 'No indicada aun'
+
         articulo_seguimiento = articulo.seguimiento
         costo_ultima_compra = None
 
@@ -442,6 +454,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
         'opciones_clave': opciones_clave,
         'detalle_modificacionestime': detalle_modificacionestime,
         'detalle_modificacionestime_salidas': detalle_modificacionestime_salidas,
+        'articulo_linea' : articulo_linea,
         }
     return HttpResponse( json.dumps( datos ), mimetype = "application/javascript" )
 
@@ -517,6 +530,11 @@ def get_existenciasarticulo_byid( request, **kwargs ):
     if not detalle_modificacionestime:
         detalle_modificacionestime = ''
 
+    try:
+        articulo_linea = articulo.linea.nombre
+    except ObjectDoesNotExist:
+        articulo_linea = 'No indicada aun'
+
     return simplejson.dumps( { 
         'existencias' : int( inv_fin ), 
         'ya_ajustado': ya_ajustado,
@@ -524,4 +542,5 @@ def get_existenciasarticulo_byid( request, **kwargs ):
         'costo_ultima_compra' : str(costo_ultima_compra),
         'detalle_modificacionestime': detalle_modificacionestime,
         'detalle_modificacionestime_salidas': detalle_modificacionestime_salidas,
+        'articulo_linea' : articulo_linea
         })

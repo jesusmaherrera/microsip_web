@@ -16,6 +16,12 @@
 .money-text {
   color: #ffa500;
 }
+#ultimo_conteo {
+  text-align: center;
+}
+#label_linea {
+  float: left;
+}
 #btn-primarymenu {
   background-color: #d33f3f;
   background-image: none;

@@ -158,21 +158,24 @@ function add_existenciasarticulo_byajuste()
 
 function resultado(data)
 {
-  if (data.is_mobile == false )
+  if ( $("#is_mobile").val() == 'False' )
     window.location = "/inventarios/inventariofisico/"+data.alamcen_id+"/";
   else
+  {
     limpiarForm();
+    $("#ultimo_conteo").html("<strong>Ultimo conteo</strong><br> "+data.articulo_nombre+"<br>Ex Acual. "+data.existencia_actual+"");
+  }
 }
 
 /* Mostrar articulo */
-function cargar_articulo( articulo_id, articulo_nombre, existencias, costo_ultima_compra, detalle_modificacionestime, ya_ajustado, detalle_modificacionestime_salidas, articulo_seguimiento )
+function cargar_articulo( articulo_id, articulo_nombre, existencias, costo_ultima_compra, detalle_modificacionestime, ya_ajustado, detalle_modificacionestime_salidas, articulo_seguimiento, articulo_linea )
 {
   $('#id_articulo-deck').attr('style','');
   $('#id_articulo-deck').html('<span class="div hilight" data-value="'+articulo_id+'"><span style="display: inline;" class="remove div">X</span>'+articulo_nombre+'</span>');
   $('#id_articulo').html('<option selected="selected" value="'+articulo_id+'"></option>');
   $('#id_articulo_text').hide();
   
-  cargar_detallesmovimientos_articulo( detalle_modificacionestime, detalle_modificacionestime_salidas, existencias, ya_ajustado, articulo_seguimiento );
+  cargar_detallesmovimientos_articulo( detalle_modificacionestime, detalle_modificacionestime_salidas, existencias, ya_ajustado, articulo_seguimiento, articulo_linea );
   
   $("#id_costo_unitario").val(costo_ultima_compra);
 
@@ -193,8 +196,9 @@ function cargar_articulo( articulo_id, articulo_nombre, existencias, costo_ultim
   $("#id_unidades").focus();
 }
 /* Mostrar articulo > detalles*/
-function cargar_detallesmovimientos_articulo(entradas_detalles, salidas_detalles, existencias, ya_ajustado, seguimiento)
+function cargar_detallesmovimientos_articulo(entradas_detalles, salidas_detalles, existencias, ya_ajustado, seguimiento, articulo_linea )
 {
+  $("#label_linea").html("<strong>Linea&nbsp;</strong>"+ articulo_linea);
   $(".span_clave").hide();
   $(".span_articulo, #span_nombre_articulo").show();
 
@@ -270,13 +274,14 @@ function mostrar_articulo_byclave(data)
   } 
   else
   {
-    cargar_articulo( data.articulo_id, data.articulo_nombre, data.existencias, data.costo_ultima_compra, data.detalle_modificacionestime, data.ya_ajustado, data.detalle_modificacionestime_salidas, data.articulo_seguimiento );
+    cargar_articulo( data.articulo_id, data.articulo_nombre, data.existencias, data.costo_ultima_compra, data.detalle_modificacionestime, data.ya_ajustado, data.detalle_modificacionestime_salidas, data.articulo_seguimiento, data.articulo_linea );
+
   }
 }
 
 function mostrar_articulo_byid(data) 
 {
-  cargar_detallesmovimientos_articulo( data.detalle_modificacionestime, data.detalle_modificacionestime_salidas, data.existencias, data.ya_ajustado , data.articulo_seguimiento);
+  cargar_detallesmovimientos_articulo( data.detalle_modificacionestime, data.detalle_modificacionestime_salidas, data.existencias, data.ya_ajustado , data.articulo_seguimiento, data.articulo_linea);
   $("#id_costo_unitario").val(data.costo_ultima_compra);
 
 }
