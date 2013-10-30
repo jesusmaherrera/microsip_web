@@ -78,6 +78,7 @@ function mostrar_articulos_agregados(data)
 /* Modificar existencias */
 function add_existenciasarticulo_byajuste()
 {
+
   if ($('#id_ubicacion').val() == '')
   {
     alert("El campo ubicacion es obligatorio");
@@ -121,7 +122,7 @@ function add_existenciasarticulo_byajuste()
   { 
     var costo_unitario = 0;
     if ( $('#puede_modificar_costos').val() == 'True' )
-      costo_unitario = $("#id_costo_unitario").val()
+      costo_unitario = $("#id_costo_unitario").val();
     Dajaxice.microsip_web.apps.inventarios.add_existenciasarticulo_byajustes_view(resultado,{
       'ubicacion' : $("#id_ubicacion").val(),
       'articulo_id' : $("#id_articulo").val()[0],
@@ -131,8 +132,8 @@ function add_existenciasarticulo_byajuste()
       'detalle_costo_unitario' :costo_unitario,
       'entrada2_id' : $("#entrada2_id").val(),
       'salida2_id' : $("#salida2_id").val(),
-      }
-    ); 
+      'ajustar_primerconteo': $("#id_ajusteprimerconteo").attr('checked')== 'checked',
+      }); 
     
     $("#enviar_btn").attr("disabled",true);
     $("#enviar_btn").text("Enviando...");
@@ -282,6 +283,20 @@ function mostrar_articulo_byid(data)
 /* Otras funcionalidades */
 function load_localstorage()
 {
+  ajustar_primerconteo = localStorage.getItem("ajustar_primerconteo");
+  if (ajustar_primerconteo == false)
+    localStorage.setItem("ajustar_primerconteo", 'false');
+  
+
+  if( localStorage.getItem("ajustar_primerconteo") === 'true')
+    $("#id_ajusteprimerconteo").attr('checked', true);
+  else
+    $("#id_ajusteprimerconteo").attr('checked', false);
+
+  if( localStorage.getItem("ajustar_primerconteo") === true)
+    alert(localStorage.getItem("ajustar_primerconteo"));
+
+
   modo_rapido = localStorage.getItem("modo_rapido");
   if (modo_rapido == null)
     localStorage.setItem("modo_rapido", 'false');
@@ -361,7 +376,12 @@ $('#span_alerta_unidades, #span_ya_ajustado, #span_sin_ajustado').hide();
 if (Modernizr.localstorage) 
   load_localstorage();
 else
+{
   $("#chbx_modorapido").attr('checked', true);
+  $('#id_ajusteprimerconteo').attr("checked", false);
+}
+
+
 // modo_rapido_ajustes = localStorage.getItem("modo_rapido_ajustes");
 // if (modo_rapido_ajustes == null)
 //   localStorage.setItem("modo_rapido_ajustes", 'false');
@@ -377,7 +397,9 @@ else
 
 // });
 
-// $('#id_articulo_text').focusin(function(){
-//   if (localStorage.getItem("modo_rapido_ajustes") == 'true')
-//     localStorage.setItem("modo_rapido_ajustes", 'false');
-// });
+$('#id_ajusteprimerconteo').on("click", function(){
+  if ($('#id_ajusteprimerconteo').attr('checked') == 'checked')
+    localStorage.setItem("ajustar_primerconteo", 'true');
+  else
+    localStorage.setItem("ajustar_primerconteo", 'false');
+});

@@ -52,6 +52,9 @@ class claves_articulos_form(forms.ModelForm):
         self.fields['rol'].widget.attrs['class'] = 'input-medium'
         self.fields['clave'].widget.attrs['class'] = 'input-small'
 
+class PreferneciasEmpresaInv( forms.Form ):
+    ajustesprimerconteo = forms.BooleanField( required = False )
+    
 class CustomAuthenticationForm(forms.Form):
     conexion_db = forms.ModelChoiceField(ConexionDB.objects.all(), required= False)
     username = forms.CharField( max_length=150)

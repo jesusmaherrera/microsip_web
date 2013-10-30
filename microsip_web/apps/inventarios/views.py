@@ -34,6 +34,12 @@ import fdb
 from microsip_web.settings.common import MICROSIP_DATABASES, DATABASES
 from django.db.models import Sum
 from microsip_web.apps.config.models import DerechoUsuario
+
+def preferencias_manageview(request, template_name = 'inventarios/herramientas/preferencias.html'):
+    msg = ''
+    c = {'msg': msg,}
+    return render_to_response( template_name, c, context_instance = RequestContext( request ) )
+
 @detect_mobile
 @login_required( login_url = '/login/' )
 def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.html' ):
@@ -44,7 +50,7 @@ def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.ht
         return HttpResponseRedirect( '/select_db/' )
 
     almacenes = Almacenes.objects.all()
-
+    
     if "Chrome" in request.META[ 'HTTP_USER_AGENT' ]:
        request.mobile = False
        

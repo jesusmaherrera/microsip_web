@@ -125,12 +125,48 @@
     <a class='btn' href="#" onclick="cerrar_inventario()">Aceptar</a>
   </div>
 </div>
-<!-- END MODALES -->
 
-<div class="ms-custom-form">
-    <div id="ms-custom-form-header">
-      <div class='span ' >
-        <h3 class='span'>Inventario fisico por ajustes 
+<div id="modal_primerconteo" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Ajustes en primer conteo</h3> <br>
+  </div>
+  <div class="modal-body">
+    <p class="text-warning">
+      Esta heramienta nos ayuda cuando se van a contar los articulos por primera ves, <strong>ajustando existencia</strong> en el primer conteo <strong> a cantidad de articulos indicados</strong>
+    </p>
+    <p>
+      Ejemplo
+    </p>
+    <p>No se ha contado el articulo lapiz y la exitencia actual es de <strong>10 unidades</strong>, posteriormente <strong>mando 2 unidades en el formulario </strong><br/>
+      <br/>
+      <strong>Como resultado tendre</strong>
+    </p>
+    <p>Con ajuste en primero conteo</p>
+    <blockquote>
+      <p><small>Existencias <strong>2 unidades</strong></small></p>
+    </blockquote>
+    <p>Sin ajuste en primero conteo</p>
+    <blockquote>
+      <p><small>Existencias <strong>12 unidades</strong></small></p>
+    </blockquote>
+  </div>
+  <div class="modal-footer">
+    <span id='id_agregando_span' class='hide'>
+      <label class="span">Agregando articulos </label>
+      <img class= 'imagecenter' src="{{STATIC_URL}}img\ajax-loader.gif">
+    </span>
+    <button class="btn" id='btnCancel' data-dismiss="modal">Cerrar</button>
+  </div>
+</div>
+
+<!-- END MODALES -->
+<div id="sic_from" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span8">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <h3>Inventario fisico por ajustes</h3>  
           {% if request.user.username = 'SYSDBA' %}
           <ul class="nav btn btn-mini" style=" margin: 0px; ">
             <li class="dropdown">
@@ -145,45 +181,55 @@
             </li>
           </ul>
           {% endif %}
-        </h3>
-      </div>
-      <div class="pull-right ms-form-right-detail">
-        <div class="span2" >
-          <label>Fecha</label>
-          <div >
-            {{ entrada_fecha }} 
+        </div>
+        <div class="row">
+          <div class="span">
+            <div id='ubicacionform'>
+              <label>Ubicacion</label>
+              {{ ubicacion_form.ubicacion }}
+            </div>
+            <div class='span8'>
+              <label>ajustar en primer conteo <a href="#modal_primerconteo" role="button" data-toggle="modal"><i class="icon-info-sign"></i></a></label>
+              <input checked="checked" id="id_ajusteprimerconteo" name="ajustesprimerconteo" type="checkbox">
+            </div>
           </div>
-        </div> 
-        <div class="span2" >
-          <label>Folios</label>
-          <div >
-            Ent {{ folio_entrada }}
-            <br>
-            Sal {{ folio_salida }}
-          </div>
-        </div>  
+        </div>
       </div>
     </div>
-    <div id="ms-custom-form-footer">
-      <div class='span all_screen' >
-        <label id='label_ubicacion' class="span" style="padding: .3em 0.6em 0 0;">Ubicación </label>
-        {{ ubicacion_form.ubicacion }}
-      </div>
-      <div  class=" pull-right ">
-        <div class="span4">
-          <input type="hidden" id="almacen_nombre" value="{{ almacen.nombre }}"/>
-          <input type="hidden" id="almacen_id" value="{{ almacen_id }}"/>
-          <input type="hidden" id="entrada_id" value="{{ entrada_id }}"/>
-          <input type="hidden" id="salida_id" value="{{ salida_id }}"/>
-
-          <input type="hidden" id="entrada2_id" value="{{ entrada2_id }}"/>
-          <input type="hidden" id="salida2_id" value="{{ salida2_id }}"/>
-          <input type="hidden" id="puede_modificar_costos" value="{{ puede_modificar_costos }}"/>
-          <strong>Alamacen: </strong> {{ almacen }}
+    <div class="span4">
+      <div id="sic_form_details" class="container-fluid">
+        <div class="row-fluid">
+          <div class="span6" >
+            <label>Fecha</label>
+            <div >
+              {{ entrada_fecha }} 
+            </div>
+          </div> 
+          <div class="span6" >
+            <label>Folios</label>
+            <div >
+              Ent {{ folio_entrada }}
+              <br>
+              Sal {{ folio_salida }}
+            </div>
+          </div>  
         </div>
-      </div>  
+        
+      </div>
+      <div class="row-fluid">
+        <input type="hidden" id="almacen_nombre" value="{{ almacen.nombre }}"/>
+        <input type="hidden" id="almacen_id" value="{{ almacen_id }}"/>
+        <input type="hidden" id="entrada_id" value="{{ entrada_id }}"/>
+        <input type="hidden" id="salida_id" value="{{ salida_id }}"/>
+
+        <input type="hidden" id="entrada2_id" value="{{ entrada2_id }}"/>
+        <input type="hidden" id="salida2_id" value="{{ salida2_id }}"/>
+        <input type="hidden" id="puede_modificar_costos" value="{{ puede_modificar_costos }}"/>
+        <strong>Alamacen: </strong> {{ almacen }}
+      </div>
     </div>
   </div>
+</div>
 {{ form.errors }}
 {{ ubicacion_form.errors }} 
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
@@ -193,8 +239,8 @@
   <div class="input-prepend input-append">
     {{ form.articulo }}
     <span id='span_alerta_unidades' class="text-error" style=" background-color: rgb(255, 0, 0); color: white; padding: .2em 2em;"> </span>
-    <span id='span_ya_ajustado' class="text-error" style=" background-color: rgb(20, 122, 11); color: white; padding: .2em 2em;"> ya ajustado </span>
-    <span id='span_sin_ajustado' class="text-error" style=" background-color: rgb(224, 132, 14); color: white; padding: .2em 2em;"> sin ajustar </span>
+    <span id='span_ya_ajustado' class="text-error" style=" background-color: rgb(20, 122, 11); color: white; padding: .2em 2em;"> ya contado </span>
+    <span id='span_sin_ajustado' class="text-error" style=" background-color: rgb(224, 132, 14); color: white; padding: .2em 2em;"> sin contar </span>
     <input type="hidden" id="articulo_seguimiento" value=""/>
   </div>
   <div class="input-prepend input-append">

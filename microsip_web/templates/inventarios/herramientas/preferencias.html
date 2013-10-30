@@ -1,0 +1,32 @@
+{% extends "inventarios/base.html" %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+{% endblock %}
+
+{% block breadcrumb %}{{ block.super }}Inventarios fisicos{% endblock %}
+{% block content %}
+{% if msg %}
+<div class="alert alert-success fade in">
+  <button type="button" class="close" data-dismiss="alert">×</button>
+  <strong>{{ msg }}</strong> 
+</div>
+{% endif %}
+
+
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+  <div class="ms-custom-form container-fluid hidden-phone">
+    <div class="row-fluid">
+      <div class="span3"><h3>Preferencias</h3></div>
+      <div class="span8" style=" margin-top: 15px; ">
+        <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
+      </div>
+    </div>
+  </div>
+  
+</form>
+<br>
+{% endblock %}

@@ -47,6 +47,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     """
 
     #Paramentros
+    ajustar_primerconteo = kwargs.get( 'ajustar_primerconteo', None )
     ubicacion = kwargs.get( 'ubicacion', None )
     articulo_id = kwargs.get( 'articulo_id', None )
     articulo = Articulos.objects.get( pk = articulo_id )
@@ -99,7 +100,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     #Logica
 
     #Si no se existe arituclo en documentos se ajustan unidades
-    if not existe_en_detalles:
+    if not existe_en_detalles and ajustar_primerconteo:
         detalle.unidades = ajustar_existencias( articulo_id = articulo.id, ajustar_a = detalle.unidades ,almacen = almacen , connection_name = connection_name )
 
     es_nuevo = False
@@ -194,6 +195,8 @@ def close_inventario_byalmacen_view( request, **kwargs ):
 def add_existenciasarticulo_byajustes_view( request, **kwargs ):
     """ Para agregar existencia a un articulo por ajuste"""
     #Paramentros
+    ajustar_primerconteo = kwargs.get( 'ajustar_primerconteo', False )
+
     ubicacion = kwargs.get( 'ubicacion', None )
     articulo_id = kwargs.get( 'articulo_id', None )
     entrada_id = kwargs.get( 'entrada_id', None )
@@ -221,6 +224,7 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
         request_user = request.user,
         ubicacion = ubicacion,
         almacen_id = almacen_sinventas.ALMACEN_ID,
+        ajustar_primerconteo = ajustar_primerconteo,
         )
 
     datos = add_existenciasarticulo_byajustes(
@@ -233,6 +237,7 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
         request_user = request.user,
         ubicacion = ubicacion,
         almacen_id = almacen_id,
+        ajustar_primerconteo = ajustar_primerconteo,
         )
 
 
