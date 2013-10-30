@@ -201,13 +201,11 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
     articulo_id = kwargs.get( 'articulo_id', None )
     entrada_id = kwargs.get( 'entrada_id', None )
     salida_id = kwargs.get( 'salida_id', None )
+    is_mobile =  kwargs.get( 'is_mobile', False )
     detalle_unidades = Decimal( kwargs.get( 'detalle_unidades', None ) )
     detalle_costo_unitario = Decimal( kwargs.get( 'detalle_costo_unitario', None ) )
     entrada = DoctosIn.objects.get( pk = entrada_id )
     almacen_id = entrada.almacen.ALMACEN_ID
-
-    if "Chrome" in request.META[ 'HTTP_USER_AGENT' ]:
-       request.mobile = False
 
     #Para dos almacenes
     entrada2_id = kwargs.get( 'entrada2_id', None )
@@ -241,7 +239,7 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
         )
 
 
-    datos['is_mobile'] = request.mobile
+    datos['is_mobile'] = is_mobile
     
     return HttpResponse( json.dumps( datos ), mimetype = "application/javascript" )
 

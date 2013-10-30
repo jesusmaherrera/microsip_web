@@ -331,6 +331,7 @@ def invetariofisico_manageview( request, almacen_id = None, template_name = 'inv
         'salida_id' : salida.id,
         'entrada2_id' : entrada2_id,
         'salida2_id' : salida2_id,
+        'is_mobile' : False,
         }
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
@@ -353,6 +354,7 @@ def invetariofisicomobile_manageView( request, almacen_id = None, template_name 
         'folio_salida': salida.folio, 
         'entrada_id' : entrada.id,
         'salida_id' : salida.id,
+        'is_mobile' : True,
         }
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )    
 

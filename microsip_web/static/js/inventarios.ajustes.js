@@ -133,6 +133,7 @@ function add_existenciasarticulo_byajuste()
       'entrada2_id' : $("#entrada2_id").val(),
       'salida2_id' : $("#salida2_id").val(),
       'ajustar_primerconteo': $("#id_ajusteprimerconteo").attr('checked')== 'checked',
+      'is_mobile': $("#is_mobile").val(),
       }); 
     
     $("#enviar_btn").attr("disabled",true);
