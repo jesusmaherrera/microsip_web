@@ -55,6 +55,8 @@ class ArticuloManageForm(forms.ModelForm):
             'es_almacenable',
             'seguimiento',
             'carpeta',
+            'estatus',
+            'costo_ultima_compra',
         }
 
 class ClienteManageForm(forms.ModelForm):

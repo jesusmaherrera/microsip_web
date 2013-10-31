@@ -6,6 +6,7 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}
+{% include 'autocomplete_light/static.html' %}
 <script>
 function cargar_arbol(datos){
 
@@ -20,9 +21,9 @@ function cargar_arbol(datos){
   })
 }
 
-$(document).ready(function() {
-  Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
-});
+// $(document).ready(function() {
+//   Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
+// });
 
   $(function() {
     
@@ -69,14 +70,23 @@ $(document).ready(function() {
  {% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
-  <div class="ms-custom-form container-fluid hidden-phone">
+  <div id="sic_from" class="container-fluid">
     <div class="row-fluid">
-      <div class="span3"><h3>Articulo</h3></div>
-      <div class="span8" style=" margin-top: 15px; ">
-        <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
+      <div class="span3">
+        <div class="container-fluid">
+          <div class="row-fluid">
+            <h3>Articulo</h3>  
+          </div>
+        </div>
+      </div>
+      <div class="span9">
+        <div id='main_form'>
+          <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
+        </div>
       </div>
     </div>
   </div>
+
   {{ form.errors }}
   <div class="span4" >
     <label>Nombre</label>
@@ -201,5 +211,4 @@ $(document).ready(function() {
   {% endif %}
   <br style='clear:both;'>
 </form>
-{% include 'autocomplete_light/static.html' %}
 {% endblock %}

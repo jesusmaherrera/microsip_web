@@ -178,29 +178,36 @@ $('#select_article_all').change(function(){
     <strong>{{ msg }}</strong> 
 </div>
 {% endif %}
- <div class="ms-custom-form container-fluid">
+<div id="sic_from" class="container-fluid">
   <div class="row-fluid">
-      <div class="span2 hidden-phone"><h3>Articulos</h3></div>
-    <div class='span9'> 
-      
-      <form method="post" id="form-search-articulo" class="form-inline" action="" enctype='multipart/form-data'>
-        {% csrf_token %}  
-        <div class="span1 hidden-phone">
-          <a tabindex="-1" class='btn' href='#' onclick='cargar_selector_movera();'><i class="icon-folder-open"></i></a> 
+    <div class="span3">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <h3>Articulos</h3>  
         </div>
-        <div class='span3' >
-            {{ filtro_form.articulo }}
-        </div>
-        <div class="input-prepend input-append mobile_inputdata">
-            <span class="add-on visible-phone label-data">Clave</span>
-            {{ filtro_form.clave }}
-        </div>
-        <div class="input-prepend input-append mobile_inputdata">
-            <span class="label-data add-on visible-phone">Nombre</span>
-            {{ filtro_form.nombre }}
-        </div>
-        <button class="btn" type="submit"><i class='icon-search'></i> <span class="visible-phone">Buscar</span></button>
-      </form>   
+      </div>
+    </div>
+    <div class="span9">
+      <div id='main_form'>
+        <form method="post" id="form-search-articulo" class="form-inline" action="" enctype='multipart/form-data'>
+          {% csrf_token %}  
+          <div class="span1 hidden-phone">
+            <a tabindex="-1" class='btn' href='#' onclick='cargar_selector_movera();'><i class="icon-folder-open"></i></a> 
+          </div>
+          <div class='span3' >
+              {{ filtro_form.articulo }}
+          </div>
+          <div class="input-prepend input-append mobile_inputdata">
+              <span class="add-on visible-phone label-data">Clave</span>
+              {{ filtro_form.clave }}
+          </div>
+          <div class="input-prepend input-append mobile_inputdata">
+              <span class="label-data add-on visible-phone">Nombre</span>
+              {{ filtro_form.nombre }}
+          </div>
+          <button class="btn" type="submit"><i class='icon-search'></i> <span class="visible-phone">Buscar</span></button>
+        </form>  
+      </div>
     </div>
   </div>
 </div>

@@ -16,18 +16,26 @@
 
 {% block breadcrumb %}{{ block.super }} clientes {% endblock %}
 {% block content %}
-<div class="ms-custom-form container-fluid">
+<div id="sic_from" class="container-fluid">
   <div class="row-fluid">
-      <div class="span3"><h3>Clientes</h3></div>
-    <div class='span9' style=" margin-top: 1em; ">
-      <form method="post" class="form-inline" action="" enctype='multipart/form-data'>
-        {% csrf_token %}  
-        <div class='span3'>
-        {{ filtro_form.cliente }}
+    <div class="span3">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <h3>Clientes</h3>  
         </div>
-        {{ filtro_form.clave }}{{ filtro_form.nombre }}
-        <button class="btn" type="submit">Ir</button>
-      </form>   
+      </div>
+    </div>
+    <div class="span9">
+      <div id='main_form'>
+        <form method="post" class="form-inline" action="" enctype='multipart/form-data'>
+          {% csrf_token %}  
+          <div class='span3'>
+          {{ filtro_form.cliente }}
+          </div>
+          {{ filtro_form.clave }}{{ filtro_form.nombre }}
+          <button class="btn" type="submit">Ir</button>
+        </form> 
+      </div>
     </div>
   </div>
 </div>

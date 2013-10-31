@@ -13,6 +13,7 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}
+{% include 'autocomplete_light/static.html' %}
 <script src='{{STATIC_URL}}js/jquery.formset.js'></script>
 <script src='{{STATIC_URL}}js/plantillas.js'></script>
 <script type="text/javascript">
@@ -49,14 +50,20 @@ $(document).ready(function() {
 {% endblock %}
 {% block breadcrumb %}{{ block.super }} <a href="/cuentas_por_cobrar/PreferenciasEmpresa/">Preferencias de la Empresa</a> <i class=' icon-play'></i> Plantilla{% endblock %}
 {% block content %}
-<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
-
-  {% csrf_token %}
-  <div class="ms-custom-form container-fluid" >
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+  <div id="sic_from" class="container-fluid">
     <div class="row-fluid">
-        <div class="span2"><h3>Plantilla</h3></div>
-      <div class='span7' style=" margin-top: 1em; ">  
-        <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar </button>
+      <div class="span3">
+        <div class="container-fluid">
+          <div class="row-fluid">
+            <h3>Plantilla</h3>  
+          </div>
+        </div>
+      </div>
+      <div class="span9">
+        <div id='main_form'>
+          <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar </button>
+        </div>
       </div>
     </div>
   </div>
@@ -127,5 +134,4 @@ $(document).ready(function() {
   </div>
   {% endif %}
 </form>
-{% include 'autocomplete_light/static.html' %}
 {% endblock %}

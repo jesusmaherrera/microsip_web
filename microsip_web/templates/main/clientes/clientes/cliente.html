@@ -56,11 +56,20 @@ $(function() {
 {{ formset }}
 
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
-  <div class="ms-custom-form container-fluid hidden-phone">
+  
+  <div id="sic_from" class="container-fluid">
     <div class="row-fluid">
-      <div class="span3"><h3>Cliente</h3></div>
-      <div class="span8" style=" margin-top: 15px; ">
-        <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
+      <div class="span3">
+        <div class="container-fluid">
+          <div class="row-fluid">
+            <h3>Clientes</h3>  
+          </div>
+        </div>
+      </div>
+      <div class="span9">
+        <div id='main_form'>
+          <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
+        </div>
       </div>
     </div>
   </div>

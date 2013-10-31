@@ -40,11 +40,19 @@
 {% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/lineas_articulos/">Lineas Articulos</a> <i class=" icon-play"></i> Linea Articulo{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
-  <div class="ms-custom-form container-fluid hidden-phone">
+  <div id="sic_from" class="container-fluid">
     <div class="row-fluid">
-      <div class="span3"><h3>Linea</h3></div>
-      <div class="span8" style=" margin-top: 15px; ">
-        <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
+      <div class="span2">
+        <div class="container-fluid">
+          <div class="row-fluid">
+            <h3>Linea</h3>  
+          </div>
+        </div>
+      </div>
+      <div class="span10">
+        <div id='main_form'>
+          <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
+        </div>
       </div>
     </div>
   </div>

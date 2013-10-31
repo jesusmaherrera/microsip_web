@@ -9,11 +9,18 @@
 
 {% block breadcrumb %}{{ block.super }} ventas {% endblock %}
 {% block content %}
-<div class="ms-custom-form container-fluid">
+<div id="sic_from" class="container-fluid">
   <div class="row-fluid">
-      <div class="span2"><h3>Ventas</h3></div>
-    <div class='span9' style=" margin-top: 1em; ">  
-      <a class="btn" href="/punto_de_venta/venta/"><i class=" icon-plus"></i></a>
+    <div class="span3">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <h3>Ventas</h3>  
+        </div>
+      </div>
+    </div>
+    <div class="span9">
+      <div id='main_form'>
+      </div>
     </div>
   </div>
 </div>
