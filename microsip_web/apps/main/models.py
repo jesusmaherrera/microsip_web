@@ -617,7 +617,7 @@ class DoctosInDet(models.Model):
         db_table = u'doctos_in_det'
 
 class DesgloseEnDiscretos(models.Model):
-    id = models.AutoField(primary_key=True, db_column='DESGLOSE_EN_DISCRETOS')
+    id = models.AutoField(primary_key=True, db_column='DESGLOSE_DISCRETO_ID')
     docto_in_det = models.ForeignKey(DoctosInDet, db_column='DOCTO_IN_DET_ID')
     art_discreto = models.ForeignKey(ArticulosDiscretos, db_column='ART_DISCRETO_ID')
     unidades = models.IntegerField(default=0, blank=True, null=True, db_column='UNIDADES')

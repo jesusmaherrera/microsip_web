@@ -37,7 +37,7 @@
   </div>
   <div class="modal-footer">
     <button class="btn" id='btnCancel' data-dismiss="modal">Cancelar</button>
-    <button type="submit" class="btn" name='add_seies_btn'>Aceptar</button>
+    <button type="submit" class="btn" onclick="add_series()" name='add_seies_btn'>Aceptar</button>
   </div>
 </div>
 
@@ -166,7 +166,7 @@
     <div class="span8">
       <div class="container-fluid">
         <div class="row-fluid">
-          <h3>Inventario fisico por ajustes</h3>  
+          <h3>Inventario fisico</h3>  
           {% if request.user.username = 'SYSDBA' %}
           <ul class="nav btn btn-mini" style=" margin: 0px; ">
             <li class="dropdown">
