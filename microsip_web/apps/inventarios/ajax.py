@@ -69,8 +69,6 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
 
         #AJUSTAR SERIES
         if ajusteprimerconteo and not existe_en_detalles:
-            unidades = ajustar_existencias(articulo_id=articulo.id, ajustar_a=unidades, almacen=almacen, connection_name=connection_name,)
-            existdiscretos_aeliminar = ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen).exclude(articulo_discreto__clave__in=series)
             detalle_salidas = DoctosInDet.objects.get_or_create(
                 articulo=articulo, doctosIn__id=salida_id,
                 defaults={
@@ -85,12 +83,36 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
                     'usuario_ult_modif': request.user.username,
                 })[0]
 
+            detalle_salidas.unidades = detalle_salidas.unidades + unidades_eliminar
+            detalle_salidas.costo_unitario = articulo.costo_ultima_compra
+            detalle_salidas.costo_total = detalle_salidas.unidades * detalle_salidas.costo_unitario
+            detalle_salidas.fechahora_ult_modif = datetime.now()
+            if detalle_salidas.detalle_modificacionestime == None:
+                detalle_salidas.detalle_modificacionestime = ''
+
+            detalle_salidas.detalle_modificacionestime += '%s %s/%s=%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request.user.username, ubicacion, unidades_eliminar)
+            
+            detalle_salidas.save( update_fields = [ 'unidades', 'fechahora_ult_modif','detalle_modificacionestime', ] )
+
+            c = connections[ connection_name ].cursor()
+            c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% articulo.id )
+            c.execute( "EXECUTE PROCEDURE RECALC_SALDOS_ART_IN %s;"% articulo.id )
+            transaction.commit_unless_managed()
+            c.close()
+            management.call_command( 'syncdb', database = connection_name )
+           
+            unidades_eliminar = ajustar_existencias(articulo_id=articulo.id, ajustar_a=unidades, almacen=almacen, connection_name=connection_name,)
+            unidades_eliminar = - unidades_eliminar + unidades
+            existdiscretos_aeliminar = ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen).exclude(articulo_discreto__clave__in=series)
+            
             for existdiscreto in existdiscretos_aeliminar:
                 existdiscreto.existencia = 0
                 existdiscreto.save()
                 articulo_discreto = ArticulosDiscretos.objects.filter( clave = existdiscreto.articulo_discreto.clave, articulo = articulo, tipo = 'S' ).update(fecha=datetime.now())
                 DesgloseEnDiscretos.objects.create( id = -1, docto_in_det = detalle_salidas, art_discreto = articulo_discreto, unidades = 1 )
 
+            
+            
         detalle = None
         #DETALLES ENTRADAS
         if unidades > 0:
