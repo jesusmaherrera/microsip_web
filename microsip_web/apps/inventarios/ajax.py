@@ -61,16 +61,36 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
     if msg == '':
         series_count = len(series)
 
-        # existe_en_detalles = DoctosInDet.objects.filter(
-        #     Q(doctosIn__concepto=27) | Q(doctosIn__concepto=38), articulo=articulo,
-        #     almacen=almacen,
-        #     doctosIn__descripcion='ES INVENTARIO',
-        #     ).count() > 0
+        existe_en_detalles = DoctosInDet.objects.filter(
+            Q(doctosIn__concepto=27) | Q(doctosIn__concepto=38), articulo=articulo,
+            almacen=almacen,
+            doctosIn__descripcion='ES INVENTARIO',
+            ).count() > 0
 
+        #AJUSTAR SERIES
+        if ajusteprimerconteo and not existe_en_detalles:
+            unidades = ajustar_existencias(articulo_id=articulo.id, ajustar_a=unidades, almacen=almacen, connection_name=connection_name,)
+            existdiscretos_aeliminar = ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen).exclude(articulo_discreto__clave__in=series)
+            detalle_salidas = DoctosInDet.objects.get_or_create(
+                articulo=articulo, doctosIn__id=salida_id,
+                defaults={
+                    'id': next_id('ID_DOCTOS', connection_name),
+                    'doctosIn': salida,
+                    'almacen': salida.almacen,
+                    'concepto': salida.concepto,
+                    'tipo_movto': 'S',
+                    'claveArticulo': articulo_clave,
+                    'articulo': articulo,
+                    'unidades': 0,
+                    'usuario_ult_modif': request.user.username,
+                })[0]
 
-        # unidades = ajustar_existencias(articulo_id=articulo.id, ajustar_a=unidades, almacen=almacen, connection_name=connection_name,)
+            for existdiscreto in existdiscretos_aeliminar:
+                existdiscreto.existencia = 0
+                existdiscreto.save()
+                articulo_discreto = ArticulosDiscretos.objects.filter( clave = existdiscreto.articulo_discreto.clave, articulo = articulo, tipo = 'S' ).update(fecha=datetime.now())
+                DesgloseEnDiscretos.objects.create( id = -1, docto_in_det = detalle_salidas, art_discreto = articulo_discreto, unidades = 1 )
 
-        #existdiscretos_aeliminar = ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen).exclude(articulo_discreto__clave__in=series)
         detalle = None
         #DETALLES ENTRADAS
         if unidades > 0:
@@ -101,14 +121,6 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
                     'unidades': 0,
                     'usuario_ult_modif': request.user.username,
                 })[0]
-
-        # #AJUSTAR SERIES
-        # if not existe_en_detalles and ajusteprimerconteo:
-        #     for existdiscreto in existdiscretos_aeliminar:
-        #         existdiscreto.existencia = 0
-        #         existdiscreto.save()
-        #         articulo_discreto = ArticulosDiscretos.objects.get( clave = existdiscreto.articulo_discreto.clave, articulo = articulo, tipo = 'S' )
-        #         DesgloseEnDiscretos.objects.create( id = -1, docto_in_det = detalle_salidas, art_discreto = articulo_discreto, unidades = 1 )
 
         for serie in series:
             articulo_discreto = ArticulosDiscretos.objects.get_or_create(
