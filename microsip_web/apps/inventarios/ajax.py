@@ -126,20 +126,16 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
             elif detalle.tipo_movto == 'S':
                 articulo_discreto.fecha = datetime.now()
                 articulo_discreto.save(update_fields=['fecha',],)
-                exist_discreto = ExistDiscreto.objects.get(articulo_discreto= articulo_discreto, almacen = almacen)
-                exist_discreto.existencia = 0
-                try:
-                    exist_discreto.save(update_fields=['existencia',],)
-                except HTTPError:
-                    pass
-
+                exist_discreto = ExistDiscreto.objects.filter(articulo_discreto= articulo_discreto, almacen = almacen).update(existencia=0)
+                
             DesgloseEnDiscretos.objects.get_or_create(
                 docto_in_det=detalle,
                 art_discreto=articulo_discreto,
                 defaults={'id': next_id('ID_DOCTOS', connection_name), 'unidades': 1, 
                 })
 
-            
+        if unidades < 0:
+            unidades = - unidades    
 
         detalle.unidades = detalle.unidades + unidades
         detalle.costo_unitario = articulo.costo_ultima_compra
