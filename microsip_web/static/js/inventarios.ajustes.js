@@ -99,6 +99,9 @@ function add_series()
       'almacen_id': $("#almacen_id").val(),
       'series': series,
       'entrada_id':  $("#entrada_id").val(),
+      'salida_id':  $("#salida_id").val(),
+      'ubicacion': $("#id_ubicacion").val(),
+      'ajusteprimerconteo': $("#id_ajusteprimerconteo").attr('checked')== 'checked',
     });
   }
   else if ($("#id_unidades").val() < 0 )
@@ -109,6 +112,8 @@ function add_series()
       'almacen_id': $("#almacen_id").val(),
       'series': series,
       'salida_id':  $("#salida_id").val(),
+      'ubicacion': $("#id_ubicacion").val(),
+      'ajusteprimerconteo': $("#id_ajusteprimerconteo").attr('checked')== 'checked',
     });
   }
 }
