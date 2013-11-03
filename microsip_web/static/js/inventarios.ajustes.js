@@ -91,31 +91,18 @@ function add_series()
   if (error == 1)
     return;
 
-  if($("#id_unidades").val() >=0 )
+  
+  Dajaxice.microsip_web.apps.inventarios.add_seriesinventario_byarticulo(series_agregadas, 
   {
-    Dajaxice.microsip_web.apps.inventarios.add_seriesinventario_byarticulo(series_agregadas, 
-    {
-      'articulo_id': $("#id_articulo").val()[0], 
-      'almacen_id': $("#almacen_id").val(),
-      'series': series,
-      'entrada_id':  $("#entrada_id").val(),
-      'salida_id':  $("#salida_id").val(),
-      'ubicacion': $("#id_ubicacion").val(),
-      'ajusteprimerconteo': $("#id_ajusteprimerconteo").attr('checked')== 'checked',
-    });
-  }
-  else if ($("#id_unidades").val() < 0 )
-  {
-    Dajaxice.microsip_web.apps.inventarios.remove_seriesinventario_byarticulo(series_agregadas, 
-    {
-      'articulo_id': $("#id_articulo").val()[0], 
-      'almacen_id': $("#almacen_id").val(),
-      'series': series,
-      'salida_id':  $("#salida_id").val(),
-      'ubicacion': $("#id_ubicacion").val(),
-      'ajusteprimerconteo': $("#id_ajusteprimerconteo").attr('checked')== 'checked',
-    });
-  }
+    'articulo_id': $("#id_articulo").val()[0], 
+    'almacen_id': $("#almacen_id").val(),
+    'series': series,
+    'entrada_id':  $("#entrada_id").val(),
+    'salida_id':  $("#salida_id").val(),
+    'ubicacion': $("#id_ubicacion").val(),
+    'unidades' : $("#id_unidades").val(),
+    'ajusteprimerconteo': $("#id_ajusteprimerconteo").attr('checked')== 'checked',
+  });
 }
 
 function series_agregadas(data)
