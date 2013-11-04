@@ -34,7 +34,7 @@ def ajustar_seriesinventario_byarticulo( **kwargs ):
     request_username = kwargs.get('request_username', None)
     series = kwargs.get('series', None)
     ubicacion = kwargs.get('ubicacion', None)
-
+    
     detalle = None
     #DETALLES ENTRADAS
     if unidades > 0:
@@ -114,7 +114,7 @@ def ajustar_seriesinventario_byarticulo( **kwargs ):
 def add_seriesinventario_byarticulo( request, **kwargs ):
     # Parametros
     connection_name = get_conecctionname(request.session)
-
+    error = False
     articulo_id = kwargs.get('articulo_id', None)
     articulo = Articulos.objects.get(pk=articulo_id)
     articulo_clave = first_or_none(
@@ -161,18 +161,19 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
             for existdiscreto in existdiscretos_aeliminar:
                 series_aeliminar.append(existdiscreto.articulo_discreto.clave)
 
-            ajustar_seriesinventario_byarticulo(
-                    connection_name = connection_name,
-                    unidades = -existdiscretos_aeliminar_count,
-                    articulo = articulo,
-                    articulo_clave = articulo_clave,
-                    entrada = entrada,
-                    almacen = almacen,
-                    salida = salida,
-                    request_username = request_username,
-                    series =  series_aeliminar,
-                    ubicacion = ubicacion,
-                )
+            if existdiscretos_aeliminar_count > 0:
+                ajustar_seriesinventario_byarticulo(
+                        connection_name = connection_name,
+                        unidades = -existdiscretos_aeliminar_count,
+                        articulo = articulo,
+                        articulo_clave = articulo_clave,
+                        entrada = entrada,
+                        almacen = almacen,
+                        salida = salida,
+                        request_username = request_username,
+                        series =  series_aeliminar,
+                        ubicacion = ubicacion,
+                    )
             
             ajustar_seriesinventario_byarticulo(
                      connection_name = connection_name,
@@ -209,9 +210,11 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
 
         
         msg = 'articulos agregados'
+        
     else:
-        msg = msg
-    return simplejson.dumps( { 'msg' : msg, } ) 
+        error = True
+
+    return simplejson.dumps( { 'msg' : msg, 'error': error,} ) 
 
 @dajaxice_register( method = 'GET' )
 def get_seriesinventario_byarticulo( request, **kwargs ):

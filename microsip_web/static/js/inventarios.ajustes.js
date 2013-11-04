@@ -107,8 +107,19 @@ function add_series()
 
 function series_agregadas(data)
 {
+  $("#add_seies_btn").attr("disabled",true);
+  $("#add_seies_btn").text("Enviando...");
+  
   alert(data.msg);
-  window.location = "/inventarios/inventariofisico/" + $( "#almacen_id" ).val() + "/";
+  if (data.error == false)
+  {
+    window.location = "/inventarios/inventariofisico/" + $( "#almacen_id" ).val() + "/";
+  }
+  else
+  {
+    $("#add_seies_btn").attr("disabled", false);
+    $("#add_seies_btn").text("Enviar");  
+  }
 }
 
 function cargar_series_actuales(data)
