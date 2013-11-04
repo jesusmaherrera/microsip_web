@@ -22,9 +22,129 @@ from microsip_web.apps.config.models import DerechoUsuario
 def allow_microsipuser( username = None, clave_objeto=  None ):
     return DerechoUsuario.objects.filter(usuario__nombre = username, clave_objeto = clave_objeto).exists() or username == 'SYSDBA'
 
+def ajustar_series(**kwargs):
+    connection_name = kwargs.get('connection_name', None)
+    salida = kwargs.get('salida', None)
+    articulo = kwargs.get('articulo', None)
+    articulo_clave = kwargs.get('articulo_clave', None)
+    request_username = kwargs.get('request_username', None)
+    almacen = kwargs.get('almacen', None)
+    series = kwargs.get('series', None)
+    msg = ''
+
+    existdiscretos_aeliminar = ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen).exclude(articulo_discreto__clave__in=series)
+    existdiscretos_aeliminar_count =existdiscretos_aeliminar.count()
+    
+    detalle_salidas = DoctosInDet.objects.create(
+            id= next_id('ID_DOCTOS', connection_name),
+            doctosIn= salida,
+            almacen= salida.almacen,
+            concepto= salida.concepto,
+            tipo_movto= 'S',
+            claveArticulo= articulo_clave,
+            articulo= articulo,
+            unidades= existdiscretos_aeliminar_count,
+            costo_unitario= articulo.costo_ultima_compra,
+            costo_total= articulo.costo_ultima_compra * existdiscretos_aeliminar_count,
+            usuario_ult_modif= request_username,
+            fechahora_ult_modif = datetime.now(),
+        )
+
+    for existdiscreto in existdiscretos_aeliminar:
+        existdiscreto.existencia = 0
+        existdiscreto.save()
+        articulo_discreto = ArticulosDiscretos.objects.filter( clave = existdiscreto.articulo_discreto.clave, articulo = articulo, tipo = 'S' )
+        ArticulosDiscretos.objects.filter( clave = existdiscreto.articulo_discreto.clave, articulo = articulo, tipo = 'S' ).update(fecha=datetime.now())
+        DesgloseEnDiscretos.objects.create( id = -1, docto_in_det = detalle_salidas, art_discreto = articulo_discreto, unidades = 1 )
+
+    return simplejson.dumps( { 'mensaje' : 'series ajustadas', } ) 
+
+
+def ajustar_seriesinventario_byarticulo( **kwargs ):
+    # Parametros
+    connection_name = kwargs.get('connection_name', None)
+    unidades = kwargs.get('unidades', None)
+    articulo = kwargs.get('articulo', None)
+    articulo_clave = kwargs.get('articulo_clave', None)
+    entrada = kwargs.get('entrada', None)
+    almacen = kwargs.get('almacen', None)
+    salida = kwargs.get('salida', None)
+    request_username = kwargs.get('request_username', None)
+    series = kwargs.get('series', None)
+    ubicacion = kwargs.get('ubicacion', None)
+
+    detalle = None
+    #DETALLES ENTRADAS
+    if unidades > 0:
+        detalle = DoctosInDet.objects.get_or_create(articulo=articulo, doctosIn=entrada, defaults={
+            'id': next_id('ID_DOCTOS', connection_name),
+            'doctosIn': entrada,
+            'almacen': entrada.almacen,
+            'concepto': entrada.concepto,
+            'tipo_movto': 'E',
+            'claveArticulo': articulo_clave,
+            'articulo': articulo,
+            'unidades': 0,
+            'usuario_ult_modif': request_username,
+        })[0]
+
+    #DETALLES SALIDAS
+    if unidades < 0:    
+        detalle = DoctosInDet.objects.get_or_create(
+            articulo=articulo, doctosIn=salida,
+            defaults={
+                'id': next_id('ID_DOCTOS', connection_name),
+                'doctosIn': salida,
+                'almacen': salida.almacen,
+                'concepto': salida.concepto,
+                'tipo_movto': 'S',
+                'claveArticulo': articulo_clave,
+                'articulo': articulo,
+                'unidades': 0,
+                'usuario_ult_modif': request_username,
+            })[0]
+
+    for serie in series:
+        articulo_discreto = ArticulosDiscretos.objects.get_or_create(
+            clave=serie,
+            articulo=articulo,
+            tipo='S',
+            defaults={'id': next_id('ID_CATALOGOS', connection_name), 
+            })[0]
+
+        if detalle.tipo_movto == 'E':
+            ExistDiscreto.objects.get_or_create(articulo_discreto= articulo_discreto, almacen= almacen,
+                    defaults={'id':next_id('ID_DOCTOS', connection_name), 'existencia':1,},
+                    )[0]
+
+        elif detalle.tipo_movto == 'S':
+            articulo_discreto.fecha = datetime.now()
+            articulo_discreto.save(update_fields=['fecha',],)
+            ExistDiscreto.objects.filter(articulo_discreto= articulo_discreto, almacen = almacen).update(existencia=0)
+            
+        DesgloseEnDiscretos.objects.get_or_create(
+            docto_in_det=detalle,
+            art_discreto=articulo_discreto,
+            defaults={'id': next_id('ID_DOCTOS', connection_name), 'unidades': 1, 
+            })
+
+    if unidades < 0:
+        unidades = - unidades    
+    
+    detalle.unidades = detalle.unidades + unidades
+    detalle.costo_unitario = articulo.costo_ultima_compra
+    detalle.costo_total = detalle.unidades * detalle.costo_unitario
+    detalle.fechahora_ult_modif = datetime.now()
+
+    if detalle.detalle_modificacionestime == None:
+        detalle.detalle_modificacionestime = ''
+
+    detalle.detalle_modificacionestime += '%s %s/%s=%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_username, ubicacion, unidades)
+    detalle.save( update_fields = [ 'unidades', 'fechahora_ult_modif','detalle_modificacionestime', ] )
+
 @dajaxice_register( method = 'GET' )
 def add_seriesinventario_byarticulo( request, **kwargs ):
-    #Parametros
+    # Parametros
     connection_name = get_conecctionname(request.session)
 
     articulo_id = kwargs.get('articulo_id', None)
@@ -59,127 +179,58 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
             series.remove(serie)
 
     if msg == '':
-        series_count = len(series)
-
         existe_en_detalles = DoctosInDet.objects.filter(
             Q(doctosIn__concepto=27) | Q(doctosIn__concepto=38), articulo=articulo,
             almacen=almacen,
             doctosIn__descripcion='ES INVENTARIO',
             ).count() > 0
-
+        request_username = request.user.username
         #AJUSTAR SERIES
-        if ajusteprimerconteo and not existe_en_detalles:
-            detalle_salidas = DoctosInDet.objects.get_or_create(
-                articulo=articulo, doctosIn__id=salida_id,
-                defaults={
-                    'id': next_id('ID_DOCTOS', connection_name),
-                    'doctosIn': salida,
-                    'almacen': salida.almacen,
-                    'concepto': salida.concepto,
-                    'tipo_movto': 'S',
-                    'claveArticulo': articulo_clave,
-                    'articulo': articulo,
-                    'unidades': 0,
-                    'usuario_ult_modif': request.user.username,
-                })[0]
-
-            detalle_salidas.unidades = detalle_salidas.unidades + unidades_eliminar
-            detalle_salidas.costo_unitario = articulo.costo_ultima_compra
-            detalle_salidas.costo_total = detalle_salidas.unidades * detalle_salidas.costo_unitario
-            detalle_salidas.fechahora_ult_modif = datetime.now()
-            if detalle_salidas.detalle_modificacionestime == None:
-                detalle_salidas.detalle_modificacionestime = ''
-
-            detalle_salidas.detalle_modificacionestime += '%s %s/%s=%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request.user.username, ubicacion, unidades_eliminar)
-            
-            detalle_salidas.save( update_fields = [ 'unidades', 'fechahora_ult_modif','detalle_modificacionestime', ] )
-
-            c = connections[ connection_name ].cursor()
-            c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% articulo.id )
-            c.execute( "EXECUTE PROCEDURE RECALC_SALDOS_ART_IN %s;"% articulo.id )
-            transaction.commit_unless_managed()
-            c.close()
-            management.call_command( 'syncdb', database = connection_name )
-           
-            unidades_eliminar = ajustar_existencias(articulo_id=articulo.id, ajustar_a=unidades, almacen=almacen, connection_name=connection_name,)
-            unidades_eliminar = - unidades_eliminar + unidades
+        if ajusteprimerconteo:
             existdiscretos_aeliminar = ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen).exclude(articulo_discreto__clave__in=series)
-            
+            existdiscretos_aeliminar_count =existdiscretos_aeliminar.count()
+            series_aeliminar = []
             for existdiscreto in existdiscretos_aeliminar:
-                existdiscreto.existencia = 0
-                existdiscreto.save()
-                articulo_discreto = ArticulosDiscretos.objects.filter( clave = existdiscreto.articulo_discreto.clave, articulo = articulo, tipo = 'S' ).update(fecha=datetime.now())
-                DesgloseEnDiscretos.objects.create( id = -1, docto_in_det = detalle_salidas, art_discreto = articulo_discreto, unidades = 1 )
+                series_aeliminar.append(existdiscreto.articulo_discreto.clave)
 
+            ajustar_seriesinventario_byarticulo(
+                    connection_name = connection_name,
+                    unidades = -existdiscretos_aeliminar_count,
+                    articulo = articulo,
+                    articulo_clave = articulo_clave,
+                    entrada = entrada,
+                    almacen = almacen,
+                    salida = salida,
+                    request_username = request_username,
+                    series =  series_aeliminar,
+                    ubicacion = ubicacion,
+                )
             
-            
-        detalle = None
-        #DETALLES ENTRADAS
-        if unidades > 0:
-            detalle = DoctosInDet.objects.get_or_create(articulo=articulo, doctosIn__id=entrada_id, defaults={
-                'id': next_id('ID_DOCTOS', connection_name),
-                'doctosIn': entrada,
-                'almacen': entrada.almacen,
-                'concepto': entrada.concepto,
-                'tipo_movto': 'E',
-                'claveArticulo': articulo_clave,
-                'articulo': articulo,
-                'unidades': 0,
-                'usuario_ult_modif': request.user.username,
-            })[0]
-
-        #DETALLES SALIDAS
-        if unidades < 0:    
-            detalle = DoctosInDet.objects.get_or_create(
-                articulo=articulo, doctosIn__id=salida_id,
-                defaults={
-                    'id': next_id('ID_DOCTOS', connection_name),
-                    'doctosIn': salida,
-                    'almacen': salida.almacen,
-                    'concepto': salida.concepto,
-                    'tipo_movto': 'S',
-                    'claveArticulo': articulo_clave,
-                    'articulo': articulo,
-                    'unidades': 0,
-                    'usuario_ult_modif': request.user.username,
-                })[0]
-
-        for serie in series:
-            articulo_discreto = ArticulosDiscretos.objects.get_or_create(
-                clave=serie,
-                articulo=articulo,
-                tipo='S',
-                defaults={'id': next_id('ID_CATALOGOS', connection_name), 
-                })[0]
-
-            if detalle.tipo_movto == 'E':
-                exist_discreto = ExistDiscreto.objects.get_or_create(articulo_discreto= articulo_discreto, almacen= almacen,
-                        defaults={'id':next_id('ID_DOCTOS', connection_name), 'existencia':1,},
-                        )[0]
-
-            elif detalle.tipo_movto == 'S':
-                articulo_discreto.fecha = datetime.now()
-                articulo_discreto.save(update_fields=['fecha',],)
-                exist_discreto = ExistDiscreto.objects.filter(articulo_discreto= articulo_discreto, almacen = almacen).update(existencia=0)
-                
-            DesgloseEnDiscretos.objects.get_or_create(
-                docto_in_det=detalle,
-                art_discreto=articulo_discreto,
-                defaults={'id': next_id('ID_DOCTOS', connection_name), 'unidades': 1, 
-                })
-
-        if unidades < 0:
-            unidades = - unidades    
-
-        detalle.unidades = detalle.unidades + unidades
-        detalle.costo_unitario = articulo.costo_ultima_compra
-        detalle.costo_total = detalle.unidades * detalle.costo_unitario
-        detalle.fechahora_ult_modif = datetime.now()
-        if detalle.detalle_modificacionestime == None:
-            detalle.detalle_modificacionestime = ''
-
-        detalle.detalle_modificacionestime += '%s %s/%s=%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request.user.username, ubicacion, unidades)
-        detalle.save( update_fields = [ 'unidades', 'fechahora_ult_modif','detalle_modificacionestime', ] )
+            ajustar_seriesinventario_byarticulo(
+                     connection_name = connection_name,
+                     unidades = unidades,
+                     articulo = articulo,
+                     articulo_clave = articulo_clave,
+                     entrada = entrada,
+                     almacen = almacen,
+                     salida = salida,
+                     request_username = request_username,
+                     series = series,
+                     ubicacion = ubicacion,
+                 )
+        else:
+           ajustar_seriesinventario_byarticulo(
+                    connection_name = connection_name,
+                    unidades = unidades,
+                    articulo = articulo,
+                    articulo_clave = articulo_clave,
+                    entrada = entrada,
+                    almacen = almacen,
+                    salida = salida,
+                    request_username = request_username,
+                    series = series,
+                    ubicacion = ubicacion,
+                )
 
         c = connections[ connection_name ].cursor()
         c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% articulo.id )
@@ -187,6 +238,8 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
         transaction.commit_unless_managed()
         c.close()
         management.call_command( 'syncdb', database = connection_name )
+
+        
         msg = 'articulos agregados'
     else:
         msg = msg
