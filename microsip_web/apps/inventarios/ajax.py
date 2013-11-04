@@ -22,44 +22,6 @@ from microsip_web.apps.config.models import DerechoUsuario
 def allow_microsipuser( username = None, clave_objeto=  None ):
     return DerechoUsuario.objects.filter(usuario__nombre = username, clave_objeto = clave_objeto).exists() or username == 'SYSDBA'
 
-def ajustar_series(**kwargs):
-    connection_name = kwargs.get('connection_name', None)
-    salida = kwargs.get('salida', None)
-    articulo = kwargs.get('articulo', None)
-    articulo_clave = kwargs.get('articulo_clave', None)
-    request_username = kwargs.get('request_username', None)
-    almacen = kwargs.get('almacen', None)
-    series = kwargs.get('series', None)
-    msg = ''
-
-    existdiscretos_aeliminar = ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen).exclude(articulo_discreto__clave__in=series)
-    existdiscretos_aeliminar_count =existdiscretos_aeliminar.count()
-    
-    detalle_salidas = DoctosInDet.objects.create(
-            id= next_id('ID_DOCTOS', connection_name),
-            doctosIn= salida,
-            almacen= salida.almacen,
-            concepto= salida.concepto,
-            tipo_movto= 'S',
-            claveArticulo= articulo_clave,
-            articulo= articulo,
-            unidades= existdiscretos_aeliminar_count,
-            costo_unitario= articulo.costo_ultima_compra,
-            costo_total= articulo.costo_ultima_compra * existdiscretos_aeliminar_count,
-            usuario_ult_modif= request_username,
-            fechahora_ult_modif = datetime.now(),
-        )
-
-    for existdiscreto in existdiscretos_aeliminar:
-        existdiscreto.existencia = 0
-        existdiscreto.save()
-        articulo_discreto = ArticulosDiscretos.objects.filter( clave = existdiscreto.articulo_discreto.clave, articulo = articulo, tipo = 'S' )
-        ArticulosDiscretos.objects.filter( clave = existdiscreto.articulo_discreto.clave, articulo = articulo, tipo = 'S' ).update(fecha=datetime.now())
-        DesgloseEnDiscretos.objects.create( id = -1, docto_in_det = detalle_salidas, art_discreto = articulo_discreto, unidades = 1 )
-
-    return simplejson.dumps( { 'mensaje' : 'series ajustadas', } ) 
-
-
 def ajustar_seriesinventario_byarticulo( **kwargs ):
     # Parametros
     connection_name = kwargs.get('connection_name', None)
@@ -113,20 +75,26 @@ def ajustar_seriesinventario_byarticulo( **kwargs ):
             })[0]
 
         if detalle.tipo_movto == 'E':
-            ExistDiscreto.objects.get_or_create(articulo_discreto= articulo_discreto, almacen= almacen,
-                    defaults={'id':next_id('ID_DOCTOS', connection_name), 'existencia':1,},
-                    )[0]
+            try:
+                existencia_disc = ExistDiscreto.objects.get(articulo_discreto= articulo_discreto, almacen= almacen,)
+            except ObjectDoesNotExist:
+                ExistDiscreto.objects.create(id= next_id('ID_DOCTOS', connection_name), existencia= 1, articulo_discreto= articulo_discreto, almacen= almacen,)
+            else:
+                existencia_disc.existencia=1
+                existencia_disc.save()
 
         elif detalle.tipo_movto == 'S':
-            articulo_discreto.fecha = datetime.now()
-            articulo_discreto.save(update_fields=['fecha',],)
             ExistDiscreto.objects.filter(articulo_discreto= articulo_discreto, almacen = almacen).update(existencia=0)
             
         DesgloseEnDiscretos.objects.get_or_create(
-            docto_in_det=detalle,
-            art_discreto=articulo_discreto,
-            defaults={'id': next_id('ID_DOCTOS', connection_name), 'unidades': 1, 
-            })
+                    docto_in_det=detalle,
+                    art_discreto=articulo_discreto,
+                    defaults= {
+                        'id': next_id('ID_DOCTOS', connection_name),
+                        'unidades': 1,
+                    },
+                )
+
 
     if unidades < 0:
         unidades = - unidades    
@@ -186,7 +154,7 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
             ).count() > 0
         request_username = request.user.username
         #AJUSTAR SERIES
-        if ajusteprimerconteo:
+        if ajusteprimerconteo and not existe_en_detalles:
             existdiscretos_aeliminar = ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen).exclude(articulo_discreto__clave__in=series)
             existdiscretos_aeliminar_count =existdiscretos_aeliminar.count()
             series_aeliminar = []

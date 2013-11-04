@@ -11,30 +11,7 @@ function cerrar_inventario()
     'almacen_id' : $("#almacen_id").val(),
   });
 }
-function ajustarseries()
-{
-  var series='';
-  error =  0; 
-  $("input[id^='id_numeroserie']").each(function( index ) { 
-    if ($(this).val() == "" && error == 0)  
-    {
-      alert('por favor llena todos los campos')
-      error = 1;
-    }  
-    series = series + $(this).val()+',';
-  });
 
-  if (error == 1)
-    return;
-
-  Dajaxice.microsip_web.apps.inventarios.ajustar_series(alert_resultado,{
-    'articulo_id': $("#id_articulo").val()[0], 
-    'almacen_id': $("#almacen_id").val(),
-    'series': series,
-    'salida_id':  $("#salida_id").val(),
-    'unidades' : $("#id_unidades").val(),
-  }); 
-}
 /* Inicializar articulos */
 
 function agregar_articulos_porlineafn()
