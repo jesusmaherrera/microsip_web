@@ -156,10 +156,11 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
 
         elif not ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen, articulo_discreto__clave=serie).exists() and serie != '' and unidades < 0:
             msg = '%s El numero de serie %s no esta registrado.' % (msg, serie)
-            if ajusteprimerconteo and not existe_en_detalles:
-                msg= 'No esta permitido ajustar en primer conteo a valores negativos'
         if serie == '':
             series.remove(serie)
+    
+    if ajusteprimerconteo and not existe_en_detalles and unidades < 0:
+        msg= 'No esta permitido ajustar en primer conteo a valores negativos'
 
     if msg == '':
         request_username = request.user.username
