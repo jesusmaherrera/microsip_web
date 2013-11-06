@@ -75,6 +75,10 @@ def ajustar_seriesinventario_byarticulo( **kwargs ):
             })[0]
 
         if detalle.tipo_movto == 'E':
+            
+            if ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen, articulo_discreto__clave=serie).exists():
+                unidades =  unidades -1
+
             try:
                 existencia_disc = ExistDiscreto.objects.get(articulo_discreto= articulo_discreto, almacen= almacen,)
             except ObjectDoesNotExist:
@@ -137,21 +141,27 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
     series = series.split(',')
     msg = ''
 
+    existe_en_detalles = DoctosInDet.objects.filter(
+        Q(doctosIn__concepto=27) | Q(doctosIn__concepto=38), articulo=articulo,
+        almacen=almacen,
+        doctosIn__descripcion='ES INVENTARIO',
+        ).count() > 0
+
     #Checar numeros de serie
     for serie in series:
-        if ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen, articulo_discreto__clave=serie).exists() and serie != '' and unidades > 0:
-            msg = '%s El numero de serie %s ya esta registrado.' % (msg, serie)
+        if ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen, articulo_discreto__clave=serie).exists() and serie != '' and unidades > 0 :
+            #Si es la primera ves que se cuenta 
+            if not ajusteprimerconteo or (ajusteprimerconteo and existe_en_detalles):
+                msg = '%s El numero de serie %s ya esta registrado.' % (msg, serie)
+
         elif not ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen, articulo_discreto__clave=serie).exists() and serie != '' and unidades < 0:
             msg = '%s El numero de serie %s no esta registrado.' % (msg, serie)
+            if ajusteprimerconteo:
+                msg= 'No esta permitido ajustar en primer conteo a valores negativos'
         if serie == '':
             series.remove(serie)
 
     if msg == '':
-        existe_en_detalles = DoctosInDet.objects.filter(
-            Q(doctosIn__concepto=27) | Q(doctosIn__concepto=38), articulo=articulo,
-            almacen=almacen,
-            doctosIn__descripcion='ES INVENTARIO',
-            ).count() > 0
         request_username = request.user.username
         #AJUSTAR SERIES
         if ajusteprimerconteo and not existe_en_detalles:
@@ -209,7 +219,7 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
         management.call_command( 'syncdb', database = connection_name )
 
         
-        msg = 'articulos agregados'
+        msg = 'Movimiento registrado correctamente'
         
     else:
         error = True
