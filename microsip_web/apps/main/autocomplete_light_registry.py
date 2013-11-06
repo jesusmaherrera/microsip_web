@@ -2,12 +2,13 @@ from models import *
 from microsip_web.apps.main.filtros.models import *
 from microsip_web.apps.config.models import Empresa
 import autocomplete_light
+from django.db.models import Q
 
 autocomplete_light.register(ClavesArticulos, search_fields=('clave',),
     autocomplete_js_attributes={'placeholder': 'Clave ..'})
 
 autocomplete_light.register(Articulos, autocomplete_js_attributes = {'placeholder':'Articulo'},
-        search_fields = ('nombre',), choices= Articulos.objects.exclude(estatus = 'B', seguimiento='L'))
+        search_fields = ('nombre',), choices= Articulos.objects.filter( Q(seguimiento='N') | Q(seguimiento='S'), estatus='A' ) )
 
 autocomplete_light.register(Cliente, autocomplete_js_attributes={'placeholder': 'Busca un cliente ..'}, 
         search_fields=('nombre',), choices= Cliente.objects.all(), name='ClienteAutocomplete')

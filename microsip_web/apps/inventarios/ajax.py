@@ -581,7 +581,12 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     articulo_id = ''
     articulo_nombre = ''
     articulo_seguimiento = ''
-    clave_articulo = first_or_none( ClavesArticulos.objects.exclude( articulo__estatus = 'B').filter( clave = articulo_clave, articulo__seguimiento = 'N' ) )
+    clave_articulo = first_or_none( ClavesArticulos.objects.filter( clave = articulo_clave, articulo__estatus = 'A'))
+    
+    if clave_articulo:
+        if clave_articulo.articulo.seguimiento == 'L':
+            clave_articulo = None
+        
     opciones_clave = {}
     
     detalle_modificacionestime = ''
@@ -637,6 +642,9 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
             doctosIn__descripcion = 'ES INVENTARIO').order_by('fechahora_ult_modif')
 
         for detalle_entradas in detalles_entradas:
+            if not detalle_entradas.detalle_modificacionestime:
+                detalle_entradas.detalle_modificacionestime =''
+                
             detalle_modificacionestime = detalle_modificacionestime + detalle_entradas.detalle_modificacionestime
             costo_ultima_compra = detalle_entradas.costo_unitario
         
@@ -654,9 +662,10 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
             costo_ultima_compra = str(articulo.costo_ultima_compra)
     else:
         error = "no_existe_clave"
-        claves = ClavesArticulos.objects.exclude(articulo__estatus='B').filter( clave__contains = articulo_clave, articulo__seguimiento = 'N' )
+        claves = ClavesArticulos.objects.filter( clave__contains = articulo_clave, articulo__estatus='A',)
         for c in claves:
-            opciones_clave[ str( c.clave ) ] = c.articulo.nombre
+            if c.articulo.seguimiento == 'S' or c.articulo.seguimiento == 'N':
+                opciones_clave[ str( c.clave ) ] = c.articulo.nombre
     
     if not detalle_modificacionestime:
         detalle_modificacionestime = ''
