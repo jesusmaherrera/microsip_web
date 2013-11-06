@@ -24,6 +24,7 @@ def allow_microsipuser( username = None, clave_objeto=  None ):
 
 def ajustar_seriesinventario_byarticulo( **kwargs ):
     # Parametros
+    msg = ''
     connection_name = kwargs.get('connection_name', None)
     unidades = kwargs.get('unidades', None)
     articulo = kwargs.get('articulo', None)
@@ -99,7 +100,6 @@ def ajustar_seriesinventario_byarticulo( **kwargs ):
                     },
                 )
 
-
     if unidades < 0:
         unidades = - unidades    
     
@@ -113,6 +113,7 @@ def ajustar_seriesinventario_byarticulo( **kwargs ):
 
     detalle.detalle_modificacionestime += '%s %s/%s=%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_username, ubicacion, unidades)
     detalle.save( update_fields = [ 'unidades', 'fechahora_ult_modif','detalle_modificacionestime', ] )
+    return msg
 
 @dajaxice_register( method = 'GET' )
 def add_seriesinventario_byarticulo( request, **kwargs ):
@@ -173,7 +174,7 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
                 series_aeliminar.append(existdiscreto.articulo_discreto.clave)
 
             if existdiscretos_aeliminar_count > 0:
-                ajustar_seriesinventario_byarticulo(
+                msg = ajustar_seriesinventario_byarticulo(
                         connection_name = connection_name,
                         unidades = -existdiscretos_aeliminar_count,
                         articulo = articulo,
@@ -186,7 +187,7 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
                         ubicacion = ubicacion,
                     )
             
-            ajustar_seriesinventario_byarticulo(
+            msg = ajustar_seriesinventario_byarticulo(
                      connection_name = connection_name,
                      unidades = unidades,
                      articulo = articulo,
@@ -199,7 +200,7 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
                      ubicacion = ubicacion,
                  )
         else:
-           ajustar_seriesinventario_byarticulo(
+           msg = ajustar_seriesinventario_byarticulo(
                     connection_name = connection_name,
                     unidades = unidades,
                     articulo = articulo,
@@ -219,13 +220,19 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
         c.close()
         management.call_command( 'syncdb', database = connection_name )
 
+        if msg == '':
+            msg = 'Movimiento registrado correctamente'
         
-        msg = 'Movimiento registrado correctamente'
-        
+        entradasx, salidasx, existenciasx, exitencia = get_existencias_articulo(
+            articulo_id = articulo.id, 
+            connection_name = connection_name, 
+            fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
+            almacen = almacen, 
+            )
     else:
         error = True
-
-    return simplejson.dumps( { 'msg' : msg, 'error': error,} ) 
+        exitencia =''
+    return simplejson.dumps( { 'msg' : msg, 'error': error,'articulo_nombre': articulo.nombre, 'existencia_actual':  str(exitencia),} ) 
 
 @dajaxice_register( method = 'GET' )
 def get_seriesinventario_byarticulo( request, **kwargs ):

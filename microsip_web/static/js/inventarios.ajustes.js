@@ -113,7 +113,19 @@ function series_agregadas(data)
   alert(data.msg);
   if (data.error == false)
   {
-    window.location = "/inventarios/inventariofisico/" + $( "#almacen_id" ).val() + "/";
+    if ( $("#is_mobile").val() == 'False' )
+      window.location = "/inventarios/inventariofisico/" + $( "#almacen_id" ).val() + "/";
+    else
+    {
+      limpiarForm();
+      $("#ultimo_conteo").html("<strong>Ultimo conteo</strong><br> "+data.articulo_nombre+"<br>Ex Acual. "+data.existencia_actual+"");
+      $("#add_seies_btn").attr("disabled", false);
+      $("#add_seies_btn").text("Enviar"); 
+      $('#modal_series').modal("hide");
+
+    }
+
+    
   }
   else
   {
@@ -167,9 +179,10 @@ function add_existenciasarticulo_byajuste()
 
     for ( x = 1; x <= numero_series ; x++ )
     { 
-      inputs_html = inputs_html + "<input id='id_numeroserie_" + x + "' type='text'/> </br>";
+      inputs_html = inputs_html + "<input id='id_numeroserie_" + x + "' type='text' class='input-medium'/> </br>";
     }   
-    $("#table_numeros_serie > tbody").html(inputs_html);
+
+    $("#div_numeros_serie").html(inputs_html);
     $("#modal_series").modal();
 
     return;
@@ -278,7 +291,7 @@ function cargar_detallesmovimientos_articulo(entradas_detalles, salidas_detalles
   var entradas = entradas_detalles.split(',');
   var salidas = salidas_detalles.split(',');
   
-  var detalles_html = '<h5> ENTRADAS: </h5>';
+  var detalles_html = '<h6> ENTRADAS: </h6>';
   
   $.each(entradas, function(key, entrada) {
     numero = key + 1;
@@ -286,7 +299,7 @@ function cargar_detallesmovimientos_articulo(entradas_detalles, salidas_detalles
       detalles_html = detalles_html + numero + ") " + entrada + '<br>';
   });
 
-  detalles_html = detalles_html + '<h5> SALIDAS: </h5>';
+  detalles_html = detalles_html + '<h6> SALIDAS: </h6>';
   
   $.each(salidas, function(key, salida) {
     numero = key + 1;
@@ -304,17 +317,16 @@ function mostrar_articulo_byclave(data)
   if (data.error_msg == "no_existe_clave")
   {
     var opciones = data.opciones_clave;
-    var html_var = "<table><tr><th>Clave</th><th>Articulo</td><tr/>";
     var no_opciones = 0;
+    html_var = '';
     for (art in opciones)
     { 
       no_opciones = no_opciones +  1;
-      html_var = html_var + "<tr><td><a href='#' class='clave_link'>" + art + "</a></td>" + "<td>" + opciones[art] + "</td></tr>"
+      html_var = html_var + "<a href='#' class='clave_link'>" + art + "</a> " + opciones[art]+"<br>";
     }
-    html_var = html_var + "</table>";
     if (no_opciones > 0)
     {
-      $("#modal_opciones-claves > .modal-body").html(html_var);
+      $("#div_filterclaves").html(html_var);
       $(".clave_link").on("click",function(){
         $("#id_claveArticulo").val($(this).text());
         $("#modal_opciones-claves").modal("hide");
