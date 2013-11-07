@@ -428,6 +428,7 @@ def entradas_View( request, template_name = 'inventarios/Entradas/entradas.html'
 @login_required( login_url='/login/' )
 def entrada_manageView( request, id = None, template_name='inventarios/Entradas/entrada.html' ):
     message = ''
+    connection_name = get_conecctionname(request.session)
     hay_repetido = False
     if id:
         Entrada = get_object_or_404( DoctosIn, pk = id )
@@ -445,7 +446,7 @@ def entrada_manageView( request, id = None, template_name='inventarios/Entradas/
 
             #CARGA NUEVO ID
             if not Entrada.id:
-                Entrada.id = c_get_next_key('ID_DOCTOS')
+                Entrada.id = next_id( 'ID_DOCTOS', connection_name ),
                 Entrada.naturaleza_concepto = 'E'
             
             Entrada.save()

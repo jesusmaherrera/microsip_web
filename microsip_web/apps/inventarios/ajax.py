@@ -581,7 +581,7 @@ def get_detallesarticulo_byid( request, **kwargs ):
     articulo = Articulos.objects.get( pk = articulo_id )
 
     if not articulo_clave:
-        articulo_clave = first_or_none( ClavesArticulos.objects.filter( clave = articulo_clave, articulo__estatus = 'A'))
+        articulo_clave = first_or_none( ClavesArticulos.objects.filter( articulo_id = articulo_id, articulo__estatus = 'A'))
         if articulo_clave:
             articulo_clave = articulo_clave.clave
 
@@ -628,8 +628,6 @@ def get_articulo_byclave( request, **kwargs ):
     datos = {
         'articulo_id': articulo_id,
         'articulo_nombre': articulo_nombre,
-        # 'articulo_seguimiento': articulo_seguimiento,
-        # 'articulo_costoultimacompra' : format(articulo_costoultimacompra, '.2f'),
         'comun_name' : comun_name,
         'opciones_clave': opciones_clave,
     }

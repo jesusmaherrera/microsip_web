@@ -125,6 +125,8 @@ $("input[name*='costo_total']:last").live('keydown', function(e) {
 
 function cargar_detallesarticulo(data)
 {
+	if (data.articulo_seguimiento == 'S')
+		alert("articulo con serie no soportado");
 	var costo_unitario = $("input[name='"+data.comun_name+"costo_unitario']"); 
 	var unidades = $("input[name='"+data.comun_name+"unidades']");
 	var input_clavearticulo = $("input[name='"+data.comun_name+"claveArticulo']"); 

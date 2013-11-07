@@ -154,7 +154,7 @@ class UbicacionArticulosForm(forms.Form):
 
 class EntradaManageForm(forms.ModelForm):
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'class':'span12', 'rows':2, 'placeholder': 'Descripcion...',}) )
-    concepto = forms.ModelChoiceField( ConceptosIn.objects.filter( naturaleza= 'E'))
+    concepto = forms.ModelChoiceField( ConceptosIn.objects.filter( naturaleza= 'E', nombre_abrev='Compra'))
 
     def __init__(self, *args, **kwargs):
         super(EntradaManageForm, self).__init__(*args, **kwargs)
@@ -165,16 +165,16 @@ class EntradaManageForm(forms.ModelForm):
     class Meta:
         model = DoctosIn
         exclude = (
-            'cancelado',
-            'aplicado',
-            'forma_emitida',
-            'contabilizado',
-            'sistema_origen',
-            'naturaleza_concepto',
-            'usuario_creador',
-            'fechahora_creacion',
-            'usuario_ult_modif',
-            'fechahora_ult_modif',
+                'cancelado',
+                'aplicado',
+                'forma_emitida',
+                'contabilizado',
+                'sistema_origen',
+                'naturaleza_concepto',
+                'usuario_creador',
+                'fechahora_creacion',
+                'usuario_ult_modif',
+                'fechahora_ult_modif',
             )
 
 
@@ -186,18 +186,18 @@ class DoctoInDetManageForm(forms.ModelForm):
     class Meta:
         model   = DoctosInDet
         exclude = (
-            'doctosIn',
-            'tipo_movto',
-            'almacen',
-            'concepto',
-            'metodo_costeo',
-            'rol',
-            'cancelado',
-            'aplicado',
-            'costeo_pend',
-            'pedimento_pend',
-            'fecha',
-            'costo_total',)
+                'doctosIn',
+                'tipo_movto',
+                'almacen',
+                'concepto',
+                'metodo_costeo',
+                'rol',
+                'cancelado',
+                'aplicado',
+                'costeo_pend',
+                'pedimento_pend',
+                'fecha',
+            )
 
     def __init__(self, *args, **kwargs):
         super(DoctoInDetManageForm, self).__init__(*args, **kwargs)
