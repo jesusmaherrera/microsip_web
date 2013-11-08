@@ -9,12 +9,13 @@
 
 {% block breadcrumb %}{{ block.super }} Entradas {% endblock %}
 {% block content %}
+
 <div id="sic_from" class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
       <div class="container-fluid">
         <div class="row-fluid">
-          <h3>Almacenes</h3>  
+          <h3>Entradas</h3>  
         </div>
       </div>
     </div>
@@ -30,8 +31,7 @@
       <th>FOLIO</th>
       <th>FECHA</th>
       <th>DESCRIPCION</th>
-      <th>APLICADO</th>
-      <th>OPCIONES</th>
+      <!-- <th>OPCIONES</th> -->
     </tr>
     {% for entrada in entradas%}
     
@@ -40,10 +40,9 @@
       <td><a href="/inventarios/entrada/{{ entrada.id }}/">{{ entrada.folio }}</a></td>
       <td>{{ entrada.fecha }}</td>
       <td>{{ entrada.descripcion }}</td>
-      <td>{{ entrada.aplicado }}</td>
-      <td style="text-align:center;">
+      <!-- <td style="text-align:center;">
         <a href='#myModal{{ entrada.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
-      </td>
+      </td> -->
     </tr>
     {% endfor %}
 

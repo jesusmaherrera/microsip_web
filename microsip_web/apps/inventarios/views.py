@@ -461,7 +461,7 @@ def entrada_manageView( request, id = None, template_name='inventarios/Entradas/
                     DetalleEntrada.docto_invfis = Entrada
             
             EntradaItems_formset.save()
-            return HttpResponseRedirect('/Entradas/')
+            return HttpResponseRedirect('/entradas/')
     else:
         Entrada_items = doctoIn_items_formset(DoctosInDetManageForm, extra=1, can_delete=True)
         Entrada_form= EntradaManageForm(instance=Entrada)

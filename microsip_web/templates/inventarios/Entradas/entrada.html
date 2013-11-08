@@ -25,17 +25,17 @@
 $(function() {
   $('#id_doctosIn_table tbody tr').formset({
     prefix: '{{ formset.prefix }}',
-    addCssClass:'btn btn-success',
+    addCssClass:'hide',
     addText:'Nuevo Articulo',
     deleteText:'',
   });
+  $("input[name*='claveArticulo']:last")[0].focus();  
 });
 </script>
 
 {% endblock %}
 {% block breadcrumb %}{{ block.super }} <a href="/inventarios/entradas/">Entradas</a> <i class="icon-play"></i> Entrada{% endblock %}
 {% block content %}
-
 <div id="modal_opciones-claves" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -92,7 +92,7 @@ $(function() {
   </div>
 </div>
     
-  {{ formset.total_form_count }} Articulos
+  
   {% if message %}
   <div class="alert alert-block alert-error fade in">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -100,37 +100,36 @@ $(function() {
     <p>{{ message }}</p>
   </div>
   {% endif %}
-  <hr>
-  <div id="doctosIn_data">
-    <fieldset>
-      <table class="table tableCell table-hover" id="id_doctosIn_table" border="0" cellpadding="0" cellspacing="5">
-        <thead>
-          <tr>
-            <th>Clave</th>
-            <th>Articulo</th>
-            <th>Unidades</th>
-            <th>Costo Unitario</th>
-            <th>Costo Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for form in formset.forms %}
-          <tr id="{{ form.prefix }}-row" class="form-container">
-            {{ form.errors }}
-            <td> {{ form.claveArticulo }} </td>
-            <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}
-            	{{ form.articulo }}</td>
-            <td>{{ form.unidades }}
-              {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
-            </td>
-            <td>{{ form.costo_unitario }}</td>
-            <td>{{ form.costo_total }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </fieldset>
-    {{ formset.management_form }}
+  <table class="table tableCell table-hover" id="id_doctosIn_table" border="0" cellpadding="0" cellspacing="5">
+    <thead>
+      <tr>
+        <th>Clave</th>
+        <th>Articulo</th>
+        <th>Unidades</th>
+        <th>Costo Unitario</th>
+        <th>Costo Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for form in formset.forms %}
+      <tr id="{{ form.prefix }}-row" class="form-container">
+        {{ form.errors }}
+        <td> {{ form.claveArticulo }} </td>
+        <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+        	{{ form.articulo }}</td>
+        <td>{{ form.unidades }}
+          {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+        </td>
+        <td>{{ form.costo_unitario }}</td>
+        <td>{{ form.costo_total }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class='row-fluid'>
+    <span class='span9'>{{ formset.total_form_count }} Articulos</span>
+    <span class='span3' id='span_total_ventas'></span>
   </div>
+  {{ formset.management_form }}
 </form>
 {% endblock %}

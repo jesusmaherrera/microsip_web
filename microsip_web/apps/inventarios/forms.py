@@ -218,7 +218,7 @@ class DoctosInDetManageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(DoctosInDetManageForm, self).__init__(*args, **kwargs)
         self.fields['costo_unitario'].widget.attrs['class'] = 'input-mini'
-        self.fields['costo_total'].widget.attrs['disabled'] = ''
+        # self.fields['costo_total'].widget.attrs['disabled'] = ''
         self.fields['costo_total'].widget.attrs['class'] = 'input-small'
 
     class Meta:

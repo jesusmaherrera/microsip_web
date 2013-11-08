@@ -572,18 +572,42 @@ def add_articulossinexistencia_bylinea( request, **kwargs ):
     return simplejson.dumps( { 'articulos_agregados' : articulos_agregados, 'articulo_pendientes' : articulos_pendientes, } )
 
 @dajaxice_register( method = 'GET' )
+def get_detallesarticulo_byid( request, **kwargs ):
+    """ Selecionar un articulo por clave """
+    #Paramentros
+    articulo_id = kwargs.get( 'articulo_id', None)
+    comun_name = kwargs.get( 'comun_name', None)
+    articulo_clave = kwargs.get( 'articulo_clave', None)
+    articulo = Articulos.objects.get( pk = articulo_id )
+
+    if not articulo_clave:
+        articulo_clave = first_or_none( ClavesArticulos.objects.filter( clave = articulo_clave, articulo__estatus = 'A'))
+        if articulo_clave:
+            articulo_clave = articulo_clave.clave
+
+    datos = {
+        'articulo_id': articulo.id,
+        'articulo_nombre': articulo.nombre,
+        'comun_name' : comun_name,
+        'articulo_clave' : articulo_clave,
+        'articulo_seguimiento': articulo.seguimiento,
+        'articulo_costoultimacompra' : format(articulo.costo_ultima_compra, '.2f'),
+    }
+
+    return HttpResponse( json.dumps( datos ), mimetype = "application/javascript" )
+
+
+@dajaxice_register( method = 'GET' )
 def get_articulo_byclave( request, **kwargs ):
     """ Selecionar un articulo por clave """
     #Paramentros
     clave = kwargs.get( 'clave', None)
-    comun_id = kwargs.get( 'comun_id', None)
+    comun_name = kwargs.get( 'comun_name', None)
     clave_articulo = first_or_none( ClavesArticulos.objects.filter( clave = clave, articulo__estatus = 'A'))
 
     articulo_id = ''
     articulo_nombre = ''
-    articulo_seguimiento = ''
-    articulo_costoultimacompra = ''
-
+    
     #Para excluir claves de ariculos con lotes
     if clave_articulo:
         if clave_articulo.articulo.seguimiento == 'L':
@@ -595,8 +619,6 @@ def get_articulo_byclave( request, **kwargs ):
         articulo = Articulos.objects.get( pk = clave_articulo.articulo.id )
         articulo_id = articulo.id
         articulo_nombre = articulo.nombre
-        articulo_seguimiento = articulo.seguimiento     
-        articulo_costoultimacompra = articulo.costo_ultima_compra   
     else:
         claves = ClavesArticulos.objects.filter( clave__contains=clave, articulo__estatus='A',)
         for c in claves:
@@ -606,13 +628,12 @@ def get_articulo_byclave( request, **kwargs ):
     datos = {
         'articulo_id': articulo_id,
         'articulo_nombre': articulo_nombre,
-        'articulo_seguimiento': articulo_seguimiento,
-        'articulo_costoultimacompra' : str(articulo_costoultimacompra),
-        'comun_id' : comun_id,
+        # 'articulo_seguimiento': articulo_seguimiento,
+        # 'articulo_costoultimacompra' : format(articulo_costoultimacompra, '.2f'),
+        'comun_name' : comun_name,
         'opciones_clave': opciones_clave,
     }
-
-
+    
     return HttpResponse( json.dumps( datos ), mimetype = "application/javascript" )
 
 @dajaxice_register( method = 'GET' )
