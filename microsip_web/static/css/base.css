@@ -19,6 +19,14 @@ body {
 #sic_form_details {
   background-color: #fff;
   margin-bottom: 1em;
+  padding-bottom: 1em;
+}
+#sicfrom-title .row {
+  padding-left: 2em;
+  padding-bottom: 0.5em;
+}
+#sicfrom-title .row span.add-on {
+  width: 62px;
 }
 #ubicacionform {
   float: left;

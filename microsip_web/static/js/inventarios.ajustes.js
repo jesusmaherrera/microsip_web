@@ -421,7 +421,6 @@ $('#id_claveArticulo').live('keydown', function(e) {
 
   if (keyCode == 13 || keyCode == 9) 
   { 
-
     buscarClave();
     /*return false*/
   }

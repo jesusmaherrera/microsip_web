@@ -17,9 +17,9 @@ urlpatterns = patterns('',
     # (r'^preferencias/', views.preferencias_manageview),
     #(r'^InventarioFisico/Delete/(?P<id>\d+)/', views.invetarioFisico_delete),
     #ENTRADAS
-    # (r'^Entradas/$', views.entradas_View),
-    # (r'^Entrada/$', views.entrada_manageView),
-    # (r'^Entrada/(?P<id>\d+)/', views.entrada_manageView),
+    (r'^entradas/$', views.entradas_View),
+    (r'^entrada/$', views.entrada_manageView),
+    (r'^entrada/(?P<id>\d+)/', views.entrada_manageView),
     # (r'^Entrada/Delete/(?P<id>\d+)/', views.entrada_delete),
     #SALIDAS
     # (r'^Salidas/$', views.salidas_View),
