@@ -152,23 +152,31 @@ class linea_articulos_form(forms.Form):
 class UbicacionArticulosForm(forms.Form):
     ubicacion = forms.CharField(widget=forms.TextInput(attrs={'class':'input-small',}))
 
-class DoctosInManageForm(forms.ModelForm):
-    file_inventario = forms.CharField(widget=forms.FileInput, required = False)
-    
+class EntradaManageForm(forms.ModelForm):
+    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class':'span12', 'rows':2, 'placeholder': 'Descripcion...',}) )
+    concepto = forms.ModelChoiceField( ConceptosIn.objects.filter( naturaleza= 'E', nombre_abrev='Compra'))
+
+    def __init__(self, *args, **kwargs):
+        super(EntradaManageForm, self).__init__(*args, **kwargs)
+        self.fields['fecha'].widget.attrs['class'] = 'input-small'
+        self.fields['folio'].widget.attrs['class'] = 'input-small'
+
+
     class Meta:
         model = DoctosIn
         exclude = (
-            'cancelado',
-            'aplicado',
-            'forma_emitida',
-            'contabilizado',
-            'sistema_origen',
-            'naturaleza_concepto',
-            'usuario_creador',
-            'fechahora_creacion',
-            'usuario_ult_modif',
-            'fechahora_ult_modif',
+                'cancelado',
+                'aplicado',
+                'forma_emitida',
+                'contabilizado',
+                'sistema_origen',
+                'naturaleza_concepto',
+                'usuario_creador',
+                'fechahora_creacion',
+                'usuario_ult_modif',
+                'fechahora_ult_modif',
             )
+
 
 class DoctoInDetManageForm(forms.ModelForm):
     articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
@@ -178,34 +186,40 @@ class DoctoInDetManageForm(forms.ModelForm):
     class Meta:
         model   = DoctosInDet
         exclude = (
-            'doctosIn',
-            'tipo_movto',
-            'almacen',
-            'concepto',
-            'metodo_costeo',
-            'rol',
-            'cancelado',
-            'aplicado',
-            'costeo_pend',
-            'pedimento_pend',
-            'fecha',
-            'costo_total',)
+                'doctosIn',
+                'tipo_movto',
+                'almacen',
+                'concepto',
+                'metodo_costeo',
+                'rol',
+                'cancelado',
+                'aplicado',
+                'costeo_pend',
+                'pedimento_pend',
+                'fecha',
+            )
 
     def __init__(self, *args, **kwargs):
         super(DoctoInDetManageForm, self).__init__(*args, **kwargs)
-        self.fields['claveArticulo'].widget.attrs['class'] = 'input-medium'
+        self.fields['claveArticulo'].widget.attrs['class'] = 'input-mini'
         self.fields['claveArticulo'].widget.attrs['placeholder'] = "clave"
         
 
 class DoctosInDetManageForm(forms.ModelForm):    
     claveArticulo = forms.CharField(
         max_length=100, 
-        widget=forms.TextInput(attrs={"class":"input-medium", "placeholder":"clave ...",}),
+        widget=forms.TextInput(attrs={"class":"input-small", "placeholder":"Clave",}),
         required=False
         )
 
     articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
     unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades ...'}),required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(DoctosInDetManageForm, self).__init__(*args, **kwargs)
+        self.fields['costo_unitario'].widget.attrs['class'] = 'input-mini'
+        # self.fields['costo_total'].widget.attrs['disabled'] = ''
+        self.fields['costo_total'].widget.attrs['class'] = 'input-small'
 
     class Meta:
         # widgets = autocomplete_light.get_widgets_dict(DoctosInDet)

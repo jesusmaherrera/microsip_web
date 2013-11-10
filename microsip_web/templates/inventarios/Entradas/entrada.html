@@ -1,5 +1,4 @@
 {% extends "inventarios/base.html" %}
-{% block title %}Inicio{% endblock %}
 
 <!-- CSS Code -->
 {% block style_css %}
@@ -12,60 +11,87 @@
 <link rel='stylesheet' href='{{STATIC_URL}}css/redmond/jquery-ui-1.8.23.custom.css'/>
 
 {% endblock %}
-
 <!-- JavaScript Code -->
 {% block js_code %}
+{% include 'autocomplete_light/static.html' %}
 <script type="text/javascript">
     // Define this so we don't have to bother with the admin jsi18n stuff:
     function gettext(msgid) { return msgid; }
 </script>
 <script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script src='{{STATIC_URL}}js/inventarios/entradas.js'></script>
 <script type="text/javascript">
 $(function() {
   $('#id_doctosIn_table tbody tr').formset({
     prefix: '{{ formset.prefix }}',
-    addCssClass:'btn btn-success',
+    addCssClass:'hide',
     addText:'Nuevo Articulo',
     deleteText:'',
   });
+  $("input[name*='claveArticulo']:last")[0].focus();  
 });
 </script>
 
 {% endblock %}
-{% block breadcrumb %}{{ block.super }} <a href="/Entradas/">Entradas</a> > Entrada{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/inventarios/entradas/">Entradas</a> <i class="icon-play"></i> Entrada{% endblock %}
 {% block content %}
-<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
-  {% csrf_token %}
-  <div class="form-actions mainmenu">
-    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
+<div id="modal_opciones-claves" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="myModalLabel">Claves</h3>
   </div>
-    {{ Entrada_form.errors }}
+  <div class="modal-body" id="div_filterclaves">
+  </div>
+</div>
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+{{ Entrada_form.errors }}
+<div id="sic_from" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span8" id="sicfrom-title">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <h3 style="width:5em;">Entrada  </h3> 
+          <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
+          <a  href="#" class="btn disabled"><i class="icon-ban-circle"></i></a> 
+          <a href="#" class="btn disabled"><i class="icon-trash"></i></a> 
+        </div>
+        <div class="row">
+          Concepto
+          {{ Entrada_form.concepto }}
+        </div>
+        <div class="row">
+          Almacen
+          {{ Entrada_form.almacen }}
+        </div>
+      </div>
+    </div>
+    <div class="span4">
+      <div id="sic_form_details" class="container-fluid">
+        <div class="row-fluid">
+          <div class="span6" >
+            <label>Fecha</label>
+            <div class="input-append">
+              {{ Entrada_form.fecha }} 
+              <span class="add-on"><i class="icon-calendar"></i> </span>
+            </div>
+          </div> 
+          <div class="span6" >
+            <label>Folio</label>
+            <div >
+              {{ Entrada_form.folio }} 
+            </div>
+          </div>  
+        </div>
+        
+      </div>
+      <div class="row-fluid">
+        {{ Entrada_form.descripcion }} 
+      </div>
+    </div>
+  </div>
+</div>
+    
   
-   <div class="control-group">
-    <label class="control-label" for="id_folio">Folio</label>
-    <div class="controls">
-      {{ Entrada_form.folio }} 
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="id_descripcion">Descripcion</label>
-    <div class="controls">
-      {{ Entrada_form.descripcion }} 
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="id_concepto">Cocepto</label>
-    <div class="controls">
-      {{ Entrada_form.concepto }}
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="id_almacen">Almacen</label>
-    <div class="controls">
-      {{ Entrada_form.almacen }}
-    </div>
-  </div>
-  {{ formset.total_form_count }} Articulos
   {% if message %}
   <div class="alert alert-block alert-error fade in">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -73,53 +99,36 @@ $(function() {
     <p>{{ message }}</p>
   </div>
   {% endif %}
-  <hr>
-  {% ifequal Entrada_form.folio.value  '' %}
-    <a href="{{STATIC_URL}}plantilla_inventarioFisico.xlsx">Descargar plantilla</a>
-    <br>
-    Agregar campos desde archivo de excel: {{ Entrada_form.file_inventario }}<input type="submit" name='excel' class="btn btn-primary" value="Cargar" />
-  {% endifequal %}
-  
-  <div id="doctosIn_data">
-    <fieldset>
-      <table class="table tableCell table-hover" id="id_doctosIn_table" border="0" cellpadding="0" cellspacing="5">
-        <thead>
-          <tr>
-            <th>Articulo</th>
-            <th>Unidades</th>
-            <th>Costo Unitario</th>
-            <th>Costo Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for form in formset.forms %}
-          <tr id="{{ form.prefix }}-row" class="form-container">
-            {{ form.errors }}
-            <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}
-            	{{ form.articulo }}</td>
-            <td>{{ form.unidades }}
-              {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
-            </td>
-            <td>{{ form.costo_unitario }}</td>
-            <td>{{ form.costo_total }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </fieldset>
-    {{ formset.management_form }}
+  <table class="table tableCell table-hover" id="id_doctosIn_table" border="0" cellpadding="0" cellspacing="5">
+    <thead>
+      <tr>
+        <th>Clave</th>
+        <th>Articulo</th>
+        <th>Unidades</th>
+        <th>Costo Unitario</th>
+        <th>Costo Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for form in formset.forms %}
+      <tr id="{{ form.prefix }}-row" class="form-container">
+        {{ form.errors }}
+        <td> {{ form.claveArticulo }} </td>
+        <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+        	{{ form.articulo }}</td>
+        <td>{{ form.unidades }}
+          {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+        </td>
+        <td>{{ form.costo_unitario }}</td>
+        <td>{{ form.costo_total }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class='row-fluid'>
+    <span class='span9'>{{ formset.total_form_count }} Articulos</span>
+    <span class='span3' id='span_total_ventas'></span>
   </div>
-  {% if message %}
-  <div class="alert alert-block alert-error fade in">
-    <button type="button" class="close" data-dismiss="alert">×</button>
-    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
-    <p>{{ message }}</p>
-  </div>
-  {% endif %}
-  <div class="form-actions mainmenu">
-    <input type="submit" class="btn btn-primary" value="Guardar y Salir" />
-  </div>
+  {{ formset.management_form }}
 </form>
-
-{% include 'autocomplete_light/static.html' %}
 {% endblock %}

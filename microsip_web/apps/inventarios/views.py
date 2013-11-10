@@ -428,6 +428,7 @@ def entradas_View( request, template_name = 'inventarios/Entradas/entradas.html'
 @login_required( login_url='/login/' )
 def entrada_manageView( request, id = None, template_name='inventarios/Entradas/entrada.html' ):
     message = ''
+    connection_name = get_conecctionname(request.session)
     hay_repetido = False
     if id:
         Entrada = get_object_or_404( DoctosIn, pk = id )
@@ -435,72 +436,36 @@ def entrada_manageView( request, id = None, template_name='inventarios/Entradas/
         Entrada = DoctosIn()
 
     if request.method == 'POST':
-        Entrada_form = DoctosInManageForm( request.POST, request.FILES, instance = Entrada )
-
-        #PARA CARGAR DATOS DE EXCEL
-        if 'excel' in request.POST:
-            input_excel = request.FILES[ 'file_inventario' ]
-            book = xlrd.open_workbook( file_contents = input_excel.read() )
-            sheet = book.sheet_by_index( 0 )
-            articulos = Articulos.objects.filter( es_almacenable = 'S' )
-
-            Entrada_items = doctoIn_items_formset( DoctosInDetManageForm, extra = articulos.count(), can_delete = True )
-            
-            lista = []
-            lista_articulos = []        
-
-            for i in range(sheet.nrows):
-                clave_articulo = get_object_or_404(ClavesArticulos, clave=sheet.cell_value(i,0))
-                if clave_articulo and clave_articulo.articulo.es_almacenable=='S':
-                    if clave_articulo.articulo.id in lista_articulos:
-                        message = 'El Articulo [%s] esta repetido en el archivo de excel por favor corrigelo para continuar '% clave_articulo.articulo.nombre
-                        hay_repetido = True
-                    lista.append({'articulo': clave_articulo.articulo, 'clave':clave_articulo.clave, 'unidades':int(sheet.cell_value(i,1)),})
-                    lista_articulos.append(clave_articulo.articulo.id)
-
-            
-            articulos_enceros = Articulos.objects.exclude(pk__in=lista_articulos).filter(es_almacenable='S')
-            
-            for i in articulos_enceros:
-                
-                #clave_articulo = ClavesArticulos.objects.filter(articulo__id=i.id)
-                articulosclav = ClavesArticulos.objects.filter(articulo__id=i.id)
-                if articulosclav:
-                    lista.append({'articulo': i, 'clave':articulosclav[0].clave , 'unidades':0,})   
-                else:
-                    lista.append({'articulo': i, 'clave':'', 'unidades':0,})    
-
-            EntradaItems_formset = Entrada_items(initial=lista)
+        Entrada_form = EntradaManageForm( request.POST, request.FILES, instance = Entrada )
         #GUARDA CAMBIOS EN INVENTARIO FISICO
-        else:
-            Entrada_items = doctoIn_items_formset(DoctosInDetManageForm, extra=1, can_delete=True)
-            EntradaItems_formset = Entrada_items(request.POST, request.FILES, instance=Entrada)
+        Entrada_items = doctoIn_items_formset(DoctosInDetManageForm, extra=1, can_delete=True)
+        EntradaItems_formset = Entrada_items(request.POST, request.FILES, instance=Entrada)
+        
+        if Entrada_form.is_valid() and EntradaItems_formset.is_valid():
+            Entrada = Entrada_form.save(commit = False)
+
+            #CARGA NUEVO ID
+            if not Entrada.id:
+                Entrada.id = next_id( 'ID_DOCTOS', connection_name ),
+                Entrada.naturaleza_concepto = 'E'
             
-            if Entrada_form.is_valid() and EntradaItems_formset.is_valid():
-                Entrada = Entrada_form.save(commit = False)
+            Entrada.save()
 
-                #CARGA NUEVO ID
-                if not Entrada.id:
-                    Entrada.id = c_get_next_key('ID_DOCTOS')
-                    Entrada.naturaleza_concepto = 'E'
-                
-                Entrada.save()
-
-                #GUARDA ARTICULOS DE INVENTARIO FISICO
-                for articulo_form in EntradaItems_formset:
-                    DetalleEntrada = articulo_form.save(commit = False)
-                    #PARA CREAR UNO NUEVO
-                    if not DetalleEntrada.id:
-                        DetalleEntrada.id = -1
-                        DetalleEntrada.almacen = Entrada.almacen
-                        DetalleEntrada.concepto = Entrada.concepto
-                        DetalleEntrada.docto_invfis = Entrada
-                
-                EntradaItems_formset.save()
-                return HttpResponseRedirect('/Entradas/')
+            #GUARDA ARTICULOS DE INVENTARIO FISICO
+            for articulo_form in EntradaItems_formset:
+                DetalleEntrada = articulo_form.save(commit = False)
+                #PARA CREAR UNO NUEVO
+                if not DetalleEntrada.id:
+                    DetalleEntrada.id = -1
+                    DetalleEntrada.almacen = Entrada.almacen
+                    DetalleEntrada.concepto = Entrada.concepto
+                    DetalleEntrada.docto_invfis = Entrada
+            
+            EntradaItems_formset.save()
+            return HttpResponseRedirect('/entradas/')
     else:
         Entrada_items = doctoIn_items_formset(DoctosInDetManageForm, extra=1, can_delete=True)
-        Entrada_form= DoctosInManageForm(instance=Entrada)
+        Entrada_form= EntradaManageForm(instance=Entrada)
         EntradaItems_formset = Entrada_items(instance=Entrada)
     
     c = {'Entrada_form': Entrada_form, 'formset': EntradaItems_formset, 'message':message,}

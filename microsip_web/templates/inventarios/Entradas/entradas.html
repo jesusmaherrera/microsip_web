@@ -1,5 +1,4 @@
 {% extends "inventarios/base.html" %}
-{% block title %}Inicio{% endblock %}
 
 <!-- CSS Code -->
 {% block style_css %}{% endblock %}
@@ -9,44 +8,40 @@
 
 {% block breadcrumb %}{{ block.super }} Entradas {% endblock %}
 {% block content %}
-<div class="form-actions mainmenu">
-  <a class="btn btn-success" href="/inventarios/Entrada/">Nueva</a>
+
+<div id="sic_from" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <h3>Entradas</h3>  
+        </div>
+      </div>
+    </div>
+    <div class="span10">
+      <div id='main_form'>
+        <a class="btn" href="/inventarios/entrada/"><i class="icon-plus"></i></a>
+      </div>
+    </div>
+  </div>
 </div>
 <table class="table tableCell table-hover">
     <tr>
-      <th>ID</th>
       <th>FOLIO</th>
       <th>FECHA</th>
       <th>DESCRIPCION</th>
-      <th>APLICADO</th>
-      <th>OPCIONES</th>
+      <!-- <th>OPCIONES</th> -->
     </tr>
     {% for entrada in entradas%}
-    <div id="myModal{{ entrada.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
-      </div>
-      <div class="modal-body">
-        <h4>Al eliminar la entrada con el folio: {{ entrada.folio }}</h4>
-        <p style="color:red;">Ya no sera posible recuperar los datos del inventario</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" data-dismiss="modal">Cancelar</button>
-        <a href="/inventarios/Entrada/Delete/{{ entrada.id }}/" class="btn btn-primary">Estoy Seguro</a>
-      </div>
-    </div>
+    
     <tr>
-      <td>
-        <a href="/inventarios/Entrada/{{ entrada.id }}/">{{ entrada.id }}</a>
-      </td>
-      <td>{{ entrada.folio }}</td>
+      
+      <td><a href="/inventarios/entrada/{{ entrada.id }}/">{{ entrada.folio }}</a></td>
       <td>{{ entrada.fecha }}</td>
       <td>{{ entrada.descripcion }}</td>
-      <td>{{ entrada.aplicado }}</td>
-      <td style="text-align:center;">
+      <!-- <td style="text-align:center;">
         <a href='#myModal{{ entrada.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
-      </td>
+      </td> -->
     </tr>
     {% endfor %}
 
