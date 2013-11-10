@@ -574,12 +574,12 @@ class DoctosInvfisDet(models.Model):
     clave       = models.CharField(blank=True, null=True, max_length=20, db_column='CLAVE_ARTICULO')
     articulo    = models.ForeignKey(Articulos, db_column='ARTICULO_ID')
     unidades    = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='UNIDADES')
-    fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='SIC_FECHAHORA_U')
-    usuario_ult_modif = models.CharField(blank=True, null=True, max_length=31, db_column='SIC_USUARIO_ULT_MODIF')
-    detalle_modificaciones = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLE_MODIFICACIONES')
-    detalle_modificacionestime = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLETIME_MODIFICACIONES')
-    unidades_syn = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='SIC_UNIDADES_SYN')
-    unidades_margen = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='SIC_UNIDADESMARGEN')
+    # fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='SIC_FECHAHORA_U')
+    # usuario_ult_modif = models.CharField(blank=True, null=True, max_length=31, db_column='SIC_USUARIO_ULT_MODIF')
+    # detalle_modificaciones = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLE_MODIFICACIONES')
+    # detalle_modificacionestime = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLETIME_MODIFICACIONES')
+    # unidades_syn = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='SIC_UNIDADES_SYN')
+    # unidades_margen = models.DecimalField(default=0, blank=True, null=True, max_digits=18, decimal_places=5, db_column='SIC_UNIDADESMARGEN')
     
     def __unicode__(self):
         return u'%s' % self.id
@@ -637,7 +637,6 @@ class DesgloseEnDiscretosInvfis(models.Model):
     docto_invfis_det = models.ForeignKey(DoctosInvfisDet, db_column='DOCTO_INVFIS_DET_ID')
     art_discreto = models.ForeignKey(ArticulosDiscretos, db_column='ART_DISCRETO_ID')
     unidades = models.IntegerField(default=0, blank=True, null=True, db_column='UNIDADES')
-    sic_nuevo = models.CharField(default='N', max_length=1, db_column='SIC_NUEVO')
     
     def __unicode__(self):
         return u'%s' % self.id

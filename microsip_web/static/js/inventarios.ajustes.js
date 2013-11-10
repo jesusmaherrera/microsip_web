@@ -27,8 +27,7 @@ function agregar_articulos_porlineafn()
     Dajaxice.microsip_web.apps.inventarios.add_articulossinexistencia_bylinea(mostrar_articulos_agregados,{
         'ubicacion' : $("#id_ubicacion").val(),
         'linea_id' : linea,
-        'entrada_id' : $("#entrada_id").val(),
-        'salida_id' : $("#salida_id").val(),
+        'almacen_id' : $("#almacen_id").val(),
       });
 
     $('#btn_agregar_articulosinexistencia_bylinea').hide();
@@ -45,8 +44,7 @@ function agregar_articulos_fn()
 
   Dajaxice.microsip_web.apps.inventarios.add_articulossinexistencia(mostrar_articulos_agregados,{
     'ubicacion' : $("#id_ubicacion").val(),
-    'entrada_id' : $("#entrada_id").val(),
-    'salida_id' : $("#salida_id").val(),
+    'almacen_id' : $("#almacen_id").val(),
   });
 
   $('#btn_agregar_articulosinexistencia').hide();
@@ -65,7 +63,12 @@ function mostrar_articulos_agregados(data)
     alert(mensaje);
   }
   else
-    alert('No hay articulos por inicializar');
+  {
+    if (data.message != '')
+      alert(data.message);
+    else
+      alert('No hay articulos por inicializar');
+  }
 
   window.location = "/inventarios/inventariofisico/" + $( "#almacen_id" ).val() + "/";
   

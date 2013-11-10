@@ -138,13 +138,6 @@ def sincronizar_tablas( conexion_name = None ):
     c.execute('DROP PROCEDURE SIC_FILTROS_ARTICULOS_AT;')   
 
     #inventarios
-    c.execute( procedures['SIC_DOCTOINVFISDET_AT'] )
-    c.execute("EXECUTE PROCEDURE SIC_DOCTOINVFISDET_AT;")
-    c.execute("DROP PROCEDURE SIC_DOCTOINVFISDET_AT;")
-
-    c.execute( procedures['SIC_DESGDISCINVFIS_AT'] )
-    c.execute("EXECUTE PROCEDURE SIC_DESGDISCINVFIS_AT;")
-    c.execute("DROP PROCEDURE SIC_DESGDISCINVFIS_AT;")
 
     c.execute( procedures['SIC_DOCTOSINDET_AT'] )
     c.execute("EXECUTE PROCEDURE SIC_DOCTOSINDET_AT;")
