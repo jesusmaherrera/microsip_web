@@ -421,6 +421,7 @@ def close_inventario_byalmacen_view( request, **kwargs ):
     almacen_id = kwargs.get( 'almacen_id', None )
     almacen = Almacenes.objects.get(pk= almacen_id)
     almacen.inventariando = False
+    almacen.inventario_conajustes = False
     almacen.save()
 
     DoctosIn.objects.filter(almacen__ALMACEN_ID = almacen_id, descripcion='ES INVENTARIO').update(descripcion= 'INVENTARIO CERRADO')
