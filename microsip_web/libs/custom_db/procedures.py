@@ -16,6 +16,22 @@ procedures[ 'SIC_PUERTA_DEL_TRIGGERS' ] = '''
     end
     '''
 
+procedures[ 'SIC_ALMACENES_AT' ] = '''
+    CREATE OR ALTER PROCEDURE SIC_ALMACENES_AT 
+    as
+    begin
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'ALMACENES' and rf.RDB$FIELD_NAME = 'SIC_INVENTARIANDO')) then
+            execute statement 'ALTER TABLE ALMACENES ADD SIC_INVENTARIANDO SMALLINT DEFAULT 1';
+
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'ALMACENES' and rf.RDB$FIELD_NAME = 'SIC_INVCONAJUSTES')) then
+            execute statement 'ALTER TABLE ALMACENES ADD SIC_INVCONAJUSTES SMALLINT DEFAULT 0';
+    end
+    '''
+
 procedures['SIC_DOCTOSINDET_AT'] = '''
     CREATE OR ALTER PROCEDURE SIC_DOCTOSINDET_AT
     as

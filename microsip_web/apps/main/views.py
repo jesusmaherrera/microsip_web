@@ -143,6 +143,10 @@ def sincronizar_tablas( conexion_name = None ):
     c.execute("EXECUTE PROCEDURE SIC_DOCTOSINDET_AT;")
     c.execute("DROP PROCEDURE SIC_DOCTOSINDET_AT;")
 
+    c.execute( procedures['SIC_ALMACENES_AT'] )
+    c.execute("EXECUTE PROCEDURE SIC_ALMACENES_AT;")
+    c.execute("DROP PROCEDURE SIC_ALMACENES_AT;")
+
     transaction.commit_unless_managed()
 
 def ventas_inicializar_tablas( conexion_name = None ):

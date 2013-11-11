@@ -12,6 +12,8 @@ urlpatterns = patterns('',
     
     (r'^articulos/$', pv_views.articulos_view),
     (r'^almacenes/$', views.almacenes_view),
+    (r'^almacenes/abririnventario/(?P<almacen_id>\d+)/$', views.abrir_inventario_byalmacen),
+    
 
     (r'^articulo/(?P<id>\d+)/', pv_views.articulo_manageView),
     # (r'^preferencias/', views.preferencias_manageview),

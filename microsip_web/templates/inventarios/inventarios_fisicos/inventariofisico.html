@@ -179,7 +179,11 @@
             </div>
             <div class='span8'>
               <label>ajustar en primer conteo <a href="#modal_primerconteo" role="button" data-toggle="modal"><i class="icon-info-sign"></i></a></label>
-              <input checked="checked" id="id_ajusteprimerconteo" name="ajustesprimerconteo" type="checkbox">
+              {% if almacen.inventario_conajustes %}
+                <input checked="checked" type="checkbox" disabled>
+              {% else %}
+                <input type="checkbox" disabled>
+              {% endif %}
             </div>
           </div>
         </div>

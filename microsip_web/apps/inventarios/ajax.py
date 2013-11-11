@@ -1,5 +1,5 @@
  #encoding:utf-8
-from django.utils import simplejson
+import json
 from dajaxice.decorators import dajaxice_register
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
@@ -7,7 +7,6 @@ from django.core import serializers
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.core import management
-import json
 import datetime, time
 from django.db.models import Q
 from mobi.decorators import detect_mobile
@@ -137,7 +136,8 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
     ubicacion = kwargs.get('ubicacion', None)
     unidades = kwargs.get('unidades', None)
     unidades = int(unidades)
-    ajusteprimerconteo = kwargs.get('ajusteprimerconteo', None)
+    ajusteprimerconteo = almacen.inventario_conajustes
+
     series = kwargs.get('series', None)
     series = series.split(',')
     msg = ''
@@ -232,7 +232,7 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
     else:
         error = True
         exitencia =''
-    return simplejson.dumps( { 'msg' : msg, 'error': error,'articulo_nombre': articulo.nombre, 'existencia_actual':  str(exitencia),} ) 
+    return json.dumps( { 'msg' : msg, 'error': error,'articulo_nombre': articulo.nombre, 'existencia_actual':  str(exitencia),} ) 
 
 @dajaxice_register( method = 'GET' )
 def get_seriesinventario_byarticulo( request, **kwargs ):
@@ -246,7 +246,7 @@ def get_seriesinventario_byarticulo( request, **kwargs ):
     for existenciadiscreto in existenciadiscretos:
         series = "%s%s, "% (series, existenciadiscreto.articulo_discreto.clave)
     
-    return simplejson.dumps( { 'series' : series, } ) 
+    return json.dumps( { 'series' : series, } ) 
 
 def ajustar_existencias( **kwargs ):
     ''' Para ajustar un articulo a las unidades indicadas sin importar su existencia actual '''
@@ -419,16 +419,19 @@ def close_inventario_byalmacen_view( request, **kwargs ):
     """ Para agregar existencia a un articulo por ajuste"""
     #Paramentros
     almacen_id = kwargs.get( 'almacen_id', None )
+    almacen = Almacenes.objects.get(pk= almacen_id)
+    almacen.inventariando = False
+    almacen.save()
+
     DoctosIn.objects.filter(almacen__ALMACEN_ID = almacen_id, descripcion='ES INVENTARIO').update(descripcion= 'INVENTARIO CERRADO')
-    return simplejson.dumps( { 'mensaje' : 'Inventario cerrado', } ) 
+
+    return json.dumps( { 'mensaje' : 'Inventario cerrado', } ) 
 
 @detect_mobile
 @dajaxice_register( method = 'GET' )
 def add_existenciasarticulo_byajustes_view( request, **kwargs ):
     """ Para agregar existencia a un articulo por ajuste"""
     #Paramentros
-    ajustar_primerconteo = kwargs.get( 'ajustar_primerconteo', False )
-
     ubicacion = kwargs.get( 'ubicacion', None )
     articulo_id = kwargs.get( 'articulo_id', None )
     entrada_id = kwargs.get( 'entrada_id', None )
@@ -439,6 +442,7 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
     entrada = DoctosIn.objects.get( pk = entrada_id )
     almacen_id = entrada.almacen.ALMACEN_ID
 
+    ajustar_primerconteo = entrada.almacen.inventario_conajustes
     #Para dos almacenes
     entrada2_id = kwargs.get( 'entrada2_id', None )
     salida2_id = kwargs.get( 'salida2_id', None )
@@ -511,14 +515,14 @@ def add_articulossinexistencia( request, **kwargs ):
     
     if not ultimofolio.exists():
         message = 'Para poder crear un inventario es nesesario Asignarles folios automaticos a estos, OPERACION RECHAZADA!!'
-        return simplejson.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )    
+        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )    
 
     if inventario_sincontarlinea:
         message = 'Ya se genero anteriormente un documento con articulos sin contar de almenos una linea, OPERACION RECHAZADA!!'
-        return simplejson.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
+        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
     if DoctosInvfis.objects.filter(descripcion= 'ARTICULOS SIN CONTAR', aplicado= 'N', almacen= almacen).exists():
         message = 'Ya se genero anteriormente un documento con articulos sin contar de todas las lineas, OPERACION RECHAZADA!!'
-        return simplejson.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
+        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
 
     inventario = DoctosInvfis.objects.create(
             id = next_id('ID_DOCTOS', connection_name),
@@ -550,7 +554,7 @@ def add_articulossinexistencia( request, **kwargs ):
         articulos_agregados = articulos_agregados + detalles_en_ceros
 
     articulos_pendientes = total_articulos_sinexistencia -  articulos_agregados
-    return simplejson.dumps( { 'articulos_agregados' : articulos_agregados, 'articulo_pendientes' : articulos_pendientes, 'message': message, } )
+    return json.dumps( { 'articulos_agregados' : articulos_agregados, 'articulo_pendientes' : articulos_pendientes, 'message': message, } )
 
 @dajaxice_register( method = 'GET' )
 def add_articulossinexistencia_bylinea( request, **kwargs ):
@@ -584,13 +588,13 @@ def add_articulossinexistencia_bylinea( request, **kwargs ):
     
     if inventario_sincontarall:
         message = 'Ya se genero anteriormente un documento con articulos sin contar de todas las lineas, OPERACION RECHAZADA!!'
-        return simplejson.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
+        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
     if not ultimofolio.exists():
         message = 'Para poder crear un inventario es nesesario Asignarles folios automaticos a los inventarios fisicos, OPERACION RECHAZADA!!'
-        return simplejson.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
+        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
     if DoctosInvfis.objects.filter(descripcion= 'ARTICULOS SIN CONTAR LINEA(%s)'% linea.nombre, aplicado = 'N', almacen= almacen ).exists():
         message = 'Ya se genero anteriormente un documento con articulos sin contar de esta linea, OPERACION RECHAZADA!!'
-        return simplejson.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
+        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
 
     inventario = DoctosInvfis.objects.create(
             id = next_id('ID_DOCTOS', connection_name),
@@ -622,7 +626,7 @@ def add_articulossinexistencia_bylinea( request, **kwargs ):
     articulos_agregados = articulos_agregados + detalles_en_ceros
 
     articulos_pendientes = total_articulos_sinexistencia -  articulos_agregados
-    return simplejson.dumps( { 'articulos_agregados' : articulos_agregados, 'articulo_pendientes' : articulos_pendientes, 'message': message, } )
+    return json.dumps( { 'articulos_agregados' : articulos_agregados, 'articulo_pendientes' : articulos_pendientes, 'message': message, } )
 
 @dajaxice_register( method = 'GET' )
 def get_detallesarticulo_byid( request, **kwargs ):
@@ -886,7 +890,7 @@ def get_existenciasarticulo_byid( request, **kwargs ):
     except ObjectDoesNotExist:
         articulo_linea = 'No indicada aun'
 
-    return simplejson.dumps( { 
+    return json.dumps( { 
         'existencias' : int( inv_fin ), 
         'ya_ajustado': ya_ajustado,
         'articulo_seguimiento' : articulo.seguimiento,

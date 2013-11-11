@@ -327,6 +327,14 @@ def inventarioFisico_items_formset(form, formset = BaseInlineFormSet, **kwargs):
     return inlineformset_factory(DoctosInvfis, DoctosInvfisDet, form, formset, **kwargs)
 
 
+class almacen_inventariando_form(forms.ModelForm):
+    class Meta:
+        model = Almacenes
+        exclude = (
+            'nombre',
+            'inventariando',
+            )
+
 class ArticulosDiscretos_ManageForm(forms.ModelForm):
     id = forms.IntegerField(required=False)
     articulo   =  forms.ModelChoiceField(queryset= Articulos.objects.filter(es_almacenable='S'), required=True, widget=forms.HiddenInput())

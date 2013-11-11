@@ -1,4 +1,4 @@
-from django.utils import simplejson
+import json
 from dajaxice.decorators import dajaxice_register
 from django.shortcuts import get_object_or_404
 
@@ -19,7 +19,7 @@ def crear_nodo(request, nombre, padre):
 
     id = get_next_id_carpeta(connection_name=conexion_name)
     Carpeta.objects.create(id=id, nombre=nombre, carpeta_padre=Carpeta.objects.get(pk=padre))
-    return simplejson.dumps({'id':id})
+    return json.dumps({'id':id})
 
 @dajaxice_register(method='GET')
 def update_node(request, id, padre_id):

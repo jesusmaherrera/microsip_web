@@ -40,6 +40,19 @@ def preferencias_manageview(request, template_name = 'inventarios/herramientas/p
     c = {'msg': msg,}
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
+def abrir_inventario_byalmacen(request, almacen_id, template_name = 'inventarios/almacenes/abrir_inventario.html'):
+    almacen = Almacenes.objects.get( pk = almacen_id )
+    almacenform = almacen_inventariando_form(request.POST or None, instance=  almacen)
+    
+    if almacenform.is_valid():
+        almacen_form = almacenform.save(commit= False)
+        almacen_form.inventariando = True
+        almacen_form.save()
+        
+        return HttpResponseRedirect( '/inventarios/almacenes/' )
+    c = { 'form': almacenform, 'almacen_nombre': almacen.nombre, }
+    return render_to_response( template_name, c, context_instance = RequestContext( request ) )
+
 @detect_mobile
 @login_required( login_url = '/login/' )
 def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.html' ):
@@ -48,9 +61,9 @@ def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.ht
     connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
-
-    almacenes = Almacenes.objects.all()
     
+    almacenes = Almacenes.objects.all()
+
     if "Chrome" in request.META[ 'HTTP_USER_AGENT' ]:
        request.mobile = False
        

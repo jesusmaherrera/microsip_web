@@ -1,4 +1,4 @@
-from django.utils import simplejson
+import json
 from dajaxice.decorators import dajaxice_register
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
@@ -15,7 +15,7 @@ from microsip_web.apps.main.filtros.views import get_next_id_carpeta
 
 @dajaxice_register(method='GET')
 def args_example(request, text):
-    return simplejson.dumps({'message':'Your message is %s!' % text})
+    return json.dumps({'message':'Your message is %s!' % text})
 
 @dajaxice_register(method='GET')
 def get_infoarticulo(request, articulo_id):
@@ -29,14 +29,14 @@ def get_infoarticulo(request, articulo_id):
     for art in articulos_compatibles:
         compatibles = '%s [%s]'% (compatibles, art.compatible_articulo.nombre) 
 
-    return simplejson.dumps({'detalles':articulo.nota_ventas,'compatibilidades':compatibles,})
+    return json.dumps({'detalles':articulo.nota_ventas,'compatibilidades':compatibles,})
 
 @dajaxice_register(method='GET')
 def articulos_moveto(request, carpeta_id, articulos_seleccionados):
     for id in articulos_seleccionados:
         articulo = Articulos.objects.filter(pk=id).update(carpeta= Carpeta.objects.get(pk=carpeta_id))
 
-    return simplejson.dumps({'message':'Your message is'})
+    return json.dumps({'message':'Your message is'})
 
 @dajaxice_register(method='GET')
 def get_articulosby_grupopadre(request, carpetapadre_id):

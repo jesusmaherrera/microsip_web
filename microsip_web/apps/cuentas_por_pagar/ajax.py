@@ -1,4 +1,3 @@
-from django.utils import simplejson
 from dajaxice.decorators import dajaxice_register
 from microsip_web.apps.inventarios.models import *
 from django.core import serializers

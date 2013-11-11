@@ -117,7 +117,9 @@ class Agentes(models.Model):
 class Almacenes(models.Model):
     ALMACEN_ID  = models.AutoField(primary_key=True)
     nombre      = models.CharField(max_length=50, db_column='NOMBRE')
-    
+    inventariando = models.BooleanField(default= False, db_column = 'SIC_INVENTARIANDO' )
+    inventario_conajustes = models.BooleanField(default= False, db_column = 'SIC_INVCONAJUSTES' )
+
     def __unicode__(self):
         return self.nombre
 

@@ -104,7 +104,6 @@ function add_series()
     'salida_id':  $("#salida_id").val(),
     'ubicacion': $("#id_ubicacion").val(),
     'unidades' : $("#id_unidades").val(),
-    'ajusteprimerconteo': $("#id_ajusteprimerconteo").attr('checked')== 'checked',
   });
 }
 
