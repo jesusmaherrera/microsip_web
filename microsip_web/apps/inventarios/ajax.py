@@ -488,6 +488,94 @@ def inventario_getnew_folio():
     registro_folioinventario.save()
     return folio
 
+def add_articulos_sincontar( **kwargs ):
+    """ Agrega articulos almacenables de la linea indicada faltantes en los documentos de ajustes indicados.  """
+    #Paramentros 
+    request_username = kwargs.get( 'request_username', None )
+    connection_name = kwargs.get( 'connection_name', None )
+    ubicacion = kwargs.get( 'ubicacion', None )
+    linea = kwargs.get( 'linea', None )
+    almacen = kwargs.get( 'almacen', None )
+    
+    message= ''
+    
+    articulos_endocumentos = list( set( DoctosInDet.objects.filter(
+        Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
+        almacen = almacen,
+        doctosIn__descripcion = 'ES INVENTARIO'
+        ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True ) ) )
+    inventario_descripcion = ''
+    #Para agregar los articulos de los documentos de inventarios como ya contados
+    if linea:
+        #VALIDACIONES
+        if DoctosInvfis.objects.filter(descripcion= 'ARTICULOS SIN CONTAR', aplicado= 'N', almacen= almacen).exists():
+            message = 'Ya se genero anteriormente un documento con articulos sin contar de todos los articulos, OPERACION RECHAZADA!!'
+            return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
+
+        inventario_descripcion = 'ARTICULOS SIN CONTAR LINEA(%s)'% linea.nombre
+        articulos_all = list( set( Articulos.objects.exclude(estatus = 'B').filter( es_almacenable = 'S', linea = linea ).order_by( '-id' ).values_list( 'id', flat = True ) ))
+        
+    else:
+        inventario_descripcion = 'ARTICULOS SIN CONTAR'
+        articulos_all = list( set( Articulos.objects.exclude( estatus = 'B').filter( es_almacenable = 'S').order_by( '-id' ).values_list( 'id', flat = True )))
+
+    inventarios_fisicos =  DoctosInvfis.objects.filter(descripcion__contains= inventario_descripcion, aplicado= 'N', almacen= almacen)
+
+    for inventario_fisico in inventarios_fisicos:
+        articulos_endocumentosinv = (
+                list( set( DoctosInvfisDet.objects.filter( docto_invfis = inventario_fisico, ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True ) ) 
+            )
+        )
+
+        articulos_endocumentos = articulos_endocumentos + articulos_endocumentosinv
+
+    articulos_sincontar = [n for n in articulos_all if n not in articulos_endocumentos]
+    total_articulos_sincontar = len(articulos_sincontar)
+    articulos_sincontar = articulos_sincontar[0:9000]
+    articulos_sincontar_list = split_seq( articulos_sincontar, 2000 )
+
+    articulos_agregados = 0
+    ultimofolio = Registry.objects.filter( nombre = 'SIG_FOLIO_INVFIS' )
+
+    if total_articulos_sincontar <= 0:
+        message = 'No hay articulos por agregar!!'
+        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
+
+    if not ultimofolio.exists():
+        message = 'Para poder crear un inventario es nesesario Asignarles folios automaticos a los inventarios fisicos, OPERACION RECHAZADA!!'
+        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
+
+    inventario = DoctosInvfis.objects.create(
+            id = next_id('ID_DOCTOS', connection_name),
+            folio = inventario_getnew_folio(),
+            fecha = datetime.now(),
+            almacen = almacen,
+            descripcion = inventario_descripcion,
+            usuario_creador = request_username,
+            usuario_aut_creacion = 'SYSDBA',
+            usuario_ult_modif = request_username,
+            usuario_aut_modif = 'SYSDBA',
+        )
+
+    for articulos_sincontar_sublist in articulos_sincontar_list:
+        detalles_en_ceros = 0
+        for articulo_id in articulos_sincontar_sublist:
+            articulo = Articulos.objects.get(pk=articulo_id)
+            DoctosInvfisDet.objects.create(
+                    id = -1,
+                    docto_invfis = inventario,
+                    clave = first_or_none( ClavesArticulos.objects.filter( articulo = articulo ) ),
+                    articulo = articulo,
+                    unidades = 0,
+                )
+            detalles_en_ceros = detalles_en_ceros + 1
+
+        articulos_agregados = articulos_agregados + detalles_en_ceros
+
+    articulos_pendientes = total_articulos_sincontar -  articulos_agregados
+    return json.dumps( { 'articulos_agregados' : articulos_agregados, 'articulo_pendientes' : articulos_pendientes, 'message': message, } )
+
+
 @dajaxice_register( method = 'GET' )
 def add_articulossinexistencia( request, **kwargs ):
     """ Agrega articulos almacenables de la linea indicada faltantes en los documentos de ajustes indicados.  """
@@ -498,64 +586,12 @@ def add_articulossinexistencia( request, **kwargs ):
     almacen = Almacenes.objects.get( pk= almacen_id )
     message= ''
 
-    articulos_endocumentos = list( set( DoctosInDet.objects.filter(
-        Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
-        almacen = almacen,
-        doctosIn__descripcion = 'ES INVENTARIO'
-        ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True ) ) )
-
-    articulos_sinexistencia = Articulos.objects.exclude( estatus = 'B').filter( es_almacenable = 'S').exclude(pk__in = articulos_endocumentos ).order_by( '-id' ).values_list( 'id', flat = True )
-    
-    total_articulos_sinexistencia = articulos_sinexistencia.count()
-    articulos_sinexistencia = articulos_sinexistencia[0:9000]
-
-    articulos_sinexistencia_list = split_seq( articulos_sinexistencia, 2000 )
-    articulos_agregados = 0
-    inventario_sincontarlinea = DoctosInvfis.objects.filter(descripcion__contains= 'ARTICULOS SIN CONTAR LINEA(', aplicado= 'N', almacen= almacen).exists()
-    ultimofolio = Registry.objects.filter( nombre = 'SIG_FOLIO_INVFIS' )
-    
-    if not ultimofolio.exists():
-        message = 'Para poder crear un inventario es nesesario Asignarles folios automaticos a estos, OPERACION RECHAZADA!!'
-        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )    
-
-    if inventario_sincontarlinea:
-        message = 'Ya se genero anteriormente un documento con articulos sin contar de almenos una linea, OPERACION RECHAZADA!!'
-        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
-    if DoctosInvfis.objects.filter(descripcion= 'ARTICULOS SIN CONTAR', aplicado= 'N', almacen= almacen).exists():
-        message = 'Ya se genero anteriormente un documento con articulos sin contar de todas las lineas, OPERACION RECHAZADA!!'
-        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
-
-    inventario = DoctosInvfis.objects.create(
-            id = next_id('ID_DOCTOS', connection_name),
-            folio = inventario_getnew_folio(),
-            fecha = datetime.now(),
+    return add_articulos_sincontar(
+            request_username = request.user.username,
+            connection_name = connection_name,
+            ubicacion = ubicacion,
             almacen = almacen,
-            descripcion = 'ARTICULOS SIN CONTAR',
-            usuario_creador = request.user.username,
-            usuario_aut_creacion = 'SYSDBA',
-            usuario_ult_modif = request.user.username,
-            usuario_aut_modif = 'SYSDBA',
         )
-
-    for articulos_sinexistencia_sublist in articulos_sinexistencia_list:
-        detalles_en_ceros = 0
-        for articulo_id in articulos_sinexistencia_sublist:
-            articulo = Articulos.objects.get(pk=articulo_id)
-            DoctosInvfisDet.objects.create(
-                    id = -1,
-                    docto_invfis = inventario,
-                    clave = first_or_none( ClavesArticulos.objects.filter( articulo = articulo ) ),
-                    articulo = articulo,
-                    unidades =0,
-                    usuario_ult_modif = request.user.username,
-                )
-
-            detalles_en_ceros = detalles_en_ceros + 1
-            
-        articulos_agregados = articulos_agregados + detalles_en_ceros
-
-    articulos_pendientes = total_articulos_sinexistencia -  articulos_agregados
-    return json.dumps( { 'articulos_agregados' : articulos_agregados, 'articulo_pendientes' : articulos_pendientes, 'message': message, } )
 
 @dajaxice_register( method = 'GET' )
 def add_articulossinexistencia_bylinea( request, **kwargs ):
@@ -570,63 +606,15 @@ def add_articulossinexistencia_bylinea( request, **kwargs ):
     linea = LineaArticulos.objects.get( pk = linea_id )
     almacen = Almacenes.objects.get( pk= almacen_id )
 
-    articulos_endocumentos = list( set( DoctosInDet.objects.filter(
-        Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
-        almacen = almacen,
-        doctosIn__descripcion = 'ES INVENTARIO'
-        ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True ) ) )
 
-    articulos_sinexistencia = Articulos.objects.exclude(estatus = 'B').filter( es_almacenable = 'S', linea = linea ).exclude(pk__in = articulos_endocumentos ).order_by( '-id' ).values_list( 'id', flat = True )
-    
-    total_articulos_sinexistencia = articulos_sinexistencia.count()
-    articulos_sinexistencia = articulos_sinexistencia[0:9000]
-
-    articulos_sinexistencia_list = split_seq( articulos_sinexistencia, 2000 )
-    articulos_agregados = 0
-
-    ultimofolio = Registry.objects.filter( nombre = 'SIG_FOLIO_INVFIS' )
-    inventario_sincontarall = DoctosInvfis.objects.filter(descripcion= 'ARTICULOS SIN CONTAR', aplicado= 'N', almacen= almacen).exists()
-    
-    if inventario_sincontarall:
-        message = 'Ya se genero anteriormente un documento con articulos sin contar de todas las lineas, OPERACION RECHAZADA!!'
-        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
-    if not ultimofolio.exists():
-        message = 'Para poder crear un inventario es nesesario Asignarles folios automaticos a los inventarios fisicos, OPERACION RECHAZADA!!'
-        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
-    if DoctosInvfis.objects.filter(descripcion= 'ARTICULOS SIN CONTAR LINEA(%s)'% linea.nombre, aplicado = 'N', almacen= almacen ).exists():
-        message = 'Ya se genero anteriormente un documento con articulos sin contar de esta linea, OPERACION RECHAZADA!!'
-        return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
-
-    inventario = DoctosInvfis.objects.create(
-            id = next_id('ID_DOCTOS', connection_name),
-            folio = inventario_getnew_folio(),
-            fecha = datetime.now(),
-            almacen = almacen,
-            descripcion = 'ARTICULOS SIN CONTAR LINEA(%s)'% linea.nombre,
-            usuario_creador = request.user.username,
-            usuario_aut_creacion = 'SYSDBA',
-            usuario_ult_modif = request.user.username,
-            usuario_aut_modif = 'SYSDBA',
+    return add_articulos_sincontar( 
+            request_username = request.user.username,
+            connection_name= connection_name,
+            ubicacion= ubicacion,
+            linea = linea,
+            almacen= almacen,
         )
 
-    for articulos_sinexistencia_sublist in articulos_sinexistencia_list:
-        detalles_en_ceros = 0
-        for articulo_id in articulos_sinexistencia_sublist:
-            articulo = Articulos.objects.get(pk=articulo_id)
-            DoctosInvfisDet.objects.create(
-                    id = -1,
-                    docto_invfis = inventario,
-                    clave = first_or_none( ClavesArticulos.objects.filter( articulo = articulo ) ),
-                    articulo = articulo,
-                    unidades =0,
-                    usuario_ult_modif = request.user.username,
-                )
-
-        detalles_en_ceros = detalles_en_ceros + 1
-        
-    articulos_agregados = articulos_agregados + detalles_en_ceros
-
-    articulos_pendientes = total_articulos_sinexistencia -  articulos_agregados
     return json.dumps( { 'articulos_agregados' : articulos_agregados, 'articulo_pendientes' : articulos_pendientes, 'message': message, } )
 
 @dajaxice_register( method = 'GET' )

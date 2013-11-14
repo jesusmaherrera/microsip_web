@@ -241,7 +241,7 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
             concepto = conecpto_ajuste_salida,
             naturaleza_concepto = 'S',
             fecha = fecha_actual,
-            sistema_origen = 'IN',
+            sistema_origen = 'SI',
             usuario_creador = username,
             descripcion = 'ES INVENTARIO',
              )
@@ -264,7 +264,7 @@ def ajustes_get_or_create( almacen_id = None, connection_name = None, username =
             concepto = conecpto_ajuste_entrada,
             naturaleza_concepto = 'E',
             fecha = fecha_actual,
-            sistema_origen = 'IN',
+            sistema_origen = 'SI',
             usuario_creador = username,
             descripcion = 'ES INVENTARIO',
              )

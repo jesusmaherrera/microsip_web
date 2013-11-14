@@ -79,14 +79,12 @@
 <div id="articulosnocont_Modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    Agregar TODOS los articulos no contabilizados <br>
+    Crear inventario fisico de articulos no contados<br>
   </div>
   <div class="modal-body">
-    <p class="text-error">Seguro que desas agregar todos los articulos no contabilizados, al realizar esta accion todos los articulos que no esten en este inventarios se pondran en ceros </p>
-    <p>Importante</p>
-    <blockquote>
-      <p><small>Si el conteo de alguna linea ya se realizo en otroinventario anterior mente estos articulos se pondran en ceros</small></p>
-    </blockquote>
+    <p><span class="label label-warning" >Precausion!</span> Al realizar esta accion 
+    Se creara un <strong> inventario fisico SIN APLICAR</strong> con los articulos NO CONTADOS en este inventario</p>
+    
     <p class="text-warning">
         Esto pueder tardar unos minutos dependiendo del numero de articulos en la base de datos.
     </p>  
@@ -161,10 +159,12 @@
             <li class="dropdown">
               <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i></a>
               <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+               {% if almacen.inventario_conajustes %}
                 <li><a tabindex="-1" href="#articulosnocont_porlinea_Modal" role="button" data-toggle="modal"><i class="icon-tasks"></i> Crear inventario fisico con articulos no contados - por linea</a></li>
                 <li class='divider'></li> 
                 <li><a tabindex="-1" href="#articulosnocont_Modal" role="button" data-toggle="modal"><i class="icon-align-justify"></i> Crear inventario fisico con articulos no contados</a></li>
                 <li class='divider'></li> 
+                {% endif %}
                 <li><a tabindex="-1" href="#cerrarinventario_Modal" role="button" data-toggle="modal"><i class="icon-folder-close"></i> Cerrar inventario </a></li>
               </ul>
             </li>
@@ -178,12 +178,10 @@
               {{ ubicacion_form.ubicacion }}
             </div>
             <div class='span8'>
+            {% if almacen.inventario_conajustes %}
               <label>ajustar en primer conteo <a href="#modal_primerconteo" role="button" data-toggle="modal"><i class="icon-info-sign"></i></a></label>
-              {% if almacen.inventario_conajustes %}
-                <input checked="checked" type="checkbox" disabled>
-              {% else %}
-                <input type="checkbox" disabled>
-              {% endif %}
+              <input checked="checked" type="checkbox" disabled>
+            {% endif %}
             </div>
           </div>
         </div>
