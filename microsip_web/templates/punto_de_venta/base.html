@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Punto de venta{% endblock %}
-
+{% load punto_de_venta_tags %}
 <!-- CSS Code -->
 {% block style_css %}{% endblock %}
 {% block modulestyle_css %}{% endblock %}
@@ -21,6 +21,7 @@
     <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
       <li><a tabindex="-1" href="/punto_de_venta/ventas/"><i class="icon-shopping-cart"></i> Ventas de mostrador</a></li>
       <li><a tabindex="-1" href="/punto_de_venta/devoluciones/"><i class="icon-remove"></i> Devoluciones de ventas</a></li>
+      <li><a tabindex="-1" href="/punto_de_venta/facturas/"><i class="icon-qrcode"></i> Facturas</a></li>
     </ul>
   </li>
   <li class="dropdown">
@@ -44,21 +45,10 @@
     <li class="dropdown">
       <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i> <span class="hidden-phone">Herramientas</span> <b class="caret"></b></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
-        <li><a tabindex="-1" href="/punto_de_venta/GenerarPolizas/"><i class="icon-share"></i> Generar Polizas Contables</a></li>
-        <li role="presentation" class="divider"></li>
-        <li><a tabindex="-1" href="/punto_de_venta/PreferenciasEmpresa/"><i class="icon-cog"></i> Preferencias de la empresa</a></li>
+        {% generar_polizas_tag 'generar_polizas'%}
         {% if request.user.username == 'SYSDBA' %}
-        <li role="presentation" class="divider"></li>
-        <li><a tabindex="-1" href="/punto_de_venta/generar_tarjetas/"><i class="icon-user"></i> Generar Lote de tarjetas</a></li>
-        <li role="presentation" class="divider"></li>
-        <li><a tabindex="-1" href="#myModal_inicializar_puntos_clientes" data-toggle="modal" >
-          <i class='icon-warning-sign' style='margin-left: 0px;'></i> Inicializar puntos de clientes
-          </a>
-        </li>
-        <li><a tabindex="-1" href="#myModal_inicializar_puntos_articulos" data-toggle="modal">
-          <i class='icon-warning-sign' style='margin-left: 0px;'></i> Inicializar puntos de Articulos
-          </a>
-        </li>
+          {% puntos_tag 'generar_tarjetas' %}
+          {% puntos_tag 'inicializar_puntos' %}        
         {% endif %}
       </ul>
     </li>

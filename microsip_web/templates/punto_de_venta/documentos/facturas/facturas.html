@@ -1,0 +1,57 @@
+{% extends "punto_de_venta/base.html" %}
+{% block title %}Facturas{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Facturas {% endblock %}
+{% block content %}
+<div id="sic_from" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span3">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <h3>Facturas</h3>  
+        </div>
+      </div>
+    </div>
+    <div class="span9">
+      <div id='main_form'>
+        <a href="/punto_de_venta/factura/nueva/" class="btn"> <i class="icon-plus"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+<table class="table tableCell table-hover">
+    <tr>
+      <th>Folio</th>
+      <th>Fecha</th>
+    </tr>
+    {% for factura in facturas %}
+    <tr>
+      <td><a href="/punto_de_venta/factura/{{ factura.id }}/">{{ factura.folio }}</a></td>
+      <td>{{ factura.fecha }}</td>
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if facturas.has_previous %}
+        <li><a href="?page={{ facturas.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ facturas.number }} de {{ facturas.paginator.num_pages }}.</a></li>
+        {% if facturas.has_next %}
+        <li><a href="?page={{ facturas.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

@@ -27,3 +27,12 @@ def microsip_module_btn(ms_module):
    return result
 
 register.simple_tag(microsip_module_btn)
+
+def pv_utilerias_btn():
+   result = ''
+   if 'microsip_web.apps.punto_de_venta.utilerias' in settings.MICROSIP_MODULES:
+      result = '<li><a tabindex="-1" href="/punto_de_venta/utilerias/factura_global"><i class="icon-share"></i> Generar factura global</a></li>'
+   return result
+
+register.simple_tag(pv_utilerias_btn)
+register.simple_tag(microsip_module_btn)

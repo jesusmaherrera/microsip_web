@@ -7,40 +7,15 @@ from microsip_web.apps.ventas.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from models import *
-
-class generartarjetas_form( forms.Form ):
-    prefijo = forms.CharField( max_length = 3, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
-    iniciar_en = forms.IntegerField( widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ),)
-    cantidad = forms.IntegerField( max_value = 6000 , widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ),)
-    TIPOS_TARJETA = ( ( 'N', 'No Aplica' ), ( 'P', 'Puntos' ), ( 'D', 'Dinero Electronico' ), )
-    tipo_tarjeta = forms.ChoiceField( choices = TIPOS_TARJETA )
-    puntos = forms.IntegerField( initial = 0, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
-    dinero_electronico = forms.DecimalField( initial = 0, max_value = 2000, decimal_places = 2, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
-    hereda_valorpuntos = forms.BooleanField( initial = True, required = False )
-    valor_puntos = forms.DecimalField( initial = 0, max_digits = 15, decimal_places = 2, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
-    hereda_puntos_a = forms.ModelChoiceField( queryset = Cliente.objects.all(), widget=autocomplete_light.ChoiceWidget('ClienteAutocomplete'), required = False )
-    
-    def clean_iniciar_en(self):
-        iniciar_en = self.cleaned_data['iniciar_en']
-        if not iniciar_en:
-            raise forms.ValidationError(u'Campo obligatorio.')
-        return iniciar_en
-
-    def clean(self):
-        cleaned_data = self.cleaned_data
-        prefijo = cleaned_data.get("prefijo")
-        iniciar_en = cleaned_data.get("iniciar_en")
-        cantidad = cleaned_data.get("cantidad")
-        
-        if iniciar_en != None and cantidad != None:
-            claves = []
-            for numero in range( iniciar_en, iniciar_en + cantidad ):
-                claves.append( '%s' % '%s%s'% ( prefijo, ( "%09d" % numero ) ) )
-
-            if ClavesClientes.objects.filter( clave__in = claves ).exists():
-                raise forms.ValidationError(u'Ya Existe una o mas claves en este rango')
-
-        return cleaned_data
+class factura_global_form( forms.Form ):
+    TIPOS_GEN_FACTURA = (
+        ('C', 'Concentrada'),
+        ('D', 'Detallada'),
+    )
+    fecha_inicio = forms.DateField( widget = forms.TextInput( attrs = { 'class' : 'input-small' } ) )
+    fecha_fin = forms.DateField(widget = forms.TextInput( attrs = { 'class' : 'input-small' } ) )
+    tipo = forms.ChoiceField(choices=TIPOS_GEN_FACTURA, required=True, widget=forms.Select(attrs={'class':'input-medium',}))
+    almacen = forms.ModelChoiceField(queryset= Almacenes.objects.all(), widget=forms.Select(attrs={'class':'input-medium', 'disabled':'disabled',}))
 
 class ArticuloCompatibleArticulo_ManageForm(forms.Form):
     compatible_articulo = forms.ModelChoiceField(queryset=Articulos.objects.all(),
@@ -184,15 +159,26 @@ def PlantillaPoliza_items_formset(form, formset = BaseInlineFormSet, **kwargs):
 
 
 class DocumentoPV_ManageForm(forms.ModelForm):
+    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class':'span12', 'rows':2, 'placeholder': 'Descripcion...',}), required= False )
+
+    def __init__(self, *args, **kwargs):
+        super(DocumentoPV_ManageForm, self).__init__(*args, **kwargs)
+        self.fields['fecha'].widget.attrs['class'] = 'input-small'
+        self.fields['folio'].widget.attrs['class'] = 'input-small'
+        self.fields['folio'].required = False
+
     class Meta:
         widgets = autocomplete_light.get_widgets_dict(Docto_PV)
         model = Docto_PV
         exclude = (
+            'vendedor',
             'forma_global_emitida',
             'modalidad_facturacion',
             'total_fpgc',
             'email_envio',
+            'almacen',
             'cajero',
+            'hora',
             'clave_cliente',
             'direccion_cliente',
             'tipo_descuento',
@@ -226,18 +212,28 @@ class DocumentoPV_ManageForm(forms.ModelForm):
             'fechahora_creacion',
             'usuario_ult_modif',
             'fechahora_ult_modif',
+            'puntos',
             )
 
 class DocumentoPVDet_ManageForm(forms.ModelForm):
+    articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
+    unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades'}),required=True)
+    precio_unitario = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'costo'}),required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(DocumentoPVDet_ManageForm, self).__init__(*args, **kwargs)
+        self.fields['clave_articulo'].widget.attrs['class'] = 'input-mini'
+        self.fields['clave_articulo'].widget.attrs['placeholder'] = "clave"
+        self.fields['clave_articulo'].required = False
+
     class Meta:
-        widgets = autocomplete_light.get_widgets_dict(DoctosInDet)
         model = Docto_pv_det
         exclude = (
             'rol',
+            'puntos',
             'precio_modificado',
             'notas',
             'precio_unitario_impto',
-            'clave_articulo',
             'porcentaje_comis',
             'es_tran_elect',
             'porcentaje_descuento',

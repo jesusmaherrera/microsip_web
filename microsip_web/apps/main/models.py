@@ -1124,7 +1124,7 @@ class Docto_PV(models.Model):
     tipo_descuento          = models.CharField(default='P',max_length=1, db_column='TIPO_DSCTO')
     porcentaje_descuento    = models.DecimalField(default=0, max_digits=9, decimal_places=6, db_column='DSCTO_PCTJE')
     importe_descuento       = models.DecimalField(default=0, max_digits=15, decimal_places=2, db_column='DSCTO_IMPORTE')
-    estado                  = models.CharField(max_length=1, db_column='ESTATUS')
+    estado                  = models.CharField(default='N', max_length=1, db_column='ESTATUS')
     aplicado                = models.CharField(default='S', max_length=1, db_column='APLICADO')
     importe_neto            = models.DecimalField(max_digits=15, decimal_places=2, db_column='IMPORTE_NETO')
     total_impuestos         = models.DecimalField(max_digits=15, decimal_places=2, db_column='TOTAL_IMPUESTOS')
@@ -1155,10 +1155,10 @@ class Docto_PV(models.Model):
     fecha_envio             = models.DateTimeField(blank=True, null=True, db_column='FECHA_HORA_ENVIO')
 
     usuario_creador         = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_CREADOR')
-    fechahora_creacion      = models.DateTimeField(blank=True, null=True, db_column='FECHA_HORA_CREACION')
+    fechahora_creacion      = models.DateTimeField(auto_now_add=True, db_column='FECHA_HORA_CREACION')
     usuario_aut_creacion    = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_AUT_CREACION')
     usuario_ult_modif       = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_ULT_MODIF')
-    fechahora_ult_modif     = models.DateTimeField(blank=True, null=True, db_column='FECHA_HORA_ULT_MODIF')
+    fechahora_ult_modif     = models.DateTimeField(auto_now = True, db_column='FECHA_HORA_ULT_MODIF')
     usuario_aut_modif       = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_AUT_MODIF')
 
     usuario_cancelacion     = models.CharField(blank=True, null=True, max_length=31, db_column='USUARIO_CANCELACION')
@@ -1168,7 +1168,7 @@ class Docto_PV(models.Model):
     puntos                  = models.IntegerField(db_column='SIC_PUNTOS')
     dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
     def __unicode__(self):
-        return u'%s'% self.id 
+        return u'%s'% self.folio
     class Meta:
         db_table = u'doctos_pv'
 
@@ -1197,10 +1197,38 @@ class Docto_pv_det(models.Model):
     dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
 
     def __unicode__(self):
-        return u'%s'% self.id 
+        return u'%s(%s)'% (self.id, self.documento_pv)
         
     class Meta:
         db_table = u'doctos_pv_det'
+
+class DoctoPVLiga(models.Model):
+    id = models.AutoField(primary_key=True, db_column='DOCTO_PV_LIGA_ID')
+    docto_pv_fuente = models.ForeignKey(Docto_PV, related_name='fuente', db_column='DOCTO_PV_FTE_ID')
+    docto_pv_destino = models.ForeignKey(Docto_PV, related_name='destino', db_column='DOCTO_PV_DEST_ID')
+
+    def __unicode__(self):
+        return u'%s'% self.id 
+        
+    class Meta:
+        db_table = u'doctos_pv_ligas'
+
+class DoctoPVLigaDetManager(models.Manager):
+    def get_by_natural_key(self, documento_liga,  detalle_fuente, detalle_destino):
+        return self.get(documento_liga=documento_liga, detalle_fuente=detalle_fuente, detalle_destino=detalle_destino,)
+
+class DoctoPVLigaDet(models.Model):
+    objects = DoctoPVLigaDetManager()
+    documento_liga = models.ForeignKey(DoctoPVLiga, related_name='liga', db_column='DOCTO_PV_LIGA_ID')
+    detalle_fuente = models.ForeignKey(Docto_pv_det, related_name='fuente', db_column='DOCTO_PV_DET_FTE_ID')
+    detalle_destino = models.ForeignKey(Docto_pv_det, related_name='destino', db_column='DOCTO_PV_DET_DEST_ID')
+
+    def __unicode__(self):
+        return u'%s'% (self.documento_liga, self.detalle_fuente )
+        
+    class Meta:
+        db_table = u'doctos_pv_ligas_det'
+        unique_together = (('documento_liga', 'detalle_fuente','detalle_destino',),)
 
 class Docto_pv_det_tran_elect(models.Model):
     id                  = models.AutoField(primary_key=True, db_column='DOCTO_PV_DET_ID')

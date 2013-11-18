@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Punto de venta{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+{% block modulestyle_css %}{% endblock %}
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+{% block selected_module %}<a href="/punto_de_venta/ventas/"> <i class="msicon-punto_de_venta"></i> <label class="small_screen"> Punto de venta</label></a>{% endblock %}
+{% block btn_modulo_punto_venta %}
+  <li style='color: #555555; background-color: #e5e5e5;'><a href="/punto_de_venta/ventas/"> <i class="msicon-punto_de_venta"></i><label class='small_screen'> Punto de venta</label></a></li>
+{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Punto de venta <i class=' icon-play'></i>{% endblock %}
+{% block tools-module %}
+<div class="navbar navbar-static">
+  <ul class="nav" role="navigation">
+  </ul>
+  <ul class="nav pull-right">
+    <li class="dropdown">
+      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i> <span class="hidden-phone">Herramientas</span> <b class="caret"></b></a>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+        {% load main_menu_tags %}
+        {% pv_utilerias_btn %}    
+      </ul>
+    </li>
+  </ul>
+</div>
+
+{% endblock %}
+{% block content %}
+{% endblock %}

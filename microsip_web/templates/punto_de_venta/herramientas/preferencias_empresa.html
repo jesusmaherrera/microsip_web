@@ -10,7 +10,7 @@
 {% endblock %}
 {% block breadcrumb %}{{ block.super }} Preferencias de la Empresa {% endblock %}
 {% block content %}
- <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
+ <form method="post" action="" width="300px"  enctype='multipart/form-data'>
 {% if msg %}
 <div class="alert alert-block fade in">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -26,7 +26,7 @@
   </div>
 </div>
 <div class="form-actions">
-  <ul id="myTab" class="nav nav-tabs ">
+  <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
     <li class=""><a href="#general" data-toggle="tab">General</a></li>
     <li class="active"><a href="#informacionContable" data-toggle="tab">Informacion Contable</a></li>
     <li class="dropdown">

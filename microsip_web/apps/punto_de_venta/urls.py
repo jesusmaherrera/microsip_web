@@ -1,18 +1,28 @@
-from django.conf.urls import patterns, url
 from django.views import generic
 from microsip_web.apps.punto_de_venta import views
+from  microsip_web.settings.prod import MICROSIP_MODULES
+from django.conf.urls import patterns, include, url
 
-urlpatterns = patterns('',
+urlpatterns = patterns('',    
+
+    
+
 	(r'^venta/$', views.venta_mostrador_manageView),
     (r'^fectura_general/$', views.create_facturageneral_dia),
     
     (r'^venta/(?P<id>\d+)/', views.venta_mostrador_manageView),
 	(r'^ventas/$', views.ventas_de_mostrador_view),
+    
+    #facturas
+    (r'^facturas/$', views.facturas_view),
+    (r'^factura/nueva/', views.factura_manageView),
+    # (r'^factura/(?P<id>\d+)/', views.factura_manageView),
+    (r'^factura/(?P<id>\d+)/', views.factura_manageView),
+
 	(r'^devoluciones/$', views.devoluciones_de_ventas_view),
 
 	(r'^GenerarPolizas/$', views.generar_polizas_View),
 	(r'^PreferenciasEmpresa/$', views.preferenciasEmpresa_View),
-    (r'^generar_tarjetas/$', views.generar_tarjetas),
     
 	#Plantilla Poliza
 	(r'^plantilla_poliza/$', views.plantilla_poliza_manageView),

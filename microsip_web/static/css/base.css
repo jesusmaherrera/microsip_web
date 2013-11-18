@@ -9,7 +9,7 @@ body {
   background-color: #e7e7e7;
 }
 #sic_from {
-  background-color: #f5f5f5;
+  background-color: #ececec;
   margin-bottom: 12px;
   padding: 0 1em 1em 0;
 }
@@ -17,11 +17,21 @@ body {
   display: inline-block;
 }
 #sic_form_details {
-  background-color: #fff;
+  background-color: #e4e4e4;
   margin-bottom: 1em;
   padding-bottom: 1em;
   border-bottom-left-radius: 1em;
   border-bottom-right-radius: 1em;
+}
+.nav-tabs>.active>a,
+.nav-tabs>.active>a:hover,
+.nav-tabs>.active>a:focus {
+  background-color: #ececec;
+}
+.tab-content>.tab-pane,
+.pill-content>.pill-pane {
+  background-color: #ececec;
+  padding: 1em;
 }
 #sicfrom-title .row {
   padding-left: 2em;
@@ -150,7 +160,7 @@ footer {
   background-color: #fff;
   text-align: left;
   padding: 1em;
-  padding-top: 0em;
+  padding-top: 1em;
   padding-bottom: 2em;
   margin-left: 1em;
   margin-right: 1em;

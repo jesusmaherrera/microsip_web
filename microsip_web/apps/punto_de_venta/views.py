@@ -20,62 +20,7 @@ from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_f
 from microsip_web.libs.custom_db.main import get_conecctionname
 from mobi.decorators import detect_mobile
 
-@login_required( login_url = '/login/' )
-def generar_tarjetas( request, template_name = 'punto_de_venta/herramientas/generar_tarjetas.html' ):
-    msg = ''
-    connection_name = get_conecctionname(request.session)
-    form = generartarjetas_form(request.POST or None)
 
-    if form.is_valid():
-        
-        iniciar_en = form.cleaned_data[ 'iniciar_en' ]
-        prefijo = form.cleaned_data[ 'prefijo' ]
-        cantidad = form.cleaned_data[ 'cantidad' ]
-        tipo_tarjeta = form.cleaned_data[ 'tipo_tarjeta' ]
-        puntos = form.cleaned_data[ 'puntos' ]
-        dinero_electronico = form.cleaned_data[ 'dinero_electronico' ]
-        hereda_valorpuntos = form.cleaned_data[ 'hereda_valorpuntos' ]
-        valor_puntos = form.cleaned_data[ 'valor_puntos' ]
-        hereda_puntos_a = form.cleaned_data[ 'hereda_puntos_a' ]
-
-        claves = []
-
-        #Datos para cliente
-        rolclaves = RolClavesClientes.objects.get( es_ppal = 'S' )
-        moneda_local = Moneda.objects.get( es_moneda_local = 'S' )
-        
-        try:
-            condicion_pago = CondicionPago.objects.get( es_predet = 'S' )
-        except ObjectDoesNotExist:
-            condicion_pago = CondicionPago.objects.all()[0]
-        
-        try:            
-            tipo_cliente = TipoCliente.objects.get( nombre = 'TARJETA PROMOCION' )
-        except ObjectDoesNotExist:
-            tipo_cliente = TipoCliente.objects.create(id=-1, nombre = 'TARJETA PROMOCION', valor_puntos = 1)
-
-        for numero in range( iniciar_en, iniciar_en + cantidad ):
-            clave = '%s%s'% ( prefijo, ( "%09d" % numero ) )
-            cliente = Cliente.objects.create(
-                id = next_id( 'ID_CATALOGOS', connection_name ), 
-                nombre = clave, 
-                moneda = moneda_local, 
-                condicion_de_pago = condicion_pago, 
-                tipo_cliente = tipo_cliente,
-                tipo_tarjeta = tipo_tarjeta,
-                puntos = puntos,
-                dinero_electronico = dinero_electronico,
-                hereda_valorpuntos = hereda_valorpuntos,
-                valor_puntos = valor_puntos,
-                hereda_puntos_a = hereda_puntos_a,
-                )
-
-            ClavesClientes.objects.create( id = -1, clave = clave, cliente = cliente, rol =  rolclaves )
-        msg = 'Clientes generados correctamente.'
-        form = generartarjetas_form()
-
-    c= { 'form' : form, 'msg' : msg, }
-    return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
 def create_facturageneral_dia(request, cliente_id=None):
     cliente_id = 331
@@ -893,4 +838,57 @@ def devoluciones_de_ventas_view(request, template_name='punto_de_venta/documento
         documentos = paginator.page(paginator.num_pages)
     
     c = {'documentos':documentos}
+    return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+##########################################
+##                                      ##
+##              Factura                 ##
+##                                      ##
+##########################################
+
+@login_required(login_url='/login/')
+def facturas_view(request, template_name='punto_de_venta/documentos/facturas/facturas.html'):
+    connection_name = get_conecctionname(request.session)
+    if connection_name == '':
+        return HttpResponseRedirect('/select_db/')
+
+    facturas_list = Docto_PV.objects.filter(tipo='F').order_by('-id')
+
+    paginator = Paginator(facturas_list, 15) # Muestra 10 ventas por pagina
+    page = request.GET.get('page')
+
+    #####PARA PAGINACION##############
+    try:
+        facturas = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        facturas = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        facturas = paginator.page(paginator.num_pages)
+
+    c = {'facturas':facturas}
+    return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required( login_url='/login/' )
+def factura_manageView( request, id = None, template_name='punto_de_venta/documentos/facturas/factura.html' ):
+    message = ''
+    connection_name = get_conecctionname(request.session)
+    hay_repetido = False
+    
+    if id:
+        factura = get_object_or_404( Docto_PV, pk = id )
+    else:
+        factura = Docto_PV()
+
+    factura_form = DocumentoPV_ManageForm( request.POST or None, instance = factura,)
+    factura_items = DocumentoPV_items_formset(DocumentoPVDet_ManageForm, extra=1, can_delete=True)
+    formset = factura_items(request.POST or None, instance=factura)
+    factura_global_fm =  factura_global_form(request.POST or None)
+
+    if factura_form.is_valid():
+        fatura= factura_form.save(commit=False)
+
+    c = {'factura_global_fm':factura_global_fm, 'factura_form': factura_form, 'formset':formset, 'message':message,}
+
     return render_to_response(template_name, c, context_instance=RequestContext(request))

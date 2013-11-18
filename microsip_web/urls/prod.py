@@ -44,4 +44,7 @@ if 'microsip_web.apps.cuentas_por_pagar' in MICROSIP_MODULES:
 if 'microsip_web.apps.contabilidad' in MICROSIP_MODULES:
     urlpatterns += url(r'^contabilidad/', include('microsip_web.apps.contabilidad.urls', namespace='contabilidad')),
 
+if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
+    urlpatterns += url(r'punto_de_venta/', include('microsip_web.apps.punto_de_venta.puntos.urls', namespace='pv_puntos')),
+
 urlpatterns += staticfiles_urlpatterns()

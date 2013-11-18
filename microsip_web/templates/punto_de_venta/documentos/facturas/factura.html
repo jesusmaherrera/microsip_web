@@ -1,0 +1,152 @@
+{% extends "punto_de_venta/base.html" %}
+
+<!-- CSS Code -->
+{% block style_css %}
+<style type="text/css">
+  .delete-row {
+    margin-left:5px;
+  }
+</style>
+
+<link rel='stylesheet' href='{{STATIC_URL}}css/redmond/jquery-ui-1.8.23.custom.css'/>
+
+{% endblock %}
+<!-- JavaScript Code -->
+{% block js_code %}
+{% include 'autocomplete_light/static.html' %}
+<script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script src='{{STATIC_URL}}js/punto_de_venta/documentos.factura.js'></script>
+
+{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/facturas/">Facturas</a> <i class="icon-play"></i> Factura{% endblock %}
+{% block content %}
+<div id="modal_opciones-claves" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="myModalLabel">Claves</h3>
+  </div>
+  <div class="modal-body" id="div_filterclaves">
+  </div>
+</div>
+
+<form method="post" action="" enctype='multipart/form-data'>{% csrf_token %}
+
+
+  <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
+    <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+    <li class=""><a href="#ventas_de_mostrador" data-toggle="tab">Ventas de mostrador</a></li>
+  </ul>
+  <div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="general">
+      {{ factura_form.errors }}
+      <div id="sic_from" class="container-fluid" style="margin-top: -1em;">
+        <div class="row-fluid">
+          <div class="span8" id="sicfrom-title">
+            <div class="container-fluid">
+              <div class="row-fluid">
+                <h3 style="width:5em;"> Factura  </h3> 
+                <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
+                <a  href="#" class="btn disabled"><i class="icon-ban-circle"></i></a> 
+                <a href="#" class="btn disabled"><i class="icon-trash"></i></a> 
+              </div>
+              <div class="row-fluid">
+                {{ factura_form.cliente }}
+              </div>
+            </div>
+          </div>
+          <div class="span4">
+            <div id="sic_form_details" class="container-fluid">
+              <div class="row-fluid">
+                <div class="span6" >
+                  <label>Fecha</label>
+                  <div class="input-append">
+                    {{ factura_form.fecha }} 
+                    <span class="add-on"><i class="icon-calendar"></i> </span>
+                  </div>
+                </div> 
+                <div class="span6" >
+                  <label>Folio</label>
+                  <div >
+                    {{ factura_form.folio }} 
+                  </div>
+                </div>  
+              </div>
+              
+            </div>
+            <div class="row-fluid">
+              {{ factura_form.descripcion }} 
+            </div>
+          </div>
+        </div>
+        <div class="row-fluid" style="padding: .5em;">
+          {% if message %}
+          <div class="alert alert-block alert-error fade in">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
+            <p>{{ message }}</p>
+          </div>
+          {% endif %}
+          <table class="table tableCell table-hover" id="id_doctosIn_table" border="0" cellpadding="0" cellspacing="5">
+            <thead>
+              <tr>
+                <th>Clave</th>
+                <th>Articulo</th>
+                <th>Unidades</th>
+                <th>Costo</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for form in formset.forms %}
+              <tr id="{{ form.prefix }}-row" class="form-container">
+                {{ form.errors }}
+                <td> {{ form.clave_articulo }} </td>
+                <td>{% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                  {{ form.articulo }}</td>
+                <td>{{ form.unidades }}
+                  {% for fld in form.hidden_fields %}{{ fld }}{% endfor %}
+                </td>
+                <td>{{ form.precio_unitario }}</td>
+                <td>{{ form.precio_total_neto }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <div class='row-fluid'>
+            <span class='span9'>{{ formset.total_form_count }} Articulos</span>
+            <span class='span3' id='span_total_ventas'></span>
+          </div>
+          {{ formset.management_form }}
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade " id="ventas_de_mostrador">  
+      <fieldset>
+        <div class="input-append input-prepend">
+          <span class="add-on"> de </span>
+          {{ factura_global_fm.fecha_inicio }}
+          <span class="add-on"><i class="icon-calendar"></i> </span>
+          <span class="add-on"> a </span>
+          {{ factura_global_fm.fecha_fin }}
+          <span class="add-on"><i class="icon-calendar"></i> </span>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Opciones</legend> 
+        <div class='span2'>
+          Factura en forma
+        </div>
+        {{ factura_global_fm.tipo }}
+        <br>
+        <div class='span2'>
+          <input type="checkbox"/>
+          Un almacen
+        </div>
+        {{ factura_global_fm.almacen }}
+        
+      </fieldset>
+      <a href="#" id='btn_facturaglobal'class="btn">Generar Factura Global</a>
+    </div>
+  </div>
+</form>
+{% endblock %}
