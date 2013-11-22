@@ -3,7 +3,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.db import connections, transaction
-from django.db.models import Q
+from django.db.models import Q, Sum, Max
 # user autentication
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
@@ -17,10 +17,8 @@ from microsip_web.libs.custom_db.main import next_id
 from microsip_web.libs import contabilidad
 from triggers import triggers
 from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_form
-from microsip_web.libs.custom_db.main import get_conecctionname
+from microsip_web.libs.custom_db.main import get_conecctionname, first_or_none
 from mobi.decorators import detect_mobile
-
-
 
 def create_facturageneral_dia(request, cliente_id=None):
     cliente_id = 331
@@ -888,7 +886,7 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
 
     if factura_form.is_valid():
         fatura= factura_form.save(commit=False)
-
-    c = {'factura_global_fm':factura_global_fm, 'factura_form': factura_form, 'formset':formset, 'message':message,}
+    ventas = DoctoPVLiga.objects.filter(docto_pv_destino= factura)
+    c = {'factura_global_fm':factura_global_fm, 'factura_form': factura_form, 'formset':formset, 'message':message,'ventas':ventas, }
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))

@@ -9,8 +9,8 @@ from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from models import *
 class factura_global_form( forms.Form ):
     TIPOS_GEN_FACTURA = (
-        ('C', 'Concentrada'),
         ('D', 'Detallada'),
+        ('C', 'Concentrada'),
     )
     fecha_inicio = forms.DateField( widget = forms.TextInput( attrs = { 'class' : 'input-small' } ) )
     fecha_fin = forms.DateField(widget = forms.TextInput( attrs = { 'class' : 'input-small' } ) )

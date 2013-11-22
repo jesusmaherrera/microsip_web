@@ -192,6 +192,9 @@ function add_existenciasarticulo_byajuste()
 
   if ( ( $('#puede_modificar_costos').val() == 'True'  && $('#id_costo_unitario').val() != '' && $.isNumeric($('#id_costo_unitario').val()) == true)  || ($('#puede_modificar_costos').val() == 'False') )
   { 
+    $("#enviar_btn").attr("disabled",true);
+    $("#enviar_btn").text("Enviando...");
+
     var costo_unitario = 0;
     if ( $('#puede_modificar_costos').val() == 'True' )
       costo_unitario = $("#id_costo_unitario").val();
@@ -204,12 +207,9 @@ function add_existenciasarticulo_byajuste()
       'detalle_costo_unitario' :costo_unitario,
       'entrada2_id' : $("#entrada2_id").val(),
       'salida2_id' : $("#salida2_id").val(),
-      'ajustar_primerconteo': $("#id_ajusteprimerconteo").attr('checked')== 'checked',
       'is_mobile': $("#is_mobile").val(),
       }); 
     
-    $("#enviar_btn").attr("disabled",true);
-    $("#enviar_btn").text("Enviando...");
   }
   else
   {
@@ -360,20 +360,7 @@ function mostrar_articulo_byid(data)
 /* Otras funcionalidades */
 function load_localstorage()
 {
-  ajustar_primerconteo = localStorage.getItem("ajustar_primerconteo");
-  if (ajustar_primerconteo == false)
-    localStorage.setItem("ajustar_primerconteo", 'false');
-  
-
-  if( localStorage.getItem("ajustar_primerconteo") === 'true')
-    $("#id_ajusteprimerconteo").attr('checked', true);
-  else
-    $("#id_ajusteprimerconteo").attr('checked', false);
-
-  if( localStorage.getItem("ajustar_primerconteo") === true)
-    alert(localStorage.getItem("ajustar_primerconteo"));
-
-
+ 
   modo_rapido = localStorage.getItem("modo_rapido");
   if (modo_rapido == null)
     localStorage.setItem("modo_rapido", 'false');
@@ -454,7 +441,6 @@ if (Modernizr.localstorage)
 else
 {
   $("#chbx_modorapido").attr('checked', true);
-  $('#id_ajusteprimerconteo').attr("checked", false);
 }
 
 
@@ -472,10 +458,3 @@ else
 //     localStorage.setItem("modo_rapido_ajustes", 'true');
 
 // });
-
-$('#id_ajusteprimerconteo').on("click", function(){
-  if ($('#id_ajusteprimerconteo').attr('checked') == 'checked')
-    localStorage.setItem("ajustar_primerconteo", 'true');
-  else
-    localStorage.setItem("ajustar_primerconteo", 'false');
-});

@@ -51,7 +51,9 @@
         <label class="small_screen"> Ubic.</label> 
         <input class="input-small" id="id_ubicacion" name="ubicacion" placeholder="Ubicacion.." type="text">  
         <input type="checkbox" id="chbx_modorapido" value="ham" onclick="limpiarForm();" /><div class="small_screen" style="font-size: .8em;">Rapido</div>
-        <input checked="checked" id="id_ajusteprimerconteo" name="ajustesprimerconteo" type="checkbox" ><div class="small_screen" style="font-size: .8em;">APC</div>
+        {% if almacen.inventario_conajustes %}
+         <input checked="checked" type="checkbox" disabled><div class="small_screen" style="font-size: .8em;">APC</div>
+        {% endif %}
       </div>
     </div>
   </div>

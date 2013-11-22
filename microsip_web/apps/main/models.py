@@ -1186,7 +1186,7 @@ class Docto_pv_det(models.Model):
     porcentaje_descuento    = models.DecimalField(max_digits=9, decimal_places=6, db_column='PCTJE_DSCTO')
     precio_total_neto       = models.DecimalField(max_digits=15, decimal_places=2, db_column='PRECIO_TOTAL_NETO')
     precio_modificado       = models.CharField(default='N', max_length=1, db_column='PRECIO_MODIFICADO')
-    vendedor                = models.ForeignKey(Vendedor, db_column='VENDEDOR_ID')
+    vendedor                = models.ForeignKey(Vendedor, blank=True, null=True, db_column='VENDEDOR_ID')
     porcentaje_comis        = models.DecimalField(max_digits=9, decimal_places=6, db_column='PCTJE_COMIS')
     rol                     = models.CharField(max_length=1, db_column='ROL')
     notas                   = models.TextField(db_column='NOTAS')
@@ -1248,6 +1248,23 @@ class Docto_pv_det_tran_elect(models.Model):
         
     class Meta:
         db_table = u'doctos_pv_det_tran_elect'
+#Cobros de documentos
+class FolioVenta(models.Model):
+    id = models.AutoField(primary_key=True, db_column='FOLIO_VENTAS_ID')
+    tipo_doc = models.CharField(max_length=1, db_column='TIPO_DOCTO')
+    serie = models.CharField(max_length=3, db_column='SERIE')
+    consecutivo = models.IntegerField(db_column='CONSECUTIVO')
+    modalidad_facturacion = models.CharField(max_length=10, db_column='MODALIDAD_FACTURACION')
+    punto_reorden = models.IntegerField(db_column='PUNTO_REORDEN_FOLIOS')
+    dias_reorden = models.IntegerField(db_column='DIAS_REORDEN_FOLIOS')
+    
+    
+    def __unicode__(self):
+        return u'%s'%self.id
+        
+    class Meta:
+        db_table = u'folios_ventas'
+
 
 #Cobros de documentos
 class Forma_cobro(models.Model):
