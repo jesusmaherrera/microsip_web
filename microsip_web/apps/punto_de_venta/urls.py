@@ -5,20 +5,14 @@ from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('',    
 
-    
-
 	(r'^venta/$', views.venta_mostrador_manageView),
-    (r'^fectura_general/$', views.create_facturageneral_dia),
-    
     (r'^venta/(?P<id>\d+)/', views.venta_mostrador_manageView),
 	(r'^ventas/$', views.ventas_de_mostrador_view),
     
     #facturas
     (r'^facturas/$', views.facturas_view),
-
-    (r'^factura/nueva/', views.factura_manageView),
+    # (r'^factura/nueva/', views.factura_manageView),
     # (r'^factura/(?P<id>\d+)/', views.factura_manageView),
-    (r'^factura/(?P<id>\d+)/', views.factura_manageView),
 
 	(r'^devoluciones/$', views.devoluciones_de_ventas_view),
 

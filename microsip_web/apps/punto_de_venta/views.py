@@ -20,29 +20,6 @@ from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_f
 from microsip_web.libs.custom_db.main import get_conecctionname, first_or_none
 from mobi.decorators import detect_mobile
 
-def create_facturageneral_dia(request, cliente_id=None):
-    cliente_id = 331
-    # fecha = datetime.date.today()
-    # fechahora = datetime.datetime.today()
-    # hora = fechahora.time().__str__().split('.')[0]
-    # caja = Caja.objects.get(pk=750)
-    # detalles = Docto_pv_det.objects.filter(documento_pv__fecha=fecha, documento_pv__cliente__id=cliente_id)
-    
-    # Docto_PV.objects.create(
-    #     id = -1,
-    #     caja = caja,
-    #     tipo ='F',
-    #     folio ='',
-    #     fecha = fecha,
-    #     hora= hora,
-    #     cajero = 
-
-    #     )
-    # for detalle in detalles:
-
-
-    # objects.asdas
-    return HttpResponseRedirect('/')
 
 
 ##########################################
