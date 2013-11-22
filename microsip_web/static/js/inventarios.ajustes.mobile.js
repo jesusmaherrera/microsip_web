@@ -6,7 +6,9 @@ function limpiarForm()
   $(".span_unidades, #cancelar_btn, #span_ya_ajustado, #span_sin_ajustado").hide();
   $("#enviar_btn").attr("disabled",false);
   $("#enviar_btn").text("Enviar");
-
+  $("#buscar_btn").attr("disabled",false);
+  $("#buscar_btn").text("Buscar");
+  
   if ($("#chbx_modorapido").is(':checked'))
   {
     $(".span_articulo, #span_nombre_articulo").hide();

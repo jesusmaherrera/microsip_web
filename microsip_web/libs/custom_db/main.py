@@ -68,4 +68,4 @@ def get_existencias_articulo( articulo_id = None, connection_name = '', fecha_in
         salidas = 0
     
     existencias = entradas - salidas
-    return entradas, salidas, existencias, inv_fin
+    return inv_fin

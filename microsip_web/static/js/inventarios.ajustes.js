@@ -145,6 +145,10 @@ function cargar_series_actuales(data)
 function add_existenciasarticulo_byajuste()
 {
 
+  if ( $("#enviar_btn").attr("disabled") == "disabled")
+    return false
+
+
   if ($('#id_ubicacion').val() == '')
   {
     alert("El campo ubicacion es obligatorio");
@@ -293,23 +297,32 @@ function cargar_detallesmovimientos_articulo(entradas_detalles, salidas_detalles
   var entradas = entradas_detalles.split(',');
   var salidas = salidas_detalles.split(',');
   
-  var detalles_html = '<h6> ENTRADAS: </h6>';
-  
+  var detalles_html = '';
+  var header_entradas = '';
+
   $.each(entradas, function(key, entrada) {
-    numero = key + 1;
-    if (entrada != "")
+    if ( entrada.toLowerCase().indexOf("existin") >= 0 )
+      header_entradas = '<h6> ENTRADAS: '+ entrada+'</H6>';
+    else if (entrada != "")
+    {
+      numero = key + 1;
       detalles_html = detalles_html + numero + ") " + entrada + '<br>';
+    }
   });
 
   detalles_html = detalles_html + '<h6> SALIDAS: </h6>';
   
   $.each(salidas, function(key, salida) {
-    numero = key + 1;
-    if (salida != "")
+    if ( salida.toLowerCase().indexOf("existin") >= 0 )
+      header_entradas = '<h6> ENTRADAS: '+ salida+'</H6>';
+    else if (salida != "")
+    {
+      numero = key + 1;
       detalles_html = detalles_html + numero + ") " + salida + '<br>';
+    }
   });
 
-  $("#modal_movimientos_articulo > .modal-body").html(detalles_html);  
+  $("#modal_movimientos_articulo > .modal-body").html(header_entradas + detalles_html);  
 }
 
 /* Buscar articulo */
@@ -395,12 +408,19 @@ function load_localstorage()
 
 function buscarClave()
 {
+  if ( $("#buscar_btn").attr("disabled") == "disabled")
+    return false
+  
   if( $("#id_claveArticulo").val() != '' )
+  {
+    $("#buscar_btn").attr("disabled",true);
+    $("#buscar_btn").text("Buscando...");
     Dajaxice.microsip_web.apps.inventarios.get_existenciasarticulo_byclave(mostrar_articulo_byclave,{
       'articulo_clave': $("#id_claveArticulo").val(), 
       'almacen': $("#almacen_nombre").val(), 
       'entrada_id' : $("#entrada_id").val(),
     });
+  }
   else
     $("#id_articulo_text").focus();
 }

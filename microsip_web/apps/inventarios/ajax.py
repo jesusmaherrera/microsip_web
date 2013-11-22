@@ -223,7 +223,7 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
         if msg == '':
             msg = 'Movimiento registrado correctamente'
         
-        entradasx, salidasx, existenciasx, exitencia = get_existencias_articulo(
+        exitencia = get_existencias_articulo(
             articulo_id = articulo.id, 
             connection_name = connection_name, 
             fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
@@ -256,7 +256,7 @@ def ajustar_existencias( **kwargs ):
     almacen = kwargs.get( 'almacen', None )
     connection_name = kwargs.get( 'connection_name', None )
 
-    entradas, salidas, existencias, inv_fin = get_existencias_articulo(
+    inv_fin = get_existencias_articulo(
         articulo_id = articulo_id, 
         connection_name = connection_name, 
         fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
@@ -323,10 +323,20 @@ def add_existenciasarticulo_byajustes( **kwargs ):
         )
     
     #Logica
-
+    existencia_inicial = ''
     #Si no se existe arituclo en documentos se ajustan unidades
-    if not existe_en_detalles and ajustar_primerconteo:
-        detalle.unidades = ajustar_existencias( articulo_id = articulo.id, ajustar_a = detalle.unidades ,almacen = almacen , connection_name = connection_name )
+    if not existe_en_detalles:
+        existencia_inicial = get_existencias_articulo(
+                articulo_id = articulo.id, 
+                connection_name = connection_name, 
+                fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
+                almacen = almacen, 
+            )    
+
+        if ajustar_primerconteo:
+            detalle.unidades = ajustar_existencias( articulo_id = articulo.id, ajustar_a = detalle.unidades ,almacen = almacen , connection_name = connection_name )
+        
+        
 
     es_nuevo = False
 
@@ -387,7 +397,13 @@ def add_existenciasarticulo_byajustes( **kwargs ):
         detalle.detalle_modificacionestime = ''
     detalle_ajuste = '' 
     if not existe_en_detalles:   
-        detalle_ajuste = '(AJ.=%s)'%detalle.unidades
+        detalle.detalle_modificacionestime +='EXISTIN=%s,'%existencia_inicial
+        if ajustar_primerconteo:
+            if detalle.tipo_movto == 'S':
+                detalle_ajuste = '(AJ=-%s)'% detalle.unidades
+            elif detalle.tipo_movto == 'E': 
+                detalle_ajuste = '(AJ=%s)'% detalle.unidades
+
     detalle.detalle_modificacionestime += '%s %s/%s=%s%s,'%( datetime.now().strftime("%d-%b-%Y %I:%M %p"), request_user.username, ubicacion, detalle_unidades, detalle_ajuste)
 
     if es_nuevo:
@@ -403,7 +419,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
 
     management.call_command( 'syncdb', database = connection_name )
 
-    entradasx, salidasx, existenciasx, exitencia = get_existencias_articulo(
+    exitencia = get_existencias_articulo(
         articulo_id = articulo.id, 
         connection_name = connection_name, 
         fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
@@ -729,7 +745,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
 
             management.call_command( 'syncdb', database = connection_name )
 
-        entradas, salidas, existencias, inv_fin = get_existencias_articulo(
+        inv_fin = get_existencias_articulo(
             articulo_id = articulo.id,
             connection_name = connection_name, 
             fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
@@ -835,7 +851,7 @@ def get_existenciasarticulo_byid( request, **kwargs ):
 
         management.call_command( 'syncdb', database = connection_name )
 
-    entradas, salidas, existencias, inv_fin = get_existencias_articulo(
+    inv_fin = get_existencias_articulo(
         articulo_id = articulo_id , 
         connection_name = connection_name, 
         fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
