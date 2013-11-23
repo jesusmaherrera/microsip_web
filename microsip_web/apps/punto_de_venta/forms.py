@@ -157,6 +157,66 @@ class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
 def PlantillaPoliza_items_formset(form, formset = BaseInlineFormSet, **kwargs):
     return inlineformset_factory(PlantillaPolizas_pv, DetallePlantillaPolizas_pv, form, formset, **kwargs)
 
+class FacturaManageForm(forms.ModelForm):
+    MODALIDADES_FATURACION = (
+        ('PREIMP', 'Factura pre-impresa'),
+    )
+    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class':'span12', 'rows':2, 'placeholder': 'Descripcion...',}), required= False )
+    modalidad_facturacion = forms.ChoiceField(choices= MODALIDADES_FATURACION, required=True)
+
+    def __init__(self, *args, **kwargs):
+        super(FacturaManageForm, self).__init__(*args, **kwargs)
+        self.fields['fecha'].widget.attrs['class'] = 'input-small'
+        self.fields['folio'].widget.attrs['class'] = 'input-small'
+        self.fields['folio'].required = False
+
+    class Meta:
+        widgets = autocomplete_light.get_widgets_dict(Docto_PV)
+        model = Docto_PV
+        exclude = (
+            'vendedor',
+            'forma_global_emitida',
+            'total_fpgc',
+            'email_envio',
+            'almacen',
+            'cajero',
+            'hora',
+            'clave_cliente',
+            'direccion_cliente',
+            'tipo_descuento',
+            'porcentaje_descuento',
+            'importe_descuento',
+            'persona',
+            'tipo_cambio',
+            'cliente_fac',
+            'caja',
+            'clave_cliente_fac',
+            'clave_global_emitida',
+            'unidad_comprom',
+            'es_cfd',
+            'total_impuestos',
+            'estado',
+            'cargar_sun',
+            'impuesto_incluido',
+            'importe_donativo',
+            'tipo',
+            'enviado',
+            'unid_comprom',
+            'refer_reting',
+            'moneda',
+            'importe_neto',
+            'ticket_emitido',
+            'aplicado',
+            'forma_emitida',
+            'contabilizado',
+            'sistema_origen',
+            'usuario_creador',
+            'fechahora_creacion',
+            'usuario_ult_modif',
+            'fechahora_ult_modif',
+            'puntos',
+            )
+
 
 class DocumentoPV_ManageForm(forms.ModelForm):
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'class':'span12', 'rows':2, 'placeholder': 'Descripcion...',}), required= False )

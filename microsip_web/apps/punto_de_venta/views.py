@@ -20,8 +20,6 @@ from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_f
 from microsip_web.libs.custom_db.main import get_conecctionname, first_or_none
 from mobi.decorators import detect_mobile
 
-
-
 ##########################################
 ##                                      ##
 ##              Articulos               ##
@@ -856,7 +854,7 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
     else:
         factura = Docto_PV()
 
-    factura_form = DocumentoPV_ManageForm( request.POST or None, instance = factura,)
+    factura_form = FacturaManageForm( request.POST or None, instance = factura,)
     factura_items = DocumentoPV_items_formset(DocumentoPVDet_ManageForm, extra=1, can_delete=True)
     formset = factura_items(request.POST or None, instance=factura)
     factura_global_fm =  factura_global_form(request.POST or None)

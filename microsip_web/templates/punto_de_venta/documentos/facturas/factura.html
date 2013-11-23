@@ -29,6 +29,44 @@
   </div>
 </div>
 
+<div id="modal_factura_global" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h4 id="myModalLabel">Generar factura global</h4>
+  </div>
+  <div class="modal-body">
+    <fieldset>
+      <div class="input-append input-prepend">
+        <span class="add-on"> de </span>
+        {{ factura_global_fm.fecha_inicio }}
+        <span class="add-on"><i class="icon-calendar"></i> </span>
+        <span class="add-on"> a </span>
+        {{ factura_global_fm.fecha_fin }}
+        <span class="add-on"><i class="icon-calendar"></i> </span>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Opciones</legend> 
+      <div class='span2'>
+        Factura en forma
+      </div>
+      {{ factura_global_fm.tipo }}
+      <br>
+      <div class='span2'>
+        <input id='check_almacen' type="checkbox"/>
+        Un almacen
+      </div>
+      {{ factura_global_fm.almacen }}
+      
+    </fieldset>
+    
+  </div>
+  <div class="modal-footer">
+    <button class="btn" id='btnCancel' data-dismiss="modal">Cancelar</button>
+    <a href="#" id='btn_facturaglobal'class="btn">Generar</a>
+  </div>
+</div>
+
 <form method="post" action="" enctype='multipart/form-data'>{% csrf_token %}
 
 
@@ -142,31 +180,12 @@
           </table>
         </span>
         <span class='span8'>
+          <a href="#modal_factura_global" role="button" class="btn" data-toggle="modal">Factura Global</a>
+          <br><br><br><br><br><br><br><br><br>
           <fieldset>
-            <div class="input-append input-prepend">
-              <span class="add-on"> de </span>
-              {{ factura_global_fm.fecha_inicio }}
-              <span class="add-on"><i class="icon-calendar"></i> </span>
-              <span class="add-on"> a </span>
-              {{ factura_global_fm.fecha_fin }}
-              <span class="add-on"><i class="icon-calendar"></i> </span>
-            </div>
+            <legend>Comprobante fiscal</legend> 
+            Facturacón {{ factura_form.modalidad_facturacion }}
           </fieldset>
-          <fieldset>
-            <legend>Opciones</legend> 
-            <div class='span2'>
-              Factura en forma
-            </div>
-            {{ factura_global_fm.tipo }}
-            <br>
-            <div class='span2'>
-              <input id='check_almacen' type="checkbox"/>
-              Un almacen
-            </div>
-            {{ factura_global_fm.almacen }}
-            
-          </fieldset>
-          <a href="#" id='btn_facturaglobal'class="btn">Generar Factura Global</a>
         </span>
       </div>
     </div>

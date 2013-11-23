@@ -4,7 +4,7 @@ from dajaxice.decorators import dajaxice_register
 from django.core.exceptions import ObjectDoesNotExist
 from django.core import serializers
 from django.http import HttpResponse
-from django.db.models import Sum, Max
+from django.db.models import Sum, Max, Avg
 import datetime, time
 from django.db.models import Q
 
@@ -22,67 +22,53 @@ def generar_factura_global( request, **kwargs ):
     fecha_inicio = kwargs.get('fecha_inicio', None)
     fecha_fin = kwargs.get('fecha_fin', None)
     almacen_id = kwargs.get('almacen_id', None)
+    cliente_id = kwargs.get('cliente_id', None)
+    modalidad_facturacion = kwargs.get('modalidad_facturacion', None)
+
     fecha_inicio = datetime.strptime(fecha_inicio, '%d/%m/%Y').date()
     fecha_fin = datetime.strptime(fecha_fin, '%d/%m/%Y').date()
     almacen = first_or_none( Almacenes.objects.filter(pk=almacen_id) )
-    cliente = Cliente.objects.get(pk=287)
+    cliente = Cliente.objects.get(pk=int(cliente_id))
     cliente_clave = first_or_none( ClavesClientes.objects.filter( cliente=cliente ) )
-    cliente_direccion = DirCliente.objects.get(pk=292)
+    cliente_direccion =  first_or_none( DirCliente.objects.filter(cliente=cliente) )
+    
+    ventas_facturadas = DoctoPVLiga.objects.filter(docto_pv_fuente__fecha__gte = fecha_inicio, docto_pv_fuente__fecha__lte = fecha_fin)
+    
+    if almacen:
+        ventas_facturadas = ventas_facturadas.filter(docto_pv_fuente__almacen= almacen)
+
+    ventas_facturadas_list =  list( set( ventas_facturadas.values_list( 'docto_pv_fuente__id', flat = True ) ) ) 
+    ventas_sinfacturar =  Docto_PV.objects.exclude( id__in = ventas_facturadas_list).filter(tipo= 'V', fecha__gte = fecha_inicio, fecha__lte = fecha_fin)
+    detalles_factura = Docto_pv_det.objects.exclude(documento_pv__id__in = ventas_facturadas_list)\
+        .filter(documento_pv__tipo = 'V',documento_pv__fecha__gte= fecha_inicio, documento_pv__fecha__lte=fecha_fin)
 
     if almacen:
-        ventas_facturadas =  list( set( 
-                DoctoPVLiga.objects.filter(docto_pv_fuente__almacen= almacen,docto_pv_fuente__fecha__gte = fecha_inicio, docto_pv_fuente__fecha__lte = fecha_fin).values_list( 'docto_pv_fuente__id', flat = True ) 
-                ) ) 
-
-        ventas_sin_facturar = Docto_PV.objects.exclude(id__in=ventas_facturadas).filter(almacen=almacen, tipo = 'V', fecha__gte = fecha_inicio, fecha__lte = fecha_fin)
-        
-        # for venta in ventas_sin_facturar:
-        #     venta.clave_cliente_fac = cliente_clave.clave
-        #     venta.cliente_fac = cliente
-        #     venta.direccion_cliente = cliente_direccion
-        #     venta.save(update_fields = [ 'clave_cliente_fac', 'cliente_fac', 'direccion_cliente', ])
-
-        detalles = Docto_pv_det.objects.exclude(documento_pv__id__in = ventas_facturadas).\
-            filter(documento_pv__almacen = almacen, documento_pv__tipo = 'V',documento_pv__fecha__gte= fecha_inicio, documento_pv__fecha__lte=fecha_fin).\
-            values('articulo').annotate(unidades=Sum('unidades'), precio_total_neto=Sum('precio_total_neto'), )
-
-        detalles_factura = Docto_pv_det.objects.exclude(documento_pv__id__in = ventas_facturadas)\
-            .filter(documento_pv__almacen = almacen, documento_pv__tipo = 'V',documento_pv__fecha__gte= fecha_inicio, documento_pv__fecha__lte=fecha_fin)
-        
-
-        ventas_sinfacturar =  Docto_PV.objects.exclude( id__in = ventas_facturadas).filter(almacen =almacen, tipo= 'V', fecha__gte = fecha_inicio, fecha__lte = fecha_fin)
-
-    else:
-        ventas_facturadas =  list( set( 
-                DoctoPVLiga.objects.filter(docto_pv_fuente__fecha__gte = fecha_inicio, docto_pv_fuente__fecha__lte = fecha_fin).values_list( 'docto_pv_fuente__id', flat = True ) 
-                ) ) 
-
-        ventas_sin_facturar = Docto_PV.objects.exclude(id__in=ventas_facturadas).filter(tipo = 'V', fecha__gte = fecha_inicio, fecha__lte = fecha_fin)
-        
-        detalles = Docto_pv_det.objects.exclude(documento_pv__id__in = ventas_facturadas).\
-            filter(documento_pv__tipo = 'V',documento_pv__fecha__gte= fecha_inicio, documento_pv__fecha__lte=fecha_fin).\
-            values('articulo').annotate(unidades=Sum('unidades'), precio_total_neto=Sum('precio_total_neto'), )
-
-        detalles_factura = Docto_pv_det.objects.exclude(documento_pv__id__in = ventas_facturadas)\
-            .filter(documento_pv__tipo = 'V',documento_pv__fecha__gte= fecha_inicio, documento_pv__fecha__lte=fecha_fin)
-        
-
-        ventas_sinfacturar =  Docto_PV.objects.exclude( id__in = ventas_facturadas).filter(tipo= 'V', fecha__gte = fecha_inicio, fecha__lte = fecha_fin)        
-    # for detalle in detalles:
-    #     detalle['unidades'] = str( detalle['unidades'] )
-    #     detalle['precio_total_neto'] = str( detalle['precio_total_neto'] )
+        ventas_sinfacturar = ventas_sinfacturar.filter(almacen = almacen)
+        detalles_factura = detalles_factura.filter(documento_pv__almacen = almacen)
+    
+    detalles_factura_values = detalles_factura.values('articulo', 'precio_unitario',).annotate(unidades = Sum('unidades'), precio_unitario = Sum('precio_unitario', field='precio_unitario*unidades') )
+    objects.sd
+    
+    totales = ventas_sinfacturar.aggregate(
+            importe_neto=Sum('importe_neto',),  
+            total_impuestos=Sum('total_impuestos',),
+            importe_donativo=Sum('importe_donativo',),
+            total_fpgc=Sum('total_fpgc',),
+            importe_descuento=Sum('importe_descuento',),
+        )
+    importe_neto = totales['importe_neto']
+    total_impuestos = totales['total_impuestos']
+    importe_donativo = totales['importe_donativo']
+    total_fpgc = totales['total_fpgc']
+    importe_descuento = totales['importe_descuento']
+    
     message =''
-    caja  = Caja.objects.get(pk=265)
-    importe_neto = 80
-    total_impuestos = 23
-    importe_donativo,total_fpgc = 0, 0
-    modalidad_facturacion = 'PREIMP'
     
     folio = get_sigfolio_ve(connection_name=connection_name, tipo_docto='F',serie='S')
     if ventas_sinfacturar.count() > 0:
         factura_global = Docto_PV.objects.create(
                 id= next_id('ID_DOCTOS', connection_name),
-                caja =  caja,
+                caja = first_or_none( Caja.objects.all() ) ,
                 tipo = 'F',
                 folio = folio,
                 fecha= datetime.now(),
@@ -97,7 +83,7 @@ def generar_factura_global( request, **kwargs ):
                 tipo_cambio=1,
                 tipo_descuento='I',
                 porcentaje_descuento=0,
-                importe_descuento=0,
+                importe_descuento = importe_descuento,
                 importe_neto = importe_neto ,
                 total_impuestos= total_impuestos,
                 importe_donativo= importe_donativo,
