@@ -59,6 +59,7 @@ $(function() {
       'almacen_id': almacen_id,
       'cliente_id':$("#id_cliente").val()[0],
       'modalidad_facturacion': $("#id_modalidad_facturacion").val(),
+      'factura_tipo': $("#id_tipo").val(),
 	  });
   });
 });

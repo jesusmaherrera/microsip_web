@@ -23,6 +23,7 @@ def generar_factura_global( request, **kwargs ):
     fecha_fin = kwargs.get('fecha_fin', None)
     almacen_id = kwargs.get('almacen_id', None)
     cliente_id = kwargs.get('cliente_id', None)
+    factura_tipo = kwargs.get('factura_tipo', None)
     modalidad_facturacion = kwargs.get('modalidad_facturacion', None)
 
     fecha_inicio = datetime.strptime(fecha_inicio, '%d/%m/%Y').date()
@@ -46,9 +47,7 @@ def generar_factura_global( request, **kwargs ):
         ventas_sinfacturar = ventas_sinfacturar.filter(almacen = almacen)
         detalles_factura = detalles_factura.filter(documento_pv__almacen = almacen)
     
-    detalles_factura_values = detalles_factura.values('articulo', 'precio_unitario',).annotate(unidades = Sum('unidades'), precio_unitario = Sum('precio_unitario', field='precio_unitario*unidades') )
-    objects.sd
-    
+    #Calcula totales
     totales = ventas_sinfacturar.aggregate(
             importe_neto=Sum('importe_neto',),  
             total_impuestos=Sum('total_impuestos',),
@@ -56,6 +55,7 @@ def generar_factura_global( request, **kwargs ):
             total_fpgc=Sum('total_fpgc',),
             importe_descuento=Sum('importe_descuento',),
         )
+
     importe_neto = totales['importe_neto']
     total_impuestos = totales['total_impuestos']
     importe_donativo = totales['importe_donativo']
@@ -63,8 +63,9 @@ def generar_factura_global( request, **kwargs ):
     importe_descuento = totales['importe_descuento']
     
     message =''
-    
     folio = get_sigfolio_ve(connection_name=connection_name, tipo_docto='F',serie='S')
+
+    #Se crea factura y ligas
     if ventas_sinfacturar.count() > 0:
         factura_global = Docto_PV.objects.create(
                 id= next_id('ID_DOCTOS', connection_name),
@@ -94,7 +95,43 @@ def generar_factura_global( request, **kwargs ):
                 modalidad_facturacion = modalidad_facturacion,
                 usuario_creador= request.user.username,
             )
-        
+
+        for venta in ventas_sinfacturar:
+            DoctoPVLiga.objects.create(
+                    id = next_id('ID_LIGAS_DOCTOS', connection_name),
+                    docto_pv_fuente = venta,
+                    docto_pv_destino = factura_global,
+                )
+
+    #Se crean los detalles segun el tipo de fatura
+    if factura_tipo == 'C':
+        detalles_factura_concentrada = detalles_factura.values('articulo').annotate(unidades_sum = Sum('unidades'), precio_totalneto_sum = Sum('precio_total_neto'))
+
+        for detalle in detalles_factura_concentrada:
+            articulo = Articulos.objects.get(pk=detalle['articulo'])
+            articulo_clave = first_or_none(ClavesArticulos.objects.filter(articulo=articulo))
+            unidades = detalle['unidades_sum']
+            precio_promedio = detalle['precio_totalneto_sum']/ unidades
+            precio_total_neto =  precio_promedio * unidades
+
+            Docto_pv_det.objects.create(
+                    id = -1,
+                    documento_pv = factura_global,
+                    clave_articulo = articulo_clave,
+                    articulo = articulo,
+                    unidades = detalle['unidades_sum'],
+                    unidades_dev = 0,
+                    precio_unitario = precio_promedio,
+                    precio_unitario_impto = 0 ,
+                    fpgc_unitario = 0 ,
+                    porcentaje_descuento = 0 ,
+                    precio_total_neto =precio_total_neto,
+                    precio_modificado = 0 ,
+                    porcentaje_comis = 0 ,
+                    rol = 'N' ,
+                    posicion = -1,
+                )          
+    elif factura_tipo == 'D':
         for detalle_factura in detalles_factura:
             Docto_pv_det.objects.create(
                     id = -1,
@@ -118,12 +155,6 @@ def generar_factura_global( request, **kwargs ):
                     posicion = -1,
                 )
 
-        for venta in ventas_sinfacturar:
-            DoctoPVLiga.objects.create(
-                    id = next_id('ID_LIGAS_DOCTOS', connection_name),
-                    docto_pv_fuente = venta,
-                    docto_pv_destino = factura_global,
-                )
     else:
         message = 'No hay ventas por facturar'
 
