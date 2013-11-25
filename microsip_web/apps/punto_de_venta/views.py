@@ -9,22 +9,50 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist
 #Paginacion
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 import datetime, time
 from forms import *
 from models import *
+from triggers import triggers
+from mobi.decorators import detect_mobile
+
 from microsip_web.apps.main.filtros.models import *
 from microsip_web.libs.custom_db.main import next_id
 from microsip_web.libs import contabilidad
-from triggers import triggers
 from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_form
-from microsip_web.libs.custom_db.main import get_conecctionname, first_or_none 
-from mobi.decorators import detect_mobile
+from microsip_web.libs.custom_db.main import get_conecctionname, first_or_none,  get_sigfolio_ve
+from microsip_web.libs.punto_de_venta import new_factura_global
 
 ##########################################
 ##                                      ##
 ##              Articulos               ##
 ##                                      ##
 ##########################################
+def generar_fatcura(request):
+    # Parametros
+    almacen_id = '318'
+    cliente_id = 297
+    factura_tipo = 'C'
+    modalidad_facturacion = 'PREIMP'
+
+    connection_name = get_conecctionname(request.session)
+    fecha_inicio = datetime.strptime( '25/11/2013', '%d/%m/%Y' ).date()
+    fecha_fin = datetime.strptime( '25/11/2013', '%d/%m/%Y' ).date()
+    almacen = first_or_none( Almacenes.objects.filter( pk = almacen_id ) )
+    cliente = Cliente.objects.get( pk = int( cliente_id ) )
+
+    message = new_factura_global(
+            fecha_inicio=fecha_inicio,
+            fecha_fin= fecha_fin,
+            almacen= almacen,
+            cliente= cliente,
+            factura_tipo= factura_tipo,
+            modalidad_facturacion= modalidad_facturacion,
+            connection_name= connection_name,
+            username = request.user.username,
+        )
+    objects.asd
+
 
 @login_required(login_url='/login/')
 def inicializar_puntos_clientes(request):
