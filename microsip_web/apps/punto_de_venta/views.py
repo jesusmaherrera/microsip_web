@@ -17,7 +17,7 @@ from microsip_web.libs.custom_db.main import next_id
 from microsip_web.libs import contabilidad
 from triggers import triggers
 from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_form
-from microsip_web.libs.custom_db.main import get_conecctionname, first_or_none
+from microsip_web.libs.custom_db.main import get_conecctionname, first_or_none 
 from mobi.decorators import detect_mobile
 
 ##########################################

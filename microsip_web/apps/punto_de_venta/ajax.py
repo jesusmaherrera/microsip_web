@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.db.models import Sum, Max, Avg
 import datetime, time
 from django.db.models import Q
-
+from django.db import connections
 from decimal import *
 from models import *
 from microsip_web.libs.custom_db.main import next_id, get_existencias_articulo, first_or_none, get_sigfolio_ve
@@ -41,7 +41,7 @@ def generar_factura_global( request, **kwargs ):
     ventas_facturadas_list =  list( set( ventas_facturadas.values_list( 'docto_pv_fuente__id', flat = True ) ) ) 
     ventas_sinfacturar =  Docto_PV.objects.exclude( id__in = ventas_facturadas_list).filter(tipo= 'V', fecha__gte = fecha_inicio, fecha__lte = fecha_fin)
     detalles_factura = Docto_pv_det.objects.exclude(documento_pv__id__in = ventas_facturadas_list)\
-        .filter(documento_pv__tipo = 'V',documento_pv__fecha__gte= fecha_inicio, documento_pv__fecha__lte=fecha_fin)
+       .filter(documento_pv__tipo = 'V',documento_pv__fecha__gte= fecha_inicio, documento_pv__fecha__lte=fecha_fin)
 
     if almacen:
         ventas_sinfacturar = ventas_sinfacturar.filter(almacen = almacen)
@@ -103,57 +103,67 @@ def generar_factura_global( request, **kwargs ):
                     docto_pv_destino = factura_global,
                 )
 
-    #Se crean los detalles segun el tipo de fatura
-    if factura_tipo == 'C':
-        detalles_factura_concentrada = detalles_factura.values('articulo').annotate(unidades_sum = Sum('unidades'), precio_totalneto_sum = Sum('precio_total_neto'))
-
-        for detalle in detalles_factura_concentrada:
-            articulo = Articulos.objects.get(pk=detalle['articulo'])
-            articulo_clave = first_or_none(ClavesArticulos.objects.filter(articulo=articulo))
-            unidades = detalle['unidades_sum']
-            precio_promedio = detalle['precio_totalneto_sum']/ unidades
-            precio_total_neto =  precio_promedio * unidades
-
-            Docto_pv_det.objects.create(
-                    id = -1,
-                    documento_pv = factura_global,
-                    clave_articulo = articulo_clave,
-                    articulo = articulo,
-                    unidades = detalle['unidades_sum'],
-                    unidades_dev = 0,
-                    precio_unitario = precio_promedio,
-                    precio_unitario_impto = 0 ,
-                    fpgc_unitario = 0 ,
-                    porcentaje_descuento = 0 ,
-                    precio_total_neto =precio_total_neto,
-                    precio_modificado = 0 ,
-                    porcentaje_comis = 0 ,
-                    rol = 'N' ,
-                    posicion = -1,
-                )          
-    elif factura_tipo == 'D':
-        for detalle_factura in detalles_factura:
-            Docto_pv_det.objects.create(
-                    id = -1,
-                    documento_pv = factura_global,
-                    clave_articulo = detalle_factura.clave_articulo,
-                    articulo = detalle_factura.articulo,
-                    unidades = detalle_factura.unidades,
-                    unidades_dev = detalle_factura.unidades_dev,
-                    precio_unitario = detalle_factura.precio_unitario,
-                    precio_unitario_impto = detalle_factura.precio_unitario_impto ,
-                    fpgc_unitario = detalle_factura.fpgc_unitario ,
-                    porcentaje_descuento = detalle_factura.porcentaje_descuento ,
-                    precio_total_neto = detalle_factura.precio_total_neto ,
-                    precio_modificado = detalle_factura.precio_modificado ,
-                    vendedor = detalle_factura.vendedor ,
-                    porcentaje_comis = detalle_factura.porcentaje_comis ,
-                    rol = detalle_factura.rol ,
-                    notas = detalle_factura.notas ,
-                    es_tran_elect = detalle_factura.es_tran_elect ,
-                    estatus_tran_elect = detalle_factura.estatus_tran_elect ,
-                    posicion = -1,
-                )
+        #Se crean los detalles segun el tipo de fatura
+        if factura_tipo == 'C':
+            c = connections[connection_name].cursor()
+            query =  '''SELECT DOCTOS_PV_DET.articulo_id, SUM(DOCTOS_PV_DET.unidades), SUM(DOCTOS_PV_DET.precio_unitario_impto*DOCTOS_PV_DET.unidades) as total_unidades\
+                FROM DOCTOS_PV_DET INNER JOIN DOCTOS_PV ON (DOCTOS_PV_DET.DOCTO_PV_ID = DOCTOS_PV.DOCTO_PV_ID)\
+                WHERE\
+                    DOCTOS_PV.tipo_docto ='V' and\
+                    DOCTOS_PV.fecha >= '%s' AND DOCTOS_PV.fecha <= '%s' AND\
+                    not DOCTOS_PV.docto_pv_id in %s\
+                group by DOCTOS_PV_DET.articulo_id\
+                '''%(fecha_inicio, fecha_fin, tuple(ventas_facturadas_list))
+            c.execute(query)
+            detalles_factura_concentrada = c.fetchall()
+            c.close()
+            
+            for detalle in detalles_factura_concentrada:
+                articulo = Articulos.objects.get(pk=detalle[0])
+                articulo_clave = first_or_none(ClavesArticulos.objects.filter(articulo=articulo))
+                unidades = detalle[1]
+                precio_promedio = detalle[2]/ unidades
+                precio_total_neto =  precio_promedio * unidades
+                Docto_pv_det.objects.create(
+                        id = -1,
+                        documento_pv = factura_global,
+                        clave_articulo = articulo_clave,
+                        articulo = articulo,
+                        unidades = detalle[1],
+                        unidades_dev = 0,
+                        precio_unitario = precio_promedio,
+                        precio_unitario_impto = 0 ,
+                        fpgc_unitario = 0 ,
+                        porcentaje_descuento = 0 ,
+                        precio_total_neto =precio_total_neto,
+                        precio_modificado = 'P' ,
+                        porcentaje_comis = 0 ,
+                        rol = 'N' ,
+                        posicion = -1,
+                    )          
+        elif factura_tipo == 'D':
+            for detalle_factura in detalles_factura:
+                Docto_pv_det.objects.create(
+                        id = -1,
+                        documento_pv = factura_global,
+                        clave_articulo = detalle_factura.clave_articulo,
+                        articulo = detalle_factura.articulo,
+                        unidades = detalle_factura.unidades,
+                        unidades_dev = detalle_factura.unidades_dev,
+                        precio_unitario = detalle_factura.precio_unitario,
+                        precio_unitario_impto = detalle_factura.precio_unitario_impto ,
+                        fpgc_unitario = detalle_factura.fpgc_unitario ,
+                        porcentaje_descuento = detalle_factura.porcentaje_descuento ,
+                        precio_total_neto = detalle_factura.precio_total_neto ,
+                        precio_modificado = detalle_factura.precio_modificado ,
+                        vendedor = detalle_factura.vendedor ,
+                        porcentaje_comis = detalle_factura.porcentaje_comis ,
+                        rol = detalle_factura.rol ,
+                        notas = detalle_factura.notas ,
+                        es_tran_elect = detalle_factura.es_tran_elect ,
+                        estatus_tran_elect = detalle_factura.estatus_tran_elect ,
+                        posicion = -1,
+                    )
 
     else:
         message = 'No hay ventas por facturar'

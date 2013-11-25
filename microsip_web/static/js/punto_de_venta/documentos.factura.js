@@ -51,7 +51,8 @@ $(function() {
         alert('Seleciona el cliente');
         return false 
       }
-
+    
+     // window.location = "/punto_de_venta/facturaglobal/"+$("#id_cliente").val()[0]+"/"+$("#id_tipo").val()+"/"+$("#id_modalidad_facturacion").val()+"/";
 
     Dajaxice.microsip_web.apps.punto_de_venta.generar_factura_global( cargar_factura_global, { 
   		'fecha_inicio': $("#id_fecha_inicio").val(),
