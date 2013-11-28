@@ -7,7 +7,6 @@
     margin-left:5px;
   }
 </style>
-
 <link rel='stylesheet' href='{{STATIC_URL}}css/redmond/jquery-ui-1.8.23.custom.css'/>
 
 {% endblock %}
@@ -15,11 +14,33 @@
 {% block js_code %}
 {% include 'autocomplete_light/static.html' %}
 <script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script src='{{STATIC_URL}}js/microsip_api/punto_de_venta.js'></script>
 <script src='{{STATIC_URL}}js/punto_de_venta/documentos.factura.js'></script>
+<script type="text/javascript">
+  $('#id_doctosIn_table tbody tr').formset({
+    prefix: '{{ formset.prefix }}',
+    addCssClass:'hide',
+    addText:'Nuevo Articulo',
+    deleteText:'',
+  });
+
+  // $('#ligas_fromset tbody tr').formset({
+  //   prefix: '{{ formset.prefix }}',
+  //   addCssClass:'hide',
+  //   addText:'Nuevo Articulo',
+  //   deleteText:'',
+  // });
+</script>
 
 {% endblock %}
 {% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/facturas/">Facturas</a> <i class="icon-play"></i> Factura{% endblock %}
 {% block content %}
+{% if message %}
+<div class="alert alert-success fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Bien hecho!! </strong> {{ message }}
+</div>
+{% endif %}
 <div id="modal_opciones-claves" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -77,13 +98,19 @@
   <div id="myTabContent" class="tab-content">
     <div class="tab-pane fade active in" id="general">
       {{ factura_form.errors }}
+      {{ factura_form.importe_neto }}
+      {{ factura_form.importe_donativo }}
+      {{ factura_form.total_fpgc }}
+      {{ factura_form.importe_descuento }}
+      {{ factura_form.total_impuestos }}
+      {{ factura_form.ventas_en_factura }}
       <div id="sic_from" class="container-fluid" style="margin-top: -1em;">
         <div class="row-fluid">
           <div class="span8" id="sicfrom-title">
             <div class="container-fluid">
               <div class="row-fluid">
                 <h3 style="width:5em;"> Factura  </h3> 
-                <button type="submit" class="btn disabled"><i class="icon-download-alt"></i> Guardar</button> 
+                <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
                 <a  href="#" class="btn disabled"><i class="icon-ban-circle"></i></a> 
                 <a href="#" class="btn disabled"><i class="icon-trash"></i></a> 
               </div>
@@ -104,7 +131,7 @@
                 </div> 
                 <div class="span6" >
                   <label>Folio</label>
-                  <div >
+                  <div>
                     {{ factura_form.folio }} 
                   </div>
                 </div>  
@@ -117,13 +144,6 @@
           </div>
         </div>
         <div class="row-fluid" style="padding: .5em;">
-          {% if message %}
-          <div class="alert alert-block alert-error fade in">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
-            <p>{{ message }}</p>
-          </div>
-          {% endif %}
           <table class="table tableCell table-hover" id="id_doctosIn_table" border="0" cellpadding="0" cellspacing="5">
             <thead>
               <tr>
@@ -159,10 +179,12 @@
       </div>
     </div>
     <div class="tab-pane fade " id="ventas_de_mostrador">  
+      {{ factura_global_fm.errors }}
       <div class='row-fluid'>
         <span class='span4'>
           Ventas de mostrador facturadas
-          <table class="table tableCell table-hover" style="background-color: white;margin-top: 1em;">
+
+          <table class="table tableCell table-hover" id="ligas_fromset"  style="background-color: white;margin-top: 1em;" border="0" cellpadding="0" cellspacing="5">
             <thead>
               <tr>
                 <th>Fecha</th>
@@ -170,11 +192,11 @@
               </tr>
             </thead>
             <tbody>
-              {% for venta in ventas %}
-                <tr>
-                  <td>{{ venta.docto_pv_fuente.fecha }}</td>
-                  <td>{{ venta.docto_pv_fuente.folio }}</td>
-                </tr>
+              {% for venta in ventas_factura %}
+              <tr>
+                <td> {{ venta.docto_pv_fuente.fecha }} </td>
+                <td>{{ venta.docto_pv_fuente.folio }}</td>
+              </tr>
               {% endfor %}
             </tbody>
           </table>

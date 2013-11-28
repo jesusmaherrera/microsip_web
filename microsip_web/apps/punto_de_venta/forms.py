@@ -7,15 +7,19 @@ from microsip_web.apps.ventas.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from models import *
+
+class articulo_byclave_form( forms.Form ):
+    clave = forms.CharField(max_length=100)
+
 class factura_global_form( forms.Form ):
     TIPOS_GEN_FACTURA = (
         ('D', 'Detallada'),
         ('C', 'Concentrada'),
     )
-    fecha_inicio = forms.DateField( widget = forms.TextInput( attrs = { 'class' : 'input-small' } ) )
-    fecha_fin = forms.DateField(widget = forms.TextInput( attrs = { 'class' : 'input-small' } ) )
+    fecha_inicio = forms.DateField( widget = forms.TextInput( attrs = { 'class' : 'input-small' } ), required= True )
+    fecha_fin = forms.DateField(widget = forms.TextInput( attrs = { 'class' : 'input-small' } ) , required= True)
     tipo = forms.ChoiceField(choices=TIPOS_GEN_FACTURA, required=True, widget=forms.Select(attrs={'class':'input-medium',}))
-    almacen = forms.ModelChoiceField(queryset= Almacenes.objects.all(), widget=forms.Select(attrs={'class':'input-medium', 'disabled':'disabled',}))
+    almacen = forms.ModelChoiceField(queryset= Almacenes.objects.all(), widget=forms.Select(attrs={'class':'input-medium', 'disabled':'disabled',}), required=False)
 
 class ArticuloCompatibleArticulo_ManageForm(forms.Form):
     compatible_articulo = forms.ModelChoiceField(queryset=Articulos.objects.all(),
@@ -163,12 +167,18 @@ class FacturaManageForm(forms.ModelForm):
     )
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'class':'span12', 'rows':2, 'placeholder': 'Descripcion...',}), required= False )
     modalidad_facturacion = forms.ChoiceField(choices= MODALIDADES_FATURACION, required=True)
+    ventas_en_factura = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(FacturaManageForm, self).__init__(*args, **kwargs)
         self.fields['fecha'].widget.attrs['class'] = 'input-small'
         self.fields['folio'].widget.attrs['class'] = 'input-small'
         self.fields['folio'].required = False
+        self.fields['total_impuestos'].widget = forms.HiddenInput()
+        self.fields['importe_neto'].widget = forms.HiddenInput()
+        self.fields['importe_donativo'].widget = forms.HiddenInput()
+        self.fields['total_fpgc'].widget = forms.HiddenInput()
+        self.fields['importe_descuento'].widget = forms.HiddenInput()
 
     class Meta:
         widgets = autocomplete_light.get_widgets_dict(Docto_PV)
@@ -176,7 +186,6 @@ class FacturaManageForm(forms.ModelForm):
         exclude = (
             'vendedor',
             'forma_global_emitida',
-            'total_fpgc',
             'email_envio',
             'almacen',
             'cajero',
@@ -185,7 +194,6 @@ class FacturaManageForm(forms.ModelForm):
             'direccion_cliente',
             'tipo_descuento',
             'porcentaje_descuento',
-            'importe_descuento',
             'persona',
             'tipo_cambio',
             'cliente_fac',
@@ -194,17 +202,14 @@ class FacturaManageForm(forms.ModelForm):
             'clave_global_emitida',
             'unidad_comprom',
             'es_cfd',
-            'total_impuestos',
             'estado',
             'cargar_sun',
             'impuesto_incluido',
-            'importe_donativo',
             'tipo',
             'enviado',
             'unid_comprom',
             'refer_reting',
             'moneda',
-            'importe_neto',
             'ticket_emitido',
             'aplicado',
             'forma_emitida',
@@ -316,6 +321,9 @@ class Docto_pv_cobro_ManageForm(forms.ModelForm):
 
 def DocumentoPV_items_formset(form, formset = BaseInlineFormSet, **kwargs):
     return inlineformset_factory(Docto_PV, Docto_pv_det, form, formset, **kwargs)
+
+# def DoctoPVLigas_formset(form, formset = BaseInlineFormSet, **kwargs):
+#     return inlineformset_factory(Docto_PV, DoctoPVLiga, form, formset, **kwargs)
 
 def DocumentoPV_cobro_items_formset(form, formset = BaseInlineFormSet, **kwargs):
     return inlineformset_factory(Docto_PV, Docto_pv_cobro, form, formset, **kwargs)

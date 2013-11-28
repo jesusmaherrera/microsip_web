@@ -433,7 +433,6 @@ $('#id_claveArticulo').live('keydown', function(e) {
     buscarClave();
     /*return false*/
   }
-
 });
 
 $("#id_articulo").change(function(){

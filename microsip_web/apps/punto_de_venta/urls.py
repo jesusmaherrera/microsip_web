@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     (r'^facturaglobal/', views.generar_fatcura),
     
     (r'^factura/(?P<id>\d+)/', views.factura_manageView),
-
+    
 	(r'^devoluciones/$', views.devoluciones_de_ventas_view),
 
 	(r'^GenerarPolizas/$', views.generar_polizas_View),
@@ -33,7 +33,8 @@ urlpatterns = patterns('',
     #Articulos
     (r'^articulos/$', views.articulos_view),
     (r'^articulos/(?P<carpeta>\d+)/', views.articulos_view),
-
+    (r'^articulo/precio/', views.get_precio_articulo),
+        
     (r'^articulo/(?P<id>\d+)/', views.articulo_manageView),
 	#Clientes
 	(r'^clientes/$', views.clientes_view),

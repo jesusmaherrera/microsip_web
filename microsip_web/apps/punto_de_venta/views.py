@@ -28,6 +28,32 @@ from microsip_web.libs.punto_de_venta import new_factura_global
 ##              Articulos               ##
 ##                                      ##
 ##########################################
+@login_required(login_url='/login/')
+def get_precio_articulo(request, template_name='punto_de_venta/articulos/articulos/precio.html'):
+    connection_name = get_conecctionname(request.session)
+    c = connections[connection_name].cursor()
+    articulo = ''
+    precio = '' 
+    precio_lista= ''
+    form = articulo_byclave_form(request.POST or None)
+    if form.is_valid():
+        clave = form.cleaned_data['clave']
+        articulo = ClavesArticulos.objects.get(clave=clave).articulo
+
+        c.execute("EXECUTE PROCEDURE GET_PRECIO_ARTCLI(331,%s,'2013/11/27');"%articulo.id)
+        row = c.fetchone()
+        precio = row[0]
+        precio_lista = row[2]
+        c.close()
+
+    c = {
+        'form':form,
+        'articulo':articulo,
+        'precio':precio,
+        'precio_lista':precio_lista,
+    }
+    return render_to_response(template_name, c, context_instance=RequestContext(request))
+
 def generar_fatcura(request):
     # Parametros
     almacen_id = '318'
@@ -884,12 +910,74 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
 
     factura_form = FacturaManageForm( request.POST or None, instance = factura,)
     factura_items = DocumentoPV_items_formset(DocumentoPVDet_ManageForm, extra=1, can_delete=True)
+
     formset = factura_items(request.POST or None, instance=factura)
     factura_global_fm =  factura_global_form(request.POST or None)
 
-    if factura_form.is_valid():
-        fatura= factura_form.save(commit=False)
-    ventas = DoctoPVLiga.objects.filter(docto_pv_destino= factura)
-    c = {'factura_global_fm':factura_global_fm, 'factura_form': factura_form, 'formset':formset, 'message':message,'ventas':ventas, }
+    if formset.is_valid() and factura_form.is_valid() :
+        factura = factura_form.save(commit=False)
+
+        cliente =factura.cliente
+        cliente_clave = first_or_none( ClavesClientes.objects.filter( cliente=cliente ) )
+        cliente_direccion =  first_or_none( DirCliente.objects.filter(cliente=cliente) )
+
+        if not factura.id:
+            folio = get_sigfolio_ve(connection_name=connection_name, tipo_docto='F',serie='S')
+            factura.id =next_id('ID_DOCTOS', connection_name)
+            factura.caja = first_or_none( Caja.objects.all() )
+            factura.tipo = 'F'
+            factura.folio = folio
+            factura.fecha= datetime.now()
+            factura.hora= datetime.now().strftime('%H:%M:%S')
+            factura.clave_cliente= cliente_clave
+            factura.cliente=cliente
+            factura.clave_cliente_fac = cliente_clave
+            factura.cliente_fac = cliente
+            factura.direccion_cliente= cliente_direccion
+            factura.moneda= Moneda.objects.get(pk=1)
+            factura.impuesto_incluido='N'
+            factura.tipo_cambio=1
+            factura.tipo_descuento='I'
+            factura.porcentaje_descuento=0
+            
+            factura.sistema_origen='PV'
+            factura.persona='FACTURA GLOBAL DIARIA'
+            factura.modalidad_facturacion = 'PREIMP'
+            factura.usuario_creador= request.user.username
+
+        factura.save()
+
+        ventas_en_factura = factura_form.cleaned_data['ventas_en_factura']
+        ventas_faturadas = ventas_en_factura.split(',')
+        if ventas_faturadas!= [u'']:
+            for venta_facturada in ventas_faturadas:
+                DoctoPVLiga.objects.create(
+                        id = -1,
+                        docto_pv_fuente = Docto_PV.objects.get(pk=venta_facturada),
+                        docto_pv_destino = factura,
+                    )
+
+        for detalle_form in formset:
+            detalle = detalle_form.save(commit = False)
+
+            if not detalle.id:
+                detalle.id = -1
+                detalle.documento_pv = factura
+                detalle.clave_articulo = ''
+                detalle.unidades_dev = 0
+                detalle.precio_unitario_impto = 0
+                detalle.fpgc_unitario = 0
+                detalle.porcentaje_descuento = 0
+                detalle.precio_modificado = 'P' 
+                detalle.porcentaje_comis = 0 
+                detalle.rol = 'N' 
+                detalle.posicion = -1
+
+            detalle.save()
+
+        message= 'Datos guardados'
+
+    ventas_factura = DoctoPVLiga.objects.filter(docto_pv_destino= factura)
+    c = {'factura_global_fm':factura_global_fm, 'factura_form': factura_form, 'formset':formset, 'message':message,'ventas_factura':ventas_factura, 'message':message, }
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))

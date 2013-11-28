@@ -29,7 +29,7 @@ def generar_factura_global( request, **kwargs ):
     factura_tipo = kwargs.get('factura_tipo', None)
     modalidad_facturacion = kwargs.get('modalidad_facturacion', None)
 
-    message = new_factura_global(
+    data = new_factura_global(
             fecha_inicio=fecha_inicio,
             fecha_fin= fecha_fin,
             almacen= almacen,
@@ -40,4 +40,13 @@ def generar_factura_global( request, **kwargs ):
             username = request.user.username
         )
 
-    return HttpResponse( json.dumps({"detalles": 'HOLA', 'message': message,}), mimetype = "application/javascript" )
+    c = {
+        'detalles': data['detalles'], 
+        'totales': data['totales'],
+        'ventas_facturadas':data['ventas_facturadas'],
+        'message': data['message'],
+        'fecha_inicio': data['fecha_inicio'],
+        'fecha_fin':data['fecha_fin'],
+        }
+
+    return HttpResponse( json.dumps(c), mimetype = "application/javascript" )

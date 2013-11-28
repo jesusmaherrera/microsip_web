@@ -29,6 +29,8 @@ def new_factura_global( **kwargs ):
     factura_tipo = kwargs.get('factura_tipo', None)
     modalidad_facturacion = kwargs.get('modalidad_facturacion', None)
 
+    detalles_list =[]
+    ventas_list = []
     # Ventas facturadas
     ventas_facturadas = DoctoPVLiga.objects.filter(docto_pv_fuente__fecha__gte = fecha_inicio, docto_pv_fuente__fecha__lte = fecha_fin)
     if almacen:
@@ -62,43 +64,13 @@ def new_factura_global( **kwargs ):
      
     # si hay ventas por facturar
     if ventas_sinfacturar.count() > 0:
-        folio = get_sigfolio_ve(connection_name=connection_name, tipo_docto='F',serie='S')
-
-        factura_global = Docto_PV.objects.create(
-                id= next_id('ID_DOCTOS', connection_name),
-                caja = first_or_none( Caja.objects.all() ) ,
-                tipo = 'F',
-                folio = folio,
-                fecha= datetime.now(),
-                hora= datetime.now().strftime('%H:%M:%S'),
-                clave_cliente= cliente_clave,
-                cliente=cliente,
-                clave_cliente_fac = cliente_clave,
-                cliente_fac = cliente,
-                direccion_cliente= cliente_direccion,
-                moneda= Moneda.objects.get(pk=1),
-                impuesto_incluido='N',
-                tipo_cambio=1,
-                tipo_descuento='I',
-                porcentaje_descuento=0,
-                importe_descuento = importe_descuento,
-                importe_neto = importe_neto ,
-                total_impuestos= total_impuestos,
-                importe_donativo= importe_donativo,
-                total_fpgc= total_fpgc,
-                sistema_origen='PV',
-                persona='FACTURA GLOBAL DIARIA',
-                descripcion='FACTURA GLOBAL(%s-%s)'%(fecha_inicio, fecha_fin),
-                modalidad_facturacion = modalidad_facturacion,
-                usuario_creador= username,
-            )
-
         for venta in ventas_sinfacturar:
-            DoctoPVLiga.objects.create(
-                    id = next_id('ID_LIGAS_DOCTOS', connection_name),
-                    docto_pv_fuente = venta,
-                    docto_pv_destino = factura_global,
-                )
+            ventas_list.append({
+                    'id':venta.id,
+                    'folio': venta.folio,
+                    'fecha':str(venta.fecha),
+                })
+
         #Se crean los detalles segun el tipo de fatura
         if factura_tipo == 'C':
             c = connections[connection_name].cursor()
@@ -139,48 +111,40 @@ def new_factura_global( **kwargs ):
                 porcentaje_comis = detalle[5]
                 fpgc_unitario = detalle[6]
                 unidades_dev = detalle[7]
-
-                Docto_pv_det.objects.create(
-                        id = -1,
-                        documento_pv = factura_global,
-                        clave_articulo = articulo_clave,
-                        articulo = articulo,
-                        unidades = detalle[1],
-                        unidades_dev = unidades_dev,
-                        precio_unitario = precio_promedio,
-                        precio_unitario_impto = total_precio_unitario_impt,
-                        fpgc_unitario = fpgc_unitario ,
-                        porcentaje_descuento = porcentaje_descuento ,
-                        precio_total_neto =precio_total_neto,
-                        precio_modificado = 'P' ,
-                        porcentaje_comis = porcentaje_comis ,
-                        rol = 'N' ,
-                        posicion = -1,
-                    )          
+                detalles_list.append({
+                        'articulo_nombre':articulo.nombre, 
+                        'articulo_id': articulo.id, 
+                        'precio': str(precio_promedio),
+                        'unidades':str(unidades),
+                        'precio_total_neto': str(precio_total_neto),
+                    })
+               
         elif factura_tipo == 'D':
             for detalle_factura in detalles_factura:
-                Docto_pv_det.objects.create(
-                        id = -1,
-                        documento_pv = factura_global,
-                        clave_articulo = detalle_factura.clave_articulo,
-                        articulo = detalle_factura.articulo,
-                        unidades = detalle_factura.unidades,
-                        unidades_dev = detalle_factura.unidades_dev,
-                        precio_unitario = detalle_factura.precio_unitario,
-                        precio_unitario_impto = detalle_factura.precio_unitario_impto ,
-                        fpgc_unitario = detalle_factura.fpgc_unitario ,
-                        porcentaje_descuento = detalle_factura.porcentaje_descuento ,
-                        precio_total_neto = detalle_factura.precio_total_neto ,
-                        precio_modificado = detalle_factura.precio_modificado ,
-                        vendedor = detalle_factura.vendedor ,
-                        porcentaje_comis = detalle_factura.porcentaje_comis ,
-                        rol = detalle_factura.rol ,
-                        notas = detalle_factura.notas ,
-                        es_tran_elect = detalle_factura.es_tran_elect ,
-                        estatus_tran_elect = detalle_factura.estatus_tran_elect ,
-                        posicion = -1,
-                    )
+                detalles_list.append({
+                        'articulo_nombre':detalle_factura.articulo.nombre, 
+                        'articulo_id': detalle_factura.articulo.id, 
+                        'precio': str(detalle_factura.precio_unitario), 
+                        'unidades':str(detalle_factura.unidades),
+                        'precio_total_neto': str(detalle_factura.precio_total_neto),
+                    })
     else:
         message = 'No hay ventas por facturar'
 
-    return message
+    totales_factura = {
+        'importe_neto': str(importe_neto),
+        'total_impuestos': str(total_impuestos),
+        'importe_donativo': str(importe_donativo),
+        'total_fpgc': str(total_fpgc),
+        'importe_descuento': str(importe_descuento),
+    }
+
+    data = {
+        'totales':totales_factura,
+        'detalles': detalles_list,
+        'ventas_facturadas':ventas_list,
+        'message': message,
+        'fecha_inicio':str(fecha_inicio),
+        'fecha_fin':str(fecha_fin),
+    }
+    return data

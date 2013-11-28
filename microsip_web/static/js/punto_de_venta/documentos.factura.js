@@ -6,12 +6,57 @@ function cargar_factura_global(data){
     alert(data.message);
   }
   else
-    window.location = "/punto_de_venta/facturas/";
-	// for (var i = 0; i <= data.length ; i++) 
+  {
+    $.each(data.detalles, function( index, detalle ) {
+      seleccionar_articulo({'articulo_id':detalle.articulo_id, 'articulo_nombre':detalle.articulo_nombre, 'comun_name':'docto_pv_det_set-'+index+'-'});
+      $("input[name='docto_pv_det_set-"+index+"-unidades']").val(detalle.unidades);
+      $("input[name='docto_pv_det_set-"+index+"-precio_unitario']").val(detalle.precio);
+      $("input[name='docto_pv_det_set-"+index+"-precio_total_neto']").val(detalle.precio_total_neto);
+      if (data.detalles.length-1 > index)
+        $('#id_doctosIn_table').find('a:last').click();
+    });
+    
+    $("#id_importe_neto").val(data.totales.importe_neto);
+    $("#id_total_impuestos").val(data.totales.total_impuestos);
+    $("#id_importe_donativo").val(data.totales.importe_donativo);
+    $("#id_total_fpgc").val(data.totales.total_fpgc);
+    $("#id_importe_descuento").val(data.totales.importe_descuento);
+    $("#id_ventas_en_factura").val(data.totales.ventas_facturadas);
+    $("#id_descripcion").val("FACTURA GLOBAL("+data.fecha_inicio+"-"+data.fecha_fin+")");
+    
+    var ventas_ids = '';
+    $.each(data.ventas_facturadas, function( index, venta ) {
+      ventas_ids = $("#id_ventas_en_factura").val() + venta.id;
+      if (data.ventas_facturadas.length-1 > index)
+        ventas_ids = ventas_ids +',';
 
+      $("#id_ventas_en_factura").val(ventas_ids);    
+      $("#ligas_fromset tbody").append('<tr><td>'+venta.fecha+'</td><td>'+ venta.folio+'</td></tr>');
+    });
+    // ligas_fromset
+    
+    $('#modal_factura_global').modal("hide");
+  }
 }
 
 $(function() {
+
+
+  $("input[name*='clave_articulo']").live('keydown', function(e) { 
+    var keyCode = e.keyCode || e.which; 
+    
+    var clave = $(this).val();
+
+    var comun_name = $(this).attr('name').replace("clave_articulo", "");
+
+    if (keyCode == 13 || keyCode == 9) 
+    {
+      get_articulo_byclave(clave, comun_name);
+      if (keyCode == 13 )
+      e.preventDefault();
+    }
+
+  });
   
   $("input[name*='precio_total_neto']:last").live('keydown', function(e) {
     var keyCode = e.keyCode || e.which; 
@@ -29,12 +74,8 @@ $(function() {
       $("#id_almacen").attr("disabled",true);
   });
   $("input[id*='fecha']").datepicker({dateFormat:'dd/mm/yy',});
-  $('#id_doctosIn_table tbody tr').formset({
-    prefix: '{{ formset.prefix }}',
-    addCssClass:'hide',
-    addText:'Nuevo Articulo',
-    deleteText:'',
-  });
+  
+
   $("input[name*='clave_articulo']:last")[0].focus();  
 
   $("#btn_facturaglobal").on("click", function(){
