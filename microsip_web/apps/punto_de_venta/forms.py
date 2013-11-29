@@ -168,6 +168,9 @@ class FacturaManageForm(forms.ModelForm):
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'class':'span12', 'rows':2, 'placeholder': 'Descripcion...',}), required= False )
     modalidad_facturacion = forms.ChoiceField(choices= MODALIDADES_FATURACION, required=True)
     ventas_en_factura = forms.CharField(widget=forms.HiddenInput(), required=False)
+    impuestos_venta_neta = forms.CharField(widget=forms.HiddenInput(), required=False)
+    impuestos_otros_impuestos = forms.CharField(widget=forms.HiddenInput(), required=False)
+    impuestos_importe_impuesto = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(FacturaManageForm, self).__init__(*args, **kwargs)
@@ -288,6 +291,7 @@ class DocumentoPVDet_ManageForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(DocumentoPVDet_ManageForm, self).__init__(*args, **kwargs)
         self.fields['clave_articulo'].widget.attrs['class'] = 'input-mini'
+        self.fields['porcentaje_descuento'].widget.attrs['class'] = 'input-mini'
         self.fields['clave_articulo'].widget.attrs['placeholder'] = "clave"
         self.fields['clave_articulo'].required = False
 
@@ -301,7 +305,6 @@ class DocumentoPVDet_ManageForm(forms.ModelForm):
             'precio_unitario_impto',
             'porcentaje_comis',
             'es_tran_elect',
-            'porcentaje_descuento',
             'fpgc_unitario',
             'vendedor',
             'posicion',

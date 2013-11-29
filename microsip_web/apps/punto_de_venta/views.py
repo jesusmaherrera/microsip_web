@@ -948,6 +948,28 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
         factura.save()
 
         ventas_en_factura = factura_form.cleaned_data['ventas_en_factura']
+
+        impuestos_venta_neta = factura_form.cleaned_data['impuestos_venta_neta']
+        impuestos_otros_impuestos = factura_form.cleaned_data['impuestos_otros_impuestos']
+        impuestos_importe_impuesto = factura_form.cleaned_data['impuestos_importe_impuesto']
+
+        if impuestos_venta_neta != '':
+
+            c = connections[connection_name].cursor()
+            query =  '''INSERT INTO "IMPUESTOS_DOCTOS_PV" ("DOCTO_PV_ID", "IMPUESTO_ID", "VENTA_NETA", "OTROS_IMPUESTOS", "PCTJE_IMPUESTO", "IMPORTE_IMPUESTO") \
+                VALUES (%s, %s, %s, %s, %s, %s)'''%(factura.id,  Impuesto.objects.get(pk=295).id, impuestos_venta_neta,  impuestos_otros_impuestos, 16, impuestos_importe_impuesto)
+            c.execute(query)
+            c.close()
+
+            # Impuestos_docto_pv.objects.create(
+            #         documento_pv = factura,
+            #         impuesto = Impuesto.objects.get(pk=295),
+            #         venta_neta = impuestos_venta_neta,
+            #         otros_impuestos = impuestos_otros_impuestos,
+            #         porcentaje_impuestos = 16,
+            #         importe_impuesto = impuestos_importe_impuesto,
+            #     )
+
         ventas_faturadas = ventas_en_factura.split(',')
         if ventas_faturadas!= [u'']:
             for venta_facturada in ventas_faturadas:
@@ -957,17 +979,17 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
                         docto_pv_destino = factura,
                     )
 
+
+
         for detalle_form in formset:
             detalle = detalle_form.save(commit = False)
 
             if not detalle.id:
                 detalle.id = -1
                 detalle.documento_pv = factura
-                detalle.clave_articulo = ''
                 detalle.unidades_dev = 0
                 detalle.precio_unitario_impto = 0
                 detalle.fpgc_unitario = 0
-                detalle.porcentaje_descuento = 0
                 detalle.precio_modificado = 'P' 
                 detalle.porcentaje_comis = 0 
                 detalle.rol = 'N' 

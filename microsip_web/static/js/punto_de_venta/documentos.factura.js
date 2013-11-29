@@ -1,3 +1,5 @@
+var seleccionar_articulo;
+
 function cargar_factura_global(data){
 	// alert(data.detalles);
 	// var detallesj = JSON.stringify(eval("(" + data.detalles + ")"));
@@ -12,6 +14,9 @@ function cargar_factura_global(data){
       $("input[name='docto_pv_det_set-"+index+"-unidades']").val(detalle.unidades);
       $("input[name='docto_pv_det_set-"+index+"-precio_unitario']").val(detalle.precio);
       $("input[name='docto_pv_det_set-"+index+"-precio_total_neto']").val(detalle.precio_total_neto);
+      $("input[name='docto_pv_det_set-"+index+"-clave_articulo']").val(detalle.articulo_clave);
+      $("input[name='docto_pv_det_set-"+index+"-porcentaje_descuento']").val(detalle.porcentaje_descuento);
+      
       if (data.detalles.length-1 > index)
         $('#id_doctosIn_table').find('a:last').click();
     });
@@ -22,6 +27,10 @@ function cargar_factura_global(data){
     $("#id_total_fpgc").val(data.totales.total_fpgc);
     $("#id_importe_descuento").val(data.totales.importe_descuento);
     $("#id_ventas_en_factura").val(data.totales.ventas_facturadas);
+
+    $("#id_impuestos_venta_neta").val(data.impuestos.venta_neta);
+    $("#id_impuestos_otros_impuestos").val(data.impuestos.otros_impuestos);
+    $("#id_impuestos_importe_impuesto").val(data.impuestos.importe_impuesto);
     $("#id_descripcion").val("FACTURA GLOBAL("+data.fecha_inicio+"-"+data.fecha_fin+")");
     
     var ventas_ids = '';
@@ -40,30 +49,21 @@ function cargar_factura_global(data){
 }
 
 $(function() {
-
-
-  $("input[name*='clave_articulo']").live('keydown', function(e) { 
-    var keyCode = e.keyCode || e.which; 
-    
-    var clave = $(this).val();
-
-    var comun_name = $(this).attr('name').replace("clave_articulo", "");
-
-    if (keyCode == 13 || keyCode == 9) 
-    {
-      get_articulo_byclave(clave, comun_name);
-      if (keyCode == 13 )
-      e.preventDefault();
-    }
-
-  });
   
+  seleccionar_articulo = $("input[name*='clave_articulo']").InputClaveArticulo({
+    searchFunction : Dajaxice.microsip_web.apps.inventarios.get_articulo_byclave
+  });
+
+  seleccionar_articulo = seleccionar_articulo.seleccionar_articulo;
+
   $("input[name*='precio_total_neto']:last").live('keydown', function(e) {
     var keyCode = e.keyCode || e.which; 
       if (keyCode == 9 || keyCode == 13) 
       {
         $(this).parent().parent().parent().find('a:last').click();
-      // $("input[name*='claveArticulo']:last")[0].focus(); 
+        $("input[name*='clave_articulo']").InputClaveArticulo({
+          searchFunction : Dajaxice.microsip_web.apps.inventarios.get_articulo_byclave
+        });
       }
   });
 

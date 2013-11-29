@@ -19,7 +19,9 @@
     function gettext(msgid) { return msgid; }
 </script>
 <script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script src='{{STATIC_URL}}js/microsip_api/jquery.articulosearch.js'></script>
 <script src='{{STATIC_URL}}js/inventarios/entradas.js'></script>
+
 <script type="text/javascript">
 $(function() {
   $('#id_doctosIn_table tbody tr').formset({
@@ -35,14 +37,6 @@ $(function() {
 {% endblock %}
 {% block breadcrumb %}{{ block.super }} <a href="/inventarios/entradas/">Entradas</a> <i class="icon-play"></i> Entrada{% endblock %}
 {% block content %}
-<div id="modal_opciones-claves" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 id="myModalLabel">Claves</h3>
-  </div>
-  <div class="modal-body" id="div_filterclaves">
-  </div>
-</div>
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
 {{ Entrada_form.errors }}
 <div id="sic_from" class="container-fluid">

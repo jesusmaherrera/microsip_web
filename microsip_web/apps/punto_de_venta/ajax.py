@@ -47,6 +47,7 @@ def generar_factura_global( request, **kwargs ):
         'message': data['message'],
         'fecha_inicio': data['fecha_inicio'],
         'fecha_fin':data['fecha_fin'],
+        'impuestos': data['impuestos'],
         }
 
     return HttpResponse( json.dumps(c), mimetype = "application/javascript" )

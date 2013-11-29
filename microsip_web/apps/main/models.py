@@ -1314,17 +1314,25 @@ class Docto_pv_cobro_refer(models.Model):
     class Meta:
         db_table = u'doctos_pv_cobros_refer'
 
+
+class ImpuestoDoctoPVManager(models.Manager):
+    def get_by_natural_key(self, documento_pv,  impuesto):
+        return self.get(documento_pv=documento_pv, impuesto=impuesto,)
+
 #Impuestos de documentos
 class Impuestos_docto_pv(models.Model):
+    objects = ImpuestoDoctoPVManager()
+
     documento_pv        = models.ForeignKey(Docto_PV, db_column='DOCTO_PV_ID')
     impuesto            = models.ForeignKey(Impuesto, db_column='IMPUESTO_ID')
     venta_neta          = models.DecimalField(max_digits=15, decimal_places=2, db_column='VENTA_NETA')
     otros_impuestos     = models.DecimalField(max_digits=15, decimal_places=2, db_column='OTROS_IMPUESTOS')
-    porcentaje_impuestos= models.DecimalField(max_digits=9, decimal_places=6, db_column='PCTJE_IMPUESTOS')
+    porcentaje_impuestos= models.DecimalField(max_digits=9, decimal_places=6, db_column='PCTJE_IMPUESTO')
     importe_impuesto    = models.DecimalField(max_digits=15, decimal_places=2, db_column='IMPORTE_IMPUESTO')
     
     class Meta:
         db_table = u'impuestos_doctos_pv'
+        unique_together = (('documento_pv', 'impuesto',),)
         
 
 class Impuestos_grav_docto_pv(models.Model):
