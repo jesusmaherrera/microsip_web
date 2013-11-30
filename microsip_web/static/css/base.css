@@ -8,10 +8,13 @@ body {
   text-shadow: 0 1px 1px rgba(255,255,255,0.5);
   background-color: #e7e7e7;
 }
+#id_doctosIn_table {
+  margin-bottom: 0;
+}
 #sic_from {
   background-color: #ececec;
-  margin-bottom: 12px;
-  padding: 0 1em 1em 0;
+  margin-bottom: 0;
+  padding: 0 1em 0 0;
 }
 #sic_from h3 {
   display: inline-block;

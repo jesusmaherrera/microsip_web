@@ -54,32 +54,6 @@ def get_precio_articulo(request, template_name='punto_de_venta/articulos/articul
     }
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
-def generar_fatcura(request):
-    # Parametros
-    almacen_id = '318'
-    cliente_id = 297
-    factura_tipo = 'C'
-    modalidad_facturacion = 'PREIMP'
-
-    connection_name = get_conecctionname(request.session)
-    fecha_inicio = datetime.strptime( '25/11/2013', '%d/%m/%Y' ).date()
-    fecha_fin = datetime.strptime( '25/11/2013', '%d/%m/%Y' ).date()
-    almacen = first_or_none( Almacenes.objects.filter( pk = almacen_id ) )
-    cliente = Cliente.objects.get( pk = int( cliente_id ) )
-
-    message = new_factura_global(
-            fecha_inicio=fecha_inicio,
-            fecha_fin= fecha_fin,
-            almacen= almacen,
-            cliente= cliente,
-            factura_tipo= factura_tipo,
-            modalidad_facturacion= modalidad_facturacion,
-            connection_name= connection_name,
-            username = request.user.username,
-        )
-    objects.asd
-
-
 @login_required(login_url='/login/')
 def inicializar_puntos_clientes(request):
     connection_name = get_conecctionname(request.session)
@@ -937,6 +911,7 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
             factura.moneda= Moneda.objects.get(pk=1)
             factura.impuesto_incluido='N'
             factura.tipo_cambio=1
+            factura.unidad_comprom= 'S'
             factura.tipo_descuento='I'
             factura.porcentaje_descuento=0
             
@@ -946,7 +921,6 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
             factura.usuario_creador= request.user.username
 
         factura.save()
-
         ventas_en_factura = factura_form.cleaned_data['ventas_en_factura']
 
         impuestos_venta_neta = factura_form.cleaned_data['impuestos_venta_neta']
@@ -960,15 +934,6 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
                 VALUES (%s, %s, %s, %s, %s, %s)'''%(factura.id,  Impuesto.objects.get(pk=295).id, impuestos_venta_neta,  impuestos_otros_impuestos, 16, impuestos_importe_impuesto)
             c.execute(query)
             c.close()
-
-            # Impuestos_docto_pv.objects.create(
-            #         documento_pv = factura,
-            #         impuesto = Impuesto.objects.get(pk=295),
-            #         venta_neta = impuestos_venta_neta,
-            #         otros_impuestos = impuestos_otros_impuestos,
-            #         porcentaje_impuestos = 16,
-            #         importe_impuesto = impuestos_importe_impuesto,
-            #     )
 
         ventas_faturadas = ventas_en_factura.split(',')
         if ventas_faturadas!= [u'']:
@@ -997,7 +962,7 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
 
             detalle.save()
 
-        message= 'Datos guardados'
+        message= 'Factura guardada'
 
     ventas_factura = DoctoPVLiga.objects.filter(docto_pv_destino= factura)
     c = {'factura_global_fm':factura_global_fm, 'factura_form': factura_form, 'formset':formset, 'message':message,'ventas_factura':ventas_factura, 'message':message, }

@@ -74,7 +74,7 @@ def new_factura_global( **kwargs ):
                 })
         exclude =''
         
-        impuestos_doc =  Impuestos_docto_pv.objects.filter(documento_pv__in=ventas_facturadas_list).aggregate(
+        impuestos_doc =  Impuestos_docto_pv.objects.filter(documento_pv__in=ventas_sinfacturar_list).aggregate(
                 venta_neta = Sum('venta_neta'),
                 otros_impuestos = Sum('otros_impuestos'),
                 importe_impuesto = Sum('importe_impuesto'),
@@ -124,10 +124,14 @@ def new_factura_global( **kwargs ):
                 porcentaje_comis = detalle[5]
                 fpgc_unitario = detalle[6]
                 unidades_dev = detalle[7]
+                # clav = first_or_none(ClavesArticulos.objects.filter(articulo=articulo))
+                # if clav:
+                #     clav.clave
+
                 detalles_list.append({
                         'articulo_nombre':articulo.nombre, 
                         'articulo_id': articulo.id, 
-                        'articulo_clave': first_or_none(ClavesArticulos.objects.filter(articulo=articulo)).clave,
+                        'articulo_clave': '',
                         'precio': str(precio_promedio),
                         'porcentaje_descuento': 0,
                         'unidades':str(unidades),

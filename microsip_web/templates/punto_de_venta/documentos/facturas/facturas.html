@@ -32,7 +32,13 @@
     </tr>
     {% for factura in facturas %}
     <tr>
-      <td><a href="/punto_de_venta/factura/{{ factura.id }}/">{{ factura.folio }}</a></td>
+      <td>
+        {% if factura.estado = "C" %}
+        <a href="/punto_de_venta/factura/{{ factura.id }}/" class="text-error" >{{ factura.folio }}</a>
+        {% else %}
+        <a href="/punto_de_venta/factura/{{ factura.id }}/" >{{ factura.folio }}</a>
+        {% endif %}
+      </td>
       <td>{{ factura.fecha }}</td>
     </tr>
     {% endfor %}

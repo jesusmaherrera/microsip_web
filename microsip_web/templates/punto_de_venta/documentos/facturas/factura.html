@@ -88,18 +88,19 @@
     <li class=""><a href="#ventas_de_mostrador" data-toggle="tab">Ventas de mostrador</a></li>
   </ul>
   <div id="myTabContent" class="tab-content">
-    <div class="tab-pane fade active in" id="general">
+    <div class="tab-pane fade active in" id="general" style="padding-bottom: 0;">
       {{ factura_form.errors }}
-      {{ factura_form.importe_neto }}
       {{ factura_form.importe_donativo }}
       {{ factura_form.total_fpgc }}
       {{ factura_form.importe_descuento }}
-      {{ factura_form.total_impuestos }}
       {{ factura_form.ventas_en_factura }}
-
+      {{ factura_form.total_impuestos }}
+      {{ factura_form.importe_neto }}
       {{ factura_form.impuestos_venta_neta }}
       {{ factura_form.impuestos_otros_impuestos }}
       {{ factura_form.impuestos_importe_impuesto }}
+
+
       
       <div id="sic_from" class="container-fluid" style="margin-top: -1em;">
         <div class="row-fluid">
@@ -169,20 +170,41 @@
               {% endfor %}
             </tbody>
           </table>
-          <div class='row-fluid'>
-            <!-- <span class='span9'>{{ formset.total_form_count }} Articulos</span> -->
-            <span class='span3' id='span_total_ventas'></span>
+          <div class="row-fluid" style="text-align: right;">
+            <div class='span10'><!-- {{ formset.total_form_count }} Articulos --></div>
+            <div class="span2">
+              <div class="row">
+                <div class='span6'><strong>Subtotal </strong> </div>
+                <div class='span4'><label id="label_importe_neto" ></label> </div>  
+                <div class='span2'></div>
+              </div>
+              <div class="row">
+                <div class='span6'><strong>Impuestos </strong> </div>
+                <div class='span4'><label id="label_total_impuestos" ></label></div>  
+                <div class='span2'></div>
+              </div>
+              <!-- <div class="row">
+                <div class='span6'><strong>Total </strong> </div>
+                <div class='span4'><label id="label_total" ></label> </div>  
+                <div class='span2'></div>
+              </div> -->
+              
+            </div>
           </div>
           {{ formset.management_form }}
         </div>
       </div>
     </div>
+   
+    <!-- <div class='row-fluid'>
+      <span class='span9'>{{ formset.total_form_count }} Articulos</span>
+      <span class='span3' id='span_total_ventas'>180</span>
+    </div> -->
     <div class="tab-pane fade " id="ventas_de_mostrador">  
       {{ factura_global_fm.errors }}
       <div class='row-fluid'>
         <span class='span4'>
           Ventas de mostrador facturadas
-
           <table class="table tableCell table-hover" id="ligas_fromset"  style="background-color: white;margin-top: 1em;" border="0" cellpadding="0" cellspacing="5">
             <thead>
               <tr>

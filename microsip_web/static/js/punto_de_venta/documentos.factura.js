@@ -22,7 +22,7 @@ function cargar_factura_global(data){
     });
     
     $("#id_importe_neto").val(data.totales.importe_neto);
-    $("#id_total_impuestos").val(data.totales.total_impuestos);
+    $("#id_total_impuestos").val(data.totales.total_impuestos).trigger('change');
     $("#id_importe_donativo").val(data.totales.importe_donativo);
     $("#id_total_fpgc").val(data.totales.total_fpgc);
     $("#id_importe_descuento").val(data.totales.importe_descuento);
@@ -49,7 +49,14 @@ function cargar_factura_global(data){
 }
 
 $(function() {
+  $("#label_total_impuestos").text($("#id_total_impuestos").val());
+  $("#label_importe_neto").text($("#id_importe_neto").val());
   
+  $("#id_total_impuestos").change(function(){
+    $("#label_total_impuestos").text($("#id_total_impuestos").val());
+    $("#label_importe_neto").text($("#id_importe_neto").val());
+  });
+
   seleccionar_articulo = $("input[name*='clave_articulo']").InputClaveArticulo({
     searchFunction : Dajaxice.microsip_web.apps.inventarios.get_articulo_byclave
   });

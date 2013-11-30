@@ -12,7 +12,6 @@ urlpatterns = patterns('',
     #facturas
     (r'^facturas/$', views.facturas_view),
     (r'^factura/nueva/', views.factura_manageView),
-    (r'^facturaglobal/', views.generar_fatcura),
     
     (r'^factura/(?P<id>\d+)/', views.factura_manageView),
     
