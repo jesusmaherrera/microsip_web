@@ -13,7 +13,7 @@ body {
 }
 #sic_from {
   background-color: #ececec;
-  margin-bottom: 0;
+  margin-bottom: 1em;
   padding: 0 1em 0 0;
 }
 #sic_from h3 {
@@ -165,8 +165,6 @@ footer {
   padding: 1em;
   padding-top: 1em;
   padding-bottom: 2em;
-  margin-left: 1em;
-  margin-right: 1em;
 }
 .table th,
 .table td {

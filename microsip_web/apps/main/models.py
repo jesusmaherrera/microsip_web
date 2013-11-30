@@ -601,7 +601,7 @@ class DoctosInDet(models.Model):
     articulo        = models.ForeignKey(Articulos, db_column='ARTICULO_ID')
     tipo_movto      = models.CharField(default='E', max_length=1, db_column='TIPO_MOVTO')
     unidades        = models.DecimalField(default=0, max_digits=18, decimal_places=5, db_column='UNIDADES')
-    costo_unitario  = models.DecimalField(default=0, max_digits=18, decimal_places=2, db_column='COSTO_UNITARIO')
+    costo_unitario  = models.DecimalField(default=0, max_digits=18, decimal_places=5, db_column='COSTO_UNITARIO')
     costo_total     = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='COSTO_TOTAL')
     metodo_costeo   = models.CharField(default='C', max_length=1, db_column='METODO_COSTEO')
     cancelado       = models.CharField(default='N', blank=True, null=True, max_length=1, db_column='CANCELADO')

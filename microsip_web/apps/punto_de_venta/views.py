@@ -78,7 +78,7 @@ def inicializar_puntos_articulos(request):
 
 @detect_mobile
 @login_required(login_url='/login/')
-def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punto_de_venta/articulos/articulos/articulos.html'):
+def articulos_view(request, carpeta=1, modulo='punto_de_venta' ,template_name='punto_de_venta/articulos/articulos/articulos.html'):
     articulos_porpagina = 20  
     basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
@@ -95,6 +95,13 @@ def articulos_view(request, clave='', nombre ='', carpeta=1, template_name='punt
 
     msg = ''
     if request.method =='POST':
+        PATH = request.path
+
+        if '/punto_de_venta/' in PATH:
+            url_articulo = '/punto_de_venta/articulo/'
+        elif '/inventarios/' in PATH:
+            url_articulo = '/inventarios/articulo/'
+
         filtro_form = filtroarticulos_form(request.POST)
         if filtro_form.is_valid():
             articulo = filtro_form.cleaned_data['articulo']

@@ -25,7 +25,11 @@ class precios_articulos_form(forms.ModelForm):
 class articulos_form(forms.ModelForm):
     class Meta:
         model = Articulos
-        exclude = ('seguimiento', 'estatus', 'puntos','es_almacenable', 'costo_ultima_compra')
+        exclude = ('seguimiento', 'estatus', 'puntos','es_almacenable',)
+
+    def __init__(self, *args, **kwargs):
+        super(articulos_form, self).__init__(*args, **kwargs)
+        self.fields['nombre'].widget.attrs['class'] = 'span12'
 
 class claves_articulos_form(forms.ModelForm):
     class Meta:

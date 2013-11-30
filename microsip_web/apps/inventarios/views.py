@@ -76,7 +76,7 @@ def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.ht
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
 
 @login_required(login_url='/login/')
-def ArticuloManageView(request, id, template_name='inventarios/articulos/articulo_mobile.html'):
+def ArticuloManageView(request, id, template_name='inventarios/articulos/articulo.html'):
     ''' Modificacion de datos de un articulo '''
 
     articulo = get_object_or_404(Articulos, pk=id)
