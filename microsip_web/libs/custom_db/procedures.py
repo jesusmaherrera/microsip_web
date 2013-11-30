@@ -29,6 +29,11 @@ procedures[ 'SIC_ALMACENES_AT' ] = '''
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'ALMACENES' and rf.RDB$FIELD_NAME = 'SIC_INVCONAJUSTES')) then
             execute statement 'ALTER TABLE ALMACENES ADD SIC_INVCONAJUSTES SMALLINT DEFAULT 0';
+
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'ALMACENES' and rf.RDB$FIELD_NAME = 'SIC_INVMODIFCOSTOS')) then
+            execute statement 'ALTER TABLE ALMACENES ADD SIC_INVMODIFCOSTOS SMALLINT DEFAULT 0';
     end
     '''
 

@@ -119,6 +119,8 @@ class Almacenes(models.Model):
     nombre      = models.CharField(max_length=50, db_column='NOMBRE')
     inventariando = models.BooleanField(default= False, db_column = 'SIC_INVENTARIANDO' )
     inventario_conajustes = models.BooleanField(default= False, db_column = 'SIC_INVCONAJUSTES' )
+    inventario_modifcostos = models.BooleanField(default= False, db_column = 'SIC_INVMODIFCOSTOS' )
+    
 
     def __unicode__(self):
         return self.nombre

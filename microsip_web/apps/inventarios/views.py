@@ -285,7 +285,7 @@ def invetariofisico_manageview( request, almacen_id = None, template_name = 'inv
     connection_name = get_conecctionname( request.session )
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
-
+    almacen = Almacenes.objects.get(pk=almacen_id)
     entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, connection_name = connection_name, username = request.user.username)
 
     almacen_sinventas = first_or_none( Almacenes.objects.filter( nombre = 'Almacen sin ventas' ))
@@ -296,8 +296,7 @@ def invetariofisico_manageview( request, almacen_id = None, template_name = 'inv
         entrada2_id = entrada2.id 
         salida2_id = salida2.id
     
-    puede_modificar_costos = allow_microsipuser( username = request.user.username, clave_objeto = 469)
-
+    puede_modificar_costos = allow_microsipuser( username = request.user.username, clave_objeto = 469) and almacen.inventario_modifcostos
     form = DoctoInDetManageForm( request.POST or None )
     ubicacion_form = UbicacionArticulosForm(request.POST or None)
 
@@ -332,7 +331,7 @@ def invetariofisico_manageview( request, almacen_id = None, template_name = 'inv
         'form' : form, 
         'articulos_contados': articulos_contados,
         'lineas_form': lineas_form,
-        'puede_modificar_costos': False,
+        'puede_modificar_costos': puede_modificar_costos,
         'ubicacion_form' : ubicacion_form, 
         'articulos' : articulos, 
         'almacen' : entrada.almacen, 

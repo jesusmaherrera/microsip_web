@@ -36,11 +36,22 @@
     </blockquote>
   </div>
   <div class="modal-footer">
-    <span id='id_agregando_span' class='hide'>
-      <label class="span">Agregando articulos </label>
-      <img class= 'imagecenter' src="{{STATIC_URL}}img\ajax-loader.gif">
-    </span>
     <button class="btn" id='btnCancel' data-dismiss="modal">Cerrar</button>
+  </div>
+</div>
+
+<div id="modal_modificacostos" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>Modificar costos en conteos</h3> <br>
+  </div>
+  <div class="modal-body">
+    <p class="text-warning">
+      Esta opcion permitira modificar los costos de los articulos a <strong> los usuario que tengan este permiso </strong> 
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal">Cerrar</button>
   </div>
 </div>
 
@@ -81,7 +92,7 @@
 {{ form.errors }}
 {{ form.inventario_conajustes }} <a class="label label-warning" href="#modal_primerconteo" role="button" data-toggle="modal">Precausion!</a> Manejar ajuste en primero conteo 
 <br>
-<!-- {{ form.inventario_conajustes }} <a class="label label-warning" href="#" role="button" data-toggle="modal">Precausion!</a> Permitir crear inventario de articulos no contados -->
+{{ form.inventario_modifcostos }} <a class="label label-warning" href="#modal_modificacostos" role="button" data-toggle="modal">Precausion!</a> Modificar costos en conteos
 </form>
 
 
