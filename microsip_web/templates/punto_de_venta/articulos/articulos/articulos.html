@@ -227,16 +227,20 @@ $('#select_article_all').change(function(){
         <tr>
           <th class="hidden-phone"> <input id="select_article_all" value="" type="checkbox"/> </th>
           <th> Articulo</th>
+          {% if url_articulo == '/punto_de_venta/articulo/' %}
           <th class="hidden-phone"> Puntos</th>
           <th class="hidden-phone"> Dinero Electronico</th>
+          {% endif %}
         </tr>
         {% for articulo in articulos%}
         <tr>
           <td class="hidden-phone"><input id="select_article_{{ articulo.id }}" value="" type="checkbox"/></td>
           <td><a href="{{url_articulo}}{{ articulo.id }}/">{{ articulo.nombre }}</a></td>
-          <td class="hidden-phone">{{articulo.puntos }}|{{articulo.carpeta.id }}</td>
-          <td class="hidden-phone">{{articulo.dinero_electronico }}</td>
-        </tr>
+          {% if url_articulo == '/punto_de_venta/articulo/' %}
+            <td class="hidden-phone">{{articulo.puntos }}|{{articulo.carpeta.id }}</td>
+            <td class="hidden-phone">{{articulo.dinero_electronico }}</td>
+          {% endif %}
+         </tr>
         {% endfor %}
 
         <div class="pagination pagination-mini mainmenu">
