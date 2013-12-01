@@ -19,6 +19,7 @@ from microsip_web.libs.punto_de_venta import new_factura_global
 # @transaction.commit_manually
 @dajaxice_register( method = 'GET' )
 def generar_factura_global( request, **kwargs ):
+
     # Parametros
     connection_name = get_conecctionname(request.session)
     fecha_inicio = datetime.strptime( kwargs.get( 'fecha_inicio', None ), '%d/%m/%Y' ).date()
@@ -28,6 +29,23 @@ def generar_factura_global( request, **kwargs ):
     
     factura_tipo = kwargs.get('factura_tipo', None)
     modalidad_facturacion = kwargs.get('modalidad_facturacion', None)
+    
+    if not Registry.objects.filter( nombre = 'ARTICULO_VENTAS_FG_PV_ID' ).exists():
+        padre = Registry.objects.get(nombre='PreferenciasEmpresa')
+        Registry.objects.create(
+                nombre = 'ARTICULO_VENTAS_FG_PV_ID',
+                tipo = 'V',
+                padre = padre,
+                valor ='',
+            ) 
+
+    #SI NO EXITE ARICULO DE PUBLICO EN GENERAL
+    articulo_ventaspg_id = Registry.objects.get( nombre = 'ARTICULO_VENTAS_FG_PV_ID' )
+    articulo_ventaspg_id.valor = 38506
+    articulo_ventaspg_id.save(update_fields=['valor',])
+    if not Articulos.objects.filter(pk=articulo_ventaspg_id.valor).exists() and factura_tipo == 'P':
+        c = {'message':'por favor primero espesifica un articulo general',}
+        return HttpResponse( json.dumps(c), mimetype = "application/javascript" )
 
     data = new_factura_global(
             fecha_inicio=fecha_inicio,

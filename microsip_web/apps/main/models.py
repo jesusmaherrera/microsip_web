@@ -1200,7 +1200,8 @@ class Docto_pv_det(models.Model):
 
     def __unicode__(self):
         return u'%s(%s)'% (self.id, self.documento_pv)
-        
+    
+
     class Meta:
         db_table = u'doctos_pv_det'
 

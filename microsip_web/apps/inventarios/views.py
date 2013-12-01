@@ -102,7 +102,7 @@ def ArticuloManageView(request, id, template_name='inventarios/articulos/articul
     impuesto_articulo_form = impuestos_articulos_form(request.POST or None, instance=impuesto_articulo)
 
     #Si los datos de los formularios son correctos # and 
-    if articulo_form.is_valid() and formset.is_valid() and impuesto_articulo_form.is_valid(): #and #precios_formset.is_valid()
+    if articulo_form.is_valid() and formset.is_valid() and impuesto_articulo_form.is_valid() and precios_formset.is_valid():
         articulo_form.save()
 
         for form in formset :
@@ -316,7 +316,7 @@ def invetariofisico_manageview( request, almacen_id = None, template_name = 'inv
                 datetime.now().strftime( "12/31/%Y" ),
                 )
     
-    articulos_rows = runsql_rows( sql, connection_name )
+    articulos_rows = runsql_rows( sql, connection_name)
     articulos_contados = len( list( set(  DoctosInDet.objects.filter( Q(doctosIn__concepto = 27) | Q(doctosIn__concepto = 38) ).filter( 
         doctosIn__descripcion = 'ES INVENTARIO', 
         doctosIn__cancelado= 'N',

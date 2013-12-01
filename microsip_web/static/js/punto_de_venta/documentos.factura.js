@@ -40,7 +40,7 @@ function cargar_factura_global(data){
         ventas_ids = ventas_ids +',';
 
       $("#id_ventas_en_factura").val(ventas_ids);    
-      $("#ligas_fromset tbody").append('<tr><td>'+venta.fecha+'</td><td>'+ venta.folio+'</td></tr>');
+      $("#ligas_fromset tbody").append('<tr><td><p class="text-right">'+venta.fecha+'</p></td><td><p class="text-right">'+ venta.folio+'</p></td><td><p class="text-right">'+ venta.importe_neto+'</p></td></tr>');
     });
     // ligas_fromset
     

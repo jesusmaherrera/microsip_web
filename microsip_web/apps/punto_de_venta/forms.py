@@ -15,6 +15,7 @@ class factura_global_form( forms.Form ):
     TIPOS_GEN_FACTURA = (
         ('D', 'Detallada'),
         ('C', 'Concentrada'),
+        ('P', 'Una partida'),
     )
     fecha_inicio = forms.DateField( widget = forms.TextInput( attrs = { 'class' : 'input-small' } ), required= True )
     fecha_fin = forms.DateField(widget = forms.TextInput( attrs = { 'class' : 'input-small' } ) , required= True)
@@ -285,13 +286,14 @@ class DocumentoPV_ManageForm(forms.ModelForm):
 
 class DocumentoPVDet_ManageForm(forms.ModelForm):
     articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
-    unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades'}),required=True)
-    precio_unitario = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'costo'}),required=True)
+    unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini text-right', 'placeholder':'unidades'}),required=True)
+    precio_unitario = forms.FloatField(widget=forms.TextInput(attrs={'class':'input-mini text-right', 'placeholder':'costo'}),required=True)
 
     def __init__(self, *args, **kwargs):
         super(DocumentoPVDet_ManageForm, self).__init__(*args, **kwargs)
         self.fields['clave_articulo'].widget.attrs['class'] = 'input-mini'
-        self.fields['porcentaje_descuento'].widget.attrs['class'] = 'input-mini'
+        self.fields['porcentaje_descuento'].widget.attrs['class'] = 'input-mini text-right'
+        self.fields['precio_total_neto'].widget.attrs['class'] = 'input-small text-right'
         self.fields['clave_articulo'].widget.attrs['placeholder'] = "clave"
         self.fields['clave_articulo'].required = False
 

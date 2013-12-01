@@ -38,12 +38,12 @@ def runsql_firstrow( sql = "", connection_name = "" ):
     c.close() 
     return unidades_rows[0]
 
-def runsql_rows( sql = "", connection_name = "" ):
+def runsql_rows( sql = "", connection_name = "", params=[]):
     c = connections[connection_name].cursor()
-    c.execute(sql)
-    unidades_rows = c.fetchall()
+    c.execute(sql, params)
+    rows = c.fetchall()
     c.close() 
-    return unidades_rows
+    return rows
 
 def first_or_none(query):  
     try:  

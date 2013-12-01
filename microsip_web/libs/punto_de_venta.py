@@ -10,7 +10,7 @@ import datetime, time
 from microsip_web.apps.punto_de_venta.models import *
 
 #libs
-from custom_db.main import next_id, first_or_none, get_sigfolio_ve
+from custom_db.main import next_id, first_or_none, get_sigfolio_ve, runsql_rows
 
 def new_factura_global( **kwargs ):
     ''' Genera una factura global '''
@@ -64,6 +64,7 @@ def new_factura_global( **kwargs ):
 
     message =''
     impuestos_doc= ''
+    
     # si hay ventas por facturar
     if ventas_sinfacturar.count() > 0:
         for venta in ventas_sinfacturar:
@@ -71,52 +72,77 @@ def new_factura_global( **kwargs ):
                     'id':venta.id,
                     'folio': venta.folio,
                     'fecha':str(venta.fecha),
+                    'importe_neto':str(venta.importe_neto),
                 })
-        exclude =''
         
         impuestos_doc =  Impuestos_docto_pv.objects.filter(documento_pv__in=ventas_sinfacturar_list).aggregate(
                 venta_neta = Sum('venta_neta'),
                 otros_impuestos = Sum('otros_impuestos'),
                 importe_impuesto = Sum('importe_impuesto'),
             )
+        
+        if factura_tipo == 'P':
+            precio_total_neto = detalles_factura.aggregate(Sum('precio_total_neto'))['precio_total_neto__sum']
+            articulo_precio_unitario = precio_total_neto - impuestos_doc['importe_impuesto']
+            
+            articulo_ventaspg_id = Registry.objects.get( nombre = 'ARTICULO_VENTAS_FG_PV_ID' ).valor
+            articulo = Articulos.objects.get(pk=articulo_ventaspg_id)
+            articulo_clave = first_or_none(ClavesArticulos.objects.filter(articulo=articulo))
+            if articulo_clave:
+                articulo_clave = articulo_clave.clave
+            articulo_nombre = articulo.nombre
+            articulo_id = articulo.id
+
+            detalles_list.append({
+                    'articulo_nombre':articulo_nombre, 
+                    'articulo_id': articulo_id, 
+                    'articulo_clave': articulo_clave,
+                    'precio': str(articulo_precio_unitario),
+                    'porcentaje_descuento': 0,
+                    'unidades':1,
+                    'precio_total_neto': str(articulo_precio_unitario),
+                })
+        
         impuestos_doc['venta_neta'] = str(impuestos_doc['venta_neta'])
         impuestos_doc['otros_impuestos'] = str(impuestos_doc['otros_impuestos'])
         impuestos_doc['importe_impuesto'] = str(impuestos_doc['importe_impuesto'])
 
-        if ventas_facturadas_list != []:
-            exclude = "AND not DOCTOS_PV.docto_pv_id in %s"%str(tuple(ventas_facturadas_list))
-        #Se crean los detalles segun el tipo de fatura
-
         if factura_tipo == 'C':
-            c = connections[connection_name].cursor()
+            exclude =''
+            if ventas_facturadas_list != []:
+                exclude = " AND not DOCTOS_PV.docto_pv_id in %s"%str(tuple(ventas_facturadas_list))
+            sql_almacen_filter= ""
             if almacen:
-                
-                query =  '''SELECT DOCTOS_PV_DET.articulo_id, SUM(DOCTOS_PV_DET.unidades), SUM(DOCTOS_PV_DET.precio_unitario*DOCTOS_PV_DET.unidades) as total_unidades, SUM(DOCTOS_PV_DET.precio_unitario_impto)\
-                    SUM(DOCTOS_PV_DET.PCTJE_DSCTO), SUM(DOCTOS_PV_DET.PCTJE_COMIS), SUM(DOCTOS_PV_DET.fpgc_unitario), SUM(DOCTOS_PV_DET.unidades_dev)  \
-                    FROM DOCTOS_PV_DET INNER JOIN DOCTOS_PV ON (DOCTOS_PV_DET.DOCTO_PV_ID = DOCTOS_PV.DOCTO_PV_ID)\
-                    WHERE\
-                        DOCTOS_PV.almacen_id = %s and\
-                        DOCTOS_PV.tipo_docto ='V' and\
-                        DOCTOS_PV.fecha >= '%s' AND DOCTOS_PV.fecha <= '%s' %s\
-                    group by DOCTOS_PV_DET.articulo_id\
-                    '''%(almacen.ALMACEN_ID, fecha_inicio, fecha_fin, exclude)
-            else:
-                query =  '''SELECT DOCTOS_PV_DET.articulo_id, SUM(DOCTOS_PV_DET.unidades), SUM(DOCTOS_PV_DET.precio_unitario*DOCTOS_PV_DET.unidades) as total_unidades, SUM(DOCTOS_PV_DET.precio_unitario_impto),\
-                    SUM(DOCTOS_PV_DET.PCTJE_DSCTO), SUM(DOCTOS_PV_DET.PCTJE_COMIS), SUM(DOCTOS_PV_DET.fpgc_unitario), SUM(DOCTOS_PV_DET.unidades_dev)  \
-                    FROM DOCTOS_PV_DET INNER JOIN DOCTOS_PV ON (DOCTOS_PV_DET.DOCTO_PV_ID = DOCTOS_PV.DOCTO_PV_ID)\
-                    WHERE\
-                        DOCTOS_PV.tipo_docto ='V' and\
-                        DOCTOS_PV.fecha >= '%s' AND DOCTOS_PV.fecha <= '%s' %s\
-                    group by DOCTOS_PV_DET.articulo_id\
-                    '''%(fecha_inicio, fecha_fin, exclude)
+                sql_almacen_filter = " DOCTOS_PV.almacen_id = %s AND"%almacen.ALMACEN_ID
 
-            c.execute(query)
-            detalles_factura_concentrada = c.fetchall()
-            c.close()
+            sql_concentrado = "SELECT \
+                DOCTOS_PV_DET.articulo_id, \
+                SUM(DOCTOS_PV_DET.unidades) as sum_unidades, \
+                SUM(DOCTOS_PV_DET.precio_unitario*DOCTOS_PV_DET.unidades) as importe_neto, \
+                SUM(DOCTOS_PV_DET.precio_unitario_impto) as sum_precioimpto,\
+                SUM(DOCTOS_PV_DET.PCTJE_DSCTO) as sum_PCTJE_DSCTO, \
+                SUM(DOCTOS_PV_DET.PCTJE_COMIS) as sum_PCTJE_COMIS, \
+                SUM(DOCTOS_PV_DET.fpgc_unitario) as sum_fpgc_unitario, \
+                SUM(DOCTOS_PV_DET.unidades_dev) as sum_unidades_dev\
+            FROM DOCTOS_PV_DET INNER JOIN DOCTOS_PV ON (DOCTOS_PV_DET.DOCTO_PV_ID = DOCTOS_PV.DOCTO_PV_ID)\
+            WHERE"+ sql_almacen_filter + "\
+                DOCTOS_PV.tipo_docto ='V' and\
+                DOCTOS_PV.fecha >= %s AND DOCTOS_PV.fecha <= %s"+ exclude +"group by DOCTOS_PV_DET.articulo_id"
+
+            detalles_factura_concentrada = runsql_rows( 
+                    sql = sql_concentrado,
+                    connection_name = connection_name,
+                    params = [fecha_inicio, fecha_fin]
+                )
             
             for detalle in detalles_factura_concentrada:
                 articulo = Articulos.objects.get(pk=detalle[0])
                 articulo_clave = first_or_none(ClavesArticulos.objects.filter(articulo=articulo))
+                if articulo_clave:
+                    articulo_clave = articulo_clave.clave
+                articulo_nombre = articulo.nombre
+                articulo_id = articulo.id
+
                 unidades = detalle[1]
                 precio_promedio = detalle[2]/ unidades
                 total_precio_unitario_impt = detalle[3]
@@ -124,20 +150,17 @@ def new_factura_global( **kwargs ):
                 porcentaje_comis = detalle[5]
                 fpgc_unitario = detalle[6]
                 unidades_dev = detalle[7]
-                # clav = first_or_none(ClavesArticulos.objects.filter(articulo=articulo))
-                # if clav:
-                #     clav.clave
 
                 detalles_list.append({
-                        'articulo_nombre':articulo.nombre, 
-                        'articulo_id': articulo.id, 
-                        'articulo_clave': '',
+                        'articulo_nombre':articulo_nombre, 
+                        'articulo_id': articulo_id, 
+                        'articulo_clave': articulo_clave,
                         'precio': str(precio_promedio),
                         'porcentaje_descuento': 0,
                         'unidades':str(unidades),
                         'precio_total_neto': str(precio_total_neto),
                     })
-               
+
         elif factura_tipo == 'D':
             for detalle_factura in detalles_factura:
                 detalles_list.append({
