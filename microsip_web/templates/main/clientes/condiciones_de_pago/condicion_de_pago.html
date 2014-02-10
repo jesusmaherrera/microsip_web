@@ -1,0 +1,91 @@
+{% extends extend %}
+{% block title %}Condicion de pago{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+<script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script type="text/javascript">
+$(function() {
+  $('#id_plazos_table tbody tr').formset({
+    prefix: '{{ formset.prefix }}',
+    addCssClass:'hide',
+    addText:'Nuevo Plazo',
+    deleteText:'',
+  });
+});
+</script>
+{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} <a href="/{{ modulo }}/condiciones_de_pago/">Condiciones de pago</a> <i class=" icon-play"></i> Condicion de pago{% endblock %}
+{% block content %}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+  <div class="row-fluid">
+    <div class="span3"><h3 style="margin:0;"> Condicion de pago</h3> </div>
+    <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
+  </div>
+  {{ form.errors }}
+  {% if message %}
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
+    <p>{{ message }}</p>
+  </div>
+  {% endif %}
+  <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
+    <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+  </ul>
+  <div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="general" style="padding-bottom: 0;">
+      
+        <div class="row-fluid" >
+          <label>Nombre</label>
+          <div class="input-prepend input-append">
+            {{ form.nombre }}
+          </div>
+        </div>
+        <fieldset>
+          <legend>Plazos</legend>
+          <div class="row-fluid" style="padding: .5em;">
+            <table class="table tableCell table-hover" id="id_plazos_table" border="0" cellpadding="0" cellspacing="2">
+              <thead>
+                <tr>
+                  <th>Días</th>
+                  <th>Porcentaje</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for form in plazo_formset.forms %}
+                <tr id="{{ form.prefix }}-row" class="form-container">
+                  {{ form.errors }}
+                  <td> {{ form.dias }}</td>
+                  <td> 
+                    {% for fld in form.hidden_fields %}{{ fld }}{% endfor %} 
+                    {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                    {{ form.porcentaje_de_venta }}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {{ plazo_formset.management_form }}
+          </div>
+        </fieldset>
+        <div class="row-fluid" >
+           <label>Es predeterminado</label>
+           <div class="input-prepend input-append">
+             {{ form.es_predet }}
+           </div>
+        </div>
+        <div class="row-fluid" style='clear:both;'>
+         
+        </div>
+      <br>
+    </div>
+  </div>
+  
+  <br style='clear:both;'>
+</form>
+{% endblock %}

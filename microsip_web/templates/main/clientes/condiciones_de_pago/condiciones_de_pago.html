@@ -1,0 +1,44 @@
+{% extends extend %}
+{% block title %}Condiciones de pago{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Condiciones de pago {% endblock %}
+{% block content %}
+
+<div class="row-fluid">
+	<div class="span3"><h3 style="margin:0;"> Condiciones de pago</h3> </div>
+    <a href="/{{ modulo }}/condicion_de_pago/" class="btn"> Nueva</a>
+</div>
+
+<table class="table tableCell table-hover">
+    <tr>
+      <th>Nombre</th>    </tr>
+    {% for condicion_de_pago in condiciones_de_pago%}
+    <tr>
+      <td><a href="/{{ modulo }}/condicion_de_pago/{{ condicion_de_pago.id }}/">{{ condicion_de_pago.nombre }}</a></td>
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if condiciones_de_pago.has_previous %}
+        <li><a href="?page={{ condiciones_de_pago.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ condiciones_de_pago.number }} de {{ condiciones_de_pago.paginator.num_pages }}.</a></li>
+        {% if condiciones_de_pago.has_next %}
+        <li><a href="?page={{ condiciones_de_pago.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

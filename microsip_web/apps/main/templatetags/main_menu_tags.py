@@ -20,9 +20,9 @@ def microsip_module_btn(ms_module):
       elif ms_module == 'microsip_web.apps.contabilidad':
          result = '<li><a href="/contabilidad/polizas_pendientes/"> <i class="msicon-contabilidad"></i><label class="small_screen"> Contabilidad </label></a></li>'
       elif ms_module == 'microsip_web.apps.punto_de_venta':
-         result ='<li><a href="/punto_de_venta/ventas/"> <i class="msicon-punto_de_venta"></i><label class="small_screen"> Punto de venta</label></a></li>'
+         result ='<li><a href="/punto_de_venta/facturas/"> <i class="msicon-punto_de_venta"></i><label class="small_screen"> Punto de venta</label></a></li>'
       elif ms_module == 'microsip_web.apps.compras':
-         result = '<li><a href="#"> <i class="msicon-compras"></i><label class="small_screen"> Compras</label></a></li>'
+         result = '<li><a href="/compras/ordenes"> <i class="msicon-compras"></i><label class="small_screen"> Compras</label></a></li>'
    
    return result
 

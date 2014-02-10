@@ -5,6 +5,8 @@
         // These are the defaults.
         searchFunction: '',
         clavecommun_name: 'clave_articulo',
+        get_detailsFunction: '',
+        load_detailsFunction: ''
 	  }, options );
 
     this.initialize = function(){
@@ -24,6 +26,14 @@
         deck_selector.html('<span class="div hilight" data-value="'+data.articulo_id+'"><span style="display: inline;" class="remove div">X</span>'+data.articulo_nombre+'</span>');
         articulo.html('<option selected="selected" value="'+data.articulo_id+'"></option>');
         articulo_text.hide();
+        if ( typeof(settings.get_detailsFunction) == "function" && typeof(settings.load_detailsFunction) == "function"){
+          debugger;
+          settings.get_detailsFunction(settings.load_detailsFunction, {
+            'articulo_id': data.articulo_id,
+            'comun_name': data.comun_name,
+            'articulo_clave':'',
+          });
+        }
       }
       else
       {

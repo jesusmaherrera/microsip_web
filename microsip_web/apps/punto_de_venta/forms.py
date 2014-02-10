@@ -13,9 +13,8 @@ class articulo_byclave_form( forms.Form ):
 
 class factura_global_form( forms.Form ):
     TIPOS_GEN_FACTURA = (
-        ('D', 'Detallada'),
-        ('C', 'Concentrada'),
         ('P', 'Una partida'),
+        ('C', 'Concentrada'),
     )
     fecha_inicio = forms.DateField( widget = forms.TextInput( attrs = { 'class' : 'input-small' } ), required= True )
     fecha_fin = forms.DateField(widget = forms.TextInput( attrs = { 'class' : 'input-small' } ) , required= True)
@@ -39,50 +38,45 @@ class ArticuloManageForm(forms.ModelForm):
             'costo_ultima_compra',
         }
 
-class ClienteManageForm(forms.ModelForm):
-    
-    class Meta:
-        widgets = autocomplete_light.get_widgets_dict(Cliente)
-        model = Cliente
-
-        exclude= {
-            'cuenta_xcobrar',
-            'estatus',
-            'moneda',
-            'condicion_de_pago',
-
-        }
 
 class TipoClienteManageForm(forms.ModelForm):
     class Meta:
         model = TipoCliente
 
-class LineaArticulosManageForm(forms.ModelForm):
-    class Meta:
-        model = LineaArticulos
-        exclude= {
-            'cuenta_ventas',
-        }
-        
-class GrupoLineasManageForm(forms.ModelForm):
-    class Meta:
-        model = GrupoLineas
-        exclude= {
-            'cuenta_ventas',
-        }
+class PreferenciasGeneralManageForm(forms.Form):
+    articulo_general= forms.ModelChoiceField(Articulos.objects.filter( es_almacenable= 'N' ), 
+            widget= autocomplete_light.ChoiceWidget('Articulos_noalm_Autocomplete')
+        )
+
+    def save(self, *args, **kwargs):
+        articulo_general_obj = Registry.objects.get( nombre = 'ARTICULO_VENTAS_FG_PV_ID')
+        if articulo_general_obj.valor != self.cleaned_data['articulo_general']:
+            articulo_general_obj.valor = self.cleaned_data['articulo_general']
+            articulo_general_obj.save()
 
 class InformacioncontableRegManageForm(forms.Form):
-    TIPOS_POLIZA = []
-    # for tipo_poliza in TipoPoliza.objects.all():
-    #     opcion = [tipo_poliza.clave, tipo_poliza.nombre]
-    #     TIPOS_POLIZA.append(opcion)
+    tipo_poliza_ventas = forms.ModelChoiceField(queryset= TipoPoliza.objects.all())
+    tipo_poliza_devol  = forms.ModelChoiceField(queryset= TipoPoliza.objects.all())
+    tipo_poliza_cobros_cc = forms.ModelChoiceField(queryset= TipoPoliza.objects.all())
+    
+    def save(self, *args, **kwargs):
+        tipo_poliza_ventas_obj = Registry.objects.get( nombre = 'TIPO_POLIZA_VENTAS_PV')
+        if tipo_poliza_ventas_obj.valor != self.cleaned_data['tipo_poliza_ventas']:
+            tipo_poliza_ventas_obj.valor = self.cleaned_data['tipo_poliza_ventas']
+            tipo_poliza_ventas_obj.save()
 
-    tipo_poliza_ventas = forms.ChoiceField(choices=TIPOS_POLIZA, required=True)
-    tipo_poliza_devol  = forms.ChoiceField(choices=TIPOS_POLIZA, required=True)
-    tipo_poliza_cobros_cc = forms.ChoiceField(choices=TIPOS_POLIZA, required =True)    
+        tipo_poliza_devol_obj = Registry.objects.get( nombre = 'TIPO_POLIZA_DEVOL_PV')
+        if tipo_poliza_devol_obj.valor != self.cleaned_data['tipo_poliza_devol']:
+            tipo_poliza_devol_obj.valor = self.cleaned_data['tipo_poliza_devol']
+            tipo_poliza_devol_obj.save()
+
+        tipo_poliza_cobros_cc_obj = Registry.objects.get( nombre = 'TIPO_POLIZA_COBROS_CXC_PV')
+        if tipo_poliza_cobros_cc_obj.valor != self.cleaned_data['tipo_poliza_cobros_cc']:
+            tipo_poliza_cobros_cc_obj.valor = self.cleaned_data['tipo_poliza_cobros_cc']
+            tipo_poliza_cobros_cc_obj.save()
 
 class InformacionContableManageForm(forms.ModelForm):
-    condicion_pago_contado  = forms.ModelChoiceField(queryset= CondicionPago.objects.all(), required=True)
+    condicion_pago_contado  = forms.ModelChoiceField(queryset= CondicionPago.objects.all(), required=False)
 
     class Meta:
         model = InformacionContable_pv
@@ -120,6 +114,7 @@ class PlantillaPolizaManageForm(forms.ModelForm):
 class DetPlantillaPolVentasManageForm(forms.ModelForm):
     posicion        =  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
     asiento_ingora  = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
+    cuenta_co = forms.ModelChoiceField(queryset=CuentaCo.objects.all(), widget=autocomplete_light.ChoiceWidget('CuentaCoAutocomplete'))
 
     def __init__(self, *args, **kwargs):
         super(DetPlantillaPolVentasManageForm, self).__init__(*args, **kwargs)
@@ -140,6 +135,7 @@ class DetPlantillaPolVentasManageForm(forms.ModelForm):
 class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
     posicion        =  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
     asiento_ingora  = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
+    cuenta_co = forms.ModelChoiceField(queryset=CuentaCo.objects.all(), widget=autocomplete_light.ChoiceWidget('CuentaCoAutocomplete'))
 
     def __init__(self, *args, **kwargs):
         super(ConceptoPlantillaPolizaManageForm, self).__init__(*args, **kwargs)
@@ -150,7 +146,6 @@ class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
         self.fields['tipo_condicionpago'].widget.attrs['class'] = 'input-small'
         
     class Meta:
-        widgets = autocomplete_light.get_widgets_dict(DetallePlantillaPolizas_pv)
         model = DetallePlantillaPolizas_pv
 
     def clean_cuenta_co(self):
@@ -164,7 +159,7 @@ def PlantillaPoliza_items_formset(form, formset = BaseInlineFormSet, **kwargs):
 
 class FacturaManageForm(forms.ModelForm):
     MODALIDADES_FATURACION = (
-        ('PREIMP', 'Factura pre-impresa'),
+        ('CFDI', 'Factura electrónica CFDI'),   
     )
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'class':'span12', 'rows':2, 'placeholder': 'Descripcion...',}), required= False )
     modalidad_facturacion = forms.ChoiceField(choices= MODALIDADES_FATURACION, required=True)
@@ -172,6 +167,8 @@ class FacturaManageForm(forms.ModelForm):
     impuestos_venta_neta = forms.CharField(widget=forms.HiddenInput(), required=False)
     impuestos_otros_impuestos = forms.CharField(widget=forms.HiddenInput(), required=False)
     impuestos_importe_impuesto = forms.CharField(widget=forms.HiddenInput(), required=False)
+    impuestos_ids = forms.CharField(widget=forms.HiddenInput(), required=False)
+    impuestos_porcentaje_impuestos = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(FacturaManageForm, self).__init__(*args, **kwargs)
@@ -187,7 +184,10 @@ class FacturaManageForm(forms.ModelForm):
     class Meta:
         widgets = autocomplete_light.get_widgets_dict(Docto_PV)
         model = Docto_PV
+        
         exclude = (
+            'tipo_gen_fac',
+            'es_fac_global',
             'vendedor',
             'forma_global_emitida',
             'email_envio',
@@ -221,6 +221,9 @@ class FacturaManageForm(forms.ModelForm):
             'sistema_origen',
             'usuario_creador',
             'fechahora_creacion',
+            'usuario_aut_creacion',
+            'usuario_aut_modif',
+            'usuario_cancelacion',
             'usuario_ult_modif',
             'fechahora_ult_modif',
             'puntos',
@@ -287,7 +290,8 @@ class DocumentoPV_ManageForm(forms.ModelForm):
 class DocumentoPVDet_ManageForm(forms.ModelForm):
     articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
     unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini text-right', 'placeholder':'unidades'}),required=True)
-    precio_unitario = forms.FloatField(widget=forms.TextInput(attrs={'class':'input-mini text-right', 'placeholder':'costo'}),required=True)
+    precio_unitario = forms.FloatField(widget=forms.TextInput(attrs={'class':'input-small text-right', 'placeholder':'costo'}),required=True)
+    detalles_liga = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         super(DocumentoPVDet_ManageForm, self).__init__(*args, **kwargs)

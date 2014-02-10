@@ -1,0 +1,184 @@
+{% extends "compras/base.html" %}
+
+<!-- CSS Code -->
+{% block style_css %}
+<style type="text/css">
+  .delete-row {
+    margin-left:5px;
+  }
+</style>
+
+<link rel='stylesheet' href='{{STATIC_URL}}css/redmond/jquery-ui-1.8.23.custom.css'/>
+
+{% endblock %}
+<!-- JavaScript Code -->
+{% block js_code %}
+{% include 'autocomplete_light/static.html' %}
+<script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script src='{{STATIC_URL}}js/microsip_api/jquery.articulosearch.js'></script>
+<script src="{{STATIC_URL}}js/compras/documentos.compra.js"></script>
+<script type="text/javascript">
+$(function() {
+  $('#id_doctosIn_table tbody tr').formset({
+    prefix: '{{ formset.prefix }}',
+    addCssClass:'hide',
+    addText:'Nuevo Articulo',
+    deleteText:'',
+  });
+
+  
+  $("input[name*='clave_articulo']:last")[0].focus();  
+});
+</script>
+
+{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/compras/ordenes/">ordenes</a> <i class="icon-play"></i> Orden{% endblock %}
+{% block content %}
+<form method="post" action="" enctype='multipart/form-data'>{% csrf_token %}
+{{ documento_form.errors }}
+{% if message %}
+<div class="alert alert-success fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Bien hecho!! </strong> {{ message }}
+</div>
+{% endif %}
+<div class="row-fluid">
+  <div class="span3">
+    <h3 style="margin:0;"> Orden de compra</h3> 
+  </div>
+  {% if documento_estado == 'R' or documento_estado == 'C'%}
+    <button type="submit" class="btn disabled" disabled><i class="icon-download-alt"></i> Guardar</button> 
+  {% else %}
+    <button type="submit" class="btn" disabled><i class="icon-download-alt"></i> Guardar</button> 
+  {% endif %}
+  <a  href="#" class="btn disabled"><i class="icon-ban-circle"></i></a> 
+  <a href="#" class="btn disabled"><i class="icon-trash"></i></a> 
+</div>
+<ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
+  <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+  <li ><a href="#otros_datos" data-toggle="tab">Otros datos</a></li>
+  {% if documento_estado == 'R' %}
+    <span class='span2'style="color: rgb(133, 133, 133); font-weight: bold; font-size: x-large; padding-left: 5em;" >Recibida</span> 
+  {% elif documento_estado == 'C'%}
+    <span class='span2'style="color: rgb(253, 64, 64); font-weight: bold; font-size: x-large; padding-left: 5em;" >Cancelada</span> 
+  {% endif %}
+</ul>
+<div id="myTabContent" class="tab-content">
+  <div class="tab-pane fade active in" id="general" style="padding-bottom: 0;">
+    <div id="sic_from" class="container-fluid"  style="margin-top: -1em;">
+      <div class="row-fluid">
+        <div class="span8" id="sicfrom-title">
+          <div class="container-fluid">
+            <div class="row-fluid">
+              <br>
+              
+            </div>
+            <div class="row">
+             <span class='span2'>Proveedor</span>    
+              {{ documento_form.proveedor }}
+            </div>
+            
+            <div class="row">
+              <span class='span2'>Almacen</span>
+              {{ documento_form.almacen }}
+            </div>
+          </div>
+          
+        </div>
+        <div class="span4">
+          <div id="sic_form_details" class="container-fluid">
+            <div class="row-fluid">
+              <div class="span6" >
+                <label>Fecha</label>
+                <div class="input-append">
+                  {{ documento_form.fecha }} 
+                  <span class="add-on"><i class="icon-calendar"></i> </span>
+                </div>
+              </div> 
+              <div class="span6" >
+                <label>Folio</label>
+                <div >
+                  {{ documento_form.folio }} 
+                </div>
+              </div>  
+            </div>
+            
+          </div>
+          <div class="row-fluid">
+            <div class="row">
+              <span class='span2'>Moneda</span>
+              {{ documento_form.moneda }}
+            </div>
+            <div class="row">
+              <span class='span2'>Entrega</span>
+              <div class="input-append">
+                {{ documento_form.fecha_entrega }}
+                <span class="add-on"><i class="icon-calendar"></i> </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row-fluid" style="padding: .5em;">
+        <table class="table tableCell table-hover" id="id_doctosIn_table" border="0" cellpadding="0" cellspacing="5">
+          <thead>
+            <tr>
+              <th>Clave</th>
+              <th>Articulo</th>
+              <th>U.m.</th>
+              <th>Unidades</th>
+              <th>Precio</th>
+              <th>Importe</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for documento_form in formset.forms %}
+            <tr id="{{ documento_form.prefix }}-row" class="documento_form-container">
+              {{ documento_form.errors }}
+              <td> {{ documento_form.clave_articulo }} </td>
+              <td>{% if documento_form.instance.pk %}{{ documento_form.DELETE }}{% endif %}
+                {{ documento_form.articulo }}</td>
+              <td> {{ documento_form.umed }} </td>
+              <td>{{ documento_form.unidades }}
+                {% for fld in documento_form.hidden_fields %}{{ fld }}{% endfor %}
+              </td>
+              <td>{{ documento_form.precio_unitario }}</td>
+              <td>{{ documento_form.precio_total_neto }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class='row-fluid'>
+          <span class='span9'>{{ formset.total_form_count }} Articulos</span>
+          <span class='span3' id='span_total_compras'></span>
+        </div>
+        {{ formset.management_form }}
+
+        {{ impuestos_form }}
+
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane fade" id="otros_datos" style="padding-bottom: 0;">
+    <fieldset>
+      <legend>Otros</legend> 
+      Condiciones {{ documento_form.condicion_pago}}
+    </fieldset>
+    <br><br>
+
+    <fieldset>
+      <legend>Recibir la orden de compra</legend> 
+      {% if documento_estado == 'R' %}
+        <a href="#" class="btn" disabled >Elaborar compra</a>
+      {% else %}
+        <a href="/compras/compra/O/{{ orden_id }}/" class="btn">Elaborar compra</a>
+      {% endif %}
+      
+    </fieldset>
+    <br><br>
+      
+  </div>
+</div>
+
+</form>
+{% endblock %}

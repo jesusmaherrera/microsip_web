@@ -1,4 +1,5 @@
-{% extends "punto_de_venta/base.html" %}
+{% extends extend %}
+{% load punto_de_venta_tags %}
 {% block title %}Cliente{% endblock %}
 
 <!-- CSS Code -->
@@ -51,102 +52,12 @@ $(function() {
 
 {% endblock %}
 
-{% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/clientes/">Clientes</a> <i class=" icon-play"></i> Cliente{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/{{ modulo }}/clientes/">Clientes</a> <i class=" icon-play"></i> Cliente{% endblock %}
 {% block content %}
 {{ formset }}
-
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
-  
-  <div id="sic_from" class="container-fluid">
-    <div class="row-fluid">
-      <div class="span3">
-        <div class="container-fluid">
-          <div class="row-fluid">
-            <h3>Clientes</h3>  
-          </div>
-        </div>
-      </div>
-      <div class="span9">
-        <div id='main_form'>
-          <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  {{ form.errors }}
-  <fieldset style='clear:both;'>
-    <legend>Informacion General</legend>
-    <div class="span4" >
-      <label>Nombre</label>
-      <div class="input-prepend input-append">
-        {{ form.nombre }}
-      </div>
-    </div>
-    <div class="span4" >
-      <label>Tipo Cliente</label>
-      <div class="input-prepend input-append">
-        {{ form.tipo_cliente }}
-      </div>
-    </div>
-  </fieldset>
-  <fieldset style='clear:both;'>
-    <legend>Informacion de Puntos</legend>
-    <div class="span4" style='clear:both;'>
-      <label>Cobrar y Abonar con</label>
-      <div class="input-prepend input-append">
-        {{ form.tipo_tarjeta }}
-      </div>
-    </div>
-    <div class="span4">
-      <label>Dar puntos a</label>
-      <div class="input-prepend input-append" >
-        {{ form.hereda_puntos_a }}
-      </div>
-    </div>
-    <div  id='div_valor_puntos'>
-      <label >Hereda valor de puntos  {{ form.hereda_valorpuntos }}</label>
-      <div class="input-prepend input-append" style='clear:both;' >
-        {{ form.valor_puntos }}
-      </div>
-    </div>
-    <div class="span4"style='clear:both;' >
-      <label>Puntos</label>
-      <div class="input-prepend input-append">
-        {{ form.puntos }}
-      </div>
-    </div>
-    <div class="span4" >
-      <label>Dinero Elecronico</label>
-      <div class="input-prepend input-append">
-        {{ form.dinero_electronico }}
-      </div>
-    </div>
-  </fieldset>
-  <!-- <fieldset style='clear:both;'>
-    <legend>Cuentas contables de Ventas</legend>
-    {% for key, value in cuentas.items %}
-    <div class="span4" >
-      <label>{{ value }}</label>
-      <div class="input-prepend input-append">
-        {% if 'cuenta_1' in cuentas and key == 'cuenta_1' %}
-        {{ form.cuenta_1 }}
-        {% endif %}
-        {% if 'cuenta_2' in cuentas and key == 'cuenta_2' %}
-        {{ form.cuenta_2 }}
-        {% endif %}
-        {% if 'cuenta_3' in cuentas and key == 'cuenta_3' %}
-        {{ form.cuenta_3 }}
-        {% endif %}
-        {% if 'cuenta_4' in cuentas and key == 'cuenta_4' %}
-        {{ form.cuenta_4 }}
-        {% endif %}
-        {% if 'cuenta_5' in cuentas and key == 'cuenta_5' %}
-        {{ form.cuenta_5 }}
-        {% endif %}
-      </div>
-    </div>  
-    {% endfor %}
-  </fieldset> -->
+  {{ articulo_form.errors }}
+  {{ direccion_form.errors }}
   {% if message %}
   <div class="alert alert-block alert-error fade in">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -155,6 +66,155 @@ $(function() {
   </div>
   {% endif %}
   
+  <div class="row-fluid">
+    <div class="span3"><h3 style="margin:0;"> Cliente </h3> </div>
+    <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
+  </div>
+  {{ form.errors }}
+  <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
+    <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+    {% puntos_tab %}
+    <li><a href="#direcciones" data-toggle="tab">Direccion</a></li>
+  </ul>
+  <div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="general" style="padding-bottom: 0;">
+      <div class="row-fluid">
+        <div class="span2" >
+          <label>Nombre</label>
+          <div class="input-prepend input-append">
+            {{ form.nombre }}
+          </div>
+        </div>
+        <div class="span2">
+          <label>RFC</label>
+          <div class="input-prepend input-append">
+            {{ direccion_form.rfc_curp }}
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row-fluid"> 
+        <div class="span2">
+          <label>moneda</label>
+          <div class="input-prepend input-append">
+            {{ form.moneda }}
+          </div>
+        </div>
+        <div class="span2">
+          <label>Condicion de pago</label>
+          <div class="input-prepend input-append">
+            {{ form.condicion_de_pago }}
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row-fluid">
+        <div class="span2">
+          <label>Cobrar impuestos</label>
+          <div class="input-prepend input-append">
+            {{ form.cobrar_impuestos }}
+          </div>
+        </div>
+        <div class="span2">
+          <label>Cargar moratorios</label>
+          <div class="input-prepend input-append">
+            {{ form.generar_interereses }}
+          </div>
+        </div>
+        <div class="span2">
+          <label>Emitir estado de cuenta</label>
+          <div class="input-prepend input-append">
+            {{ form.emir_estado_cuenta}}
+          </div>
+        </div>
+      </div>
+      <br>
+      <br>
+    </div>
+    <div class="tab-pane fade in" id="puntos" style="padding-bottom: 0;">
+      <div class="row-fluid">
+        <div class="span4" style='clear:both;'>
+          <label>Cobrar y Abonar con</label>
+          <div class="input-prepend input-append">
+            {{ form.tipo_tarjeta }}
+          </div>
+        </div>
+        <div class="span4">
+          <label>Dar puntos a</label>
+          <div class="input-prepend input-append" >
+            {{ form.hereda_puntos_a }}
+          </div>
+        </div>
+        <div  id='div_valor_puntos'>
+          <label >Hereda valor de puntos  {{ form.hereda_valorpuntos }}</label>
+          <div class="input-prepend input-append" style='clear:both;' >
+            {{ form.valor_puntos }}
+          </div>
+        </div>
+        <div class="span4"style='clear:both;' >
+          <label>Puntos</label>
+          <div class="input-prepend input-append">
+            {{ form.puntos }}
+          </div>
+        </div>
+        <div class="span4" >
+          <label>Dinero Elecronico</label>
+          <div class="input-prepend input-append">
+            {{ form.dinero_electronico }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade in" id="direcciones" style="padding-bottom: 0;">
+      <div class="row-fluid">
+        <div class="span2">
+          <label>ciudad</label>
+          <div class="input-prepend input-append">
+            {{ direccion_form.ciudad }}
+          </div>
+        </div>
+        <div class="span2">
+          <label>Colonia</label>
+          <div class="input-prepend input-append">
+            {{ direccion_form.colonia }}
+          </div>
+        </div>
+        <div class="span2">
+          <label>Codigo postal</label>
+          <div class="input-prepend input-append">
+            {{ direccion_form.codigo_postal }}
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row-fluid">
+        <div class="span2">
+          <label>Calle</label>
+          <div class="input-prepend input-append">
+            {{ direccion_form.calle_nombre }}
+          </div>
+        </div>
+        <div class="span2">
+          <label>Numero exterior</label>
+          <div class="input-prepend input-append">
+            {{ direccion_form.numero_exterior }}
+          </div>
+        </div>
+        <div class="span2">
+          <label>Numero interior</label>
+          <div class="input-prepend input-append">
+            {{ direccion_form.numero_interior }}
+          </div>
+        </div>
+        <div class="span2">
+          <label>E-mail</label>
+          <div class="input-prepend input-append">
+            {{ direccion_form.email }}
+          </div>
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
 </form>
-
 {% endblock %}

@@ -1,0 +1,43 @@
+{% extends "main/base.html" %}
+{% block title %}Plugins de aplicaion{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Plugins de Aplicacion {% endblock %}
+{% block content %}
+<div id="sic_from" class="container-fluid">
+  <div class="row-fluid">
+    <div class="span4">
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <h3>Plugins de aplicacion</h3>  
+        </div>
+      </div>
+    </div>
+    <div class="span8">
+      <div id='main_form'>
+        <a class="btn" href="/plugin/"> Nuevo</i></a> 
+      </div>
+    </div>
+  </div>
+</div>
+<table class="table table-striped table-hover">
+    <tr>
+      <th>Nombre</th>
+      <th>Descripcion</th>
+      <th></th>
+    </tr>
+    {% for plugin in plugins %}
+    <tr>
+      <td><a href="/plugin/{{ plugin.id }}/">{{ plugin.name }}</a></td>
+      <td>{{ plugin.description }}</td>
+      <td><a href="/plugin_delete/{{ plugin.id }}/" class="btn btn-danger btn-mini"> <i class="icon-trash icon-white"></i> </a></td>
+    </tr>
+    {% endfor %}
+</table>
+<br>
+{% endblock %}

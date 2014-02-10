@@ -1,6 +1,6 @@
 #encoding:utf-8
 from django import forms
-from microsip_web.apps.main.models import *
+from microsip_web.libs.api.models import *
 from models import *
 import autocomplete_light
 
@@ -10,7 +10,7 @@ class generartarjetas_form( forms.Form ):
     cantidad = forms.IntegerField( max_value = 6000 , widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ),)
     TIPOS_TARJETA = ( ( 'N', 'No Aplica' ), ( 'P', 'Puntos' ), ( 'D', 'Dinero Electronico' ), )
     tipo_tarjeta = forms.ChoiceField( choices = TIPOS_TARJETA )
-    puntos = forms.IntegerField( initial = 0, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
+    puntos = forms.IntegerField( initial = 0, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ))
     dinero_electronico = forms.DecimalField( initial = 0, max_value = 2000, decimal_places = 2, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
     hereda_valorpuntos = forms.BooleanField( initial = True, required = False )
     valor_puntos = forms.DecimalField( initial = 0, max_digits = 15, decimal_places = 2, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )

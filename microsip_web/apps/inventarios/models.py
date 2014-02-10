@@ -1,7 +1,7 @@
 #encoding:utf-8
 from django.db import models
 from datetime import datetime 
-from microsip_web.apps.main.models import *
+from microsip_web.libs.api.models import *
 
 # class DocumentoInventarioAjustes(models.Model):
 #     no_inventario = models.CharField(max_length=150)

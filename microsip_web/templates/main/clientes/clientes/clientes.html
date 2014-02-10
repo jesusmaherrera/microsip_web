@@ -1,4 +1,4 @@
-{% extends "punto_de_venta/base.html" %}
+{% extends extend %}
 {% block title %}clientes{% endblock %}
 
 <!-- CSS Code -->
@@ -16,35 +16,28 @@
 
 {% block breadcrumb %}{{ block.super }} clientes {% endblock %}
 {% block content %}
-<div id="sic_from" class="container-fluid">
+<form method="post" class="form-inline" action="" enctype='multipart/form-data'>{% csrf_token %}  
   <div class="row-fluid">
-    <div class="span3">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <h3>Clientes</h3>  
-        </div>
-      </div>
+    <div class="span2"><h3 style="margin:0;"> Clientes</h3> </div>
+    <div class='span1' ><a href="/{{ modulo }}/cliente/" class="btn"> Nuevo</a></div>
+    <div class='span2' >
+       {{ filtro_form.cliente }}
     </div>
-    <div class="span9">
-      <div id='main_form'>
-        <form method="post" class="form-inline" action="" enctype='multipart/form-data'>
-          {% csrf_token %}  
-          <div class='span3'>
-          {{ filtro_form.cliente }}
-          </div>
-          {{ filtro_form.clave }}{{ filtro_form.nombre }}
-          <button class="btn" type="submit">Ir</button>
-        </form> 
-      </div>
+    <div class="input-prepend input-append mobile_inputdata">
+       <span class="add-on visible-phone label-data">Clave</span>
+       {{ filtro_form.clave }}
     </div>
+    <div class="input-prepend input-append mobile_inputdata">
+       <span class="label-data add-on visible-phone">Nombre</span>
+       {{ filtro_form.nombre }}
+    </div>
+    <button class="btn" type="submit"><i class='icon-search'></i> <span class="visible-phone">Ir</span></button>
   </div>
-</div>
+</form>
+
 <table class="table tableCell table-hover">
     <tr>
-      <th>Nombre</th>
-      <th>Puntos</th>
-      <th>Dinero Electronico</th>
-    </tr>
+      <th>Nombre</th>    </tr>
     {% for cliente in clientes%}
     <div id="myModal{{ cliente.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-header">
@@ -61,9 +54,8 @@
       </div>
     </div>
     <tr>
-      <td><a href="/punto_de_venta/cliente/{{ cliente.id }}/">{{ cliente.nombre }}</a></td>
-      <td>{{cliente.puntos }}</td>
-      <td>$ {{cliente.dinero_electronico }}</td>
+      <td><a href="/{{ modulo }}/cliente/{{ cliente.id }}/">{{ cliente.nombre }}</a></td>
+    
       <!-- <td style="text-align:center;"> -->
         <!-- <a href='#myModal{{ cliente.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a> -->
       <!-- </td> -->

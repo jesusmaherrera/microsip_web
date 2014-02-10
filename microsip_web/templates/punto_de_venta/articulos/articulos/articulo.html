@@ -1,143 +1,67 @@
-{% extends extend %}
-{% block title %}Articulo{% endblock %}
+{% extends "main/articulos/articulos/articulo_base.html" %}
 {% load filtros_tags %}
-<!-- CSS Code -->
-{% block style_css %}{% endblock %}
+{% load punto_de_venta_tags %}
 
-<!-- JavaScript Code -->
-{% block js_code %}
-{% include 'autocomplete_light/static.html' %}
-<script>
-function cargar_arbol(datos){
-
-   $("#demo1").jstree({ 
-    "json_data" : {
-      "data" : datos
-    },
-    "plugins" : [ "themes", "json_data", "ui" ]
-  })
-  .bind("select_node.jstree", function (event, data) { 
-    $('#id_carpeta_seleccionada').val(data.rslt.obj.attr("id"));
-  })
-}
-
-// $(document).ready(function() {
-//   Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
-// });
-
-  $(function() {
-    
-    if ($('#id_hereda_puntos').is(':checked'))
-      $('#div_puntos, #div_dinero_electronico').hide();
-    else
-    {
-      $('#div_puntos, #div_dinero_electronico').show();
-      if ($('#id_puntos').val() == '') 
-        $('#id_puntos').val(0);
-      if ($('#id_dinero_electronico').val() == '') 
-        $('#id_dinero_electronico').val(0);
-    }
-    
-    $('#btn_create_articulocompatiblecarpeta').click(function() {    
-      Dajaxice.microsip_web.apps.main.filtros.create_articulocompatiblecarpeta(cargar_arbol,{ 'articulo_id': {{ articulo_id }}, 'carpeta_id': $('#id_carpeta_seleccionada').val()});
-      window.location.reload(true);
-    });
-    
-
-    $('#id_hereda_puntos').click(function() {
-        if ($(this).is(':checked')) 
-          $('#div_puntos, #div_dinero_electronico').hide();
-        else
-        {
-          $('#div_puntos, #div_dinero_electronico').show();
-          if ($('#id_puntos').val() == '') 
-            $('#id_puntos').val(0);
-          if ($('#id_dinero_electronico').val() == '') 
-            $('#id_dinero_electronico').val(0);
-        }
-    });
-  });
-</script>
+{% block extra_tabs %}
+  {% filtros_tab %}
+  {% puntos_tab %}
 {% endblock %}
-
-{% block breadcrumb %}{{ block.super }}
-{% if extend == 'punto_de_venta/base.html' %}
-  <a href="/punto_de_venta/articulos/">Articulos</a> <i class=" icon-play"></i> Articulo 
-{% else %}
-  <a href="/ventas/articulos/">Articulos</a> <i class=" icon-play"></i> Articulo 
-{% endif %}
-
- {% endblock %}
-{% block content %}
-<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
-  <div id="sic_from" class="container-fluid">
-    <div class="row-fluid">
-      <div class="span3">
-        <div class="container-fluid">
-          <div class="row-fluid">
-            <h3>Articulo</h3>  
-          </div>
-        </div>
-      </div>
-      <div class="span9">
-        <div id='main_form'>
-          <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
-        </div>
-      </div>
-    </div>
+{% block ventas_form %}
+  <div class="tab-pane fade " id="ventas">  
+    <fieldset>
+      {{ impuesto_articulo_form.errors }}
+      <legend>Precios</legend>
+      <table class="table" id="id_precios" border="0" cellpadding="0" cellspacing="5">
+        <tbody>
+          {% for form in precios_formset.forms %}
+          <tr id="{{ form.prefix }}-row" class="form-container">
+           <td>
+           {% for hid in form.hidden_fields %} {{hid}}{% endfor %} 
+           {{ form.errors }}
+           {{ form.precio_empresa }}
+           {{ form.precio }}
+           {{ form.moneda }}
+           {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+           </td>
+          </tr>
+          {% endfor %}
+       </tbody>
+     </table>
+    {{ precios_formset.management_form }}  
+    </fieldset> 
+    <label>Impuesto</label>
+    {{ impuesto_articulo_form.impuesto }}      
   </div>
-
-  {{ form.errors }}
-  <div class="span4" >
-    <label>Nombre</label>
-    <div class="input-prepend input-append">
-      {{ form.nombre }}
-    </div>
-  </div>
-  <div class="span4" >
-    <label>Linea <a href="/punto_de_venta/linea_articulos/{{ form.linea.value }}/">Ir a linea</a></label>
-    <div class="input-prepend input-append">
-      {{ form.linea }}
-    </div>
-  </div>
-  <div class="span4"  style='clear:both;'>
+{% endblock %}
+{% block puntos_form %}
+<div class="tab-pane fade " id="puntos">
+  <div>
     <label>Hereda puntos o dinero electronico</label>
-    <div class="input-prepend input-append">
-      {{ form.hereda_puntos }}
-    </div>
+    <div class="input-prepend input-append">{{ articulo_form.hereda_puntos }}</div>
   </div>
-  <div id="div_puntos" class="span4" >
+  <div id="div_puntos">
     <label>Puntos</label>
-    <div class="input-prepend input-append">
-      {{ form.puntos }}
-    </div>
+    <div class="input-prepend input-append">{{ articulo_form.puntos }}</div>
   </div>
-  <div id="div_dinero_electronico" class="span4" >
+  <div id="div_dinero_electronico" >
     <label>Dinero Elecronico (% de costo)</label>
-    <div class="input-prepend input-append">
-      {{ form.dinero_electronico }}
-    </div>
+    <div class="input-prepend input-append">{{ articulo_form.dinero_electronico }}</div>
   </div>
-  {{ form.seguimiento }}
-  <div style='clear:both;'>
-  <div class='span'>
-    Descripción<br>
-    {{ form.nota_ventas }}
-  </div>
-  
-  <div style='clear:both;'>
-  <fieldset>
-    {% compatibilidad_title %}
-      <div class="btn-group">
-          {% agregar_compatibilidad_btn %}
-          <!-- <a href="#" role="button" class="btn dropdown-toggle" data-toggle="dropdown"> <i class="icon-plus-sign"></i> Compatibilidad <b class="caret"></b></a> -->
-          <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
-            <li><a tabindex="-1" href="#id_clasificacionModal" data-toggle="modal"><i class='icon-tag'></i> Categoria</a></li>
-            <li role="presentation" class="divider"></li>
-            <li><a tabindex="-1" href="#id_articuloModal" data-toggle="modal"><i class="icon-barcode"></i> Articulo</a></li> 
-          </ul>
-      </div>
-      
+</div>
+{% endblock %}
+{% block filtros_form %}
+<div class="tab-pane fade " id="filtros">
+<fieldset>
+  {% compatibilidad_title %}
+    <div class="btn-group">
+        {% agregar_compatibilidad_btn %}
+        <!-- <a href="#" role="button" class="btn dropdown-toggle" data-toggle="dropdown"> <i class="icon-plus-sign"></i> Compatibilidad <b class="caret"></b></a> -->
+        <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+          <li><a tabindex="-1" href="#id_clasificacionModal" data-toggle="modal"><i class='icon-tag'></i> Categoria</a></li>
+          <li role="presentation" class="divider"></li>
+          <li><a tabindex="-1" href="#id_articuloModal" data-toggle="modal"><i class="icon-barcode"></i> Articulo</a></li> 
+        </ul>
+    </div>  
   <br style='clear:both;'>   
   {% for articulo_compatible in articulos_compatibles %}
     <div class="btn-group">
@@ -157,58 +81,49 @@ function cargar_arbol(datos){
       </ul>
     </div>
   {% endfor %}
-  
-  </fieldset>
-  </div>
-  <div id="id_articuloModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="infoModal" aria-hidden="true">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3 id="myModalLabel">Nueva compatibilidad de {{ form.nombre.value }}</h3>
-    </div>
-    <div class="modal-body">
-      Articulo Compatible<br>
-      {{ form_articuloCompatible.compatible_articulo }}
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-    </div>
-    <div class="modal-footer">
-      <input type="submit" class="btn" name='btnAgregarCompArticulo' value="Agregar" />
-    </div>
-  </div>
 
-  <div id="id_clasificacionModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="infoModal" aria-hidden="true">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3 id="myModalLabel">Nueva compatibilidad de {{ form.nombre.value }}</h3>
-    </div>
-    <div class="modal-body">
-      Clasificacion Compatible<br>
-      <div id="demo1" class="demo span" style="height:100px;"></div>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-      <br>
-    </div>
-    <div class="modal-footer">
-      <input type="hidden" id='id_carpeta_seleccionada' name="" value=""/>
-      <a href="#" id='btn_create_articulocompatiblecarpeta' class="btn">Agregar</a>
-    </div>
+</fieldset>
+</div>
+<div id="id_articuloModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="infoModal" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="myModalLabel">Nueva compatibilidad de {{ articulo_form.nombre.value }}</h3>
   </div>
-
-
-  {% if message %}
-  <div class="alert alert-block alert-error fade in">
-    <button type="button" class="close" data-dismiss="alert">×</button>
-    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
-    <p>{{ message }}</p>
+  <div class="modal-body">
+    Articulo Compatible<br>
+    {{ form_articuloCompatible.compatible_articulo }}
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
   </div>
-  {% endif %}
-  <br style='clear:both;'>
-</form>
+  <div class="modal-footer">
+    <input type="submit" class="btn" name='btnAgregarCompArticulo' value="Agregar" />
+  </div>
+</div>
+
+<div id="id_clasificacionModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="infoModal" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="myModalLabel">Nueva compatibilidad de {{ articulo_form.nombre.value }}</h3>
+  </div>
+  <div class="modal-body">
+    Clasificacion Compatible<br>
+    <div id="demo1" class="demo span" style="height:100px;"></div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+  </div>
+  <div class="modal-footer">
+    <input type="hidden" id='id_carpeta_seleccionada' name="" value=""/>
+    <a href="#" id='btn_create_articulocompatiblecarpeta' class="btn">Agregar</a>
+  </div>
+</div>
+<br><br><br>
+</div>
 {% endblock %}

@@ -9,7 +9,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import datetime, time
 
 #Modelos de modulos 
-from microsip_web.apps.main.models import *
+from microsip_web.libs.api.models import *
 from microsip_web.apps.contabilidad.models import *
 from microsip_web.apps.cuentas_por_pagar.models import *
 from microsip_web.apps.cuentas_por_cobrar.models import *

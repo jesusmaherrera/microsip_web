@@ -15,12 +15,12 @@ import autocomplete_light
 class impuestos_articulos_form(forms.ModelForm):
     class Meta:
         model = ImpuestosArticulo
-        exclude = ('articulo')
+        exclude = ('articulo',)
         
 class precios_articulos_form(forms.ModelForm):
     class Meta:
         model = PrecioArticulo
-        exclude = ('articulo')
+        exclude = ('articulo',)
 
 class articulos_form(forms.ModelForm):
     class Meta:
@@ -157,13 +157,14 @@ class UbicacionArticulosForm(forms.Form):
     ubicacion = forms.CharField(widget=forms.TextInput(attrs={'class':'input-small',}))
 
 class EntradaManageForm(forms.ModelForm):
-    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class':'span12', 'rows':2, 'placeholder': 'Descripcion...',}) )
+    descripcion = forms.CharField(widget=forms.Textarea(attrs={'class':'span12', 'rows':2, 'placeholder': 'Descripcion...',}), required= False )
     concepto = forms.ModelChoiceField( ConceptosIn.objects.filter( naturaleza= 'E', nombre_abrev='Compra'))
 
     def __init__(self, *args, **kwargs):
         super(EntradaManageForm, self).__init__(*args, **kwargs)
         self.fields['fecha'].widget.attrs['class'] = 'input-small'
         self.fields['folio'].widget.attrs['class'] = 'input-small'
+        self.fields['folio'].required = False
 
 
     class Meta:
@@ -226,7 +227,6 @@ class DoctosInDetManageForm(forms.ModelForm):
         self.fields['costo_total'].widget.attrs['class'] = 'input-small'
 
     class Meta:
-        # widgets = autocomplete_light.get_widgets_dict(DoctosInDet)
         model = DoctosInDet
         exclude = (
             'tipo_movto',

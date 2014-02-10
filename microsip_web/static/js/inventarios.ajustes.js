@@ -209,8 +209,6 @@ function add_existenciasarticulo_byajuste()
       'salida_id' : $("#salida_id").val(),
       'detalle_unidades' : $("#id_unidades").val(),
       'detalle_costo_unitario' :costo_unitario,
-      'entrada2_id' : $("#entrada2_id").val(),
-      'salida2_id' : $("#salida2_id").val(),
       'is_mobile': $("#is_mobile").val(),
       }); 
     

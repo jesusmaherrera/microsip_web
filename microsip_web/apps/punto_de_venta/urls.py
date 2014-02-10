@@ -5,17 +5,20 @@ from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('',    
 
-	(r'^venta/$', views.venta_mostrador_manageView),
-    (r'^venta/(?P<id>\d+)/', views.venta_mostrador_manageView),
-	(r'^ventas/$', views.ventas_de_mostrador_view),
-    
+	# (r'^venta/$', views.venta_mostrador_manageView),
+ #    (r'^venta/(?P<id>\d+)/', views.venta_mostrador_manageView),
+	# (r'^ventas/$', views.ventas_de_mostrador_view),
+    url(r'', include('microsip_web.apps.main.comun.otros.urls', namespace='pv_main_otros')),
+    url(r'', include('microsip_web.apps.main.comun.clientes.urls', namespace='pv_main_clientes')),
+    url(r'', include('microsip_web.apps.main.comun.listas.urls', namespace='pv_main_listas')),
+    url(r'', include('microsip_web.apps.main.comun.articulos.urls', namespace='pv_main_articulos')),
     #facturas
     (r'^facturas/$', views.facturas_view),
     (r'^factura/nueva/', views.factura_manageView),
     
     (r'^factura/(?P<id>\d+)/', views.factura_manageView),
     
-	(r'^devoluciones/$', views.devoluciones_de_ventas_view),
+	# (r'^devoluciones/$', views.devoluciones_de_ventas_view),
 
 	(r'^GenerarPolizas/$', views.generar_polizas_View),
 	(r'^PreferenciasEmpresa/$', views.preferenciasEmpresa_View),
@@ -30,15 +33,8 @@ urlpatterns = patterns('',
     (r'^inicializar_puntos_articulos/$', views.inicializar_puntos_articulos),
 
     #Articulos
-    (r'^articulos/$', views.articulos_view),
-    (r'^articulos/(?P<carpeta>\d+)/', views.articulos_view),
     (r'^articulo/precio/', views.get_precio_articulo),
-        
-    (r'^articulo/(?P<id>\d+)/', views.articulo_manageView),
-	#Clientes
-	(r'^clientes/$', views.clientes_view),
-	(r'^cliente/(?P<id>\d+)/', views.cliente_manageView),
-    
+	
     #Categorias
     # (r'^categorias/$', views.categorias_view),
     # (r'^categorias/(?P<grupo_id>\d+)/$', views.categorias_view),
@@ -55,13 +51,4 @@ urlpatterns = patterns('',
 
     (r'^cliente_search/', views.cliente_searchView),
     (r'^cliente_search/(?P<id>\d+)/', views.cliente_searchView),
-    
-
-    (r'^lineas_articulos/$', views.lineas_articulos_view),
-	# (r'^linea_articulos/$', views.linea_articulos_manageView),
-    (r'^linea_articulos/(?P<id>\d+)/', views.linea_articulos_manageView),
-    
-    (r'^grupos_lineas/$', views.grupos_lineas_view),
-    # (r'^grupo_lineas/$', views.grupo_lineas_manageView),
-    (r'^grupo_lineas/(?P<id>\d+)/', views.grupo_lineas_manageView),
 )

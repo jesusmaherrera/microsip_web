@@ -1,19 +1,6 @@
 from django.db import connections
 import datetime, time
-from microsip_web.apps.main.models import *
-
-def get_sigfolio_ve(tipo_docto= None, serie=None, connection_name = None ):
-    
-    consecutivo_row = first_or_none(FolioVenta.objects.filter(serie= serie, tipo_doc = tipo_docto))
-    consecutivo = ''
-    if consecutivo_row:
-        consecutivo = consecutivo_row.consecutivo 
-
-    folio = '%s%s'% (serie,("%09d" % int(consecutivo))[len(serie):]) 
-
-    consecutivo_row.consecutivo = consecutivo_row.consecutivo + 1
-    consecutivo_row.save()
-    return folio
+from microsip_web.libs.api.models import *
 
 def next_id(generator_name, connection_name = None):
     """ return next value of sequence """
@@ -48,6 +35,20 @@ def runsql_rows( sql = "", connection_name = "", params=[]):
 def first_or_none(query):  
     try:  
         return query.all()[0]  
+    except IndexError:
+        return None
+
+def firstALMACENid_or_none(query):  
+    try:  
+        id = query.all()[0].ALMACEN_ID
+        return id
+    except IndexError:
+        return None
+
+def firstid_or_none(query):  
+    try:  
+        id = query.all()[0].id
+        return id
     except IndexError:
         return None
         

@@ -13,7 +13,6 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-
 DATABASE_ROUTERS = ['microsip_web.libs.custom_db.databases_routers.MainRouter']
 MICROSIP_DATABASES = {}
 DATABASES = {
@@ -24,6 +23,7 @@ DATABASES = {
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ATOMIC_REQUESTS': True,
     },
 }
 try:
@@ -60,6 +60,7 @@ try:
                 'HOST': host,                      # Set to empty string for localhost. Not used with sqlite3.
                 'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
                 'OPTIONS' : {'charset':'ISO8859_1'},
+                'ATOMIC_REQUESTS': True,
             }
 
             for empresa in empresas_rows:                
@@ -76,6 +77,7 @@ try:
                         'HOST': host,                      # Set to empty string for localhost. Not used with sqlite3.
                         'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
                         'OPTIONS' : {'charset':'ISO8859_1'},
+                        'ATOMIC_REQUESTS': True,
                     }
 
                     DATABASES['%s-%s'%(conexion_id, empresa[0].replace(' ','_'))] = {
@@ -86,6 +88,7 @@ try:
                         'HOST': host,                      # Set to empty string for localhost. Not used with sqlite3.
                         'PORT': '3050',                      # Set to empty string for default. Not used with sqlite3.
                         'OPTIONS' : {'charset':'ISO8859_1'},
+                        'ATOMIC_REQUESTS': True,
                     }
             
 
@@ -162,12 +165,15 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'microsip_web.libs.custom_db.middleware.CustomerMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    # 'django.middleware.cache.CacheMiddleware',
+    'django.middleware.transaction.TransactionMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )

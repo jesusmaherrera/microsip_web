@@ -16,8 +16,19 @@ from microsip_web.libs.custom_db.main import next_id, get_existencias_articulo, 
 from microsip_web.libs.tools import split_seq
 from django.db import connections, transaction
 from microsip_web.libs.custom_db.main import get_conecctionname
-from microsip_web.apps.config.models import DerechoUsuario
+from microsip_web.libs.inventarios import ajustar_existencias
 
+from microsip_web.apps.config.models import DerechoUsuario
+from microsip_web.settings.local_settings import MICROSIP_MODULES
+
+@dajaxice_register( method = 'GET' )
+def aplicar_doctoin( request, **kwargs ):
+    doctoin_id = kwargs.get( 'doctoin_id', None )
+    documento = DoctosIn.objects.get(pk=doctoin_id)
+    documento.aplicado ='S'
+    documento.save()
+    return json.dumps( { 'msg' : 'ya'} )
+    
 def allow_microsipuser( username = None, clave_objeto=  None ):
     return DerechoUsuario.objects.filter(usuario__nombre = username, clave_objeto = clave_objeto).exists() or username == 'SYSDBA'
 
@@ -248,23 +259,7 @@ def get_seriesinventario_byarticulo( request, **kwargs ):
     
     return json.dumps( { 'series' : series, } ) 
 
-def ajustar_existencias( **kwargs ):
-    ''' Para ajustar un articulo a las unidades indicadas sin importar su existencia actual '''
-    #Paramentros
-    articulo_id = kwargs.get( 'articulo_id', None )
-    ajustar_a = kwargs.get( 'ajustar_a', None )
-    almacen = kwargs.get( 'almacen', None )
-    connection_name = kwargs.get( 'connection_name', None )
 
-    inv_fin = get_existencias_articulo(
-        articulo_id = articulo_id, 
-        connection_name = connection_name, 
-        fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
-        almacen = almacen, 
-        )
-
-    unidades_a_insertar = -inv_fin + ajustar_a
-    return unidades_a_insertar
 
 def add_existenciasarticulo_byajustes( **kwargs ):
     """ Para agregar existencia a un articulo por ajuste 
@@ -469,35 +464,18 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
     almacen_id = entrada.almacen.ALMACEN_ID
 
     ajustar_primerconteo = entrada.almacen.inventario_conajustes
-    #Para dos almacenes
-    entrada2_id = kwargs.get( 'entrada2_id', None )
-    salida2_id = kwargs.get( 'salida2_id', None )
-    almacen_sinventas = first_or_none( Almacenes.objects.filter( nombre = 'Almacen sin ventas' ))
-    if almacen_sinventas and entrada2_id and salida2_id:
-
-        add_existenciasarticulo_byajustes(
-        articulo_id = articulo_id,
-        entrada_id = entrada2_id,
-        salida_id = salida2_id,
-        detalle_unidades = detalle_unidades,
-        request_session = request.session,
-        request_user = request.user,
-        ubicacion = ubicacion,
-        almacen_id = almacen_sinventas.ALMACEN_ID,
-        ajustar_primerconteo = ajustar_primerconteo,
-        )
-
+    
     datos = add_existenciasarticulo_byajustes(
-        articulo_id = articulo_id,
-        entrada_id = entrada_id,
-        salida_id = salida_id,
-        detalle_unidades = detalle_unidades,
-        detalle_costo_unitario = detalle_costo_unitario,
-        request_session = request.session,
-        request_user = request.user,
-        ubicacion = ubicacion,
-        almacen_id = almacen_id,
-        ajustar_primerconteo = ajustar_primerconteo,
+            articulo_id = articulo_id,
+            entrada_id = entrada_id,
+            salida_id = salida_id,
+            detalle_unidades = detalle_unidades,
+            detalle_costo_unitario = detalle_costo_unitario,
+            request_session = request.session,
+            request_user = request.user,
+            ubicacion = ubicacion,
+            almacen_id = almacen_id,
+            ajustar_primerconteo = ajustar_primerconteo,
         )
 
 
@@ -719,6 +697,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     articulo_id = ''
     articulo_nombre = ''
     articulo_seguimiento = ''
+    costo_ultima_compra= ''
     clave_articulo = first_or_none( ClavesArticulos.objects.filter( clave = articulo_clave, articulo__estatus = 'A'))
     
     if clave_articulo:

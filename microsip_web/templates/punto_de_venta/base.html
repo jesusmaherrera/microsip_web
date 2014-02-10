@@ -6,9 +6,9 @@
 {% block modulestyle_css %}{% endblock %}
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
-{% block selected_module %}<a href="/punto_de_venta/ventas/"> <i class="msicon-punto_de_venta"></i> <label class="small_screen"> Punto de venta</label></a>{% endblock %}
+{% block selected_module %}<a href="/punto_de_venta/facturas/"> <i class="msicon-punto_de_venta"></i> <label class="small_screen"> Punto de venta</label></a>{% endblock %}
 {% block btn_modulo_punto_venta %}
-  <li style='color: #555555; background-color: #e5e5e5;'><a href="/punto_de_venta/ventas/"> <i class="msicon-punto_de_venta"></i><label class='small_screen'> Punto de venta</label></a></li>
+  <li style='color: #555555; background-color: #e5e5e5;'><a href="/punto_de_venta/facturas/"> <i class="msicon-punto_de_venta"></i><label class='small_screen'> Punto de venta</label></a></li>
 {% endblock %}
 
 {% block breadcrumb %}{{ block.super }} Punto de venta <i class=' icon-play'></i>{% endblock %}
@@ -19,8 +19,8 @@
     <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-folder-close"></i> 
       <span class="hidden-phone">Documentos</span> <b class="caret"></b></a>
     <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-      <li><a tabindex="-1" href="/punto_de_venta/ventas/"><i class="icon-shopping-cart"></i> Ventas de mostrador</a></li>
-      <li><a tabindex="-1" href="/punto_de_venta/devoluciones/"><i class="icon-remove"></i> Devoluciones de ventas</a></li>
+      <!-- <li><a tabindex="-1" href="/punto_de_venta/ventas/"><i class="icon-shopping-cart"></i> Ventas de mostrador</a></li>
+      <li><a tabindex="-1" href="/punto_de_venta/devoluciones/"><i class="icon-remove"></i> Devoluciones de ventas</a></li> -->
       <li><a tabindex="-1" href="/punto_de_venta/facturas/"><i class="icon-qrcode"></i> Facturas</a></li>
     </ul>
   </li>
@@ -28,8 +28,8 @@
     <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-barcode"></i> <span class="hidden-phone">Articulos</span> <b class="caret"></b></a>
     <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
       <li><a tabindex="-1" href="/punto_de_venta/articulos/"><i class="icon-barcode"></i> Articulos</a></li>
-      <li><a tabindex="-1" href="/punto_de_venta/lineas_articulos/"><i class="icon-tasks"></i> Lineas</a></li>
-      <li><a tabindex="-1" href="/punto_de_venta/grupos_lineas/"><i class="icon-globe"></i> Grupos</a></li>
+      <li><a tabindex="-1" href="/punto_de_venta/lineas/"><i class="icon-tasks"></i> Lineas</a></li>
+      <li><a tabindex="-1" href="/punto_de_venta/grupos/"><i class="icon-globe"></i> Grupos</a></li>
     </ul>
   </li>
   <li class="dropdown">
@@ -40,11 +40,28 @@
       <li><a tabindex="-1" href="/punto_de_venta/tipos_cliente/"><i class="icon-folder-open"></i> Tipos Clientes</a></li>
     </ul>
   </li>
+  <li class="dropdown">
+    <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> 
+      <i class="icon-list-alt"></i> <span class="hidden-phone">Listas</span> <b class="caret"></b></a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+      <li><a tabindex="-1" href="/punto_de_venta/impuestos/"><i class="icon-tag"></i> Impuestos</a></li>
+    </ul>
+  </li>
+  <li class="dropdown">
+    <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> 
+      <i class="icon-th"></i> <span class="hidden-phone">Otros</span> <b class="caret"></b></a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+      <li><a tabindex="-1" href="/punto_de_venta/ciudades/"><i class="icon-road"></i> Ciudades</a></li>
+      <li><a tabindex="-1" href="/punto_de_venta/estados/"><i class="icon-flag"></i> Estados</a></li>
+      <li><a tabindex="-1" href="/punto_de_venta/paises/"><i class="icon-globe"></i> Paises</a></li>
+    </ul>
+  </li>
   </ul>
   <ul class="nav pull-right">
     <li class="dropdown">
       <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i> <span class="hidden-phone">Herramientas</span> <b class="caret"></b></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+        <li><a tabindex="-1" href="/punto_de_venta/PreferenciasEmpresa/"><i class="icon-cog"></i> Preferencias de la empresa</a></li>
         {% generar_polizas_tag 'generar_polizas'%}
         {% if request.user.username == 'SYSDBA' %}
           {% puntos_tag 'generar_tarjetas' %}

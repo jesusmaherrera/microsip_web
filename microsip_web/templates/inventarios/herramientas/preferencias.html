@@ -1,4 +1,5 @@
 {% extends "inventarios/base.html" %}
+{% block title %}Preferencias{% endblock %}
 
 <!-- CSS Code -->
 {% block style_css %}{% endblock %}
@@ -6,27 +7,28 @@
 <!-- JavaScript Code -->
 {% block js_code %}
 {% endblock %}
-
-{% block breadcrumb %}{{ block.super }}Inventarios fisicos{% endblock %}
+{% block breadcrumb %}{{ block.super }} Preferencias{% endblock %}
 {% block content %}
-{% if msg %}
-<div class="alert alert-success fade in">
-  <button type="button" class="close" data-dismiss="alert">×</button>
-  <strong>{{ msg }}</strong> 
-</div>
-{% endif %}
-
-
-<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
-  <div class="ms-custom-form container-fluid hidden-phone">
-    <div class="row-fluid">
-      <div class="span3"><h3>Preferencias</h3></div>
-      <div class="span8" style=" margin-top: 15px; ">
-        <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
-      </div>
+<form method="post" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+  
+  {% if msg %}
+  <div class="alert alert-success fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>Bien hecho!!</strong> {{ msg }}
+  </div>
+  {% endif %}
+  <div class="row-fluid">
+    <h3 class="span3" style='margin:0;'> Prefernecias  </h3> 
+    <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
+  </div>
+  <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
+    <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+  </ul>
+  <div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="general" style="padding-bottom: 0;">
+      
     </div>
   </div>
-  
 </form>
-<br>
+
 {% endblock %}

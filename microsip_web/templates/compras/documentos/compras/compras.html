@@ -1,0 +1,60 @@
+{% extends "compras/base.html" %}
+{% block title %}Compras{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+  <script src="{{STATIC_URL}}js/compras/documentos.compras.js"></script>
+{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Compras {% endblock %}
+{% block content %}
+<div class="row-fluid">
+  <div class="span3"><h3 style="margin:0;"> Compras</h3> </div>
+  <!-- <a href="/compras/compra/" class="btn"> Nueva</a> -->
+</div>
+<table class="table tableCell table-hover">
+    <tr>
+      <th>Folio</th>
+      <th>Fecha</th>
+      <th>Proveedor</th>
+      <th></th>
+    </tr>
+    {% for compra in compras %}
+    <tr>
+      <td>
+        {% if compra.estado = "C" %}
+        <a href="/compras/compra/C/{{ compra.id }}/" class="text-error" >{{ compra.folio }}</a>
+        {% else %}
+        <a href="/compras/compra/C/{{ compra.id }}/" >{{ compra.folio }}</a>
+        {% endif %}
+      </td>
+      <td>{{ compra.fecha }}</td>
+      <td> {{ compra.proveedor.nombre }} </td>
+      <td>
+        <input type="hidden" value="{{ compra.id }}" class='documento_id'>
+        {% if compra.aplicado == 'N' %} <a href="" class="btn aplicar_btn">Aplicar</a> {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if compras.has_previous %}
+        <li><a href="?page={{ compras.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ compras.number }} de {{ compras.paginator.num_pages }}.</a></li>
+        {% if compras.has_next %}
+        <li><a href="?page={{ compras.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

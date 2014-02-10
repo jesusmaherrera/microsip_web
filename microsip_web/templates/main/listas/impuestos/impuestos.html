@@ -1,0 +1,44 @@
+{% extends extend %}
+{% block title %}Impuestos{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Impuestos {% endblock %}
+{% block content %}
+
+<div class="row-fluid">
+	<div class="span3"><h3 style="margin:0;"> Impuestos</h3> </div>
+    <a href="/{{ modulo }}/impuesto/" class="btn"> Nuevo</a>
+</div>
+
+<table class="table tableCell table-hover">
+    <tr>
+      <th>Nombre</th>    </tr>
+    {% for impuesto in impuestos%}
+    <tr>
+      <td><a href="/{{ modulo }}/impuesto/{{ impuesto.id }}/">{{ impuesto.nombre }}</a></td>
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if impuestos.has_previous %}
+        <li><a href="?page={{ impuestos.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ impuestos.number }} de {{ impuestos.paginator.num_pages }}.</a></li>
+        {% if impuestos.has_next %}
+        <li><a href="?page={{ impuestos.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

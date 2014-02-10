@@ -1,5 +1,32 @@
 from django.db import models
 
+class Configuracion(models.Model):
+    id = models.AutoField(primary_key=True, db_column='ELEMENTO_ID')
+    nombre = models.CharField(max_length=100, db_column='NOMBRE')
+    tipo = models.CharField(max_length=1, db_column='TIPO')
+    padre = models.ForeignKey('self', related_name='padre_a', db_column='PADRE_ID')
+    valor = models.CharField(default='', blank = True, null = True, max_length=100, db_column='VALOR')
+    
+    def save(self, *args, **kwargs):
+        if not self.id:
+            using = kwargs.get('using', None)
+            using = using or router.db_for_write(self.__class__, instance=self)
+            self.id = next_id('ID_CATALOGOS', using)
+
+        super(Configuracion, self).save(*args, **kwargs)
+
+    def get_value(self):
+        if self.valor == '':
+            return None
+        return self.valor
+
+    def __unicode__(self):
+        return u'%s' % self.nombre
+
+    class Meta:
+        db_table = u'registry'
+
+
 class Usuario(models.Model):
     id = models.AutoField(primary_key=True, db_column='USUARIO_ID')
     nombre = models.CharField(max_length=100, db_column='NOMBRE')

@@ -1,4 +1,5 @@
 {% extends "punto_de_venta/base.html" %}
+{% load punto_de_venta_tags %}
 {% block title %}Preferencias{% endblock %}
 
 <!-- CSS Code -->
@@ -10,119 +11,100 @@
 {% endblock %}
 {% block breadcrumb %}{{ block.super }} Preferencias de la Empresa {% endblock %}
 {% block content %}
- <form method="post" action="" width="300px"  enctype='multipart/form-data'>
+ <form method="post" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+{{ form.errors }}
+{{ preferencias_generalform.errors }}
 {% if msg %}
-<div class="alert alert-block fade in">
+<div class="alert alert-success fade in">
     <button type="button" class="close" data-dismiss="alert">×</button>
-    <strong>{{ msg }}</strong> 
+    <strong>Bien hecho!!</strong> {{ msg }}
 </div>
 {% endif %}
-<div class="ms-custom-form container-fluid" >
-  <div class="row-fluid">
-      <div class="span3"><h3>Preferencias</h3></div>
-    <div class='span8' style=" margin-top: 1em; ">  
-      <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
-    </div>
-  </div>
+<div class="row-fluid">
+  <h3 class="span3" style='margin:0;'> Prefernecias  </h3> 
+  <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
 </div>
-<div class="form-actions">
-  <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
-    <li class=""><a href="#general" data-toggle="tab">General</a></li>
-    <li class="active"><a href="#informacionContable" data-toggle="tab">Informacion Contable</a></li>
-    <li class="dropdown">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown">Mas <b class="caret"></b></a>
-      <ul class="dropdown-menu">
-        <li class=""><a href="#dropdown1" data-toggle="tab">@Algo mas..</a></li>
-      </ul>
-    </li>
-  </ul>
-  <div id="myTabContent" class="tab-content">
-    <div class="tab-pane fade " id="general">
-      <p>DATOS DE CONFIGURACION GENERAL</p>
-    </div>
-    <div class="tab-pane fade active in" id="informacionContable">
-     
-      {% csrf_token %}
-        {{ form.errors }}
-        <fieldset>
-          <legend>Tipos de polizas</legend>
-            <div class="span4" style='clear:both;'>
-              <label>Pólizas de ventas de mostrador:</label>
-              <div class="input-prepend input-append">
-                {{ form_reg.tipo_poliza_ventas }}
-              </div>
-            </div>
-            <div class="span4">
-              <label>Pólizas de devoluciones de mostrador:</label>
-              <div class="input-prepend input-append">
-                {{ form_reg.tipo_poliza_devol }} 
-              </div>
-            </div>
-            <div class="span4">
-              <label>Pólizas de cobros de cuentas por cobrar:</label>
-              <div class="input-prepend input-append">
-                {{ form_reg.tipo_poliza_cobros_cc }}
-              </div>
-            </div>
-          </fieldset>
-          <br>
-          <fieldset>
-          <legend></legend>
-          <div class="span4" >
-            <label>Condicion de pago de CONTADO</label>
-            <div class="input-prepend input-append">
-              {{ form.condicion_pago_contado }}
-            </div>
-          </div>
-          </fieldset>
-          <fieldset>
-          <legend>Plantillas Polizas:     
-            <a href='/punto_de_venta/plantilla_poliza/' class="btn btn-success btn-mini"/><i class="icon-plus-sign"></i> Nueva Plantilla</a>
-          </legend>
-          <table class="table tableCell table-hover" border="0" cellpadding="0" cellspacing="2">
-            <tbody>
-              {% for plantilla in plantillas %}
-              <div id="myModal{{ plantilla.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                  <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
-                </div>
-                <div class="modal-body">
-                  <h4>Al eliminar la plantilla {{ plantilla.nombre }}</h4>
-                  <p style="color:red;">Ya no sera posible recuperar sus datos </p>
-                </div>
-                <div class="modal-footer">
-                  <button class="btn" data-dismiss="modal">Cancelar</button>
-                  <a href="/punto_de_venta/plantilla_poliza/eliminar/{{ plantilla.id }}/" class="btn btn-primary">Estoy Seguro</a>
-                </div>
-              </div>
-                <tr>
-                  <td><a href="/punto_de_venta/plantilla_poliza/{{ plantilla.id }}">{{ plantilla.nombre }}</a></td>
-                  <td style="text-align:center;">
-                    <a href='#myModal{{ plantilla.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
-                  </td>
-                </tr>
-                
-              {% endfor %}
-            </tbody>
-          </table>
-        </fieldset>
-
-        <!-- <div class="span2">
-          <label>.</label>
-          <div class="btn-group">
-            <input type="submit" class="btn btn-primary"  data-loading-text="Guardando..." value='Guardar'/>
-          </div>
-        </div> -->
+<ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
+  <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+  {% informacion_contable_tab %}
+</ul>
+<div id="myTabContent" class="tab-content">
+  <div class="tab-pane fade active in" id="general" style="padding-bottom: 0;">
+    <fieldset>
+      <legend>Otros</legend> 
+      <div class='span4'>
+          <strong> Articulo general (Factura global)</strong> {{ preferencias_generalform.articulo_general }}
       </div>
-    <div class="tab-pane fade" id="dropdown1">
-      <p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh mi whatever gluten-free, carles pitchfork biodiesel fixie etsy retro mlkshk vice blog. Scenester cred you probably haven't heard of them, vinyl craft beer blog stumptown. Pitchfork sustainable tofu synth chambray yr.</p>
-    </div>
-    <div class="tab-pane fade" id="dropdown2">
-      <p>Trust fund seitan letterpress, keytar raw denim keffiyeh etsy art party before they sold out master cleanse gluten-free squid scenester freegan cosby sweater. Fanny pack portland seitan DIY, art party locavore wolf cliche high life echo park Austin. Cred vinyl keffiyeh DIY salvia PBR, banh mi before they sold out farm-to-table VHS viral locavore cosby sweater. Lomo wolf viral, mustache readymade thundercats keffiyeh craft beer marfa ethical. Wolf salvia freegan, sartorial keffiyeh echo park vegan.</p>
-    </div>
+    </fieldset>
+  </div>
+  <div class="tab-pane fade " id="informacion_contable">  
+    <fieldset>
+      <legend>Tipos de polizas</legend>
+        <div class="span4" style='clear:both;'>
+          <strong>Pólizas de ventas de mostrador</strong>
+          <div class="input-prepend input-append">
+            {{ form_reg.tipo_poliza_ventas }}
+          </div>
+        </div>
+        <div class="span4">
+          <strong>Pólizas de devoluciones de mostrador</strong>
+          <div class="input-prepend input-append">
+            {{ form_reg.tipo_poliza_devol }} 
+          </div>
+        </div>
+        <div class="span4">
+          <strong>Pólizas de cobros de cuentas por cobrar</strong>
+          <div class="input-prepend input-append">
+            {{ form_reg.tipo_poliza_cobros_cc }}
+          </div>
+        </div>
+      </fieldset>
+      <br>
+      <fieldset>
+      <legend></legend>
+      <div class="span4" >
+        <strong>Condicion de pago de CONTADO</strong>
+        <div class="input-prepend input-append">
+          {{ form.condicion_pago_contado }}
+        </div>
+      </div>
+      </fieldset>
+      <fieldset>
+      <legend>Plantillas Polizas:     
+        <a href='/punto_de_venta/plantilla_poliza/' class="btn btn-success btn-mini"/><i class="icon-plus-sign"></i> Nueva Plantilla</a>
+      </legend>
+      <table class="table tableCell table-hover" border="0" cellpadding="0" cellspacing="2">
+        <tbody>
+          {% for plantilla in plantillas %}
+          <div id="myModal{{ plantilla.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
+            </div>
+            <div class="modal-body">
+              <h4>Al eliminar la plantilla {{ plantilla.nombre }}</h4>
+              <p style="color:red;">Ya no sera posible recuperar sus datos </p>
+            </div>
+            <div class="modal-footer">
+              <button class="btn" data-dismiss="modal">Cancelar</button>
+              <a href="/punto_de_venta/plantilla_poliza/eliminar/{{ plantilla.id }}/" class="btn btn-primary">Estoy Seguro</a>
+            </div>
+          </div>
+            <tr>
+              <td><a href="/punto_de_venta/plantilla_poliza/{{ plantilla.id }}">{{ plantilla.nombre }}</a></td>
+              <td style="text-align:center;">
+                <a href='#myModal{{ plantilla.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
+              </td>
+            </tr>
+            
+          {% endfor %}
+        </tbody>
+      </table>
+    </fieldset>
   </div>
 </div>
+
+
 </form>
 
 {% endblock %}

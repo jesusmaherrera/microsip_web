@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Compras{% endblock %}
+
+<!-- CSS Code -->
+{% block modulestyle_css %}
+
+{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+{% block selected_module %}
+  <a href="/compras/"> <i class="msicon-compras"></i> <label class="small_screen"> Compras</label></a>
+{% endblock %}
+{% block btn_modulo_compras%}
+<li style='color: #555555; background-color: #e5e5e5;'><a href="/compras/ordenes" > <i class="msicon-compras"></i><label class='small_screen'> Compras</label></a></li>
+{% endblock %}
+{% block breadcrumb %}{{ block.super }} Compras <i class=' icon-play'></i> {% endblock %}
+{% block tools-module %}
+<div class="navbar navbar-static">
+  <ul class="nav" role="navigation">
+    <li class="dropdown">
+      <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-folder-close"></i>  
+        Documentos <b class="caret"></b></a>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+        <li><a tabindex="-1" href="/compras/compras/"> <i class="icon-shopping-cart"></i> Compras</a></li>
+        <li><a tabindex="-1" href="/compras/ordenes/"> <i class="icon-edit"></i> Ordenes Compras</a></li>
+      </ul>
+    </li>
+  </ul>
+  <ul class="nav pull-right">
+   <!--  <li class="dropdown">
+      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i> Herramientas <b class="caret"></b></a>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+        <li role="presentation" class="divider"></li>
+        <li><a tabindex="-1" href="#"><i class="icon-cog"></i> Preferencias</a></li>
+      </ul>
+    </li> -->
+  </ul>
+</div>
+{% endblock %}
+{% block content %}
+{% endblock %}

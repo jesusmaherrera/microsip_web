@@ -1,5 +1,5 @@
 from django.db import models
-from microsip_web.apps.main.models import *
+from microsip_web.libs.api.models import *
 
 
 

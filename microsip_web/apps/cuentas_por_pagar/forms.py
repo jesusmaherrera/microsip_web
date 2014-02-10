@@ -41,7 +41,9 @@ class PlantillaPolizaManageForm(forms.ModelForm):
 class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
     posicion        =  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
     asiento_ingora  = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
-    
+    cuenta_co = forms.ModelChoiceField(CuentaCo.objects.all(), 
+        widget=autocomplete_light.ChoiceWidget('CuentaCoAutocomplete'))
+
     def __init__(self, *args, **kwargs):
         super(ConceptoPlantillaPolizaManageForm, self).__init__(*args, **kwargs)
         self.fields['tipo'].widget.attrs['class'] = 'input-small'
@@ -50,7 +52,6 @@ class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
         self.fields['valor_contado_credito'].widget.attrs['class'] = 'input-small'
 
     class Meta:
-        widgets = autocomplete_light.get_widgets_dict(DetallePlantillaPolizas_CP)
         model = DetallePlantillaPolizas_CP
 
     def clean_cuenta_co(self):

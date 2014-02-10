@@ -1,0 +1,64 @@
+{% extends extend %}
+{% block title %}Estado{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} <a href="/{{ modulo }}/estados/">Estados</a> <i class=" icon-play"></i> Estado{% endblock %}
+{% block content %}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+  <div class="row-fluid">
+    <div class="span3"><h3 style="margin:0;"> Estado</h3> </div>
+    <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
+  </div>
+  {{ form.errors }}
+  {% if message %}
+  <div class="alert alert-block alert-error fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <h4 class="alert-heading">Oh NO! Ocurio un error!</h4>
+    <p>{{ message }}</p>
+  </div>
+  {% endif %}
+  <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
+    <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+  </ul>
+  <div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="general" style="padding-bottom: 0;">
+      
+        <div class="fluid" >
+          <label>Nombre</label>
+          <div class="input-prepend input-append">
+            {{ form.nombre }}
+          </div>
+        </div>
+        <div class="fluid" >
+          <label>Nombre abreviado</label>
+          <div class="input-prepend input-append">
+            {{ form.nombre_abreviado }}
+          </div>
+        </div>
+        <div class="fluid">
+          <label>
+            Pais 
+            <a href="/{{modulo}}/pais/" target="_blank" style="vertical-align: middle;" onClick="window.open(this.href, this.target, 'width=850,height=600,top=200px,left=300px'); return false;"><i class="icon-plus-sign"></i></a> 
+          </label>
+          <div class="input-prepend input-append">
+            {{ form.pais }}
+          </div>
+        </div>
+        <div class="fluid">
+          <label>Es predeterminado</label>
+          <div class="input-prepend input-append">
+            {{ form.es_predet }}
+          </div>
+        </div>
+      <br>
+    </div>
+  </div>
+  
+  <br style='clear:both;'>
+</form>
+{% endblock %}

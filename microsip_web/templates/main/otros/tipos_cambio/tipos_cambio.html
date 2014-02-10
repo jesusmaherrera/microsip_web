@@ -1,0 +1,53 @@
+{% extends extend %}
+{% block title %}Tipos de cambio{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Tipos de camnbio {% endblock %}
+{% block content %}
+
+<div class="row-fluid">
+	<div class="span3"><h3 style="margin:0;"> Tipos de camnbio</h3> </div>
+    <a href="/{{ modulo }}/tipo_cambio/" class="btn"> Nuevo</a>
+</div>
+
+<table class="table tableCell table-hover">
+    <tr>
+      <th>Fecha</th>
+      <th>Moneda</th>
+      <th>Tipo de cambio</th>
+      <th>creador</th>
+    </tr>
+    {% for tipo_cambio in tipos_cambio %}
+    <tr>
+      <td>{{ tipo_cambio.fecha }}</td>
+      <td>
+        <a href="/{{ modulo }}/tipo_cambio/{{ tipo_cambio.id }}/">{{ tipo_cambio.moneda }}</a>
+      </td>
+      <td>{{ tipo_cambio.tipo_cambio }}</td>
+      <td>{{ tipo_cambio.usuario_creador}}</td>
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if tipos_cambio.has_previous %}
+        <li><a href="?page={{ tipos_cambio.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ tipos_cambio.number }} de {{ tipos_cambio.paginator.num_pages }}.</a></li>
+        {% if tipos_cambio.has_next %}
+        <li><a href="?page={{ tipos_cambio.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

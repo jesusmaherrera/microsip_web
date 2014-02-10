@@ -27,6 +27,10 @@ from mobi.decorators import detect_mobile
 from models import *
 from forms import *
 from microsip_web.libs.custom_db.main import next_id, get_existencias_articulo, runsql_rows, get_conecctionname, first_or_none
+from microsip_web.libs.inventarios import ajustes_get_or_create
+
+from microsip_web.settings.local_settings import MICROSIP_MODULES
+
 from microsip_web.libs.tools import split_seq
 from triggers import triggers
 from microsip_web.apps.config.models import *
@@ -35,11 +39,6 @@ from microsip_web.settings.common import MICROSIP_DATABASES, DATABASES
 from django.db.models import Sum
 from microsip_web.apps.config.models import DerechoUsuario
 
-def preferencias_manageview(request, template_name = 'inventarios/herramientas/preferencias.html'):
-    msg = ''
-    c = {'msg': msg,}
-    return render_to_response( template_name, c, context_instance = RequestContext( request ) )
-
 def abrir_inventario_byalmacen(request, almacen_id, template_name = 'inventarios/almacenes/abrir_inventario.html'):
     almacen = Almacenes.objects.get( pk = almacen_id )
     almacenform = almacen_inventariando_form(request.POST or None, instance=  almacen)
@@ -47,7 +46,7 @@ def abrir_inventario_byalmacen(request, almacen_id, template_name = 'inventarios
     if almacenform.is_valid():
         almacen_form = almacenform.save(commit= False)
         almacen_form.inventariando = True
-        almacen_form.save()
+        almacen_form.save(update_fields=['inventariando','inventario_conajustes', 'inventario_modifcostos',])
         
         return HttpResponseRedirect( '/inventarios/almacenes/' )
     c = { 'form': almacenform, 'almacen_nombre': almacen.nombre, }
@@ -131,11 +130,14 @@ def ArticuloManageView(request, id, template_name='inventarios/articulos/articul
 
         return HttpResponseRedirect('/inventarios/articulos/')
 
+    extend = 'inventarios/base.html'
+
     c = {
         'articulo_form':articulo_form,
         'precios_formset':precios_formset,
         'impuesto_articulo_form':impuesto_articulo_form,
         'formset':formset,
+        'extend':extend,
     } 
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
@@ -215,64 +217,6 @@ def c_get_next_key(connection_name = None ):
 ##                                      ##
 ##########################################
 
-def ajustes_get_or_create( almacen_id = None, connection_name = None, username = '' ):
-    ''' Funcion obtener o crear documentos de entrada y salida para trabajar ccon inventario por ajustes'''
-
-    fecha_actual = datetime.now()
-    almacen = Almacenes.objects.get( pk = almacen_id )
-    conecpto_ajuste_salida = ConceptosIn.objects.get( pk = 38 )
-    conecpto_ajuste_entrada = ConceptosIn.objects.get( pk = 27 )
-    folio = '' 
-
-    #salida
-    try:
-        salida = DoctosIn.objects.get( descripcion = 'ES INVENTARIO', cancelado= 'N', concepto = 38, almacen = almacen,  fecha =  fecha_actual )
-    except ObjectDoesNotExist:
-        if conecpto_ajuste_salida.folio_autom == 'S':
-            sig_folio = int(conecpto_ajuste_salida.sig_folio) + 1
-            folio = ("%09d" % int(conecpto_ajuste_salida.sig_folio))
-            conecpto_ajuste_salida.sig_folio = ("%09d" % sig_folio)
-            conecpto_ajuste_salida.save()
-
-        salida = DoctosIn(
-            id = next_id( 'ID_DOCTOS', connection_name ), 
-            folio = folio,
-            almacen =  almacen,
-            concepto = conecpto_ajuste_salida,
-            naturaleza_concepto = 'S',
-            fecha = fecha_actual,
-            sistema_origen = 'IN',
-            usuario_creador = username,
-            descripcion = 'ES INVENTARIO',
-             )
-        salida.save()
-
-    #salida
-    try:
-        entrada = DoctosIn.objects.get( descripcion = 'ES INVENTARIO', cancelado= 'N', concepto = 27, almacen = almacen, fecha = fecha_actual )
-    except ObjectDoesNotExist:
-        if conecpto_ajuste_entrada.folio_autom == 'S':
-            sig_folio = int(conecpto_ajuste_entrada.sig_folio) + 1
-            folio = ("%09d" % int(conecpto_ajuste_entrada.sig_folio))
-            conecpto_ajuste_entrada.sig_folio = ("%09d" % sig_folio)
-            conecpto_ajuste_entrada.save()
-
-        entrada = DoctosIn(
-            id = next_id( 'ID_DOCTOS', connection_name ), 
-            folio = folio,
-            almacen =  almacen,
-            concepto = conecpto_ajuste_entrada,
-            naturaleza_concepto = 'E',
-            fecha = fecha_actual,
-            sistema_origen = 'IN',
-            usuario_creador = username,
-            descripcion = 'ES INVENTARIO',
-             )
-
-        entrada.save()
-
-    return entrada, salida
-
 def allow_microsipuser( username = None, clave_objeto=  None ):
     ''' Checa si el usuario indicado tiene el pribilegio indicado '''
 
@@ -286,15 +230,7 @@ def invetariofisico_manageview( request, almacen_id = None, template_name = 'inv
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
     almacen = Almacenes.objects.get(pk=almacen_id)
-    entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, connection_name = connection_name, username = request.user.username)
-
-    almacen_sinventas = first_or_none( Almacenes.objects.filter( nombre = 'Almacen sin ventas' ))
-
-    entrada2_id, salida2_id = None, None
-    if almacen_sinventas:
-        entrada2, salida2 = ajustes_get_or_create(almacen_id = almacen_sinventas.ALMACEN_ID, connection_name = connection_name, username = request.user.username)
-        entrada2_id = entrada2.id 
-        salida2_id = salida2.id
+    entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, username = request.user.username)
     
     puede_modificar_costos = allow_microsipuser( username = request.user.username, clave_objeto = 469) and almacen.inventario_modifcostos
     form = DoctoInDetManageForm( request.POST or None )
@@ -341,8 +277,6 @@ def invetariofisico_manageview( request, almacen_id = None, template_name = 'inv
         'folio_salida': salida.folio, 
         'entrada_id' : entrada.id,
         'salida_id' : salida.id,
-        'entrada2_id' : entrada2_id,
-        'salida2_id' : salida2_id,
         'is_mobile' : False,
         }
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
@@ -353,7 +287,7 @@ def invetariofisicomobile_manageView( request, almacen_id = None, template_name 
     connection_name = get_conecctionname(request.session)
     form = DoctoInDetManageForm( request.POST or None )
 
-    entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, connection_name = connection_name, username = request.user.username)
+    entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, username = request.user.username)
     puede_modificar_costos = allow_microsipuser( username = request.user.username, clave_objeto = 469)
 
     c = { 
@@ -419,7 +353,7 @@ def invetarioFisico_delete( request, id = None ):
 
 @login_required( login_url = '/login/' )
 def entradas_View( request, template_name = 'inventarios/Entradas/entradas.html' ):
-    entradas_list = DoctosIn.objects.filter( naturaleza_concepto = 'E' ).order_by( '-fecha' ) 
+    entradas_list = DoctosIn.objects.filter( naturaleza_concepto = 'E' ).order_by( '-id' ) 
 
     paginator = Paginator( entradas_list, 15 ) # Muestra 5 inventarios por pagina
     page = request.GET.get( 'page' )
@@ -437,52 +371,70 @@ def entradas_View( request, template_name = 'inventarios/Entradas/entradas.html'
     c = { 'entradas' : entradas }
     return render_to_response( template_name, c, context_instance=RequestContext( request ) )
 
+def recalcular_saldos_articulo( articulo_id, connection_name=None):
+    ''' Funcion recalcular los saldos del articulo del detalle '''
+    c = connections[ connection_name ].cursor()
+    c.execute( "DELETE FROM SALDOS_IN where saldos_in.articulo_id = %s;"% articulo_id )
+    c.execute( "EXECUTE PROCEDURE RECALC_SALDOS_ART_IN %s;"% articulo_id )
+    transaction.commit_unless_managed()
+    management.call_command( 'syncdb', database = connection_name )
+
 @login_required( login_url='/login/' )
 def entrada_manageView( request, id = None, template_name='inventarios/Entradas/entrada.html' ):
-    message = ''
     connection_name = get_conecctionname(request.session)
+    message = ''
+    nuevo = False
     hay_repetido = False
     if id:
         Entrada = get_object_or_404( DoctosIn, pk = id )
     else:
         Entrada = DoctosIn()
-
-    if request.method == 'POST':
-        Entrada_form = EntradaManageForm( request.POST, request.FILES, instance = Entrada )
-        #GUARDA CAMBIOS EN INVENTARIO FISICO
+    
+    initial_entrada = None
+    if id:
+        Entrada_items = doctoIn_items_formset(DoctosInDetManageForm, extra=0, can_delete=True)
+    else:
+        initial_entrada = { 'fecha': datetime.now(),}
         Entrada_items = doctoIn_items_formset(DoctosInDetManageForm, extra=1, can_delete=True)
-        EntradaItems_formset = Entrada_items(request.POST, request.FILES, instance=Entrada)
-        
-        if Entrada_form.is_valid() and EntradaItems_formset.is_valid():
-            Entrada = Entrada_form.save(commit = False)
 
-            #CARGA NUEVO ID
-            if not Entrada.id:
-                Entrada.id = next_id( 'ID_DOCTOS', connection_name ),
-                Entrada.naturaleza_concepto = 'E'
-            
+    Entrada_form = EntradaManageForm( request.POST or None, instance = Entrada, initial = initial_entrada )
+    EntradaItems_formset = Entrada_items(request.POST or None, instance=Entrada)
+
+    if Entrada_form.is_valid() and EntradaItems_formset.is_valid():
+        Entrada = Entrada_form.save(commit = False)
+        #CARGA NUEVO ID
+        if not Entrada.id:
+            Entrada.naturaleza_concepto = 'E'
+            Entrada.aplicado ='N'
+            Entrada.save()
+            nuevo = True
+        else:
+            Entrada.aplicado ='S'
             Entrada.save()
 
-            #GUARDA ARTICULOS DE INVENTARIO FISICO
-            for articulo_form in EntradaItems_formset:
-                DetalleEntrada = articulo_form.save(commit = False)
-                #PARA CREAR UNO NUEVO
-                if not DetalleEntrada.id:
-                    DetalleEntrada.id = -1
-                    DetalleEntrada.almacen = Entrada.almacen
-                    DetalleEntrada.concepto = Entrada.concepto
-                    DetalleEntrada.docto_invfis = Entrada
-            
-            EntradaItems_formset.save()
-            return HttpResponseRedirect('/entradas/')
-    else:
-        Entrada_items = doctoIn_items_formset(DoctosInDetManageForm, extra=1, can_delete=True)
-        Entrada_form= EntradaManageForm(instance=Entrada)
-        EntradaItems_formset = Entrada_items(instance=Entrada)
+        articulos_recalculo = []
+        #GUARDA ARTICULOS DE INVENTARIO FISICO
+        for articulo_form in EntradaItems_formset:
+            DetalleEntrada = articulo_form.save(commit = False)
+            #PARA CREAR UNO NUEVO
+            if not DetalleEntrada.id:
+                DetalleEntrada.id = -1
+                DetalleEntrada.almacen = Entrada.almacen
+                DetalleEntrada.concepto = Entrada.concepto
+                DetalleEntrada.doctosIn = Entrada
+            articulos_recalculo.append(DetalleEntrada.articulo.id)
+
+        EntradaItems_formset.save()
+
+        if not nuevo:
+            for articulo_id in articulos_recalculo:
+                recalcular_saldos_articulo(articulo_id, connection_name)
+
+        return HttpResponseRedirect('/inventarios/entradas')
     
     c = {'Entrada_form': Entrada_form, 'formset': EntradaItems_formset, 'message':message,}
-
     return render_to_response(template_name, c, context_instance=RequestContext(request))
+
 
 @login_required(login_url='/login/')
 def entrada_delete(request, id = None):

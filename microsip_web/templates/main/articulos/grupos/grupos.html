@@ -1,0 +1,43 @@
+{% extends extend %}
+{% block title %}Grupos Lineas{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Grupos_lineas {% endblock %}
+{% block content %}
+
+<div class="row-fluid">
+  <div class="span3"><h3 style="margin:0;"> Grupos</h3> </div>
+</div>
+<table class="table tableCell table-hover">
+    <tr>
+      <th>Nombre</th>
+    </tr>
+    {% for grupo_lineas in grupos_lineas%}
+    <tr>
+      <td><a href="/{{ modulo }}/grupo/{{ grupo_lineas.id }}/">{{ grupo_lineas.nombre }}</a></td>
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if grupos_lineas.has_previous %}
+        <li><a href="?page={{ grupos_lineas.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ grupos_lineas.number }} de {{ grupos_lineas.paginator.num_pages }}.</a></li>
+        {% if grupos_lineas.has_next %}
+        <li><a href="?page={{ grupos_lineas.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

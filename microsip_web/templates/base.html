@@ -49,9 +49,11 @@
             {% block btn_modulo_cuentas_por_pagar %}
               {% microsip_module_btn 'microsip_web.apps.cuentas_por_pagar' %}
             {% endblock %}
-
-            {% microsip_module_btn 'microsip_web.apps.compras' %}
             
+            {% block btn_modulo_compras %}
+              {% microsip_module_btn 'microsip_web.apps.compras' %}
+            {% endblock %}
+
             {% block btn_modulo_punto_venta %}
               {% microsip_module_btn 'microsip_web.apps.punto_de_venta' %}
               <!-- {% microsip_module_btn 'admin' %} -->
@@ -70,12 +72,8 @@
               <b class="caret"></b>
             </a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="/"><i class="icon-home"></i> Inicio</a></li>
               <li role="presentation"><a role="menuitem" tabindex="-1" href="/select_db/"><i class="icon-inbox"></i> Cambiar Empresa</a></li>
-              <li role="presentation" class="divider"></li>
-              {% if request.user.username == 'SYSDBA' %}
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="/conexiones/"><i class="icon-random"></i> Conexiones</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="/inicializar_tablas/"><i class="icon-refresh"></i> Actualizar base de datos</a></li>
-              {% endif %}
               <li role="presentation" class="divider"></li>
               <li role="presentation"><a role="menuitem" tabindex="-1" href="/logout/"> <i class="icon-remove"></i> Cerrar Sesion</a></li>
             </ul>

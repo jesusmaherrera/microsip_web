@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 
 from views import *
 from models import *
-from microsip_web.apps.main.models import *
+from microsip_web.libs.api.models import *
 
 @dajaxice_register(method='GET')
 def crear_nodo(request, nombre, padre):

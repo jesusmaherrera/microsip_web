@@ -44,6 +44,11 @@ if 'microsip_web.apps.cuentas_por_pagar' in MICROSIP_MODULES:
 if 'microsip_web.apps.contabilidad' in MICROSIP_MODULES:
     urlpatterns += url(r'^contabilidad/', include('microsip_web.apps.contabilidad.urls', namespace='contabilidad')),
 
+if 'microsip_web.apps.compras' in MICROSIP_MODULES:
+    urlpatterns += url(r'^compras/', include('microsip_web.apps.compras.urls', namespace='compras')),
+    # urlpatterns += url(r'^compras/', include('microsip_web.apps.compras.documentos.compras.urls', namespace='compras_doc_compras')),
+    # urlpatterns += url(r'^compras/', include('microsip_web.apps.compras.documentos.ordenes.urls', namespace='compras_doc_ordenes')),
+
 if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
     urlpatterns += url(r'punto_de_venta/', include('microsip_web.apps.punto_de_venta.puntos.urls', namespace='pv_puntos')),
 

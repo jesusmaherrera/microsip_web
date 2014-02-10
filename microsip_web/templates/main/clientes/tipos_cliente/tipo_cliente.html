@@ -1,4 +1,5 @@
 {% extends "punto_de_venta/base.html" %}
+{% load punto_de_venta_tags %}
 {% block title %}Tipo Cliente{% endblock %}
 
 <!-- CSS Code -->
@@ -10,37 +11,11 @@
 {% block breadcrumb %}{{ block.super }} <a href="/punto_de_venta/tipos_cliente/">Tipos Clientes</a> <i class=" icon-play"></i>Tipo Cliente{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
-  <div id="sic_from" class="container-fluid">
-    <div class="row-fluid">
-      <div class="span3">
-        <div class="container-fluid">
-          <div class="row-fluid">
-            <h3>Tipo de Cliente</h3>  
-          </div>
-        </div>
-      </div>
-      <div class="span9">
-        <div id='main_form'>
-          <button type="submit" class="btn" ><i class="icon-download-alt"></i> Guardar</button>
-        </div>
-      </div>
-    </div>
+  <div class="row-fluid">
+    <div class="span3"><h3 style="margin:0;"> tipo de cliente </h3> </div>
+    <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
+    <a href="#" class="btn disabled"><i class="icon-trash"></i></a> 
   </div>
-
-    {{ form.errors }}
-  <div class="span4" >
-    <label>Nombre</label>
-    <div class="input-prepend input-append">
-      {{ form.nombre }}
-    </div>
-  </div>
-  <div class="span4" >
-    <label>Valor puntos</label>
-    <div class="input-prepend input-append">
-      {{ form.valor_puntos }}
-    </div>
-  </div>
-  
   {% if message %}
   <div class="alert alert-block alert-error fade in">
     <button type="button" class="close" data-dismiss="alert">×</button>
@@ -48,7 +23,30 @@
     <p>{{ message }}</p>
   </div>
   {% endif %}
-  <br style='clear:both;'>
-  
+  {{ form.errors }}
+  <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
+    <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+    {% puntos_tab %}
+  </ul>
+  <div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="general" style="padding-bottom: 0;">
+      <div class="row-fluid">
+        <label>Nombre</label>
+        <div class="input-prepend input-append">
+          {{ form.nombre }}
+        </div>
+      </div>
+      <br>
+    </div>
+    <div class="tab-pane fade in" id="puntos" style="padding-bottom: 0;">
+      <div class="row-fluid">
+        <label>Valor puntos</label>
+        <div class="input-prepend input-append">
+          {{ form.valor_puntos }}
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
 </form>
 {% endblock %}

@@ -1,0 +1,261 @@
+
+{% extends extend %}
+{% block title %}Articulos{% endblock %}
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+{% include 'autocomplete_light/static.html' %}
+<script type="text/javascript">
+
+  function cargar_articulos(articulos)
+{
+  $('#articulos_table').html('<caption></caption><tr><th><input id="articulos_select_all" name="your_name"  type="checkbox"></th><th>Nombre</th></tr>');
+  for (var i = 0; i < articulos.length; i++){
+    {% if extend == 'punto_de_venta/base.html' %}
+      var ruta ='/punto_de_venta/articulo/'+ articulos[i]["pk"]+'/';
+    {% else %}
+      var ruta ='/ventas/articulo/'+ articulos[i]["pk"]+'/';
+    {% endif %}
+
+    $('#articulos_table').append('<tr><td><input id="select_article_'+ articulos[i]["pk"] +'" value="your_value" type="checkbox"></td><td ><a href="'+ruta+'">'+ articulos[i]["fields"]["nombre"]+'</a></td></tr>');
+  }
+
+  $('#articulos_select_all').change(function(){
+    if(this.checked)
+      $('[id^="select_article_"]').attr('checked',true);    
+    else
+      $('[id^="select_article_"]').attr('checked',false);    
+  });
+}
+
+function cargar_selector_movera(){
+  $('#movera_modal').modal();
+  Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol_mover_a);
+
+}
+function cargar_arbol_mover_a(datos){
+  var articulos_seleccionados = [];
+  $('[id^="select_article_"]:checked').each(function(){
+     articulos_seleccionados.push(this.id.replace("select_article_","")); 
+  });
+  $("#carpetas_movera").jstree({ 
+    "json_data" : {
+      "data" : datos
+    },
+    "plugins" : ["themes","json_data","ui","crrm","cookies","dnd","types","hotkeys",],
+    // the core plugin - not many options here
+    "core" : { 
+      // just open those two nodes up
+      // as this is an AJAX enabled tree, both will be downloaded from the server
+      "initially_open" : [ "15" , "15" ] 
+    },
+    })
+    .bind("select_node.jstree", function (event, data) { 
+      Dajaxice.microsip_web.apps.ventas.articulos_moveto(function(){}, {'carpeta_id': data.rslt.obj.attr("id"),'articulos_seleccionados':articulos_seleccionados,});
+    })
+}
+
+function cargar_arbol(datos){
+  $("#demo1").jstree({ 
+    "json_data" : {
+      "data" : datos
+    },
+    "plugins" : ["themes","json_data","ui","crrm","cookies","dnd","search","types","hotkeys","contextmenu"],
+    // the core plugin - not many options here
+    "core" : { 
+      // just open those two nodes up
+      // as this is an AJAX enabled tree, both will be downloaded from the server
+      "initially_open" : [ "1" ] 
+    },
+     // Configuring the search plugin
+    "search" : {
+        // As this has been a common question - async search
+        // Same as above - the `ajax` config option is actually jQuery's AJAX object
+        "ajax" : {
+            "url" : "/static/v.1.0pre/_demo/server.php",
+            // You get the search string as a parameter
+            "data" : function (str) {
+                return {
+                    "operation" : "search",
+                    "search_str" : str
+                };
+            }
+        }
+    },
+
+  }).bind("select_node.jstree", function (event, data) { 
+      // `data.rslt.obj` is the jquery extended node that was clicked
+      //Dajaxice.microsip_web.apps.ventas.get_articulosby_seccion(cargar_articulos, {'carpeta_id': data.rslt.obj.attr("id")});
+    })
+    // 2) if not using the UI plugin - the Anchor tags work as expected
+    //    so if the anchor has a HREF attirbute - the page will be changed
+    //    you can actually prevent the default, etc (normal jquery usage)
+
+    .delegate("a", "click", function (event, data) {
+     event.preventDefault(); 
+    })
+    .bind("create.jstree", function (e, data) {
+     
+     Dajaxice.microsip_web.apps.main.filtros.crear_nodo(function (r) { 
+        $(data.rslt.obj).attr("id", "node_" + r.id);
+      },{'nombre':data.rslt.name,'padre':data.rslt.parent.attr("id").replace("node_","")});
+  })
+  .bind("remove.jstree", function (e, data) {
+      Dajaxice.microsip_web.apps.main.filtros.remove_node(function (r) { 
+        data.inst.refresh();
+      },{'id':data.rslt.obj.attr("id")});
+  })
+  .bind("rename.jstree", function (e, data) {
+    Dajaxice.microsip_web.apps.main.filtros.rename_node(function (r) { 
+        
+      },{'id':data.rslt.obj.attr("id"),'nombre':data.rslt.new_name,});
+  })
+  .bind("move_node.jstree", function (e, data) {
+    data.rslt.o.each(function (i) {
+      Dajaxice.microsip_web.apps.main.filtros.update_node(function (r) { 
+      },{'id':$(this).attr("id"),'padre_id':data.rslt.np.attr("id"),});
+    });
+  });
+
+}
+
+$(function () { 
+
+  $("a").click(function () {
+    switch(this.id) {
+      case "search":
+        $("#demo1").jstree("search", document.getElementById("text").value);
+        break;
+      case "text": break;
+      default:
+        $("#demo1").jstree(this.id);
+        break;
+    }
+  });
+});
+  
+Dajaxice.microsip_web.apps.ventas.get_estructura_carpetas(cargar_arbol);
+
+$('#id_articulo_text').focus();
+
+$('#select_article_all').change(function(){
+  if(this.checked)
+    $('[id^="select_article_"]').attr('checked',true);    
+  else
+    $('[id^="select_article_"]').attr('checked',false);    
+});
+
+  
+
+
+
+</script>
+
+
+{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Articulos {% endblock %}
+{% block content %}
+<!-- {% for categoria in categorias %}
+<div class="btn-group">
+  <a class="btn" href="/punto_de_venta/articulos/{{categoria.id}}/"><i class='icon-tag'></i> {{ categoria }}</a>
+  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+  <ul class="dropdown-menu">
+    <li><a href="/punto_de_venta/categoria/delete/{{ grupo_id }}/{{ categoria.id }}/"><i class="icon-trash"></i> Eliminar</a></li>
+  </ul>
+</div>
+{% endfor %} -->
+{% if msg %}
+<div class="alert alert-block fade in">
+    <button type="button" class="close" data-dismiss="alert">×</button>
+    <strong>{{ msg }}</strong> 
+</div>
+{% endif %}
+<form method="post" id="form-search-articulo" class="form-inline" action="" enctype='multipart/form-data'>{% csrf_token %}  
+  <div class="row-fluid">
+    <div class="span3"><h3 style="margin:0;"> Articulos</h3> </div>
+    <div class="span1 hidden-phone">
+     <a tabindex="-1" class='btn' href='#' onclick='cargar_selector_movera();'><i class="icon-folder-open"></i></a> 
+    </div>
+    <div class='span2' >
+       {{ filtro_form.articulo }}
+    </div>
+    <div class="input-prepend input-append mobile_inputdata">
+       <span class="add-on visible-phone label-data">Clave</span>
+       {{ filtro_form.clave }}
+    </div>
+    <div class="input-prepend input-append mobile_inputdata">
+       <span class="label-data add-on visible-phone">Nombre</span>
+       {{ filtro_form.nombre }}
+    </div>
+    <button class="btn" type="submit"><i class='icon-search'></i> <span class="visible-phone">Ir</span></button>
+  </div>
+</form>  
+<div class="container-fluid" style='clear:both;'>
+  <div class="row-fluid">
+    <div class="span2 hidden-phone">
+      <!-- <div class="input-append span">
+        <input name="nombre" class='input-medium'  maxlength="100" placeholder="Busca una carpeta aqui..." type="text" id="text">
+        <a class='btn' id="search"  href="#"><i class='icon-search'></i></a>
+        <a class='btn' id="clear_search"  href="#"><i class=' icon-remove'></i></a>
+      </div> -->
+      <div id="demo1" class="span"></div>
+    </div>
+
+    <div class="span10">
+      <table class="table tableCell table-hover">
+        <tr>
+          <th class="hidden-phone"> <input id="select_article_all" value="" type="checkbox"/> </th>
+          <th> Articulo</th>
+          <!-- {% if  modulo == '/punto_de_venta/articulo/' %}
+          <th class="hidden-phone"> Puntos</th>
+          <th class="hidden-phone"> Dinero Electronico</th>
+          {% endif %} -->
+        </tr>
+        {% for articulo in articulos%}
+        <tr>
+          <td class="hidden-phone"><input id="select_article_{{ articulo.id }}" value="" type="checkbox"/></td>
+          <td><a href="/{{ modulo}}/articulo/{{ articulo.id }}/">{{ articulo.nombre }}</a></td>
+         <!--  {% if  modulo == '/punto_de_venta/articulo/' %}
+            <td class="hidden-phone">{{articulo.puntos }}|{{articulo.carpeta.id }}</td>
+            <td class="hidden-phone">{{articulo.dinero_electronico }}</td>
+          {% endif %} -->
+         </tr>
+        {% endfor %}
+
+        <div class="pagination pagination-mini mainmenu">
+          <ul>
+            {% if articulos.has_previous %}
+            <li><a href="?page={{ articulos.previous_page_number }}">Anterior</a></li>
+            {% else %}
+            <li class="disabled"><a href="#">Anterior</a></li>
+            {% endif %}
+            <li class="disabled"><a href="#">Pagina {{ articulos.number }} de {{ articulos.paginator.num_pages }}.</a></li>
+            {% if articulos.has_next %}
+            <li><a href="?page={{ articulos.next_page_number }}">Siguiente</a></li>
+            {% else %}
+            <li class="disabled"><a href="#">Siguiente</a></li>
+            {% endif %} 
+          </ul>
+        </div>
+      </table>
+    </div>
+  </div>
+</div>
+<div id="movera_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    Mover a
+  </div>
+  <div class="modal-body">
+    Selecciona lacarpeta a la que deseas mover los articulos seleccionados
+    <div id="carpetas_movera" class="span"></div>
+  </div>
+  <div class="modal-footer">
+    <a class='btn' data-dismiss="modal" href="#">Cancelar</a>
+    <a class='btn' href="">Aceptar</a>
+  </div>
+</div>
+<br>
+{% endblock %}

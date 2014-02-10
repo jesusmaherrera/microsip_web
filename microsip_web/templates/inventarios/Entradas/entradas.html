@@ -4,7 +4,9 @@
 {% block style_css %}{% endblock %}
 
 <!-- JavaScript Code -->
-{% block js_code %}{% endblock %}
+{% block js_code %}
+  <script src="{{STATIC_URL}}js/inventarios/documentos.entradas.js"></script>
+{% endblock %}
 
 {% block breadcrumb %}{{ block.super }} Entradas {% endblock %}
 {% block content %}
@@ -29,16 +31,22 @@
     <tr>
       <th>FOLIO</th>
       <th>FECHA</th>
+      <th>Almacen</th>
       <th>DESCRIPCION</th>
-      <!-- <th>OPCIONES</th> -->
+      <th>OPCIONES</th>
     </tr>
     {% for entrada in entradas%}
     
     <tr>
       
-      <td><a href="/inventarios/entrada/{{ entrada.id }}/">{{ entrada.folio }}</a></td>
+      <td><!-- <a href="/inventarios/entrada/{{ entrada.id }}/"> -->{{ entrada.folio }}<!-- </a>--></td>
       <td>{{ entrada.fecha }}</td>
+      <td>{{ entrada.almacen }}</td>
       <td>{{ entrada.descripcion }}</td>
+      <td> 
+        <input type="hidden" value="{{ entrada.id }}" class='entrada_id'>
+        {% if entrada.aplicado == 'N' %} <a href="" class="btn aplicar_btn">Aplicar</a> {% endif %}
+      </td>
       <!-- <td style="text-align:center;">
         <a href='#myModal{{ entrada.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
       </td> -->

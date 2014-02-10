@@ -7,7 +7,7 @@ from django.template import RequestContext
 from decimal import *
 from microsip_web.libs.custom_db.procedures import procedures
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from models import *
+from ...libs.api.models import *
 from forms import *
 
 import datetime, time
@@ -23,7 +23,49 @@ from microsip_web.settings.common import MICROSIP_MODULES
 from microsip_web.apps.inventarios.triggers import triggers as inventarios_triggers
 from microsip_web.apps.inventarios.triggers_salidas import triggers_salidas as inventarios_triggers_salidas
 from microsip_web.apps.punto_de_venta.triggers import triggers as punto_de_venta_triggers
+from microsip_web.libs.custom_db.main import first_or_none
 
+try:
+    scripts = AplicationPlugin.objects.all()
+    for script in scripts:
+        __import__('microsip_web.data.plugins.%s'%script.name)
+
+except DatabaseError:
+    pass
+
+@login_required( login_url = '/login/' )
+def AplicationPluginDelete( request, id=None):
+    """ Borrar el registro de un plugin  """
+    plugin = AplicationPlugin.objects.get(pk=id)
+    plugin.delete()
+    return HttpResponseRedirect( '/plugins/' )
+
+@login_required( login_url = '/login/' )
+def AplicationPluginsView( request, template_name = 'main/plugins/plugins.html' ):
+    """ Lista de scripts  """
+
+    c = { 'plugins' : AplicationPlugin.objects.all() }
+    return render_to_response( template_name, c, context_instance = RequestContext( request ) )
+
+@login_required(login_url='/login/')
+def AplicationPluginManageView( request, id = None, template_name = 'main/plugins/plugin.html' ):
+
+    message = ''
+
+    if id:
+        plugin = get_object_or_404( AplicationPlugin, pk = id)
+    else:
+        plugin =  AplicationPlugin()
+
+    form = AplicationPluginForm( request.POST or None, instance =  plugin )            
+    if form.is_valid():
+        grupo = form.save()
+        return HttpResponseRedirect( '/plugins/' )
+    
+
+    c = { 'form' : form, }
+    return render_to_response( template_name, c, context_instance = RequestContext( request ) )
+    
 @login_required( login_url = '/login/' )
 def conexiones_View( request, template_name = 'main/conexiones/conexiones.html' ):
     """ Lista de conexiones a carpetas ( Microsip Datos ). """
@@ -36,19 +78,24 @@ def conexion_manageView( request, id = None, template_name = 'main/conexiones/co
     """ Lista de conexiones """
 
     message = ''
-
+    initial_form = None
     if id:
         conexion = get_object_or_404( ConexionDB, pk = id)
     else:
         conexion =  ConexionDB()
-        
-    if request.method == 'POST':
-        form = ConexionManageForm( request.POST, instance =  conexion )
-        if form.is_valid():
-            grupo = form.save()
-            return HttpResponseRedirect( '/conexiones/' )
-    else:
-        form = ConexionManageForm( instance = conexion )
+        initial_form = {
+        'nombre':'local',
+        'tipo':'L',
+        'servidor':'localhost',
+        'carpeta_datos':'C:\Microsip datos',
+        'usuario':'SYSDBA'
+        }
+
+    form = ConexionManageForm( request.POST or None, instance=conexion, initial=initial_form)
+    
+    if form.is_valid():
+        grupo = form.save()
+        return HttpResponseRedirect( '/conexiones/' )
 
     c = { 'form' : form, }
     return render_to_response( template_name, c, context_instance = RequestContext( request ) )
@@ -72,13 +119,25 @@ def inicializar_tablas( request ):
         sincronizar_tablas( conexion_name = conexion_name )
         
         #Triggers
-        if 'microsip_web.apps.punto_de_venta' in MICROSIP_MODULES:
+        if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
             actualizar_triggers_puntodeventa( conexion_name = conexion_name )
         else:
             borrar_triggers_puntodeventa( conexion_name = conexion_name )
 
+        if 'microsip_web.apps.punto_de_venta' in MICROSIP_MODULES:
+            if not Registry.objects.filter( nombre = 'ARTICULO_VENTAS_FG_PV_ID' ).exists():
+                padre = first_or_none(Registry.objects.filter(nombre='PreferenciasEmpresa'))
+                if padre:
+                    Registry.objects.create(
+                            nombre = 'ARTICULO_VENTAS_FG_PV_ID',
+                            tipo = 'V',
+                            padre = padre
+                        ) 
+
+
+
         if 'microsip_web.apps.inventarios' in MICROSIP_MODULES:
-             actualizar_triggers_inventarios( conexion_name = conexion_name )
+            actualizar_triggers_inventarios( conexion_name = conexion_name )
         else:
             borrar_triggers_inventarios( conexion_name = conexion_name )
 

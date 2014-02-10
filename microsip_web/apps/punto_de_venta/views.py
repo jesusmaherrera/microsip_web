@@ -15,12 +15,12 @@ from forms import *
 from models import *
 from triggers import triggers
 from mobi.decorators import detect_mobile
-
+from django.core import management
 from microsip_web.apps.main.filtros.models import *
 from microsip_web.libs.custom_db.main import next_id
 from microsip_web.libs import contabilidad
-from microsip_web.apps.main.forms import filtroarticulos_form, filtro_clientes_form
-from microsip_web.libs.custom_db.main import get_conecctionname, first_or_none,  get_sigfolio_ve
+from microsip_web.apps.main.forms import filtroarticulos_form
+from microsip_web.libs.custom_db.main import get_conecctionname, first_or_none
 from microsip_web.libs.punto_de_venta import new_factura_global
 
 ##########################################
@@ -76,89 +76,6 @@ def inicializar_puntos_articulos(request):
     
     return HttpResponseRedirect('/punto_de_venta/articulos/')
 
-@detect_mobile
-@login_required(login_url='/login/')
-def articulos_view(request, carpeta=1, modulo='punto_de_venta' ,template_name='punto_de_venta/articulos/articulos/articulos.html'):
-    articulos_porpagina = 20  
-    basedatos_activa = request.session['selected_database']
-    if basedatos_activa == '':
-        return HttpResponseRedirect('/select_db/')
-
-    if "Chrome" in request.META['HTTP_USER_AGENT']:
-        request.mobile = False
-       
-    if request.mobile:
-        url_articulo = '/inventarios/articulo/'
-        articulos_porpagina = 5    
-    else:
-        url_articulo = '/punto_de_venta/articulo/'
-
-    msg = ''
-    if request.method =='POST':
-        PATH = request.path
-
-        if '/punto_de_venta/' in PATH:
-            url_articulo = '/punto_de_venta/articulo/'
-        elif '/inventarios/' in PATH:
-            url_articulo = '/inventarios/articulo/'
-
-        filtro_form = filtroarticulos_form(request.POST)
-        if filtro_form.is_valid():
-            articulo = filtro_form.cleaned_data['articulo']
-            nombre = filtro_form.cleaned_data['nombre']
-            clave = filtro_form.cleaned_data['clave']
-
-            if articulo != None:
-                return HttpResponseRedirect('%s%s/'% (url_articulo, articulo.id))
-            elif clave != '':
-                clave_articulo = ClavesArticulos.objects.filter(clave=clave)
-                if clave_articulo.count() > 0:
-                    return HttpResponseRedirect('%s%s/'% (url_articulo, clave_articulo[0].articulo.id))
-                else:
-                    articulos_list = Articulos.objects.filter(nombre__icontains=nombre).order_by('nombre')
-                    msg='No se encontro ningun articulo con esta clave'
-            else:
-                articulos_list = Articulos.objects.filter(nombre__icontains=nombre).order_by('nombre')
-    else:
-        filtro_form = filtroarticulos_form()
-        articulos_list = Articulos.objects.filter(Q(carpeta__id=carpeta)| Q(carpeta__id=None)).order_by('nombre') #filter(carpeta = carpeta)
-    
-      
-    PATH = request.path
-    if  '/ventas/articulos/' in PATH:
-        extend = 'ventas/base.html'
-    elif '/punto_de_venta/articulos/' in PATH:
-        extend = 'punto_de_venta/base.html'
-    elif '/inventarios/articulos/' in PATH:
-        extend = 'inventarios/base.html'
-        url_articulo = '/inventarios/articulo/'
-
-    paginator = Paginator(articulos_list, articulos_porpagina) # Muestra 10 ventas por pagina
-    page = request.GET.get('page')
-
-    #####PARA PAGINACION##############
-    try:
-        articulos = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        articulos = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        articulos = paginator.page(paginator.num_pages)
-    
-    
-    
-
-    c = {
-        'articulos':articulos,
-        'carpeta':carpeta,
-        'extend':extend,
-        'filtro_form':filtro_form,
-        'url_articulo':url_articulo,
-    }
-
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
-
 @login_required(login_url='/login/')
 def articulo_manageView(request, id = None, template_name='punto_de_venta/articulos/articulos/articulo.html'):
     message = ''
@@ -172,12 +89,12 @@ def articulo_manageView(request, id = None, template_name='punto_de_venta/articu
     clasificaciones_compatibles = ArticuloCompatibleCarpeta.objects.filter(articulo=articulo)
 
     if request.method == 'POST':
-        form = ArticuloManageForm(request.POST, instance=  articulo)
+        articulo_form = ArticuloManageForm(request.POST, instance=  articulo)
         form_articuloCompatible = ArticuloCompatibleArticulo_ManageForm(request.POST)
         #form_clasificacionCompatible = ArticuloCompatibleClasificacion_ManageForm(request.POST)
         
-        if form.is_valid():
-            articulo = form.save( commit = False )
+        if articulo_form.is_valid():
+            articulo = articulo_form.save( commit = False )
             articulo.usuario_ult_modif = request.user.username
             articulo.save()
 
@@ -199,20 +116,13 @@ def articulo_manageView(request, id = None, template_name='punto_de_venta/articu
 
             return HttpResponseRedirect('/punto_de_venta/articulos/')
     else:
-        form = ArticuloManageForm(instance= articulo)
+        articulo_form = ArticuloManageForm(instance= articulo)
         form_articuloCompatible = ArticuloCompatibleArticulo_ManageForm()
         #form_clasificacionCompatible = ArticuloCompatibleClasificacion_ManageForm()
-
-    PATH = request.path
-    extend='punto_de_venta/base.html'
-
-    if  '/ventas/articulo/' in PATH:
-        extend = 'ventas/base.html'
-    elif '/punto_de_venta/articulo/' in PATH:
-        extend = 'punto_de_venta/base.html'
-
+        
+    extend = 'punto_de_venta/base.html'
     c = {
-    'form':form,
+    'articulo_form':articulo_form,
     'articulos_compatibles':articulos_compatibles,
     'clasificaciones_compatibles':clasificaciones_compatibles,
     'form_articuloCompatible':form_articuloCompatible,
@@ -242,96 +152,11 @@ def gruposgrupo_delete(request, categoria_padre=None, categoria_id=None, templat
     else:
         return HttpResponseRedirect('/punto_de_venta/articulos/')
         
-# @login_required(login_url='/login/')
-# def gruposgrupo_manageView(request, categoria_id=None, template_name='punto_de_venta/articulos/categorias/categoria.html'):
-    
-#     if request.method == 'POST':
-#         grupo_form = GruposGrupo_bypadre_ManageForm(request.POST)
-
-#         if grupo_form.is_valid():
-#             newgrupo = grupo_form.cleaned_data['newgrupo']
-#             grupo = grupo_form.cleaned_data['grupo']
-
-#             if categoria_id:
-#                 grupo_padre = get_object_or_404(GruposGrupo, pk=categoria_id).grupo
-#             else:
-#                 grupo_padre = None
-
-#             if newgrupo != '':
-#                 clasificacionObjeto = Grupo(
-#                     nombre = newgrupo,
-#                     )
-#                 clasificacionObjeto.save()
-#             else:
-#                 clasificacionObjeto = grupo
-
-#             clasificacion = GruposGrupo(
-#                 grupo = clasificacionObjeto,
-#                 grupo_padre = grupo_padre,
-#                 )
-
-#             clasificacion.save()
-            
-#             if categoria_id:
-#                 return HttpResponseRedirect('/punto_de_venta/articulos/%s'% categoria_id)
-#             else:
-#                 return HttpResponseRedirect('/punto_de_venta/articulos/')                
-#     else:
-#         grupo_form = GruposGrupo_bypadre_ManageForm()   
-
-#     c = {'form':grupo_form, }
-#     return render_to_response(template_name, c, context_instance=RequestContext(request))
-
 ##########################################
 ##                                      ##
 ##           Clientes                   ##
 ##                                      ##
 ##########################################
-
-@login_required(login_url='/login/')
-def clientes_view(request, template_name='main/clientes/clientes/clientes.html'):
-    basedatos_activa = request.session['selected_database']
-    if basedatos_activa == '':
-        return HttpResponseRedirect('/select_db/')
-
-    msg = ''
-    if request.method =='POST':
-        filtro_form = filtro_clientes_form(request.POST)
-        if filtro_form.is_valid():
-            cliente = filtro_form.cleaned_data['cliente']
-            nombre = filtro_form.cleaned_data['nombre']
-            clave = filtro_form.cleaned_data['clave']
-
-            if cliente != None:
-                return HttpResponseRedirect('/punto_de_venta/cliente/%s/'% cliente.id)
-            elif clave != '':
-                clave_cliente = ClavesClientes.objects.filter(clave=clave)
-                if clave_cliente.count() > 0:
-                    return HttpResponseRedirect('/punto_de_venta/cliente/%s/'% clave_cliente[0].cliente.id)
-                else:
-                    clientes_list = Cliente.objects.filter(nombre__icontains=nombre).order_by('nombre')
-                    msg='No se encontro ningun cliente con esta clave'
-            else:
-                clientes_list = Cliente.objects.filter(nombre__icontains=nombre).order_by('nombre')
-    else:
-        filtro_form = filtro_clientes_form()
-        clientes_list = Cliente.objects.all().order_by('nombre')
-    
-    paginator = Paginator(clientes_list, 20) # Muestra 10 ventas por pagina
-    page = request.GET.get('page')
-
-    #####PARA PAGINACION##############
-    try:
-        clientes = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        clientes = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        clientes = paginator.page(paginator.num_pages)
-
-    c = {'clientes':clientes, 'filtro_form':filtro_form}
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
 def tipos_cliente_view(request, template_name='main/clientes/tipos_cliente/tipos_clientes.html'):
@@ -378,41 +203,6 @@ def tipo_cliente_manageView(request, id = None, template_name='main/clientes/tip
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def cliente_manageView(request, id = None, template_name='main/clientes/clientes/cliente.html'):
-    message = ''
-
-    if id:
-        cliente = get_object_or_404(Cliente, pk=id)
-    else:
-        cliente =  Cliente()
-    
-    cuentas_ventas = clientes_config_cuenta.objects.all()
-    cuentas = {}
-    
-    for cuenta in cuentas_ventas:
-        cuentas[cuenta.campo_cliente]= "Cuenta contable ventas"
-        if cuenta.valor_contado_credito != 'Ambos':
-            cuentas[cuenta.campo_cliente] += " a %s "% cuenta.valor_contado_credito
-        
-        if cuenta.valor_iva == 'I':
-            cuentas[cuenta.campo_cliente] += " con IVA"
-        elif cuenta.valor_iva == '0':
-            cuentas[cuenta.campo_cliente] += " sin IVA"
-
-    if request.method == 'POST':
-        form = ClienteManageForm(request.POST, instance=  cliente)
-        if form.is_valid():
-            clienteform =  form.save( commit = False )
-            clienteform.usuario_ult_modif = request.user.username
-            clienteform.save()
-            return HttpResponseRedirect('/punto_de_venta/clientes/')
-    else:
-        form = ClienteManageForm(instance= cliente)
-
-    c = {'form':form, 'cuentas':cuentas,}
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
-
-@login_required(login_url='/login/')
 def cliente_searchView(request, template_name='main/clientes/clientes/cliente_search.html'):
     message = ''
     cliente =  Cliente()
@@ -436,106 +226,6 @@ def cliente_searchView(request, template_name='main/clientes/clientes/cliente_se
         form = ClienteSearchForm()
         
     c = {'form':form, 'cliente':cliente,'message':message, 'dinero_en_puntos':dinero_en_puntos, }
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
-
-##########################################
-##                                      ##
-##           Lineas articulos           ##
-##                                      ##
-##########################################
-
-@login_required(login_url='/login/')
-def lineas_articulos_view(request, template_name='punto_de_venta/articulos/lineas/lineas_articulos.html'):
-    basedatos_activa = request.session['selected_database']
-    if basedatos_activa == '':
-        return HttpResponseRedirect('/select_db/')
-
-    linea_articulos_list = LineaArticulos.objects.all()
-
-    paginator = Paginator(linea_articulos_list, 15) # Muestra 10 ventas por pagina
-    page = request.GET.get('page')
-
-    #####PARA PAGINACION##############
-    try:
-        lineas_articulos = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        lineas_articulos = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        lineas_articulos = paginator.page(paginator.num_pages)
-
-    c = {'lineas_articulos':lineas_articulos}
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
-
-@login_required(login_url='/login/')
-def linea_articulos_manageView(request, id = None, template_name='punto_de_venta/articulos/lineas/linea_articulos.html'):
-    message = ''
-
-    if id:
-        linea_articulos = get_object_or_404( LineaArticulos, pk=id)
-    else:
-        linea_articulos =  LineaArticulos()
-    
-    if request.method == 'POST':
-        form = LineaArticulosManageForm(request.POST, instance=  linea_articulos)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect('/punto_de_venta/lineas_articulos')
-    else:
-        form = LineaArticulosManageForm(instance= linea_articulos)
-
-    c = {'form':form,}
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
-
-##########################################
-##                                      ##
-##            Grupos lineas             ##
-##                                      ##
-##########################################
-
-@login_required(login_url='/login/')
-def grupos_lineas_view(request, template_name='punto_de_venta/articulos/grupos/grupos_lineas.html'):
-    basedatos_activa = request.session['selected_database']
-    if basedatos_activa == '':
-        return HttpResponseRedirect('/select_db/')
-
-    grupos_lineas_list = GrupoLineas.objects.all()
-
-    paginator = Paginator(grupos_lineas_list, 15) # Muestra 10 ventas por pagina
-    page = request.GET.get('page')
-
-    #####PARA PAGINACION##############
-    try:
-        grupos_lineas = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        grupos_lineas = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        grupos_lineas = paginator.page(paginator.num_pages)
-
-    c = {'grupos_lineas':grupos_lineas}
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
-
-@login_required(login_url='/login/')
-def grupo_lineas_manageView(request, id = None, template_name='punto_de_venta/articulos/grupos/grupo_lineas.html'):
-    message = ''
-
-    if id:
-        grupo_lineas = get_object_or_404( GrupoLineas, pk=id)
-    else:
-        grupo_lineas =  GrupoLineas()
-        
-    if request.method == 'POST':
-        form = GrupoLineasManageForm(request.POST, instance=  grupo_lineas)
-        if form.is_valid():
-            grupo = form.save()
-            return HttpResponseRedirect('/punto_de_venta/grupos_lineas')
-    else:
-        form = GrupoLineasManageForm(instance= grupo_lineas)
-
-    c = {'form':form,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################
@@ -677,26 +367,41 @@ def preferenciasEmpresa_View(request, template_name='punto_de_venta/herramientas
     except:
         informacion_contable = InformacionContable_pv()
 
-    if request.method == 'POST':
-        form_reg = InformacioncontableRegManageForm(request.POST)
-    else:
-        form_reg = InformacioncontableRegManageForm()
-        form_reg.fields['tipo_poliza_ventas'].initial = Registry.objects.get(nombre='TIPO_POLIZA_VENTAS_PV').valor
-        form_reg.fields['tipo_poliza_devol'].initial = Registry.objects.get(nombre='TIPO_POLIZA_DEVOL_PV').valor
-        form_reg.fields['tipo_poliza_cobros_cc'].initial = Registry.objects.get(nombre='TIPO_POLIZA_COBROS_CXC_PV').valor
 
+    msg = ''
+    general_initialvalues = {
+        'articulo_general': Registry.objects.get(nombre='ARTICULO_VENTAS_FG_PV_ID').get_value(),
+    }
+    preferencias_generalform = PreferenciasGeneralManageForm(request.POST or None, initial= general_initialvalues)
+
+    infcontable_initialvalues = {
+        'tipo_poliza_ventas': Registry.objects.get(nombre='TIPO_POLIZA_VENTAS_PV').get_value(),
+        'tipo_poliza_devol': Registry.objects.get(nombre='TIPO_POLIZA_DEVOL_PV').get_value(),
+        'tipo_poliza_cobros_cc': Registry.objects.get(nombre='TIPO_POLIZA_COBROS_CXC_PV').get_value(),
+    }
+    form_reg = InformacioncontableRegManageForm( request.POST or None, initial= infcontable_initialvalues)
     form = InformacionContableManageForm(request.POST or None, instance=informacion_contable)
-    msg = ''    
-    if form.is_valid() and form_reg.is_valid():
-        Registry.objects.filter(nombre='TIPO_POLIZA_VENTAS_PV').update(valor=form_reg.cleaned_data['tipo_poliza_ventas']) 
-        Registry.objects.filter(nombre='TIPO_POLIZA_DEVOL_PV').update(valor=form_reg.cleaned_data['tipo_poliza_devol']) 
-        Registry.objects.filter(nombre='TIPO_POLIZA_COBROS_CXC_PV').update(valor=form_reg.cleaned_data['tipo_poliza_cobros_cc']) 
-
+    
+    #Validar formularios y guardar datos
+    if preferencias_generalform.is_valid():
+        preferencias_generalform.save()
+        msg = 'Datos guardados correctamente'
+    if form_reg.is_valid():
+        form_reg.save()
+        msg = 'Datos guardados correctamente'
+    if form.is_valid():
         form.save()
-        msg = 'Datos Guardados Exitosamente'
+        msg = 'Datos guardados correctamente'
     
     plantillas = PlantillaPolizas_pv.objects.all()
-    c= {'form':form,'msg':msg,'plantillas':plantillas, 'form_reg':form_reg,}
+    
+    c = {
+        'form':form,
+        'preferencias_generalform': preferencias_generalform,
+        'msg':msg,
+        'plantillas':plantillas,
+        'form_reg':form_reg, 
+    }
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################
@@ -774,7 +479,6 @@ def ventas_de_mostrador_view(request, template_name='punto_de_venta/documentos/v
 def venta_mostrador_manageView(request, id = None, template_name='punto_de_venta/documentos/ventas/venta_de_mostrador.html'):
     
     message = ''
-    hay_repetido = False
     if id:
         documento = get_object_or_404(Docto_PV, pk=id)
     else:
@@ -858,11 +562,12 @@ def devoluciones_de_ventas_view(request, template_name='punto_de_venta/documento
 def facturas_view(request, template_name='punto_de_venta/documentos/facturas/facturas.html'):
     connection_name = get_conecctionname(request.session)
     if connection_name == '':
+
         return HttpResponseRedirect('/select_db/')
 
     facturas_list = Docto_PV.objects.filter(tipo='F').order_by('-id')
 
-    paginator = Paginator(facturas_list, 15) # Muestra 10 ventas por pagina
+    paginator = Paginator(facturas_list, 20) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
 
     #####PARA PAGINACION##############
@@ -875,84 +580,106 @@ def facturas_view(request, template_name='punto_de_venta/documentos/facturas/fac
         # If page is out of range (e.g. 9999), deliver last page of results.
         facturas = paginator.page(paginator.num_pages)
 
-    c = {'facturas':facturas}
+    c = {'facturas':facturas,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required( login_url='/login/' )
 def factura_manageView( request, id = None, template_name='punto_de_venta/documentos/facturas/factura.html' ):
     message = ''
     connection_name = get_conecctionname(request.session)
-    hay_repetido = False
+    factura_nueva = False
     
     if id:
         factura = get_object_or_404( Docto_PV, pk = id )
     else:
         factura = Docto_PV()
 
-    factura_form = FacturaManageForm( request.POST or None, instance = factura,)
-    factura_items = DocumentoPV_items_formset(DocumentoPVDet_ManageForm, extra=1, can_delete=True)
+    #Cargar formularios
 
+    if id:
+        factura_form = FacturaManageForm( request.POST or None, instance = factura,)
+        factura_items = DocumentoPV_items_formset(DocumentoPVDet_ManageForm, extra=0, can_delete=False)
+    else:
+        initial_factura = { 'fecha': datetime.now(),}
+        factura_form = FacturaManageForm( request.POST or None, instance = factura, initial= initial_factura)
+        factura_items = DocumentoPV_items_formset(DocumentoPVDet_ManageForm, extra=1, can_delete=False)
+        
     formset = factura_items(request.POST or None, instance=factura)
-    factura_global_fm =  factura_global_form(request.POST or None)
 
-    if formset.is_valid() and factura_form.is_valid() :
+    factura_global_fm =  factura_global_form(request.POST or None)
+   
+    if formset.is_valid() and factura_form.is_valid() and factura_global_fm.is_valid():
+
         factura = factura_form.save(commit=False)
 
-        cliente =factura.cliente
-        cliente_clave = first_or_none( ClavesClientes.objects.filter( cliente=cliente ) )
-        cliente_direccion =  first_or_none( DirCliente.objects.filter(cliente=cliente) )
-
+        cliente = factura.cliente
+        cliente_clave = first_or_none( ClavesClientes.objects.filter( cliente= cliente ) )
+        cliente_direccion =  first_or_none( DirCliente.objects.filter( cliente= cliente ) )
+        factura_global_tipo = factura_global_fm.cleaned_data['tipo']
+        #Si es una factura nueva
         if not factura.id:
-            folio = get_sigfolio_ve(connection_name=connection_name, tipo_docto='F',serie='S')
-            factura.id =next_id('ID_DOCTOS', connection_name)
-            factura.caja = first_or_none( Caja.objects.all() )
-            factura.tipo = 'F'
-            factura.folio = folio
+            factura_nueva= True
+            factura.id= -1
+            factura.caja= first_or_none( Caja.objects.all() )
+            factura.tipo= 'F'
+            factura.aplicado = 'S'
+            factura.folio= ''#Se deja vacio para que se calcule el folio al guardar
             factura.fecha= datetime.now()
             factura.hora= datetime.now().strftime('%H:%M:%S')
             factura.clave_cliente= cliente_clave
-            factura.cliente=cliente
-            factura.clave_cliente_fac = cliente_clave
-            factura.cliente_fac = cliente
+            factura.cliente= cliente
+            factura.clave_cliente_fac= cliente_clave
+            factura.cliente_fac= cliente
             factura.direccion_cliente= cliente_direccion
-            factura.moneda= Moneda.objects.get(pk=1)
-            factura.impuesto_incluido='N'
-            factura.tipo_cambio=1
+            factura.moneda= Moneda.objects.get(pk= 1)
+            factura.impuesto_incluido= 'N'
+            factura.tipo_cambio= 1
             factura.unidad_comprom= 'S'
-            factura.tipo_descuento='I'
+            factura.tipo_descuento= 'I'
+
+            #datos de factura global
+            # factura.tipo_gen_fac='R'
+            # factura.es_fac_global='S'
+            # factura.fecha_ini_fac_global = fecha_ini_fac_global
+            # factura.fecha_fin_fac_global = fecha_fin_fac_global
+
             factura.porcentaje_descuento=0
             
             factura.sistema_origen='PV'
             factura.persona='FACTURA GLOBAL DIARIA'
-            factura.modalidad_facturacion = 'PREIMP'
             factura.usuario_creador= request.user.username
+            factura.save()
+            
 
-        factura.save()
         ventas_en_factura = factura_form.cleaned_data['ventas_en_factura']
+        impuestos_venta_neta = factura_form.cleaned_data['impuestos_venta_neta'].split(',')
+        impuestos_otros_impuestos = factura_form.cleaned_data['impuestos_otros_impuestos'].split(',')
+        impuestos_importe_impuesto = factura_form.cleaned_data['impuestos_importe_impuesto'].split(',')
+        impuestos_porcentaje_impuestos = factura_form.cleaned_data['impuestos_porcentaje_impuestos'].split(',')
+        impuestos_ids = factura_form.cleaned_data['impuestos_ids'].split(',')
 
-        impuestos_venta_neta = factura_form.cleaned_data['impuestos_venta_neta']
-        impuestos_otros_impuestos = factura_form.cleaned_data['impuestos_otros_impuestos']
-        impuestos_importe_impuesto = factura_form.cleaned_data['impuestos_importe_impuesto']
+        #Guardar impuestos
+        for impuesto_id, venta_neta, otros_impuestos, importe_impuesto, porcentaje_impuesto in zip(impuestos_ids, impuestos_venta_neta, impuestos_otros_impuestos, impuestos_importe_impuesto, impuestos_porcentaje_impuestos ):
+            if impuesto_id != "":
+                c = connections[connection_name].cursor()
+                query =  '''INSERT INTO "IMPUESTOS_DOCTOS_PV" ("DOCTO_PV_ID", "IMPUESTO_ID", "VENTA_NETA", "OTROS_IMPUESTOS", "PCTJE_IMPUESTO", "IMPORTE_IMPUESTO") \
+                    VALUES (%s, %s, %s, %s, %s, %s)'''%(factura.id,  impuesto_id, venta_neta,  otros_impuestos, porcentaje_impuesto, importe_impuesto)
+                c.execute(query)
+                c.close()
 
-        if impuestos_venta_neta != '':
-
-            c = connections[connection_name].cursor()
-            query =  '''INSERT INTO "IMPUESTOS_DOCTOS_PV" ("DOCTO_PV_ID", "IMPUESTO_ID", "VENTA_NETA", "OTROS_IMPUESTOS", "PCTJE_IMPUESTO", "IMPORTE_IMPUESTO") \
-                VALUES (%s, %s, %s, %s, %s, %s)'''%(factura.id,  Impuesto.objects.get(pk=295).id, impuestos_venta_neta,  impuestos_otros_impuestos, 16, impuestos_importe_impuesto)
-            c.execute(query)
-            c.close()
-
+        ventas_en_factura_sting = ventas_en_factura
         ventas_faturadas = ventas_en_factura.split(',')
+
         if ventas_faturadas!= [u'']:
             for venta_facturada in ventas_faturadas:
+                venta = Docto_PV.objects.get(pk=venta_facturada)
                 DoctoPVLiga.objects.create(
                         id = -1,
-                        docto_pv_fuente = Docto_PV.objects.get(pk=venta_facturada),
+                        docto_pv_fuente = venta,
                         docto_pv_destino = factura,
                     )
-
-
-
+        ventas_ligas = DoctoPVLiga.objects.filter(docto_pv_destino= factura)
+        #Se guardan detalles de factura
         for detalle_form in formset:
             detalle = detalle_form.save(commit = False)
 
@@ -960,18 +687,60 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
                 detalle.id = -1
                 detalle.documento_pv = factura
                 detalle.unidades_dev = 0
-                detalle.precio_unitario_impto = 0
+                detalle.precio_unitario_impto = detalle.precio_unitario
                 detalle.fpgc_unitario = 0
-                detalle.precio_modificado = 'P' 
+                detalle.precio_modificado = 'N' 
                 detalle.porcentaje_comis = 0 
                 detalle.rol = 'N' 
+                detalle.notas = 'FOLIOS:'
                 detalle.posicion = -1
+                detalle.save()
 
-            detalle.save()
+            #Se generan todos los detalles de ligas        
+            if factura_global_tipo == 'C' and factura_nueva:
+                detalle_ligas = detalle_form.cleaned_data['detalles_liga'].split(',')
+                if detalle_ligas!= [u'']:
+                    for detalle_liga in detalle_ligas:
+                        detalle_doc = Docto_pv_det.objects.get(pk=detalle_liga)
+                        documento_liga = DoctoPVLiga.objects.get(docto_pv_fuente= detalle_doc.documento_pv)
+                        c = connections[connection_name].cursor()
+                        query =  '''INSERT INTO "DOCTOS_PV_LIGAS_DET" ("DOCTO_PV_LIGA_ID", "DOCTO_PV_DET_FTE_ID", "DOCTO_PV_DET_DEST_ID") \
+                            VALUES (%s, %s, %s)'''%(documento_liga.id, detalle_doc.id , detalle.id)
+                        c.execute(query)
+                        c.close()
 
+            #Si es una factura global nueva y si es por partida
+            if factura_global_tipo == 'P' and factura_nueva:
+
+                #Se generan todos los detalles de ligas
+                for docto_pv_liga in ventas_ligas:
+                    for detalle_venta in Docto_pv_det.objects.filter(documento_pv=docto_pv_liga.docto_pv_fuente):
+                        c = connections[connection_name].cursor()
+                        query =  '''INSERT INTO "DOCTOS_PV_LIGAS_DET" ("DOCTO_PV_LIGA_ID", "DOCTO_PV_DET_FTE_ID", "DOCTO_PV_DET_DEST_ID") \
+                            VALUES (%s, %s, %s)'''%(docto_pv_liga.id, detalle_venta.id, detalle.id)
+                        c.execute(query)
+                        c.close()
+        
+        #Para aplicar la factura  
+        c = connections[connection_name].cursor()
+        query = "EXECUTE PROCEDURE APLICA_FAC_PV(%s,'N');"%factura.id
+        c.execute(query)
+        c.close()
+
+        transaction.commit_unless_managed()
+        management.call_command( 'syncdb', database = connection_name )
+        
         message= 'Factura guardada'
 
     ventas_factura = DoctoPVLiga.objects.filter(docto_pv_destino= factura)
-    c = {'factura_global_fm':factura_global_fm, 'factura_form': factura_form, 'formset':formset, 'message':message,'ventas_factura':ventas_factura, 'message':message, }
+
+    c = {
+        'factura_global_fm':factura_global_fm, 
+        'factura_form': factura_form, 
+        'formset':formset, 
+        'message':message,
+        'ventas_factura':ventas_factura, 
+        'message':message, 
+    }
 
     return render_to_response(template_name, c, context_instance=RequestContext(request))

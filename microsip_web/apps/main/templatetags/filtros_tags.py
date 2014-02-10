@@ -12,6 +12,12 @@ def agregar_compatibilidad_btn():
 
    return result
 
+def filtros_tab():
+   result = ''
+   if 'microsip_web.apps.main.filtros' in settings.MICROSIP_MODULES:
+      result = '<li class=""><a href="#filtros" data-toggle="tab">Filtros</a></li>'
+
+   return result
 def compatibilidad_title():
    result = ''
    if 'microsip_web.apps.main.filtros' in settings.MICROSIP_MODULES:
@@ -23,3 +29,4 @@ def compatibilidad_title():
 
 register.simple_tag(agregar_compatibilidad_btn)
 register.simple_tag(compatibilidad_title)
+register.simple_tag(filtros_tab)

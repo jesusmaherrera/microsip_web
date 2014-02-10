@@ -272,6 +272,16 @@ procedures['SIC_PUNTOS_DOCTOS_PV_AT'] = '''
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'SIC_CLIENTE_TARJETA')) then
             execute statement 'ALTER TABLE DOCTOS_PV ADD SIC_CLIENTE_TARJETA ENTERO_ID';
+
+        /*FATURA GLOBAL*/
+        /*if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'TIPO_GEN_FAC')) then
+            execute statement 'ALTER TABLE DOCTOS_PV ADD TIPO_GEN_FAC CHAR(1) CHARACTER SET NONE';
+        
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'DOCTOS_PV' and rf.RDB$FIELD_NAME = 'ES_FAC_GLOBAL')) then
+            execute statement 'ALTER TABLE DOCTOS_PV ADD ES_FAC_GLOBAL CHAR(1) CHARACTER SET NONE';*/
     END  
     '''
 

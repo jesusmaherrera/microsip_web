@@ -5,30 +5,21 @@
 {% block style_css %}{% endblock %}
 
 <!-- JavaScript Code -->
-{% block js_code %}{% endblock %}
+{% block js_code %}
+  <script src="{{STATIC_URL}}js/punto_de_venta/documentos.facturas.js"></script>
+{% endblock %}
 
 {% block breadcrumb %}{{ block.super }} Facturas {% endblock %}
 {% block content %}
-<div id="sic_from" class="container-fluid">
-  <div class="row-fluid">
-    <div class="span3">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <h3>Facturas</h3>  
-        </div>
-      </div>
-    </div>
-    <div class="span9">
-      <div id='main_form'>
-        <a href="/punto_de_venta/factura/nueva/" class="btn"> <i class="icon-plus"></i></a>
-      </div>
-    </div>
-  </div>
+<div class="row-fluid">
+  <div class="span3"><h3 style="margin:0;"> Facturas</h3> </div>
+  <a href="/punto_de_venta/factura/nueva/" class="btn"> Nueva</a>
 </div>
 <table class="table tableCell table-hover">
     <tr>
       <th>Folio</th>
       <th>Fecha</th>
+      <!-- <th>Opciones</th> -->
     </tr>
     {% for factura in facturas %}
     <tr>
@@ -40,6 +31,10 @@
         {% endif %}
       </td>
       <td>{{ factura.fecha }}</td>
+      <!-- <td>
+        <input type="hidden" value="{{ factura.id }}" class='factura_id'>
+        {% if factura.aplicado == 'N' %} <a href="" class="btn aplicar_btn">Aplicar</a> {% endif %}
+      </td> -->
     </tr>
     {% endfor %}
 

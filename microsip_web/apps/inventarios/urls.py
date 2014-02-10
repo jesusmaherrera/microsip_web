@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
 from django.views import generic
 from microsip_web.apps.inventarios import views
 from microsip_web.apps.punto_de_venta import views as pv_views
@@ -10,13 +10,12 @@ urlpatterns = patterns('',
     (r'^inventariofisico/(?P<almacen_id>\d+)/$', views.invetariofisico_manageview),
     (r'^inventariofisicomobile/(?P<almacen_id>\d+)/$', views.invetariofisicomobile_manageView),
     
-    (r'^articulos/$', pv_views.articulos_view),
+    
     (r'^almacenes/$', views.almacenes_view),
     (r'^almacenes/abririnventario/(?P<almacen_id>\d+)/$', views.abrir_inventario_byalmacen),
     
-
+    url(r'', include('microsip_web.apps.main.comun.articulos.urls', namespace='in_main_articulos')),
     (r'^articulo/(?P<id>\d+)/', pv_views.articulo_manageView),
-    # (r'^preferencias/', views.preferencias_manageview),
     #(r'^InventarioFisico/Delete/(?P<id>\d+)/', views.invetarioFisico_delete),
     #ENTRADAS
     (r'^entradas/$', views.entradas_View),

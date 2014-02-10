@@ -1,0 +1,92 @@
+{% extends extend %}
+{% block title %}{% endblock %}
+<!-- CSS Code -->
+{% block style_css %}
+<link rel='stylesheet' href='{{STATIC_URL}}css/inventarios.css'/>
+{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+<script src='{{STATIC_URL}}js/jquery.formset.js'></script>
+<script type="text/javascript">
+  $(function() {
+    $('#id_claves tbody tr').formset({
+      prefix: '{{ formset.prefix }}',
+      addCssClass:'btn btn-small',
+      addText:'Nuevo Campo',
+      deleteText:'',
+    });
+  });
+  $(function() {
+    $('#id_precios tbody tr').formset({
+      prefix: '{{ formset.prefix }}',
+      addCssClass:'btn btn-small',
+      addText:'Nuevo Precio',
+      deleteText:'',
+    });
+  });
+</script>
+{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block content %}
+<form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
+  {{articulo_form.errors }}
+  {% block errors %}{% endblock %}
+  <div class="row-fluid">
+    <div class="span3"><h3 style="margin:0;"> Articulo </h3> </div>
+    <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
+    <a href="#" class="btn disabled"><i class="icon-trash"></i></a> 
+  </div>
+  <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
+    <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+    {% block extra_tabs %}
+    {% endblock %}
+  </ul>
+  <div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="general" style="padding-bottom: 0;">
+      <div class="row-fluid">
+        {{articulo_form.nombre }}
+      </div>
+      <div class="row-fluid">
+        <span class='span4'>
+          <label>Linea</label>
+          {{articulo_form.linea }}
+          <label>Unidad de medida</label>
+          {{articulo_form.unidad_venta }}
+          <label>Unidad de compra</label>
+          {{articulo_form.unidad_compra }}
+          <label>Ultimo Costo</label>
+          {{ articulo_form.costo_ultima_compra }}
+        </span>
+        <span class='span8'>
+          <fieldset>
+            <legend>Claves</legend>
+            <table class="table" id="id_claves" border="0" cellpadding="0" cellspacing="5">
+                <tbody>
+                  {% for form in formset.forms %}
+                  <tr id="{{ form.prefix }}-row" class="form-container">
+                   {% for hid in form.hidden_fields %} {{hid}}{% endfor %} 
+                   {{ form.errors }}
+                   <td>{{ form.rol }}</td>
+                   <td>{{ form.clave }}
+                   {% if form.instance.pk %}{{ form.DELETE }}{% endif %}</td>
+                  </tr>
+                  {% endfor %}
+               </tbody>
+             </table>
+             {{ formset.management_form }}
+           </fieldset>
+        </span>
+      </div>
+      <br>
+    </div>
+    {% block ventas_form %}
+    {% endblock %}
+    {% block puntos_form %}
+    {% endblock %}
+    {% block filtros_form %}
+    {% endblock %}
+  </div>
+  <br>
+</form>
+{% endblock %}
