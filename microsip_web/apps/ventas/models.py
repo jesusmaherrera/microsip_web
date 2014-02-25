@@ -1,10 +1,7 @@
 from django.db import models
 from datetime import datetime 
 
-from microsip_web.libs.api.models import *
-
-
-
+from microsip_web.libs.api.models import TipoPoliza, CondicionPago, CuentaCo, DoctoVe, DoctoVeDet
 ################################################################
 ####                                                        ####
 ####        MODELOS EXTRA A BASE DE DATOS MICROSIP          ####

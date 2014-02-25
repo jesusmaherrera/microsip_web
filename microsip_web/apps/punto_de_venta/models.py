@@ -2,7 +2,7 @@
 from django.db import models
 import datetime
 
-from microsip_web.libs.api.models import *
+from microsip_web.libs.api.models import CondicionPago, Impuesto, CuentaCo
 
 ################################################################
 ####                                                        ####

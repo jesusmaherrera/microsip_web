@@ -48,9 +48,11 @@ def condiciones_de_pago_view(request, template_name='main/clientes/condiciones_d
 
 @login_required(login_url='/login/')
 def condicion_de_pago_manageView(request, id = None, template_name='main/clientes/condiciones_de_pago/condicion_de_pago.html'):
-    connection_name = get_conecctionname(request.session)
-    if connection_name == '':
+    conexion_activa_id = request.session['conexion_activa']
+    basedatos_activa = request.session['selected_database']
+    if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
+    conexion_base_datos = "%02d-%s"%(conexion_activa_id, basedatos_activa)
 
     PATH = request.path
     if '/punto_de_venta/condicion_de_pago/' in PATH:
@@ -75,6 +77,11 @@ def condicion_de_pago_manageView(request, id = None, template_name='main/cliente
         condicion_pago.usuario_ult_modif = condicion_pago.usuario_creador
         condicion_pago.save()
         
+        for form in plazo_formset:
+            plazo = form.save(commit=False)
+            if not form.has_changed():
+                plazo.save_send_signal(using=conexion_base_datos)
+                
         plazo_formset.save()
 
         return HttpResponseRedirect('/%s/condiciones_de_pago/'%modulo)

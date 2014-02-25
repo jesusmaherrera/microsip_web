@@ -289,5 +289,5 @@ def cuentas_por_cobrar_inicializar_tablas( conexion_name = None ):
 
 @login_required( login_url = '/login/' )
 def index( request ):
-    return render_to_response( 'main/index.html', {}, context_instance = RequestContext( request ) )
+    return render_to_response( 'main/index.html',{}, context_instance = RequestContext( request ) )
     
