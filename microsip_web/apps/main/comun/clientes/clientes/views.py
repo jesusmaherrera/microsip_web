@@ -82,12 +82,12 @@ def cliente_manageView(request, id = None, template_name='main/clientes/clientes
 
     if id:
         cliente = get_object_or_404(Cliente, pk=id)
-        direccion = first_or_none(DirCliente.objects.filter(cliente=cliente))
+        direccion = first_or_none(ClienteDireccion.objects.filter(cliente=cliente))
         if not direccion:
-            direccion = DirCliente()
+            direccion = ClienteDireccion()
     else:
         cliente =  Cliente()
-        direccion = DirCliente()
+        direccion = ClienteDireccion()
 
     direccion_form = DireccionClienteForm(request.POST or None, instance = direccion)
     form = ClienteManageForm(request.POST or None, instance=  cliente)

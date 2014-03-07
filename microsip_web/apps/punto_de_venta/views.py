@@ -61,7 +61,7 @@ def inicializar_puntos_clientes(request):
         return HttpResponseRedirect('/select_db/')
 
     Cliente.objects.update(puntos=0, dinero_electronico=0, hereda_valorpuntos=1, valor_puntos=0)
-    TipoCliente.objects.update(valor_puntos=0)
+    ClienteTipo.objects.update(valor_puntos=0)
     return HttpResponseRedirect('/punto_de_venta/clientes/')
 
 @login_required(login_url='/login/')
@@ -70,7 +70,7 @@ def inicializar_puntos_articulos(request):
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
-    Articulos.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
+    Articulo.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
     LineaArticulos.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
     GrupoLineas.objects.update(puntos=0, dinero_electronico=0)
     
@@ -81,9 +81,9 @@ def articulo_manageView(request, id = None, template_name='punto_de_venta/articu
     message = ''
 
     if id:
-        articulo = get_object_or_404(Articulos, pk=id)
+        articulo = get_object_or_404(Articulo, pk=id)
     else:
-        articulo =  Articulos()
+        articulo =  Articulo()
     
     articulos_compatibles = ArticuloCompatibleArticulo.objects.filter(articulo=articulo)
     clasificaciones_compatibles = ArticuloCompatibleCarpeta.objects.filter(articulo=articulo)
@@ -164,7 +164,7 @@ def tipos_cliente_view(request, template_name='main/clientes/tipos_cliente/tipos
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
-    tipos_cliente_list = TipoCliente.objects.all()
+    tipos_cliente_list = ClienteTipo.objects.all()
 
     paginator = Paginator(tipos_cliente_list, 20) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -187,9 +187,9 @@ def tipo_cliente_manageView(request, id = None, template_name='main/clientes/tip
     message = ''
 
     if id:
-        tipo_cliente = get_object_or_404(TipoCliente, pk=id)
+        tipo_cliente = get_object_or_404(ClienteTipo, pk=id)
     else:
-        tipo_cliente =  TipoCliente()
+        tipo_cliente =  ClienteTipo()
     
     if request.method == 'POST':
         form = TipoClienteManageForm(request.POST, instance=  tipo_cliente)
@@ -614,7 +614,7 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
 
         cliente = factura.cliente
         cliente_clave = first_or_none( ClavesClientes.objects.filter( cliente= cliente ) )
-        cliente_direccion =  first_or_none( DirCliente.objects.filter( cliente= cliente ) )
+        cliente_direccion =  first_or_none( ClienteDireccion.objects.filter( cliente= cliente ) )
         factura_global_tipo = factura_global_fm.cleaned_data['tipo']
         #Si es una factura nueva
         if not factura.id:

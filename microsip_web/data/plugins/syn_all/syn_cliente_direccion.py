@@ -11,12 +11,12 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from ....libs.api.models import Cliente, DirCliente, Ciudad, Estado, Pais
+from ....libs.api.models import Cliente, ClienteDireccion, Ciudad, Estado, Pais
 from microsip_web.settings.common import MICROSIP_DATABASES
 from microsip_web.libs.custom_db.main import first_or_none
 from .syn_libs import get_indices, set_indices, default_db
 
-@receiver(post_save, sender=DirCliente)
+@receiver(post_save, sender=ClienteDireccion)
 def SincronizarClienteDireccion(sender, **kwargs):
     ''' Para sincronizar primer plazo de condiciones de pago en todas las empreas registradas. '''
 
@@ -31,7 +31,7 @@ def SincronizarClienteDireccion(sender, **kwargs):
         for base_de_datos in bases_de_datos[indice:indice_final]:
             cliente = Cliente.objects.using(base_de_datos).get(nombre=cliente_nombre)
                 
-            direccion = first_or_none(DirCliente.objects.using(base_de_datos).filter(cliente= cliente))
+            direccion = first_or_none(ClienteDireccion.objects.using(base_de_datos).filter(cliente= cliente))
             
             if direccion:
                 direccion.rfc_curp = direccion_a_syncronizar.rfc_curp
@@ -61,7 +61,7 @@ def SincronizarClienteDireccion(sender, **kwargs):
                 estado = Estado.objects.using(base_de_datos).get(nombre=estado_original_nombre)
                 pais = Pais.objects.using(base_de_datos).get(nombre=pais_original_nombre)
 
-                DirCliente.objects.using(base_de_datos).create(
+                ClienteDireccion.objects.using(base_de_datos).create(
                             cliente = cliente,
                             rfc_curp = direccion_a_syncronizar.rfc_curp,
                             ciudad = ciudad,

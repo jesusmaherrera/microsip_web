@@ -30,7 +30,7 @@ def generar_tarjetas( request, template_name = 'punto_de_venta/herramientas/gene
         claves = []
 
         #Datos para cliente
-        rolclaves = RolClavesClientes.objects.get( es_ppal = 'S' )
+        rolclaves = ClienteClaveRol.objects.get( es_ppal = 'S' )
         moneda_local = Moneda.objects.get( es_moneda_local = 'S' )
         
         try:
@@ -39,9 +39,9 @@ def generar_tarjetas( request, template_name = 'punto_de_venta/herramientas/gene
             condicion_pago = CondicionPago.objects.all()[0]
         
         try:            
-            tipo_cliente = TipoCliente.objects.get( nombre = 'TARJETA PROMOCION' )
+            tipo_cliente = ClienteTipo.objects.get( nombre = 'TARJETA PROMOCION' )
         except ObjectDoesNotExist:
-            tipo_cliente = TipoCliente.objects.create(id=-1, nombre = 'TARJETA PROMOCION', valor_puntos = 1)
+            tipo_cliente = ClienteTipo.objects.create(id=-1, nombre = 'TARJETA PROMOCION', valor_puntos = 1)
 
         for numero in range( iniciar_en, iniciar_en + cantidad ):
             clave = '%s%s'% ( prefijo, ( "%09d" % numero ) )

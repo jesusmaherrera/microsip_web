@@ -19,7 +19,7 @@ def args_example(request, text):
 
 @dajaxice_register(method='GET')
 def get_infoarticulo(request, articulo_id):
-    articulo = Articulos.objects.get(pk=articulo_id) 
+    articulo = Articulo.objects.get(pk=articulo_id) 
     articulos_compatibles = ArticuloCompatibleArticulo.objects.filter(articulo=articulo)
     clasificaciones_compatibles = ArticuloCompatibleCarpeta.objects.filter(articulo=articulo)
 
@@ -34,13 +34,13 @@ def get_infoarticulo(request, articulo_id):
 @dajaxice_register(method='GET')
 def articulos_moveto(request, carpeta_id, articulos_seleccionados):
     for id in articulos_seleccionados:
-        articulo = Articulos.objects.filter(pk=id).update(carpeta= Carpeta.objects.get(pk=carpeta_id))
+        articulo = Articulo.objects.filter(pk=id).update(carpeta= Carpeta.objects.get(pk=carpeta_id))
 
     return json.dumps({'message':'Your message is'})
 
 @dajaxice_register(method='GET')
 def get_articulosby_grupopadre(request, carpetapadre_id):
-    articulos = Articulos.objects.filter(grupo_padre__id = carpetapadre_id)
+    articulos = Articulo.objects.filter(grupo_padre__id = carpetapadre_id)
     data = serializers.serialize("json", articulos,)
     return HttpResponse(data, mimetype="application/javascript")
 
@@ -78,7 +78,7 @@ def get_estructura_carpetas(request):
 
 @dajaxice_register(method='GET')
 def get_articulosby_seccion(request, carpeta_id):
-    articulos = Articulos.objects.filter(carpeta = Carpeta.objects.get(pk=carpeta_id) )
+    articulos = Articulo.objects.filter(carpeta = Carpeta.objects.get(pk=carpeta_id) )
     
     data = serializers.serialize("json", articulos)
     return HttpResponse(data, mimetype="application/javascript")

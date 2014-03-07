@@ -18,7 +18,7 @@ from datetime import datetime
 from django.db.models import Q
 
 from microsip_web.libs.custom_db.main import first_or_none, get_existencias_articulo
-from ...libs.api.models import DocumentoCompras, ConceptosIn, Registry, Almacenes, DocumentoComprasDetalle, DoctosIn, DoctosInDet
+from ...libs.api.models import DocumentoCompras, ConceptosIn, Registry, Almacen, DocumentoComprasDetalle, DoctosIn, InventariosDocumentoDetalle, TipoCambio
 from microsip_web.libs.inventarios import ajustes_get_or_create
 
 almacen_clon_id = 1087990
@@ -33,8 +33,18 @@ def ClonarDocumentoCompras(sender, **kwargs):
     if documento_a_clonar.tipo == 'C' and documento_a_clonar.aplicado == 'S':
         concepto_compras = ConceptosIn.objects.get( pk = 20 )
         fecha_actual = datetime.now()
-        almacen = first_or_none( Almacenes.objects.filter(pk= almacen_clon_id) )
+        almacen = first_or_none( Almacen.objects.filter(pk= almacen_clon_id) )
+        moneda = documento_a_clonar.moneda
         
+        #Tipo de cambio
+        if not moneda.id == 1:
+            tipo_cambio = first_or_none(TipoCambio.objects.filter(moneda = moneda).order_by('-fecha'))
+            
+            if tipo_cambio:
+                tipo_cambio = tipo_cambio.tipo_cambio
+            else:
+                tipo_cambio = 1
+
         entrada = DoctosIn.objects.create(
                 almacen =  almacen,
                 concepto = concepto_compras,
@@ -43,7 +53,7 @@ def ClonarDocumentoCompras(sender, **kwargs):
                 fecha = documento_a_clonar.fecha,
                 sistema_origen = 'IN',
                 usuario_creador = documento_a_clonar.usuario_creador,
-                descripcion = 'CLON',
+                descripcion = 'de %s'%documento_a_clonar.folio,
              )
 
         entrada.save()
@@ -51,7 +61,7 @@ def ClonarDocumentoCompras(sender, **kwargs):
         detalles_a_clonar = DocumentoComprasDetalle.objects.filter(documento = documento_a_clonar)
 
         for detalle in detalles_a_clonar:
-            DoctosInDet.objects.create(
+            InventariosDocumentoDetalle.objects.create(
                     doctosIn = entrada,
                     almacen = almacen,
                     concepto = entrada.concepto,
@@ -59,16 +69,16 @@ def ClonarDocumentoCompras(sender, **kwargs):
                     articulo = detalle.articulo,
                     tipo_movto = 'E',
                     unidades = detalle.unidades,
-                    costo_unitario = detalle.precio_unitario,
+                    costo_unitario = detalle.precio_unitario * tipo_cambio,
                     costo_total = detalle.precio_total_neto,
                     metodo_costeo = 'C',
                     fecha = fecha_actual
                 )
 
-@receiver(pre_save, sender=DoctosInDet)
+@receiver(pre_save, sender=InventariosDocumentoDetalle)
 def ClonarExistencia(sender, **kwargs):
     ''' para en la aplicacion inventarios fisicos generar entradas y salidas en el almacen clon. '''
-    almacen_clon = first_or_none( Almacenes.objects.filter(pk= almacen_clon_id) )
+    almacen_clon = first_or_none( Almacen.objects.filter(pk= almacen_clon_id) )
 
     detalle =  kwargs.get('instance')
     if almacen_clon and detalle.almacen != almacen_clon:
@@ -81,9 +91,9 @@ def ClonarExistencia(sender, **kwargs):
 
         entrada_clon, salida_clon = ajustes_get_or_create(almacen_id = almacen_clon.ALMACEN_ID, username = detalle.usuario_ult_modif)   
         
-        old_detalle = first_or_none(DoctosInDet.objects.filter(pk=detalle.id))
+        old_detalle = first_or_none(InventariosDocumentoDetalle.objects.filter(pk=detalle.id))
 
-        existe_en_detalles = DoctosInDet.objects.filter( 
+        existe_en_detalles = InventariosDocumentoDetalle.objects.filter( 
                 Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
                 articulo = detalle.articulo,
                 almacen = detalle.almacen,
@@ -130,7 +140,7 @@ def ClonarExistencia(sender, **kwargs):
         #Entrada
         if unidades_diferencia >= 0:
             
-            detalle_clon = first_or_none( DoctosInDet.objects.filter(doctosIn=entrada_clon, articulo=detalle.articulo ))     
+            detalle_clon = first_or_none( InventariosDocumentoDetalle.objects.filter(doctosIn=entrada_clon, articulo=detalle.articulo ))     
             if detalle_clon:
                 detalle_clon_unidades =detalle_clon.unidades
                 detalle_clon.unidades = detalle_clon.unidades + unidades_diferencia
@@ -138,7 +148,7 @@ def ClonarExistencia(sender, **kwargs):
                 detalle_clon.costo_total = detalle_clon.unidades * detalle_clon.costo_unitario
                 detalle_clon.save()
             else:
-                detalle_clon = DoctosInDet.objects.create(
+                detalle_clon = InventariosDocumentoDetalle.objects.create(
                         doctosIn = entrada_clon,
                         almacen = almacen_clon,
                         concepto = entrada_clon.concepto,
@@ -153,7 +163,7 @@ def ClonarExistencia(sender, **kwargs):
 
         #Salida
         elif unidades_diferencia < 0:
-            detalle_clon = first_or_none( DoctosInDet.objects.filter(doctosIn=salida_clon, articulo=detalle.articulo ))
+            detalle_clon = first_or_none( InventariosDocumentoDetalle.objects.filter(doctosIn=salida_clon, articulo=detalle.articulo ))
             unidades_diferencia = unidades_diferencia * -1
             
             if detalle_clon:
@@ -162,7 +172,7 @@ def ClonarExistencia(sender, **kwargs):
                 detalle_clon.costo_total = detalle_clon.unidades * detalle_clon.costo_unitario
                 detalle_clon.save()
             else:
-                detalle_clon = DoctosInDet.objects.create(
+                detalle_clon = InventariosDocumentoDetalle.objects.create(
                         doctosIn = salida_clon,
                         almacen = almacen_clon,
                         concepto = salida_clon.concepto,

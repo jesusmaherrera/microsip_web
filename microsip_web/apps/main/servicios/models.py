@@ -2,9 +2,9 @@
 from django.db import models
 from datetime import datetime
 
-from microsip_web.libs.api.models import Articulos, Carpeta, Cliente
+from microsip_web.libs.api.models import Articulo, Carpeta, Cliente
 
-class ObjetoCliente(models.Model):
+class ArticuloCliente(models.Model):
     clave  = models.CharField(max_length=20)
     cliente = models.ForeignKey(Cliente)
     descripcion  = models.CharField(max_length=150)
@@ -13,17 +13,17 @@ class ObjetoCliente(models.Model):
         return u'%s'% self.id
 
     class Meta:
-        db_table = u'sic_ser_objetocliente'
+        db_table = u'sic_articulo_cliente'
 
 
-class ServicioObjetoCliente(models.Model):
-    cliente = models.ForeignKey(Cliente)
-    servicio = models.ForeignKey(Articulos)
-    objeto_cliente = models.ForeignKey(ObjetoCliente)
-    fechahora_servicio = models.DateTimeField( auto_now_add=True)
-    fecha_vencimiento = models.DateField(blank=True, null=True)
-    # dias_vigencia = models.DateField(blank=True, null=True)
+class ArticuloClienteMantenimiento(models.Model):
+    articulo = models.ForeignKey(Articulo)
+    articulo_cliente = models.ForeignKey(ArticuloCliente)
+    fechahora = models.DateTimeField( auto_now_add=True)
+    factura = models.ForeignKey(DocumentoVentas)
 
+    alerta_fechahora = models.DateTimeField( auto_now_add=True)
+    
     def __unicode__(self):
         return u'%s'% self.id
         

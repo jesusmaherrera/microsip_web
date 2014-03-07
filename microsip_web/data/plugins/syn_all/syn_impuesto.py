@@ -11,7 +11,7 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
 
-from ....libs.api.models import Impuesto, TiposImpuestos
+from ....libs.api.models import Impuesto, ImpuestoTipo
 from microsip_web.settings.common import MICROSIP_DATABASES
 from microsip_web.libs.custom_db.main import first_or_none
 from .syn_libs import get_indices, set_indices, default_db
@@ -41,7 +41,7 @@ def SincronizarImpuesto(sender, **kwargs):
                 impuesto.es_predet= impuesto_a_syncronizar.es_predet
                 impuesto.save(using=base_de_datos)
             else:
-                tipo_impuesto = first_or_none(TiposImpuestos.objects.using(base_de_datos).filter(nombre=impuesto_a_syncronizar.tipoImpuesto.nombre))
+                tipo_impuesto = first_or_none(ImpuestoTipo.objects.using(base_de_datos).filter(nombre=impuesto_a_syncronizar.tipoImpuesto.nombre))
                 if tipo_impuesto:
                     Impuesto.objects.using(base_de_datos).create(
                             id=-1,

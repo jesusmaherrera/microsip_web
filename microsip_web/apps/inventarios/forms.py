@@ -24,7 +24,7 @@ class precios_articulos_form(forms.ModelForm):
 
 class articulos_form(forms.ModelForm):
     class Meta:
-        model = Articulos
+        model = Articulo
         exclude = ('seguimiento', 'estatus', 'puntos','es_almacenable',)
 
     def __init__(self, *args, **kwargs):
@@ -184,12 +184,12 @@ class EntradaManageForm(forms.ModelForm):
 
 
 class DoctoInDetManageForm(forms.ModelForm):
-    articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
+    articulo = forms.ModelChoiceField(Articulo.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticuloAutocomplete'))
     unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades'}),required=True)
     costo_unitario = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'costo'}),required=True)
 
     class Meta:
-        model   = DoctosInDet
+        model   = InventariosDocumentoDetalle
         exclude = (
                 'doctosIn',
                 'tipo_movto',
@@ -217,7 +217,7 @@ class DoctosInDetManageForm(forms.ModelForm):
         required=False
         )
 
-    articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
+    articulo = forms.ModelChoiceField(Articulo.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticuloAutocomplete'))
     unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades ...'}),required=True)
 
     def __init__(self, *args, **kwargs):
@@ -227,7 +227,7 @@ class DoctosInDetManageForm(forms.ModelForm):
         self.fields['costo_total'].widget.attrs['class'] = 'input-small'
 
     class Meta:
-        model = DoctosInDet
+        model = InventariosDocumentoDetalle
         exclude = (
             'tipo_movto',
             'almacen',
@@ -242,7 +242,7 @@ class DoctosInDetManageForm(forms.ModelForm):
 
 class DoctoIn_CreateForm(forms.ModelForm):
     fecha = forms.DateField(widget=forms.TextInput(attrs={'class':'input-small'}))
-    almacen = forms.ModelChoiceField(queryset= Almacenes.objects.all(), widget=forms.Select(attrs={'class':'input-medium'}))
+    almacen = forms.ModelChoiceField(queryset= Almacen.objects.all(), widget=forms.Select(attrs={'class':'input-medium'}))
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'rows':'3', 'cols':'20',}))
     
     class Meta:
@@ -303,7 +303,7 @@ class DoctosInvfisDetManageForm(forms.ModelForm):
         widget=forms.TextInput(attrs={"class":"input-medium", "placeholder":"clave ...",}),
         required=False
         )
-    articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
+    articulo = forms.ModelChoiceField(Articulo.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticuloAutocomplete'))
     unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini', 'placeholder':'unidades ...'}),required=True)
     
     def __init__(self, *args, **kwargs):
@@ -325,7 +325,7 @@ class DoctosInvfisDetManageForm(forms.ModelForm):
 
 # attrs={'class':'input-medium'}
 def doctoIn_items_formset(form, formset = BaseInlineFormSet, **kwargs):
-    return inlineformset_factory(DoctosIn, DoctosInDet, form, formset, **kwargs)
+    return inlineformset_factory(DoctosIn, InventariosDocumentoDetalle, form, formset, **kwargs)
 
 def inventarioFisico_items_formset(form, formset = BaseInlineFormSet, **kwargs):
     return inlineformset_factory(DoctosInvfis, DoctosInvfisDet, form, formset, **kwargs)
@@ -333,7 +333,7 @@ def inventarioFisico_items_formset(form, formset = BaseInlineFormSet, **kwargs):
 
 class almacen_inventariando_form(forms.ModelForm):
     class Meta:
-        model = Almacenes
+        model = Almacen
         exclude = (
             'nombre',
             'inventariando',
@@ -341,30 +341,30 @@ class almacen_inventariando_form(forms.ModelForm):
 
 class ArticulosDiscretos_ManageForm(forms.ModelForm):
     id = forms.IntegerField(required=False)
-    articulo   =  forms.ModelChoiceField(queryset= Articulos.objects.filter(es_almacenable='S'), required=True, widget=forms.HiddenInput())
+    articulo   =  forms.ModelChoiceField(queryset= Articulo.objects.filter(es_almacenable='S'), required=True, widget=forms.HiddenInput())
     clave = forms.CharField(max_length=100, required=True)
 
     # def clean(self):
     #     cleaned_data = self.cleaned_data
     #     clave = cleaned_data.get("clave")
     #     articulo = cleaned_data.get("articulo")
-    #     art_disc = ArticulosDiscretos.objects.filter(articulo=articulo, clave=clave, fecha=None) 
+    #     art_disc = ArticuloDiscreto.objects.filter(articulo=articulo, clave=clave, fecha=None) 
 
     #     #if DesgloseEnDiscretosInvfis.objects.filter(art_discreto=art_disc).exists():
     #     #     raise forms.ValidationError(u'El articulo con este numero de serie ya se registro en el inventario')
-    #     if not ArticulosDiscretos.objects.filter(articulo=articulo, clave=clave, fecha=None).exists() and clave != None:
+    #     if not ArticuloDiscreto.objects.filter(articulo=articulo, clave=clave, fecha=None).exists() and clave != None:
     #         raise forms.ValidationError(u'Numero de serie, no registrado en los articulos')
 
     #     return cleaned_data
 
     class Meta:
-        model = ArticulosDiscretos
+        model = ArticuloDiscreto
         exclude = (
             'tipo',
             'fecha',
             )
 
 class LotesArticulo_ManageForm(forms.Form):
-    lote  = forms.ModelChoiceField(queryset= ArticulosDiscretos.objects.filter(tipo='L'))
+    lote  = forms.ModelChoiceField(queryset= ArticuloDiscreto.objects.filter(tipo='L'))
 
     

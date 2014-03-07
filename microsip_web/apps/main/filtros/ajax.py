@@ -38,6 +38,6 @@ def remove_node(request, id):
 
 @dajaxice_register(method='GET')
 def create_articulocompatiblecarpeta(request, articulo_id, carpeta_id):
-    ArticuloCompatibleCarpeta.objects.create(articulo=Articulos.objects.get(pk=articulo_id), carpeta_compatible=Carpeta.objects.get(pk=carpeta_id))
+    ArticuloCompatibleCarpeta.objects.create(articulo=Articulo.objects.get(pk=articulo_id), carpeta_compatible=Carpeta.objects.get(pk=carpeta_id))
     return ''
 

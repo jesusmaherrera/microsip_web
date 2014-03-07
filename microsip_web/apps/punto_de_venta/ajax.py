@@ -33,16 +33,16 @@ def generar_factura_global( request, **kwargs ):
     fecha_inicio = datetime.strptime( kwargs.get( 'fecha_inicio', None ), '%d/%m/%Y' ).date()
     # fecha_fin = datetime.strptime( kwargs.get( 'fecha_inicio', None ), '%d/%m/%Y' ).date()
     fecha_fin = datetime.strptime( kwargs.get( 'fecha_fin', None ), '%d/%m/%Y' ).date()
-    almacen = first_or_none( Almacenes.objects.filter( pk = kwargs.get('almacen_id', None) ) )
+    almacen = first_or_none( Almacen.objects.filter( pk = kwargs.get('almacen_id', None) ) )
     cliente = Cliente.objects.get( pk = int( kwargs.get('cliente_id', None) ) )
-    cliente_direccion =  first_or_none( DirCliente.objects.filter(cliente=cliente) )
+    cliente_direccion =  first_or_none( ClienteDireccion.objects.filter(cliente=cliente) )
     factura_tipo = kwargs.get('factura_tipo', None)
     modalidad_facturacion = kwargs.get('modalidad_facturacion', None)
 
     #SI NO EXITE ARICULO DE PUBLICO EN GENERAL
     articulo_ventaspg_id = Registry.objects.get( nombre = 'ARTICULO_VENTAS_FG_PV_ID' )
     articulo_ventaspg_id.save(update_fields=['valor',])
-    if not Articulos.objects.filter(pk=articulo_ventaspg_id.valor).exists() and factura_tipo == 'P':
+    if not Articulo.objects.filter(pk=articulo_ventaspg_id.valor).exists() and factura_tipo == 'P':
         c = {'message':'por favor primero espesifica un articulo general',}
         return HttpResponse( json.dumps(c), mimetype = "application/javascript" )
     

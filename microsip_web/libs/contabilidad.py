@@ -714,7 +714,7 @@ def get_impuestos_documento(documento, connection_name):
     c = connections[connection_name].cursor()
     if documento_tipo == 'Docto_PV':
         consulta ="SELECT IMPUESTO_ID, IMPORTE_IMPUESTO FROM IMPUESTOS_DOCTOS_PV WHERE DOCTO_PV_ID= %s"% documento.id
-    elif documento_tipo == 'DoctoVe':
+    elif documento_tipo == 'VentasDocumento':
         consulta ="SELECT IMPUESTO_ID, IMPORTE_IMPUESTO FROM IMPUESTOS_DOCTOS_VE WHERE DOCTO_VE_ID= %s"% documento.id
     elif documento_tipo == 'DoctosCm':
         consulta ="SELECT IMPUESTO_ID, IMPORTE_IMPUESTO FROM IMPUESTOS_DOCTOS_CM WHERE DOCTO_CM_ID= %s"% documento.id

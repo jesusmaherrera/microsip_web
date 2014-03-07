@@ -49,7 +49,7 @@ def ajustar_seriesinventario_byarticulo( **kwargs ):
     detalle = None
     #DETALLES ENTRADAS
     if unidades > 0:
-        detalle = DoctosInDet.objects.get_or_create(articulo=articulo, doctosIn=entrada, defaults={
+        detalle = InventariosDocumentoDetalle.objects.get_or_create(articulo=articulo, doctosIn=entrada, defaults={
             'id': next_id('ID_DOCTOS', connection_name),
             'doctosIn': entrada,
             'almacen': entrada.almacen,
@@ -63,7 +63,7 @@ def ajustar_seriesinventario_byarticulo( **kwargs ):
 
     #DETALLES SALIDAS
     if unidades < 0:    
-        detalle = DoctosInDet.objects.get_or_create(
+        detalle = InventariosDocumentoDetalle.objects.get_or_create(
             articulo=articulo, doctosIn=salida,
             defaults={
                 'id': next_id('ID_DOCTOS', connection_name),
@@ -78,7 +78,7 @@ def ajustar_seriesinventario_byarticulo( **kwargs ):
             })[0]
 
     for serie in series:
-        articulo_discreto = ArticulosDiscretos.objects.get_or_create(
+        articulo_discreto = ArticuloDiscreto.objects.get_or_create(
             clave=serie,
             articulo=articulo,
             tipo='S',
@@ -131,12 +131,12 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
     connection_name = get_conecctionname(request.session)
     error = False
     articulo_id = kwargs.get('articulo_id', None)
-    articulo = Articulos.objects.get(pk=articulo_id)
+    articulo = Articulo.objects.get(pk=articulo_id)
     articulo_clave = first_or_none(
         ClavesArticulos.objects.filter(articulo=articulo))
 
     almacen_id = kwargs.get('almacen_id', None)
-    almacen = Almacenes.objects.get(ALMACEN_ID=almacen_id)
+    almacen = Almacen.objects.get(ALMACEN_ID=almacen_id)
 
     entrada_id = kwargs.get('entrada_id', None)
     entrada = DoctosIn.objects.get(pk=entrada_id)
@@ -153,7 +153,7 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
     series = series.split(',')
     msg = ''
 
-    existe_en_detalles = DoctosInDet.objects.filter(
+    existe_en_detalles = InventariosDocumentoDetalle.objects.filter(
         Q(doctosIn__concepto=27) | Q(doctosIn__concepto=38), articulo=articulo,
         almacen=almacen,
         doctosIn__descripcion='ES INVENTARIO',
@@ -270,7 +270,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     ajustar_primerconteo = kwargs.get( 'ajustar_primerconteo', None )
     ubicacion = kwargs.get( 'ubicacion', None )
     articulo_id = kwargs.get( 'articulo_id', None )
-    articulo = Articulos.objects.get( pk = articulo_id )
+    articulo = Articulo.objects.get( pk = articulo_id )
 
     entrada_id = kwargs.get( 'entrada_id', None )
     entrada = DoctosIn.objects.get( pk = entrada_id )
@@ -278,7 +278,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     salida = DoctosIn.objects.get( pk = salida_id )
     
     almacen_id = kwargs.get( 'almacen_id', None )
-    almacen = Almacenes.objects.get( pk = almacen_id)
+    almacen = Almacen.objects.get( pk = almacen_id)
 
     request_session = kwargs.get( 'request_session', 0 )
     request_user = kwargs.get( 'request_user', 0 )
@@ -289,7 +289,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
 
     puede_modificar_costos = allow_microsipuser( username = request_user.username, clave_objeto = 469) and almacen.inventario_modifcostos
 
-    detalles_entradas_ultimocosto = first_or_none( DoctosInDet.objects.filter(
+    detalles_entradas_ultimocosto = first_or_none( InventariosDocumentoDetalle.objects.filter(
             Q( doctosIn__concepto = 27 ),
             articulo = articulo,
             almacen = almacen,
@@ -299,18 +299,18 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     if not detalles_entradas_ultimocosto:
          detalles_entradas_ultimocosto = articulo.costo_ultima_compra
 
-    existe_en_detalles = DoctosInDet.objects.filter( 
+    existe_en_detalles = InventariosDocumentoDetalle.objects.filter( 
         Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
         articulo = articulo,
         almacen = almacen,
         doctosIn__descripcion = 'ES INVENTARIO',
         ).count() > 0
 
-    detalle_entradas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn = entrada ) )
-    detalle_salidas = first_or_none( DoctosInDet.objects.filter( articulo = articulo, doctosIn = salida ) )
+    detalle_entradas = first_or_none( InventariosDocumentoDetalle.objects.filter( articulo = articulo, doctosIn = entrada ) )
+    detalle_salidas = first_or_none( InventariosDocumentoDetalle.objects.filter( articulo = articulo, doctosIn = salida ) )
     articulo_clave = first_or_none( ClavesArticulos.objects.filter( articulo = articulo ) )
 
-    detalle = DoctosInDet(
+    detalle = InventariosDocumentoDetalle(
         articulo = articulo,
         claveArticulo = articulo_clave,
         almacen = almacen,
@@ -438,7 +438,7 @@ def close_inventario_byalmacen_view( request, **kwargs ):
     """ Para agregar existencia a un articulo por ajuste"""
     #Paramentros
     almacen_id = kwargs.get( 'almacen_id', None )
-    almacen = Almacenes.objects.get(pk= almacen_id)
+    almacen = Almacen.objects.get(pk= almacen_id)
     almacen.inventariando = False
     almacen.inventario_conajustes = False
     almacen.inventario_modifcostos = False
@@ -502,7 +502,7 @@ def add_articulos_sincontar( **kwargs ):
     
     message= ''
     
-    articulos_endocumentos = list( set( DoctosInDet.objects.filter(
+    articulos_endocumentos = list( set( InventariosDocumentoDetalle.objects.filter(
         Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
         almacen = almacen,
         doctosIn__descripcion = 'ES INVENTARIO'
@@ -516,11 +516,11 @@ def add_articulos_sincontar( **kwargs ):
             return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
 
         inventario_descripcion = 'ARTICULOS SIN CONTAR LINEA(%s)'% linea.nombre
-        articulos_all = list( set( Articulos.objects.exclude(estatus = 'B').filter( es_almacenable = 'S', linea = linea ).order_by( '-id' ).values_list( 'id', flat = True ) ))
+        articulos_all = list( set( Articulo.objects.exclude(estatus = 'B').filter( es_almacenable = 'S', linea = linea ).order_by( '-id' ).values_list( 'id', flat = True ) ))
         
     else:
         inventario_descripcion = 'ARTICULOS SIN CONTAR'
-        articulos_all = list( set( Articulos.objects.exclude( estatus = 'B').filter( es_almacenable = 'S').order_by( '-id' ).values_list( 'id', flat = True )))
+        articulos_all = list( set( Articulo.objects.exclude( estatus = 'B').filter( es_almacenable = 'S').order_by( '-id' ).values_list( 'id', flat = True )))
 
     inventarios_fisicos =  DoctosInvfis.objects.filter(descripcion__contains= inventario_descripcion, aplicado= 'N', almacen= almacen)
 
@@ -563,7 +563,7 @@ def add_articulos_sincontar( **kwargs ):
     for articulos_sincontar_sublist in articulos_sincontar_list:
         detalles_en_ceros = 0
         for articulo_id in articulos_sincontar_sublist:
-            articulo = Articulos.objects.get(pk=articulo_id)
+            articulo = Articulo.objects.get(pk=articulo_id)
             DoctosInvfisDet.objects.create(
                     id = -1,
                     docto_invfis = inventario,
@@ -585,7 +585,7 @@ def add_articulossinexistencia( request, **kwargs ):
     connection_name = get_conecctionname(request.session)
     ubicacion = kwargs.get( 'ubicacion', None )
     almacen_id = kwargs.get( 'almacen_id', None )
-    almacen = Almacenes.objects.get( pk= almacen_id )
+    almacen = Almacen.objects.get( pk= almacen_id )
     message= ''
 
     return add_articulos_sincontar(
@@ -606,7 +606,7 @@ def add_articulossinexistencia_bylinea( request, **kwargs ):
     message= ''
 
     linea = LineaArticulos.objects.get( pk = linea_id )
-    almacen = Almacenes.objects.get( pk= almacen_id )
+    almacen = Almacen.objects.get( pk= almacen_id )
 
     return add_articulos_sincontar( 
             request_username = request.user.username,
@@ -625,7 +625,7 @@ def get_detallesarticulo_byid( request, **kwargs ):
     articulo_id = kwargs.get( 'articulo_id', None)
     comun_name = kwargs.get( 'comun_name', None)
     articulo_clave = kwargs.get( 'articulo_clave', None)
-    articulo = Articulos.objects.get( pk = articulo_id )
+    articulo = Articulo.objects.get( pk = articulo_id )
 
     if not articulo_clave:
         articulo_clave = first_or_none( ClavesArticulos.objects.filter( articulo_id = articulo_id, articulo__estatus = 'A'))
@@ -662,7 +662,7 @@ def get_articulo_byclave( request, **kwargs ):
     opciones_clave = {}
     
     if clave_articulo:
-        articulo = Articulos.objects.get( pk = clave_articulo.articulo.id )
+        articulo = Articulo.objects.get( pk = clave_articulo.articulo.id )
         articulo_id = articulo.id
         articulo_nombre = articulo.nombre
     else:
@@ -685,7 +685,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     """ Para obterner existencia de un articulo segun clave del articulo """
     #Paramentros
     almacen_nombre = kwargs.get( 'almacen', None)
-    almacen = Almacenes.objects.get(nombre = almacen_nombre)
+    almacen = Almacen.objects.get(nombre = almacen_nombre)
     entrada_id = kwargs.get( 'entrada_id', None )
     articulo_clave = kwargs.get( 'articulo_clave', None)
     connection_name = get_conecctionname( request.session )
@@ -710,9 +710,9 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     detalle_modificacionestime_salidas = ''
     ya_ajustado = False
     if clave_articulo:
-        articulo = Articulos.objects.get( pk = clave_articulo.articulo.id )
+        articulo = Articulo.objects.get( pk = clave_articulo.articulo.id )
 
-        detalles_all = DoctosInDet.objects.filter(
+        detalles_all = InventariosDocumentoDetalle.objects.filter(
             Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
             articulo = articulo,
             almacen = almacen,
@@ -744,14 +744,14 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
 
         articulo_seguimiento = articulo.seguimiento
         
-        detalles_entradas = DoctosInDet.objects.filter(
+        detalles_entradas = InventariosDocumentoDetalle.objects.filter(
             Q( doctosIn__concepto = 27 ),
             articulo = articulo,
             almacen = almacen,
             doctosIn__descripcion = 'ES INVENTARIO'
             ).order_by('fechahora_ult_modif')
 
-        detalles_salidas = DoctosInDet.objects.filter(
+        detalles_salidas = InventariosDocumentoDetalle.objects.filter(
             Q( doctosIn__concepto = 38 ),
             articulo = articulo,
             almacen = almacen,
@@ -804,7 +804,7 @@ def get_existenciasarticulo_byid( request, **kwargs ):
     """ Para obterner existencia de un articulo segun id del articulo """
     #Paramentros
     almacen_nombre = kwargs.get( 'almacen', None)
-    almacen = Almacenes.objects.get(nombre = almacen_nombre)
+    almacen = Almacen.objects.get(nombre = almacen_nombre)
     articulo_id = kwargs.get( 'articulo_id', None)
     entrada_id = kwargs.get( 'entrada_id', None )
     connection_name = get_conecctionname( request.session )
@@ -812,9 +812,9 @@ def get_existenciasarticulo_byid( request, **kwargs ):
     detalle_modificacionestime_salidas = ''
     ya_ajustado = False
     
-    articulo = Articulos.objects.get( pk = articulo_id )
+    articulo = Articulo.objects.get( pk = articulo_id )
 
-    detalles_all = DoctosInDet.objects.filter(
+    detalles_all = InventariosDocumentoDetalle.objects.filter(
         Q( doctosIn__concepto = 27 ) | Q( doctosIn__concepto = 38 ),
         articulo = articulo,
         almacen = almacen,
@@ -837,13 +837,13 @@ def get_existenciasarticulo_byid( request, **kwargs ):
         fecha_inicio = datetime.now().strftime( "01/01/%Y" ),
         almacen = almacen_nombre, )
  
-    detalles_entradas = DoctosInDet.objects.filter(
+    detalles_entradas = InventariosDocumentoDetalle.objects.filter(
         Q( doctosIn__concepto = 27 ),
         articulo = articulo,
         almacen = almacen,
         doctosIn__descripcion = 'ES INVENTARIO').order_by('fechahora_ult_modif')
 
-    detalles_salidas = DoctosInDet.objects.filter(
+    detalles_salidas = InventariosDocumentoDetalle.objects.filter(
         Q( doctosIn__concepto = 38 ),
         articulo = articulo,
         almacen = almacen,

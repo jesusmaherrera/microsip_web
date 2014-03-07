@@ -86,7 +86,7 @@ def new_factura_global( **kwargs ):
         if factura_tipo == 'P':
             
             articulo_ventaspg_id = Registry.objects.get( nombre = 'ARTICULO_VENTAS_FG_PV_ID' ).valor
-            articulo = Articulos.objects.get(pk=articulo_ventaspg_id)
+            articulo = Articulo.objects.get(pk=articulo_ventaspg_id)
             articulo_clave = first_or_none(ClavesArticulos.objects.filter(articulo=articulo))
             if articulo_clave:
                 articulo_clave = articulo_clave.clave
@@ -119,7 +119,7 @@ def new_factura_global( **kwargs ):
                 )
                             
             for detalle in detalles_factura_concentrada:
-                articulo = Articulos.objects.get(pk=detalle['articulo'])
+                articulo = Articulo.objects.get(pk=detalle['articulo'])
                 detalles_relacion = list( set( detalles_factura.filter(articulo=articulo).values_list( 'id', flat = True ) ) )
 
                 articulo_clave = first_or_none(ClavesArticulos.objects.filter(articulo=articulo))

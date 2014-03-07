@@ -1,7 +1,7 @@
 from django.db import models
 from datetime import datetime 
 
-from microsip_web.libs.api.models import TipoPoliza, CondicionPago, CuentaCo, DoctoVe, DoctoVeDet
+from microsip_web.libs.api.models import TipoPoliza, CondicionPago, CuentaCo, VentasDocumento, DoctoVeDet
 ################################################################
 ####                                                        ####
 ####        MODELOS EXTRA A BASE DE DATOS MICROSIP          ####
@@ -75,7 +75,7 @@ class DetallePlantillaPolizas_V(models.Model):
         db_table = u'sic_ve_plantillapoliza_det'
 
 # class CompatibilidadesArticulos(models.Model):
-#     articulo = models.ForeignKey(Articulos, related_name="articulo")
+#     articulo = models.ForeignKey(Articulo, related_name="articulo")
 #     articulos_compatibles = models.ManyToManyField(Articulos, blank=True, null=True, related_name="articulos_compatibles")
     
 #     YEAR_CHOICES = []

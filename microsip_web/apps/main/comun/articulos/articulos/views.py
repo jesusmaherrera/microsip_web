@@ -14,6 +14,8 @@ from django.forms.models import modelformset_factory
 @detect_mobile
 @login_required(login_url='/login/')
 def articulos_view(request, carpeta=1,template_name='main/articulos/articulos/articulos.html'):
+    almacenes = Almacen.objects.all()
+    
     articulos_porpagina = 50  
     basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
@@ -52,13 +54,13 @@ def articulos_view(request, carpeta=1,template_name='main/articulos/articulos/ar
                 if clave_articulo.count() > 0:
                     return HttpResponseRedirect('%s%s/'% (url_articulo, clave_articulo[0].articulo.id))
                 else:
-                    articulos_list = Articulos.objects.filter(nombre__icontains=nombre).order_by('nombre')
+                    articulos_list = Articulo.objects.filter(nombre__icontains=nombre).order_by('nombre')
                     msg='No se encontro ningun articulo con esta clave'
             else:
-                articulos_list = Articulos.objects.filter(nombre__icontains=nombre).order_by('nombre')
+                articulos_list = Articulo.objects.filter(nombre__icontains=nombre).order_by('nombre')
     else:
         filtro_form = filtroarticulos_form()
-        articulos_list = Articulos.objects.filter(Q(carpeta__id=carpeta)| Q(carpeta__id=None)).order_by('nombre') #filter(carpeta = carpeta)
+        articulos_list = Articulo.objects.filter(Q(carpeta__id=carpeta)| Q(carpeta__id=None)).order_by('nombre') #filter(carpeta = carpeta)
     
     paginator = Paginator(articulos_list, articulos_porpagina) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -100,7 +102,7 @@ def articulo_manageview(request, id, template_name='main/articulos/articulos/art
     elif '/inventarios/articulo/' in PATH:
         modulo = 'inventarios'
    
-    articulo = get_object_or_404(Articulos, pk=id)
+    articulo = get_object_or_404(Articulo, pk=id)
 
     clavesarticulos_fromset = modelformset_factory(ClavesArticulos, form= claves_articulos_form, can_delete=True,)
     preciosarticulos_fromset = modelformset_factory(PrecioArticulo, form= precios_articulos_form, can_delete=True,)
@@ -183,12 +185,12 @@ def articulo_manageview(request, id, template_name='main/articulos/articulos/art
 
 #     if id:
 #         cliente = get_object_or_404(Cliente, pk=id)
-#         direccion = first_or_none(DirCliente.objects.filter(cliente=cliente))
+#         direccion = first_or_none(ClienteDireccion.objects.filter(cliente=cliente))
 #         if not direccion:
-#             direccion = DirCliente()
+#             direccion = ClienteDireccion()
 #     else:
 #         cliente =  Cliente()
-#         direccion = DirCliente()
+#         direccion = ClienteDireccion()
 
 #     direccion_form = DireccionClienteForm(request.POST or None, instance = direccion)
 #     form = ClienteManageForm(request.POST or None, instance=  cliente)

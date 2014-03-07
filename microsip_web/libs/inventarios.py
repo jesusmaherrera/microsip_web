@@ -27,7 +27,7 @@ def ajustes_get_or_create( almacen_id = None, username = '' ):
     ''' Funcion obtener o crear documentos de entrada y salida para trabajar ccon inventario por ajustes'''
 
     fecha_actual = datetime.now()
-    almacen = Almacenes.objects.get( pk = almacen_id )
+    almacen = Almacen.objects.get( pk = almacen_id )
     conecpto_ajuste_salida = ConceptosIn.objects.get( pk = 38 )
     conecpto_ajuste_entrada = ConceptosIn.objects.get( pk = 27 )
     folio = '' 

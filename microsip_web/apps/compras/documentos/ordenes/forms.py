@@ -46,7 +46,7 @@ class OrdenManageForm(forms.ModelForm):
 
 
 class DocumentoComprasDetalleManageForm(forms.ModelForm):
-    articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
+    articulo = forms.ModelChoiceField(Articulo.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticuloAutocomplete'))
     unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini text-right', 'placeholder':'unidades'}),required=True)
     precio_unitario = forms.FloatField(widget=forms.TextInput(attrs={'class':'input-small text-right', 'placeholder':'costo'}),required=True)
     detalles_liga = forms.CharField(widget=forms.HiddenInput(), required=False)

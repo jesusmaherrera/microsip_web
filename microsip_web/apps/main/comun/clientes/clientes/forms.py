@@ -23,7 +23,7 @@ class ClienteManageForm(forms.ModelForm):
 
 class DireccionClienteForm(forms.ModelForm):
     class Meta:
-        model = DirCliente
+        model = ClienteDireccion
         exclude = (
             'cliente',
             'nombre_consignatario',

@@ -19,16 +19,16 @@ class factura_global_form( forms.Form ):
     fecha_inicio = forms.DateField( widget = forms.TextInput( attrs = { 'class' : 'input-small' } ), required= True )
     fecha_fin = forms.DateField(widget = forms.TextInput( attrs = { 'class' : 'input-small' } ) , required= True)
     tipo = forms.ChoiceField(choices=TIPOS_GEN_FACTURA, required=True, widget=forms.Select(attrs={'class':'input-medium',}))
-    almacen = forms.ModelChoiceField(queryset= Almacenes.objects.all(), widget=forms.Select(attrs={'class':'input-medium', 'disabled':'disabled',}), required=False)
+    almacen = forms.ModelChoiceField(queryset= Almacen.objects.all(), widget=forms.Select(attrs={'class':'input-medium', 'disabled':'disabled',}), required=False)
 
 class ArticuloCompatibleArticulo_ManageForm(forms.Form):
-    compatible_articulo = forms.ModelChoiceField(queryset=Articulos.objects.all(),
-        widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
+    compatible_articulo = forms.ModelChoiceField(queryset=Articulo.objects.all(),
+        widget=autocomplete_light.ChoiceWidget('ArticuloAutocomplete'))
 
 class ArticuloManageForm(forms.ModelForm):
     
     class Meta:
-        model = Articulos
+        model = Articulo
         exclude= {
             'cuenta_ventas',
             'es_almacenable',
@@ -41,10 +41,10 @@ class ArticuloManageForm(forms.ModelForm):
 
 class TipoClienteManageForm(forms.ModelForm):
     class Meta:
-        model = TipoCliente
+        model = ClienteTipo
 
 class PreferenciasGeneralManageForm(forms.Form):
-    articulo_general= forms.ModelChoiceField(Articulos.objects.filter( es_almacenable= 'N' ), 
+    articulo_general= forms.ModelChoiceField(Articulo.objects.filter( es_almacenable= 'N' ), 
             widget= autocomplete_light.ChoiceWidget('Articulos_noalm_Autocomplete')
         )
 
@@ -288,7 +288,7 @@ class DocumentoPV_ManageForm(forms.ModelForm):
             )
 
 class DocumentoPVDet_ManageForm(forms.ModelForm):
-    articulo = forms.ModelChoiceField(Articulos.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'))
+    articulo = forms.ModelChoiceField(Articulo.objects.all() , widget=autocomplete_light.ChoiceWidget('ArticuloAutocomplete'))
     unidades = forms.FloatField(max_value=100000, widget=forms.TextInput(attrs={'class':'input-mini text-right', 'placeholder':'unidades'}),required=True)
     precio_unitario = forms.FloatField(widget=forms.TextInput(attrs={'class':'input-small text-right', 'placeholder':'costo'}),required=True)
     detalles_liga = forms.CharField(widget=forms.HiddenInput(), required=False)

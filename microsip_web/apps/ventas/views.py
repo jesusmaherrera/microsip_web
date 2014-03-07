@@ -32,9 +32,9 @@ from microsip_web.libs.custom_db.main import get_conecctionname
 @login_required(login_url='/login/')
 def pedido_ManageView(request, id = None, template_name='ventas/documentos/pedidos/pedido.html'):
     if id:
-        documento = get_object_or_404(DoctoVe, pk=id)
+        documento = get_object_or_404(VentasDocumento, pk=id)
     else:
-        documento = DoctoVe()
+        documento = VentasDocumento()
     
     #gruposgrupo_formset = formset_factory(form= GruposGrupo_ManageForm, can_delete=True,)
 
@@ -54,7 +54,7 @@ def pedido_ManageView(request, id = None, template_name='ventas/documentos/pedid
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 def pedidos_view(request, template_name='ventas/documentos/pedidos/pedidos.html'):
-    pedidos = DoctoVe.objects.filter(tipo='P')
+    pedidos = VentasDocumento.objects.filter(tipo='P')
     c = {'pedidos':pedidos, }
     return render_to_response(template_name, c, context_instance=RequestContext(request))   
 
@@ -78,14 +78,14 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
         devoluciones= []
         if ignorar_documentos_cont:
             if crear_polizas_de     == 'F' or crear_polizas_de  == 'FD':
-                facturas            = DoctoVe.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='F', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                facturas            = VentasDocumento.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='F', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
             elif crear_polizas_de   == 'D' or crear_polizas_de  == 'FD':
-                devoluciones        = DoctoVe.objects.filter(estado = 'N').filter(tipo  ='D', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                devoluciones        = VentasDocumento.objects.filter(estado = 'N').filter(tipo  ='D', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
         else:
             if crear_polizas_de     == 'F' or crear_polizas_de  == 'FD':
-                facturas            = DoctoVe.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='F', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                facturas            = VentasDocumento.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='F', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
             elif crear_polizas_de   == 'D' or crear_polizas_de  == 'FD':
-                devoluciones        = DoctoVe.objects.filter(estado = 'N').filter(tipo  = 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                devoluciones        = VentasDocumento.objects.filter(estado = 'N').filter(tipo  = 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
 
         #PREFIJO
         prefijo = informacion_contable.tipo_poliza_ve.prefijo

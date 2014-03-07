@@ -11,7 +11,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from ....libs.api.models import Articulos, ImpuestosArticulo, Impuesto
+from ....libs.api.models import Articulo, ImpuestosArticulo, Impuesto
 from microsip_web.settings.common import MICROSIP_DATABASES
 from microsip_web.libs.custom_db.main import first_or_none
 from .syn_libs import get_indices, set_indices, default_db
@@ -29,7 +29,7 @@ def SincronizarArticuloImpuesto(sender, **kwargs):
         
         indice, indice_final = get_indices(len(bases_de_datos), 40,'ARTICULO')
         for base_de_datos in bases_de_datos[indice:indice_final]:
-            articulo = Articulos.objects.using(base_de_datos).get(nombre=articulo_nombre)
+            articulo = Articulo.objects.using(base_de_datos).get(nombre=articulo_nombre)
                 
             primer_impuesto = first_or_none(ImpuestosArticulo.objects.using(base_de_datos).filter(articulo=articulo))
             impuesto = Impuesto.objects.using(base_de_datos).get(nombre=articulo_impuesto_a_syncronizar.impuesto.nombre)

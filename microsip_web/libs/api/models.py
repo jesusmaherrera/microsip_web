@@ -16,37 +16,37 @@ import django.dispatch
 articulo_clave_save_signal = django.dispatch.Signal()
 plazo_condicion_pago_save_signal = django.dispatch.Signal()
 
-from microsip_web.libs.api.models_base.comun.articulos import *
-from microsip_web.libs.api.models_base.comun.catalogos import *
-from microsip_web.libs.api.models_base.comun.clientes import *
-from microsip_web.libs.api.models_base.comun.listas import *
-from microsip_web.libs.api.models_base.comun.otros import *
-from microsip_web.libs.api.models_base.comun.proveedores import *
+from microsip_api.models_base.comun.articulos import *
+from microsip_api.models_base.comun.catalogos import *
+from microsip_api.models_base.comun.clientes import *
+from microsip_api.models_base.comun.listas import *
+from microsip_api.models_base.comun.otros import *
+from microsip_api.models_base.comun.proveedores import *
 
-from microsip_web.libs.api.models_base.configuracion.folios_fiscales import *
-from microsip_web.libs.api.models_base.configuracion.preferencias import *
+from microsip_api.models_base.configuracion.folios_fiscales import *
+from microsip_api.models_base.configuracion.preferencias import *
 
-from microsip_web.libs.api.models_base.punto_de_venta.documentos import *
-from microsip_web.libs.api.models_base.punto_de_venta.listas import *
+from microsip_api.models_base.punto_de_venta.documentos import *
+from microsip_api.models_base.punto_de_venta.listas import *
 
-from microsip_web.libs.api.models_base.compras.documentos import *
-from microsip_web.libs.api.models_base.compras.otros import *
+from microsip_api.models_base.compras.documentos import *
+from microsip_api.models_base.compras.otros import *
 
-from microsip_web.libs.api.models_base.cuentas_por_pagar.documentos import *
-from microsip_web.libs.api.models_base.cuentas_por_pagar.catalogos import *
+from microsip_api.models_base.cuentas_por_pagar.documentos import *
+from microsip_api.models_base.cuentas_por_pagar.catalogos import *
 
-from microsip_web.libs.api.models_base.cuentas_por_cobrar.documentos import *
-from microsip_web.libs.api.models_base.cuentas_por_cobrar.catalogos import *
+from microsip_api.models_base.cuentas_por_cobrar.documentos import *
+from microsip_api.models_base.cuentas_por_cobrar.catalogos import *
 
-from microsip_web.libs.api.models_base.ventas.documentos import *
+from microsip_api.models_base.ventas.documentos import *
 
-from microsip_web.libs.api.models_base.inventarios.documentos import *
-from microsip_web.libs.api.models_base.inventarios.otros import *
-from microsip_web.libs.api.models_base.inventarios.catalogos import *
+from microsip_api.models_base.inventarios.documentos import *
+from microsip_api.models_base.inventarios.otros import *
+from microsip_api.models_base.inventarios.catalogos import *
 
-from microsip_web.libs.api.models_base.contabilidad.documentos import *
-from microsip_web.libs.api.models_base.contabilidad.catalogos import *
-from microsip_web.libs.api.models_base.contabilidad.listas import *
+from microsip_api.models_base.contabilidad.documentos import *
+from microsip_api.models_base.contabilidad.catalogos import *
+from microsip_api.models_base.contabilidad.listas import *
 
 class Pais(PaisBase):
 
@@ -116,7 +116,7 @@ class Carpeta(models.Model):
     class Meta:
         db_table = u'sic_carpeta'
 
-class GrupoLineas(GrupoLineaBase):
+class GrupoLineas(GrupoLineasBase):
     puntos = models.IntegerField(blank=True, null=True, db_column='SIC_PUNTOS')
     dinero_electronico = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
 
@@ -149,7 +149,7 @@ class LineaArticulos(LineaArticulosBase):
     def __unicode__(self):
         return u'%s' % self.nombre
 
-class Articulos(ArticuloBase):
+class Articulo(ArticuloBase):
     
     puntos = models.IntegerField(default = 0, blank = True, null = True, db_column = 'SIC_PUNTOS' )
     dinero_electronico  = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_DINERO_ELECTRONICO' )
@@ -173,7 +173,7 @@ class PrecioArticulo(ArticuloPrecioBase):
         return u'%s' % self.id
 #clientes
 
-class TipoCliente(ClienteTipoBase):
+class ClienteTipo(ClienteTipoBase):
     
     valor_puntos    = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_VALOR_PUNTOS' )
 
@@ -230,14 +230,14 @@ class Cliente(ClienteBase):
     def __unicode__( self ):
         return self.nombre
 
-class RolClavesClientes(ClienteClaveRolBase):
+class ClienteClaveRol(ClienteClaveRolBase):
     pass
 
 class ClavesClientes(ClienteClaveBase):
     def __unicode__(self):
         return self.clave
 
-class DirCliente(ClienteDireccionBase):
+class ClienteDireccion(ClienteDireccionBase):
     def save(self, *args, **kwargs):    
         using = kwargs.get('using', None)
         using = using or router.db_for_write(self.__class__, instance=self)
@@ -256,7 +256,7 @@ class libresClientes(libreClienteBase):
     cuenta_5 = models.CharField(max_length=99, db_column='CUENTA_5')
 
 #listas
-class TiposImpuestos(ImpuestoTipoBase):
+class ImpuestoTipo(ImpuestoTipoBase):
     def __unicode__(self):
         return u'%s' % self.nombre
 
@@ -357,7 +357,7 @@ class Proveedor(ProveedorBase):
     def __unicode__(self):
         return u'%s' % self.nombre
 
-class FoliosFiscales(ConfiguracionFolioFiscalBase): 
+class FolioFiscal(ConfiguracionFolioFiscalBase): 
     def __str__(self):  
           return u'%s' % self.id
 
@@ -386,7 +386,7 @@ class Aduana(AduanaBase):
     class Meta:
         db_table = u'aduanas'
 
-class Almacenes(AlmacenBase):
+class Almacen(AlmacenBase):
     inventariando = models.BooleanField(default= False, db_column = 'SIC_INVENTARIANDO' )
     inventario_conajustes = models.BooleanField(default= False, db_column = 'SIC_INVCONAJUSTES' )
     inventario_modifcostos = models.BooleanField(default= False, db_column = 'SIC_INVMODIFCOSTOS' )
@@ -394,7 +394,7 @@ class Almacenes(AlmacenBase):
     def __unicode__(self):
         return self.nombre
 
-class ArticulosDiscretos(ArticuloDiscretoBase):
+class ArticuloDiscreto(ArticuloDiscretoBase):
     def __unicode__(self):
         return u'%s' % self.clave
 
@@ -415,7 +415,7 @@ class CentrosCosto(InventariosCentroCostosBase):
     def __unicode__(self):
         return self.nombre 
     
-class RolesClavesArticulos(ArticuloClaveRolBase):
+class ArticuloClaveRol(ArticuloClaveRolBase):
     def __unicode__(self):
         return u'%s' % self.nombre
 
@@ -548,7 +548,7 @@ class DoctosIn(InventariosDocumentoBase):
 
         super(self.__class__, self).save(*args, **kwargs)
 
-class DoctosInDet(InventariosDocumentoDetalleBase):
+class InventariosDocumentoDetalle(InventariosDocumentoDetalleBase):
     fechahora_ult_modif = models.DateTimeField(auto_now=True, blank=True, null=True, db_column='SIC_FECHAHORA_U')
     usuario_ult_modif = models.CharField(blank=True, null=True, max_length=31, db_column='SIC_USUARIO_ULT_MODIF')
     detalle_modificacionestime = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLETIME_MODIFICACIONES')
@@ -687,7 +687,7 @@ class Vendedor(VendedorBase):
     def __unicode__(self):
         return self.nombre
 
-class DoctoVe(VentasDocumentoBase):
+class VentasDocumento(VentasDocumentoBase):
     def __unicode__(self):
         return u'%s' % self.id
 
@@ -786,7 +786,7 @@ class Docto_PV(PuntoVentaDocumentoBase):
 
             #si es factura 
             if consecutivo != '' and self.tipo == 'F' and self.modalidad_facturacion == 'CFDI':
-                folios_fiscales = first_or_none(FoliosFiscales.objects.filter(modalidad_facturacion=self.modalidad_facturacion))
+                folios_fiscales = first_or_none(FolioFiscal.objects.filter(modalidad_facturacion=self.modalidad_facturacion))
                 if folios_fiscales:
                     UsoFoliosFiscales.objects.create(
                             id= -1,
@@ -855,8 +855,8 @@ class Impuestos_grav_docto_pv(PuntoVentaDocumentoImpuestoGravadoBase):
 ################################################################
 
 class ArticuloCompatibleArticulo(models.Model):
-    articulo = models.ForeignKey(Articulos, related_name="articulo_id_ca", blank=True, null=True)
-    articulo_compatible = models.ForeignKey(Articulos, related_name="articulo_compatible_id_ca", blank=True, null=True)
+    articulo = models.ForeignKey(Articulo, related_name="articulo_id_ca", blank=True, null=True)
+    articulo_compatible = models.ForeignKey(Articulo, related_name="articulo_compatible_id_ca", blank=True, null=True)
 
     def __unicode__(self):
         return u'%s'% self.articulo_compatible
@@ -865,7 +865,7 @@ class ArticuloCompatibleArticulo(models.Model):
         db_table = u'sic_articulocomp_art'
 
 class ArticuloCompatibleCarpeta(models.Model):
-    articulo = models.ForeignKey(Articulos, related_name="articulo_id_cc", blank=True, null=True)
+    articulo = models.ForeignKey(Articulo, related_name="articulo_id_cc", blank=True, null=True)
     carpeta_compatible = models.ForeignKey(Carpeta, related_name="carpeta_compatible_id_cc", blank=True, null=True)
 
     def __unicode__(self):

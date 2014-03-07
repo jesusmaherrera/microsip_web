@@ -6,7 +6,7 @@ from django.contrib.auth.forms import AuthenticationForm
 
 class filtroarticulos_form(forms.Form):
     clave   = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'Clave...'}),required=False)
-    articulo = forms.ModelChoiceField(Articulos.objects.all(), widget=autocomplete_light.ChoiceWidget('ArticulosAutocomplete'), required= False)
+    articulo = forms.ModelChoiceField(Articulo.objects.all(), widget=autocomplete_light.ChoiceWidget('ArticuloAutocomplete'), required= False)
     nombre  = forms.CharField(max_length=100,  widget=forms.TextInput(attrs={'class':'input-small', 'placeholder':'Nombre...'}),required=False)
 
 class ConexionManageForm(forms.ModelForm):

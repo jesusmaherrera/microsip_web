@@ -40,7 +40,7 @@ from django.db.models import Sum
 from microsip_web.apps.config.models import DerechoUsuario
 
 def abrir_inventario_byalmacen(request, almacen_id, template_name = 'inventarios/almacenes/abrir_inventario.html'):
-    almacen = Almacenes.objects.get( pk = almacen_id )
+    almacen = Almacen.objects.get( pk = almacen_id )
     almacenform = almacen_inventariando_form(request.POST or None, instance=  almacen)
     
     if almacenform.is_valid():
@@ -61,7 +61,7 @@ def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.ht
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
     
-    almacenes = Almacenes.objects.all()
+    almacenes = Almacen.objects.all()
 
     if "Chrome" in request.META[ 'HTTP_USER_AGENT' ]:
        request.mobile = False
@@ -78,7 +78,7 @@ def almacenes_view( request, template_name = 'inventarios/almacenes/almacenes.ht
 def ArticuloManageView(request, id, template_name='inventarios/articulos/articulo.html'):
     ''' Modificacion de datos de un articulo '''
 
-    articulo = get_object_or_404(Articulos, pk=id)
+    articulo = get_object_or_404(Articulo, pk=id)
 
     clavesarticulos_fromset = modelformset_factory(ClavesArticulos, form= claves_articulos_form, can_delete=True,)
     preciosarticulos_fromset = modelformset_factory(PrecioArticulo, form= precios_articulos_form, can_delete=True,)
@@ -229,7 +229,7 @@ def invetariofisico_manageview( request, almacen_id = None, template_name = 'inv
     connection_name = get_conecctionname( request.session )
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
-    almacen = Almacenes.objects.get(pk=almacen_id)
+    almacen = Almacen.objects.get(pk=almacen_id)
     entrada, salida = ajustes_get_or_create(almacen_id = almacen_id, username = request.user.username)
     
     puede_modificar_costos = allow_microsipuser( username = request.user.username, clave_objeto = 469) and almacen.inventario_modifcostos
@@ -253,7 +253,7 @@ def invetariofisico_manageview( request, almacen_id = None, template_name = 'inv
                 )
     
     articulos_rows = runsql_rows( sql, connection_name)
-    articulos_contados = len( list( set(  DoctosInDet.objects.filter( Q(doctosIn__concepto = 27) | Q(doctosIn__concepto = 38) ).filter( 
+    articulos_contados = len( list( set(  InventariosDocumentoDetalle.objects.filter( Q(doctosIn__concepto = 27) | Q(doctosIn__concepto = 38) ).filter( 
         doctosIn__descripcion = 'ES INVENTARIO', 
         doctosIn__cancelado= 'N',
         doctosIn__almacen = entrada.almacen
@@ -486,7 +486,7 @@ def salida_manageView(request, id = None, template_name='inventarios/Salidas/sal
             input_excel = request.FILES['file_inventario']
             book = xlrd.open_workbook(file_contents=input_excel.read())
             sheet = book.sheet_by_index(0)
-            articulos = Articulos.objects.filter(es_almacenable='S')
+            articulos = Articulo.objects.filter(es_almacenable='S')
 
             Salida_items = doctoIn_items_formset(DoctosInDetManageForm, extra=articulos.count(), can_delete=True)
             
@@ -503,7 +503,7 @@ def salida_manageView(request, id = None, template_name='inventarios/Salidas/sal
                     lista_articulos.append(clave_articulo.articulo.id)
 
             
-            articulos_enceros = Articulos.objects.exclude(pk__in=lista_articulos).filter(es_almacenable='S')
+            articulos_enceros = Articulo.objects.exclude(pk__in=lista_articulos).filter(es_almacenable='S')
             
             for i in articulos_enceros:
                 

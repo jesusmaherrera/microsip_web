@@ -11,7 +11,7 @@ class DoctoVe_ManageForm(forms.ModelForm):
     fecha = forms.DateField(widget=forms.TextInput(attrs={'class':'input-small'}), required= False)
     folio = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class':'input-small'}))
     class Meta:
-        model = DoctoVe
+        model = VentasDocumento
 
 class DoctoVeDet_ManageForm(forms.ModelForm): 
     unidades = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'input-small'}))
@@ -21,7 +21,7 @@ class DoctoVeDet_ManageForm(forms.ModelForm):
         model = DoctoVeDet
 
 def DoctoVeDet_inlineformset(form, formset = BaseInlineFormSet, **kwargs):
-    return inlineformset_factory(DoctoVe, DoctoVeDet, form, formset, **kwargs)
+    return inlineformset_factory(VentasDocumento, DoctoVeDet, form, formset, **kwargs)
 
 class clientes_config_cuentaManageForm(forms.ModelForm):
     class Meta:

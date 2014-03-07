@@ -11,12 +11,12 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
 
-from ....libs.api.models import Articulos, LineaArticulos
+from ....libs.api.models import Articulo, LineaArticulos
 from microsip_web.settings.common import MICROSIP_DATABASES
 from microsip_web.libs.custom_db.main import first_or_none
 from .syn_libs import get_indices, set_indices, default_db
 
-@receiver(pre_save, sender=Articulos)
+@receiver(pre_save, sender=Articulo)
 def SincronizarArticulo(sender, **kwargs):
     ''' Para sincronizar articulos en todas las empreas registradas. '''
     if kwargs.get('using') == default_db:
@@ -28,11 +28,11 @@ def SincronizarArticulo(sender, **kwargs):
         indice, indice_final = get_indices(len(bases_de_datos), 40, 'ARTICULO')
         for base_de_datos in bases_de_datos[indice:indice_final]:
             try:
-                articulo_nombre = Articulos.objects.using(default_db).get(pk=articulo_a_syncronizar.id).nombre
+                articulo_nombre = Articulo.objects.using(default_db).get(pk=articulo_a_syncronizar.id).nombre
             except ObjectDoesNotExist: 
                 articulo_nombre = articulo_a_syncronizar.nombre
                 
-            articulo = first_or_none(Articulos.objects.using(base_de_datos).filter(nombre=articulo_nombre))
+            articulo = first_or_none(Articulo.objects.using(base_de_datos).filter(nombre=articulo_nombre))
             if articulo:
                 articulo.nombre = articulo_a_syncronizar.nombre
                 articulo.es_almacenable = articulo_a_syncronizar.es_almacenable
@@ -52,7 +52,7 @@ def SincronizarArticulo(sender, **kwargs):
             else:
                 linea = LineaArticulos.objects.using(base_de_datos).get(nombre=articulo_a_syncronizar.linea.nombre)
                 
-                Articulos.objects.using(base_de_datos).create(
+                Articulo.objects.using(base_de_datos).create(
                         nombre = articulo_a_syncronizar.nombre,
                         es_almacenable = articulo_a_syncronizar.es_almacenable,
                         estatus = articulo_a_syncronizar.estatus,
