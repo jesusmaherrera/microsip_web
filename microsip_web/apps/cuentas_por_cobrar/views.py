@@ -27,7 +27,7 @@ from microsip_web.libs.custom_db.main import get_conecctionname
 ##########################################
 
 def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True, crear_polizas_por='Documento', crear_polizas_de='', plantilla='', descripcion= '', connection_name= None, usuario_micorsip=''):
-    depto_co = DeptoCo.objects.get(clave='GRAL')
+    depto_co = ContabilidadDepartamento.objects.get(clave='GRAL')
     error   = 0
     msg     = ''
     documentosCCData = []
@@ -42,9 +42,9 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
     if error == 0:
 
         if ignorar_documentos_cont:
-            documentosCC  = DoctosCc.objects.filter(contabilizado ='N', concepto= crear_polizas_de , fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+            documentosCC  = CuentasXCobrarDocumento.objects.filter(contabilizado ='N', concepto= crear_polizas_de , fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
         else:
-            documentosCC  = DoctosCc.objects.filter(concepto= crear_polizas_de , fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+            documentosCC  = CuentasXCobrarDocumento.objects.filter(concepto= crear_polizas_de , fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
 
         msg, documentosCCData = contabilidad.crear_polizas(
             origen_documentos   = 'cuentas_por_cobrar',

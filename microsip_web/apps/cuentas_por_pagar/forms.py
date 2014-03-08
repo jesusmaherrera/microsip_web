@@ -28,12 +28,12 @@ class GenerarPolizasManageForm(forms.Form):
     )
     crear_polizas_por       = forms.ChoiceField(choices=CREAR_POR)
     plantilla = forms.ModelChoiceField(queryset= PlantillaPolizas_CP.objects.all(), required=True)
-    crear_polizas_de = forms.ModelChoiceField(queryset= ConceptoCp.objects.filter(crear_polizas='S'), required=True)
+    crear_polizas_de = forms.ModelChoiceField(queryset= CuentasXPagarConcepto.objects.filter(crear_polizas='S'), required=True)
     #plantilla_2 = forms.ModelChoiceField(queryset= PlantillaPolizas_V.objects.all(), required=True)
     descripcion = forms.CharField(max_length=100, required=False)
         
 class PlantillaPolizaManageForm(forms.ModelForm):
-    tipo = forms.ModelChoiceField(queryset= ConceptoCp.objects.filter(crear_polizas='S'), required=True)
+    tipo = forms.ModelChoiceField(queryset= CuentasXPagarConcepto.objects.filter(crear_polizas='S'), required=True)
 
     class Meta:
         model = PlantillaPolizas_CP

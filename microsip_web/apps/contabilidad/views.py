@@ -25,7 +25,7 @@ def polizas_View(request, template_name='contabilidad/polizas/polizas.html'):
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
-    polizas_list = DoctoCo.objects.filter(estatus='N').order_by('-fecha') 
+    polizas_list = ContabilidadDocumento.objects.filter(estatus='N').order_by('-fecha') 
 
     paginator = Paginator(polizas_list, 15) # Muestra 5 inventarios por pagina
     page = request.GET.get('page')
@@ -49,7 +49,7 @@ def polizas_pendientesView(request, template_name='contabilidad/polizas/polizas_
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
-    polizas_list = DoctoCo.objects.filter(estatus='P').order_by('-fecha') 
+    polizas_list = ContabilidadDocumento.objects.filter(estatus='P').order_by('-fecha') 
 
     paginator = Paginator(polizas_list, 15) # Muestra 5 inventarios por pagina
     page = request.GET.get('page')
@@ -119,10 +119,10 @@ def preferenciasEmpresa_View(request, template_name='contabilidad/herramientas/p
 #               for form in formset:
 #                   form = form.save(commit=False)
 #                   #| Q(fecha_lte=fecha_fin),
-#                   suma_a = DoctosCoDet.objects.filter(cuenta=form.cuenta, tipo_asiento='A', fecha__gte=fecha_ini).aggregate(suma_a = Sum('importe'))['suma_a']
+#                   suma_a = ContabilidadDocumentoDetalle.objects.filter(cuenta=form.cuenta, tipo_asiento='A', fecha__gte=fecha_ini).aggregate(suma_a = Sum('importe'))['suma_a']
 #                   if suma_a == None:
 #                       suma_a = 0
-#                   suma_c = DoctosCoDet.objects.filter(cuenta=form.cuenta,fecha__gte=fecha_ini, tipo_asiento='C').aggregate(suma_c = Sum('importe'))['suma_c']
+#                   suma_c = ContabilidadDocumentoDetalle.objects.filter(cuenta=form.cuenta,fecha__gte=fecha_ini, tipo_asiento='C').aggregate(suma_c = Sum('importe'))['suma_c']
 #                   if suma_c == None:
 #                       suma_c = 0
 

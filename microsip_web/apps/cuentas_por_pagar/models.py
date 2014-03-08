@@ -17,7 +17,7 @@ class InformacionContable_CP(models.Model):
 
 class PlantillaPolizas_CP(models.Model):
     nombre  = models.CharField(max_length=200)
-    tipo    = models.ForeignKey(ConceptoCp)
+    tipo    = models.ForeignKey(CuentasXPagarConcepto)
     
     def __unicode__(self):
         return u'%s'%self.nombre

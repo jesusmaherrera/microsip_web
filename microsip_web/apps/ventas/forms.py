@@ -17,11 +17,11 @@ class DoctoVeDet_ManageForm(forms.ModelForm):
     unidades = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'input-small'}))
     precio_unitario = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'input-small'}))
     class Meta:
-        widgets = autocomplete_light.get_widgets_dict(DoctoVeDet)
-        model = DoctoVeDet
+        widgets = autocomplete_light.get_widgets_dict(VentasDocumentoDetalle)
+        model = VentasDocumentoDetalle
 
 def DoctoVeDet_inlineformset(form, formset = BaseInlineFormSet, **kwargs):
-    return inlineformset_factory(VentasDocumento, DoctoVeDet, form, formset, **kwargs)
+    return inlineformset_factory(VentasDocumento, VentasDocumentoDetalle, form, formset, **kwargs)
 
 class clientes_config_cuentaManageForm(forms.ModelForm):
     class Meta:

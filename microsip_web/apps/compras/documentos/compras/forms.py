@@ -27,7 +27,7 @@ class ComprasManageForm(forms.ModelForm):
         proveedor_folio = cleaned_data.get("proveedor_folio")
         proveedor = cleaned_data.get("proveedor")
         
-        if DoctosCp.objects.filter(folio=proveedor_folio, proveedor=proveedor).exists():
+        if CuentasXPagarDocumento.objects.filter(folio=proveedor_folio, proveedor=proveedor).exists():
             raise forms.ValidationError(u'El folio de factura del proveedor ya esta capturado en cuentas por pagar')
             
         return cleaned_data

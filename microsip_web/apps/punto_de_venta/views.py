@@ -240,7 +240,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
     documentosData = []
     documentosGenerados = []
     documentosDataDevoluciones = []
-    depto_co = DeptoCo.objects.get(clave='GRAL')
+    depto_co = ContabilidadDepartamento.objects.get(clave='GRAL')
     try:
         informacion_contable = InformacionContable_pv.objects.all()[:1]
         informacion_contable = informacion_contable[0]

@@ -24,7 +24,7 @@ from microsip_web.settings.local_settings import MICROSIP_MODULES
 @dajaxice_register( method = 'GET' )
 def aplicar_doctoin( request, **kwargs ):
     doctoin_id = kwargs.get( 'doctoin_id', None )
-    documento = DoctosIn.objects.get(pk=doctoin_id)
+    documento = InventariosDocumento.objects.get(pk=doctoin_id)
     documento.aplicado ='S'
     documento.save()
     return json.dumps( { 'msg' : 'ya'} )
@@ -101,7 +101,7 @@ def ajustar_seriesinventario_byarticulo( **kwargs ):
         elif detalle.tipo_movto == 'S':
             ExistDiscreto.objects.filter(articulo_discreto= articulo_discreto, almacen = almacen).update(existencia=0)
             
-        DesgloseEnDiscretos.objects.get_or_create(
+        InventariosDesgloseEnDiscretos.objects.get_or_create(
                     docto_in_det=detalle,
                     art_discreto=articulo_discreto,
                     defaults= {
@@ -139,10 +139,10 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
     almacen = Almacen.objects.get(ALMACEN_ID=almacen_id)
 
     entrada_id = kwargs.get('entrada_id', None)
-    entrada = DoctosIn.objects.get(pk=entrada_id)
+    entrada = InventariosDocumento.objects.get(pk=entrada_id)
 
     salida_id = kwargs.get('salida_id', None)
-    salida = DoctosIn.objects.get(pk=salida_id)
+    salida = InventariosDocumento.objects.get(pk=salida_id)
 
     ubicacion = kwargs.get('ubicacion', None)
     unidades = kwargs.get('unidades', None)
@@ -273,9 +273,9 @@ def add_existenciasarticulo_byajustes( **kwargs ):
     articulo = Articulo.objects.get( pk = articulo_id )
 
     entrada_id = kwargs.get( 'entrada_id', None )
-    entrada = DoctosIn.objects.get( pk = entrada_id )
+    entrada = InventariosDocumento.objects.get( pk = entrada_id )
     salida_id = kwargs.get( 'salida_id', None )
-    salida = DoctosIn.objects.get( pk = salida_id )
+    salida = InventariosDocumento.objects.get( pk = salida_id )
     
     almacen_id = kwargs.get( 'almacen_id', None )
     almacen = Almacen.objects.get( pk = almacen_id)
@@ -444,7 +444,7 @@ def close_inventario_byalmacen_view( request, **kwargs ):
     almacen.inventario_modifcostos = False
     almacen.save()
 
-    DoctosIn.objects.filter(almacen__ALMACEN_ID = almacen_id, descripcion='ES INVENTARIO').update(descripcion= 'INVENTARIO CERRADO')
+    InventariosDocumento.objects.filter(almacen__ALMACEN_ID = almacen_id, descripcion='ES INVENTARIO').update(descripcion= 'INVENTARIO CERRADO')
 
     return json.dumps( { 'mensaje' : 'Inventario cerrado', } ) 
 
@@ -460,7 +460,7 @@ def add_existenciasarticulo_byajustes_view( request, **kwargs ):
     is_mobile =  kwargs.get( 'is_mobile', False )
     detalle_unidades = Decimal( kwargs.get( 'detalle_unidades', None ) )
     detalle_costo_unitario = Decimal( kwargs.get( 'detalle_costo_unitario', None ) )
-    entrada = DoctosIn.objects.get( pk = entrada_id )
+    entrada = InventariosDocumento.objects.get( pk = entrada_id )
     almacen_id = entrada.almacen.ALMACEN_ID
 
     ajustar_primerconteo = entrada.almacen.inventario_conajustes
@@ -511,7 +511,7 @@ def add_articulos_sincontar( **kwargs ):
     #Para agregar los articulos de los documentos de inventarios como ya contados
     if linea:
         #VALIDACIONES
-        if DoctosInvfis.objects.filter(descripcion= 'ARTICULOS SIN CONTAR', aplicado= 'N', almacen= almacen).exists():
+        if InventariosDocumentoIF.objects.filter(descripcion= 'ARTICULOS SIN CONTAR', aplicado= 'N', almacen= almacen).exists():
             message = 'Ya se genero anteriormente un documento con articulos sin contar de todos los articulos, OPERACION RECHAZADA!!'
             return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
 
@@ -522,11 +522,11 @@ def add_articulos_sincontar( **kwargs ):
         inventario_descripcion = 'ARTICULOS SIN CONTAR'
         articulos_all = list( set( Articulo.objects.exclude( estatus = 'B').filter( es_almacenable = 'S').order_by( '-id' ).values_list( 'id', flat = True )))
 
-    inventarios_fisicos =  DoctosInvfis.objects.filter(descripcion__contains= inventario_descripcion, aplicado= 'N', almacen= almacen)
+    inventarios_fisicos =  InventariosDocumentoIF.objects.filter(descripcion__contains= inventario_descripcion, aplicado= 'N', almacen= almacen)
 
     for inventario_fisico in inventarios_fisicos:
         articulos_endocumentosinv = (
-                list( set( DoctosInvfisDet.objects.filter( docto_invfis = inventario_fisico, ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True ) ) 
+                list( set( InventariosDocumentoIFDetalle.objects.filter( docto_invfis = inventario_fisico, ).order_by( '-articulo' ).values_list( 'articulo__id', flat = True ) ) 
             )
         )
 
@@ -548,7 +548,7 @@ def add_articulos_sincontar( **kwargs ):
         message = 'Para poder crear un inventario es nesesario Asignarles folios automaticos a los inventarios fisicos, OPERACION RECHAZADA!!'
         return json.dumps( { 'articulos_agregados' : 0, 'articulo_pendientes' : 0, 'message': message, } )
 
-    inventario = DoctosInvfis.objects.create(
+    inventario = InventariosDocumentoIF.objects.create(
             id = next_id('ID_DOCTOS', connection_name),
             folio = inventario_getnew_folio(),
             fecha = datetime.now(),
@@ -564,7 +564,7 @@ def add_articulos_sincontar( **kwargs ):
         detalles_en_ceros = 0
         for articulo_id in articulos_sincontar_sublist:
             articulo = Articulo.objects.get(pk=articulo_id)
-            DoctosInvfisDet.objects.create(
+            InventariosDocumentoIFDetalle.objects.create(
                     id = -1,
                     docto_invfis = inventario,
                     clave = first_or_none( ClavesArticulos.objects.filter( articulo = articulo ) ),

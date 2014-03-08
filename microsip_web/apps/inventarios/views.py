@@ -313,7 +313,7 @@ def invetariosfisicos_view( request, template_name = 'inventarios/inventarios_fi
     if connection_name == '':
         return HttpResponseRedirect( '/select_db/' )
     
-    inventarios_fisicos = DoctosInvfis.objects.filter(aplicado='N', cancelado='N').order_by('-fecha')
+    inventarios_fisicos = InventariosDocumentoIF.objects.filter(aplicado='N', cancelado='N').order_by('-fecha')
 
     if "Chrome" in request.META[ 'HTTP_USER_AGENT' ]:
        request.mobile = False
@@ -340,7 +340,7 @@ def inventario_getnew_folio():
 def invetarioFisico_delete( request, id = None ):
     ''' Borra un inventario fisico '''
 
-    inventario_fisico = get_object_or_404(DoctosInvfis, pk=id)
+    inventario_fisico = get_object_or_404(InventariosDocumentoIF, pk=id)
     inventario_fisico.delete()
 
     return HttpResponseRedirect( '/invenatrios/InventariosFisicos/' )
@@ -353,7 +353,7 @@ def invetarioFisico_delete( request, id = None ):
 
 @login_required( login_url = '/login/' )
 def entradas_View( request, template_name = 'inventarios/Entradas/entradas.html' ):
-    entradas_list = DoctosIn.objects.filter( naturaleza_concepto = 'E' ).order_by( '-id' ) 
+    entradas_list = InventariosDocumento.objects.filter( naturaleza_concepto = 'E' ).order_by( '-id' ) 
 
     paginator = Paginator( entradas_list, 15 ) # Muestra 5 inventarios por pagina
     page = request.GET.get( 'page' )
@@ -386,9 +386,9 @@ def entrada_manageView( request, id = None, template_name='inventarios/Entradas/
     nuevo = False
     hay_repetido = False
     if id:
-        Entrada = get_object_or_404( DoctosIn, pk = id )
+        Entrada = get_object_or_404( InventariosDocumento, pk = id )
     else:
-        Entrada = DoctosIn()
+        Entrada = InventariosDocumento()
     
     initial_entrada = None
     if id:
@@ -438,7 +438,7 @@ def entrada_manageView( request, id = None, template_name='inventarios/Entradas/
 
 @login_required(login_url='/login/')
 def entrada_delete(request, id = None):
-    entrada = get_object_or_404(DoctosIn, pk=id)
+    entrada = get_object_or_404(InventariosDocumento, pk=id)
     entrada.delete()
 
     return HttpResponseRedirect('/Entradas/')
@@ -451,7 +451,7 @@ def entrada_delete(request, id = None):
 
 @login_required(login_url='/login/')
 def salidas_View(request, template_name='inventarios/Salidas/salidas.html'):
-    salidas_list = DoctosIn.objects.filter(naturaleza_concepto='S').order_by('-fecha') 
+    salidas_list = InventariosDocumento.objects.filter(naturaleza_concepto='S').order_by('-fecha') 
 
     paginator = Paginator(salidas_list, 15) # Muestra 5 inventarios por pagina
     page = request.GET.get('page')
@@ -474,9 +474,9 @@ def salida_manageView(request, id = None, template_name='inventarios/Salidas/sal
     message = ''
     hay_repetido = False
     if id:
-        Salida = get_object_or_404(DoctosIn, pk=id)
+        Salida = get_object_or_404(InventariosDocumento, pk=id)
     else:
-        Salida = DoctosIn()
+        Salida = InventariosDocumento()
 
     if request.method == 'POST':
         Salida_form = DoctosInManageForm(request.POST, request.FILES, instance=Salida)
@@ -552,7 +552,7 @@ def salida_manageView(request, id = None, template_name='inventarios/Salidas/sal
 
 @login_required(login_url='/login/')
 def salida_delete(request, id = None):
-    salida = get_object_or_404(DoctosIn, pk=id)
+    salida = get_object_or_404(InventariosDocumento, pk=id)
     salida.delete()
 
     return HttpResponseRedirect('/Salidas/')

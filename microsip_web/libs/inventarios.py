@@ -34,10 +34,10 @@ def ajustes_get_or_create( almacen_id = None, username = '' ):
 
     #salida
     try:
-        salida = DoctosIn.objects.get( descripcion = 'ES INVENTARIO', cancelado= 'N', concepto = 38, almacen = almacen,  fecha =  fecha_actual )
+        salida = InventariosDocumento.objects.get( descripcion = 'ES INVENTARIO', cancelado= 'N', concepto = 38, almacen = almacen,  fecha =  fecha_actual )
     except ObjectDoesNotExist:
 
-        salida = DoctosIn(
+        salida = InventariosDocumento(
             almacen =  almacen,
             concepto = conecpto_ajuste_salida,
             naturaleza_concepto = 'S',
@@ -50,10 +50,10 @@ def ajustes_get_or_create( almacen_id = None, username = '' ):
 
     #salida
     try:
-        entrada = DoctosIn.objects.get( descripcion = 'ES INVENTARIO', cancelado= 'N', concepto = 27, almacen = almacen, fecha = fecha_actual )
+        entrada = InventariosDocumento.objects.get( descripcion = 'ES INVENTARIO', cancelado= 'N', concepto = 27, almacen = almacen, fecha = fecha_actual )
     except ObjectDoesNotExist:
 
-        entrada = DoctosIn(
+        entrada = InventariosDocumento(
             almacen =  almacen,
             concepto = conecpto_ajuste_entrada,
             naturaleza_concepto = 'E',

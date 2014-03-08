@@ -168,7 +168,7 @@ class EntradaManageForm(forms.ModelForm):
 
 
     class Meta:
-        model = DoctosIn
+        model = InventariosDocumento
         exclude = (
                 'cancelado',
                 'aplicado',
@@ -246,7 +246,7 @@ class DoctoIn_CreateForm(forms.ModelForm):
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'rows':'3', 'cols':'20',}))
     
     class Meta:
-        model = DoctosInvfis
+        model = InventariosDocumentoIF
         exclude = (
             'cancelado',
             'aplicado',
@@ -266,7 +266,7 @@ class DoctoIn_CreateForm(forms.ModelForm):
         cleaned_data = self.cleaned_data
         almacen = cleaned_data.get( "almacen" )
         
-        if DoctosIn.objects.filter( descripcion = 'ES INVENTARIO', almacen = almacen, cancelado = 'N' ).exists():
+        if InventariosDocumento.objects.filter( descripcion = 'ES INVENTARIO', almacen = almacen, cancelado = 'N' ).exists():
             raise forms.ValidationError(u'Ya existe un almenos un documento para el almacen [%s], porfavor crea uno que no sea de ese almacen.'% almacen)
         return cleaned_data
 
@@ -274,7 +274,7 @@ class DoctosInvfisManageForm(forms.ModelForm):
     file_inventario = forms.CharField(widget=forms.FileInput, required = False)
     
     class Meta:
-        model = DoctosInvfis
+        model = InventariosDocumentoIF
         exclude = (
             'cancelado',
             'aplicado',
@@ -290,7 +290,7 @@ class DoctosInvfisManageForm(forms.ModelForm):
     def clean(self):
         cleaned_data = self.cleaned_data
         almacen = cleaned_data.get("almacen")
-        if DoctosInvfis.objects.filter(aplicado='N', almacen = almacen).exists():
+        if InventariosDocumentoIF.objects.filter(aplicado='N', almacen = almacen).exists():
             raise forms.ValidationError(u'Ya existe un inventario fisico abierto para el almacen [%s], porfavor crea uno que no sea de ese almacen.'% almacen)
         return cleaned_data
 
@@ -311,7 +311,7 @@ class DoctosInvfisDetManageForm(forms.ModelForm):
         self.fields['articulo'].widget.attrs['class'] = 'input-medium'
 
     class Meta:
-        model   = DoctosInvfisDet
+        model   = InventariosDocumentoIFDetalle
         exclude = (
             'docto_invfis',
             )
@@ -325,10 +325,10 @@ class DoctosInvfisDetManageForm(forms.ModelForm):
 
 # attrs={'class':'input-medium'}
 def doctoIn_items_formset(form, formset = BaseInlineFormSet, **kwargs):
-    return inlineformset_factory(DoctosIn, InventariosDocumentoDetalle, form, formset, **kwargs)
+    return inlineformset_factory(InventariosDocumento, InventariosDocumentoDetalle, form, formset, **kwargs)
 
 def inventarioFisico_items_formset(form, formset = BaseInlineFormSet, **kwargs):
-    return inlineformset_factory(DoctosInvfis, DoctosInvfisDet, form, formset, **kwargs)
+    return inlineformset_factory(InventariosDocumentoIF, InventariosDocumentoIFDetalle, form, formset, **kwargs)
 
 
 class almacen_inventariando_form(forms.ModelForm):
@@ -350,7 +350,7 @@ class ArticulosDiscretos_ManageForm(forms.ModelForm):
     #     articulo = cleaned_data.get("articulo")
     #     art_disc = ArticuloDiscreto.objects.filter(articulo=articulo, clave=clave, fecha=None) 
 
-    #     #if DesgloseEnDiscretosInvfis.objects.filter(art_discreto=art_disc).exists():
+    #     #if InventariosDesgloseEnDiscretosIF.objects.filter(art_discreto=art_disc).exists():
     #     #     raise forms.ValidationError(u'El articulo con este numero de serie ya se registro en el inventario')
     #     if not ArticuloDiscreto.objects.filter(articulo=articulo, clave=clave, fecha=None).exists() and clave != None:
     #         raise forms.ValidationError(u'Numero de serie, no registrado en los articulos')

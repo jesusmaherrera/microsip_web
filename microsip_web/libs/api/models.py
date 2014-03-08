@@ -49,7 +49,7 @@ from microsip_api.models_base.contabilidad.catalogos import *
 from microsip_api.models_base.contabilidad.listas import *
 
 class Pais(PaisBase):
-
+    pass
     def save(self, *args, **kwargs):    
         using = kwargs.get('using', None)
         using = using or router.db_for_write(self.__class__, instance=self)
@@ -374,10 +374,6 @@ class UsoFoliosFiscales(ConfiguracionFolioFiscalUsoBase):
 
         super(self.__class__, self).save(*args, **kwargs)
 
-class FolioVenta(FolioVentaBase):
-    def __unicode__(self):
-        return u'%s'%self.id
-
 class FolioCompra(FolioCompraBase):
     def __unicode__(self):
         return u'%s'%self.id
@@ -404,9 +400,6 @@ class ExistDiscreto(ArticuloDiscretoExistenciaBase):
 
 class Bancos(BancoBase):
     pass
-
-class ViaEmbarque(ViaEmbarqueBase):
-   pass
 
 class Pedimento(PedimentoBase):
     pass
@@ -521,7 +514,7 @@ class DocumentoComprasDetalleLiga(ComprasDocumentoLigaDetalleBase):
 ##                                      ##
 ##########################################
 
-class DoctosIn(InventariosDocumentoBase):
+class InventariosDocumento(InventariosDocumentoBase):
 
     def next_folio( self, connection_name=None):
         ''' Funcion para generar el siguiente folio de un documento inventario '''
@@ -564,19 +557,19 @@ class InventariosDocumentoDetalle(InventariosDocumentoDetalleBase):
     def __unicode__(self):
         return u'%s' % self.id
 
-class DoctosInvfis(InventariosDocumentoIFBase):
+class InventariosDesgloseEnDiscretos(InventariosDesgloseEnDiscretosBase):
+    def __unicode__(self):
+        return u'%s' % self.id
+
+class InventariosDocumentoIF(InventariosDocumentoIFBase):
     def __unicode__(self):
         return u'%s' % self.id
     
-class DoctosInvfisDet(InventariosDocumentoIFDetalleBase):
+class InventariosDocumentoIFDetalle(InventariosDocumentoIFDetalleBase):
     def __unicode__(self):
         return u'%s' % self.id
 
-class DesgloseEnDiscretos(InventariosDesgloseEnDiscretosBase):
-    def __unicode__(self):
-        return u'%s' % self.id
-
-class DesgloseEnDiscretosInvfis(InventariosDesgloseEnDiscretosIFBase):
+class InventariosDesgloseEnDiscretosIF(InventariosDesgloseEnDiscretosIFBase):
     def __unicode__(self):
         return u'%s' % self.id
 
@@ -587,18 +580,18 @@ class DesgloseEnDiscretosInvfis(InventariosDesgloseEnDiscretosIFBase):
 ################################################################
 
 
-class ConceptoCp(CuentasXPagarConceptoBase):
+class CuentasXPagarConcepto(CuentasXPagarConceptoBase):
     def __unicode__(self):
         return self.nombre_abrev
 
-class DoctosCp(CuentasXPagarDocumentoBase):
+class CuentasXPagarDocumento(CuentasXPagarDocumentoBase):
     def __unicode__(self):
         return u'%s' % self.id
 
-class ImportesDoctosCP(CuentasXPagarDocumentoImportesBase):
+class CuentasXPagarDocumentoImportes(CuentasXPagarDocumentoImportesBase):
    pass
 
-class LibresCargosCP(CuentasXPagarDocumentoCargoLibresBase):
+class CuentasXPagarDocumentoCargoLibres(CuentasXPagarDocumentoCargoLibresBase):
     segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
     segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
     segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
@@ -615,19 +608,19 @@ class LibresCargosCP(CuentasXPagarDocumentoCargoLibresBase):
 ####                                                        ####
 ################################################################
 
-class ConceptoCc(CuentasXCobrarConceptoBase):
+class CuentasXCobrarConcepto(CuentasXCobrarConceptoBase):
     def __unicode__(self):
         return self.nombre_abrev
 
-class DoctosCc(CuentasXCobrarDocumentoBase):
+class CuentasXCobrarDocumento(CuentasXCobrarDocumentoBase):
     def __unicode__(self):
         return u'%s' % self.id
 
-class ImportesDoctosCC(CuentasXCobrarDocumentoImportesBase):
+class CuentasXCobrarDocumentoImportes(CuentasXCobrarDocumentoImportesBase):
     def __unicode__(self):
         return u'%s' % self.id
 
-class LibresCargosCC(CuentasXCobrarDocumentoCargoLibresBase):
+class CuentasXCobrarDocumentoCargoLibres(CuentasXCobrarDocumentoCargoLibresBase):
     segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
     segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
     segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
@@ -636,7 +629,7 @@ class LibresCargosCC(CuentasXCobrarDocumentoCargoLibresBase):
     def __unicode__(self):
         return u'%s' % self.id
 
-class LibresCreditosCC(CuentasXCobrarDocumentoCreditoLibresBase):
+class CuentasXCobrarDocumentoCreditoLibres(CuentasXCobrarDocumentoCreditoLibresBase):
     segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
     segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
     segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
@@ -652,29 +645,29 @@ class LibresCreditosCC(CuentasXCobrarDocumentoCreditoLibresBase):
 ####                                                        ####
 ################################################################
 
-class DeptoCo(ContabilidadDepartamentoBase):
+class ContabilidadDepartamento(ContabilidadDepartamentoBase):
     def __unicode__(self):
         return u'%s' % self.clave
 
-class Recordatorio(ContabilidadRecordatorioBase):
+class ContabilidadRecordatorio(ContabilidadRecordatorioBase):
     pass
 
-class GrupoPolizasPeriodoCo(ContabilidadGrupoPolizaPeriodoBase):
+class ContabilidadGrupoPolizaPeriodo(ContabilidadGrupoPolizaPeriodoBase):
     pass
 
 class TipoPoliza(TipoPolizaBase):
     def __unicode__(self):
         return u'%s' % self.nombre 
 
-class TipoPolizaDet(TipoPolizaDetalleBase):
+class TipoPolizaDetalle(TipoPolizaDetalleBase):
     def __unicode__(self):
         return u'%s' % self.id
 
-class DoctoCo(ContabilidadDocumentoBase):
+class ContabilidadDocumento(ContabilidadDocumentoBase):
     def __unicode__(self):
         return u'%s' % self.id
 
-class DoctosCoDet(ContabilidadDocumentoDetalleBase):
+class ContabilidadDocumentoDetalle(ContabilidadDocumentoDetalleBase):
     pass
 
 ################################################################
@@ -687,17 +680,27 @@ class Vendedor(VendedorBase):
     def __unicode__(self):
         return self.nombre
 
+class ViaEmbarque(ViaEmbarqueBase):
+   pass
+
+class FolioVenta(FolioVentaBase):
+    def __unicode__(self):
+        return u'%s'%self.id
+
 class VentasDocumento(VentasDocumentoBase):
     def __unicode__(self):
         return u'%s' % self.id
 
-class DoctoVeDet(VentasDocumentoDetalleBase):
+class VentasDocumentoVencimiento(VentasDocumentoVencimientoBase):
     pass
 
-class DoctoVeLigas(VentasDocumentoLigaBase):
+class VentasDocumentoDetalle(VentasDocumentoDetalleBase):
+    pass
+
+class VentasDocumentoLiga(VentasDocumentoLigaBase):
     pass
         
-class LibresFacturasV(VentasDocumentoFacturaLibresBase):
+class VentasDocumentoFacturaLibres(VentasDocumentoFacturaLibresBase):
     segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
     segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
     segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
@@ -707,7 +710,7 @@ class LibresFacturasV(VentasDocumentoFacturaLibresBase):
     def __unicode__(self):
         return u'%s' % self.id
     
-class LibresDevFacV(VentasDocumentoFacturaDevLibresBase):
+class VentasDocumentoFacturaDevLibres(VentasDocumentoFacturaDevLibresBase):
     segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
     segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
     segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')

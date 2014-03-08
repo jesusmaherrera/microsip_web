@@ -18,7 +18,7 @@ from datetime import datetime
 from django.db.models import Q
 
 from microsip_web.libs.custom_db.main import first_or_none, get_existencias_articulo
-from ...libs.api.models import DocumentoCompras, ConceptosIn, Registry, Almacen, DocumentoComprasDetalle, DoctosIn, InventariosDocumentoDetalle, TipoCambio
+from ...libs.api.models import DocumentoCompras, ConceptosIn, Registry, Almacen, DocumentoComprasDetalle, InventariosDocumento, InventariosDocumentoDetalle, TipoCambio
 from microsip_web.libs.inventarios import ajustes_get_or_create
 
 almacen_clon_id = 1087990
@@ -45,7 +45,7 @@ def ClonarDocumentoCompras(sender, **kwargs):
             else:
                 tipo_cambio = 1
 
-        entrada = DoctosIn.objects.create(
+        entrada = InventariosDocumento.objects.create(
                 almacen =  almacen,
                 concepto = concepto_compras,
                 aplicado = 'N',
