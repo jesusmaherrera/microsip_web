@@ -232,7 +232,7 @@ def proveedor_manageView(request, id = None, template_name='cuentas_por_pagar/ca
 
 @login_required(login_url='/login/')
 def tipos_proveedores_view(request, template_name='cuentas_por_pagar/catalogos/tipos_proveedores/tipos_proveedores.html'):
-    tipos_provedores_list = TipoProveedor.objects.all()
+    tipos_provedores_list = ProveedorTipo.objects.all()
 
     paginator = Paginator(tipos_provedores_list, 15) # Muestra 5 inventarios por pagina
     page = request.GET.get('page')

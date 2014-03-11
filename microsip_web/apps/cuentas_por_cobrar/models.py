@@ -49,7 +49,7 @@ class DetallePlantillaPolizas_CC(models.Model):
     
     posicion                = models.CharField(max_length=2)
     plantilla_poliza_CC     = models.ForeignKey(PlantillaPolizas_CC)
-    cuenta_co               = models.ForeignKey(CuentaCo)
+    cuenta_co               = models.ForeignKey(ContabilidadCuentaContable)
     tipo                    = models.CharField(max_length=2, choices=TIPOS, default='C')
     asiento_ingora          = models.CharField(max_length=2, blank=True, null=True)
     valor_tipo              = models.CharField(max_length=20, choices=VALOR_TIPOS)

@@ -2,7 +2,7 @@
 from django.db import models
 import datetime
 
-from microsip_web.libs.api.models import CondicionPago, Impuesto, CuentaCo
+from microsip_web.libs.api.models import CondicionPago, Impuesto, ContabilidadCuentaContable
 
 ################################################################
 ####                                                        ####
@@ -70,7 +70,7 @@ class DetallePlantillaPolizas_pv(models.Model):
     tipo_condicionpago = models.CharField(max_length=10, choices=TIPOS_CONDICIONPAGO, blank=True, null=True, default='Ambos')
 
     impuesto = models.ForeignKey(Impuesto, blank=True, null=True)
-    cuenta_co = models.ForeignKey(CuentaCo)
+    cuenta_co = models.ForeignKey(ContabilidadCuentaContable)
     asiento_ingora = models.CharField(max_length=2, blank=True, null=True)
 
     def __unicode__(self):

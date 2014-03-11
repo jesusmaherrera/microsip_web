@@ -33,11 +33,11 @@ from microsip_web.settings.local_settings import MICROSIP_MODULES
 
 from microsip_web.libs.tools import split_seq
 from triggers import triggers
-from microsip_web.apps.config.models import *
+from microsip_api.apps.config.models import *
 import fdb
 from microsip_web.settings.common import MICROSIP_DATABASES, DATABASES
 from django.db.models import Sum
-from microsip_web.apps.config.models import DerechoUsuario
+from microsip_api.apps.config.models import UsuarioDerecho
 
 def abrir_inventario_byalmacen(request, almacen_id, template_name = 'inventarios/almacenes/abrir_inventario.html'):
     almacen = Almacen.objects.get( pk = almacen_id )
@@ -80,8 +80,8 @@ def ArticuloManageView(request, id, template_name='inventarios/articulos/articul
 
     articulo = get_object_or_404(Articulo, pk=id)
 
-    clavesarticulos_fromset = modelformset_factory(ClavesArticulos, form= claves_articulos_form, can_delete=True,)
-    preciosarticulos_fromset = modelformset_factory(PrecioArticulo, form= precios_articulos_form, can_delete=True,)
+    clavesarticulos_fromset = modelformset_factory(ArticuloClave, form= claves_articulos_form, can_delete=True,)
+    preciosarticulos_fromset = modelformset_factory(ArticuloPrecio, form= precios_articulos_form, can_delete=True,)
 
     impuestos_articulo = ImpuestosArticulo.objects.filter(articulo=articulo)
     if impuestos_articulo.count() > 0:
@@ -93,8 +93,8 @@ def ArticuloManageView(request, id, template_name='inventarios/articulos/articul
         formset = clavesarticulos_fromset(request.POST, prefix="formset")
         precios_formset = preciosarticulos_fromset(request.POST, prefix="precios_formset")
     else:
-        formset = clavesarticulos_fromset(queryset=ClavesArticulos.objects.filter(articulo=articulo), prefix="formset")
-        precios_formset = preciosarticulos_fromset(queryset=PrecioArticulo.objects.filter(articulo=articulo), prefix="precios_formset")
+        formset = clavesarticulos_fromset(queryset=ArticuloClave.objects.filter(articulo=articulo), prefix="formset")
+        precios_formset = preciosarticulos_fromset(queryset=ArticuloPrecio.objects.filter(articulo=articulo), prefix="precios_formset")
 
     articulo_form = articulos_form(request.POST or None, instance= articulo)
     # precio_articulo_form = precios_articulos_form(request.POST or None, instance=precio_articulo)
@@ -220,7 +220,7 @@ def c_get_next_key(connection_name = None ):
 def allow_microsipuser( username = None, clave_objeto=  None ):
     ''' Checa si el usuario indicado tiene el pribilegio indicado '''
 
-    return DerechoUsuario.objects.filter(usuario__nombre = username, clave_objeto = clave_objeto).exists() or username == 'SYSDBA'
+    return UsuarioDerecho.objects.filter(usuario__nombre = username, clave_objeto = clave_objeto).exists() or username == 'SYSDBA'
     
 @login_required( login_url = '/login/' )
 def invetariofisico_manageview( request, almacen_id = None, template_name = 'inventarios/inventarios_fisicos/inventariofisico.html' ):
@@ -494,7 +494,7 @@ def salida_manageView(request, id = None, template_name='inventarios/Salidas/sal
             lista_articulos = []        
 
             for i in range(sheet.nrows):
-                clave_articulo = get_object_or_404(ClavesArticulos, clave=sheet.cell_value(i,0))
+                clave_articulo = get_object_or_404(ArticuloClave, clave=sheet.cell_value(i,0))
                 if clave_articulo and clave_articulo.articulo.es_almacenable=='S':
                     if clave_articulo.articulo.id in lista_articulos:
                         message = 'El Articulo [%s] esta repetido en el archivo de excel por favor corrigelo para continuar '% clave_articulo.articulo.nombre
@@ -507,8 +507,8 @@ def salida_manageView(request, id = None, template_name='inventarios/Salidas/sal
             
             for i in articulos_enceros:
                 
-                #clave_articulo = ClavesArticulos.objects.filter(articulo__id=i.id)
-                articulosclav = ClavesArticulos.objects.filter(articulo__id=i.id)
+                #clave_articulo = ArticuloClave.objects.filter(articulo__id=i.id)
+                articulosclav = ArticuloClave.objects.filter(articulo__id=i.id)
                 if articulosclav:
                     lista.append({'articulo': i, 'clave':articulosclav[0].clave , 'unidades':0,})   
                 else:

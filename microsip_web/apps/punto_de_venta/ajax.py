@@ -19,7 +19,7 @@ from microsip_web.libs.punto_de_venta import new_factura_global
 # @dajaxice_register( method = 'GET' )
 # def aplicar_doctopv( request, **kwargs ):
 #     docto_id = kwargs.get( 'docto_id', None )
-#     documento = Docto_PV.objects.get(pk=docto_id)
+#     documento = PuntoVentaDocumento.objects.get(pk=docto_id)
 #     documento.aplicado ='S'
 #     documento.save()
 #     return json.dumps( { 'msg' : 'ya'} )

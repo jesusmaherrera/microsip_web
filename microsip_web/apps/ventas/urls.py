@@ -6,7 +6,6 @@ from microsip_web.apps.punto_de_venta import views as pv_views
 INDEX_EXTEND = "ventas/base.html"
 
 urlpatterns = patterns('',
-	(r'^Facturas/$', views.facturas_View),
 	(r'^PreferenciasEmpresa/$', views.preferenciasEmpresa_View),
 	
 	url(r'', include('microsip_web.apps.main.comun.otros.urls', namespace='v_main_otros')),

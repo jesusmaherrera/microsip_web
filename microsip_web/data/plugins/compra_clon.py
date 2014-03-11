@@ -18,12 +18,12 @@ from datetime import datetime
 from django.db.models import Q
 
 from microsip_web.libs.custom_db.main import first_or_none, get_existencias_articulo
-from ...libs.api.models import DocumentoCompras, ConceptosIn, Registry, Almacen, DocumentoComprasDetalle, InventariosDocumento, InventariosDocumentoDetalle, TipoCambio
+from ...libs.api.models import ComprasDocumento, InventariosConcepto, Registry, Almacen, ComprasDocumentoDetalle, InventariosDocumento, InventariosDocumentoDetalle, TipoCambio
 from microsip_web.libs.inventarios import ajustes_get_or_create
 
 almacen_clon_id = 1087990
 
-@receiver(post_save, sender=DocumentoCompras)
+@receiver(post_save, sender=ComprasDocumento)
 def ClonarDocumentoCompras(sender, **kwargs):
     ''' Funcion para copiar un documento y cambiarle de almacen. '''
 
@@ -31,7 +31,7 @@ def ClonarDocumentoCompras(sender, **kwargs):
     
     #Al aplicar una compra
     if documento_a_clonar.tipo == 'C' and documento_a_clonar.aplicado == 'S':
-        concepto_compras = ConceptosIn.objects.get( pk = 20 )
+        concepto_compras = InventariosConcepto.objects.get( pk = 20 )
         fecha_actual = datetime.now()
         almacen = first_or_none( Almacen.objects.filter(pk= almacen_clon_id) )
         moneda = documento_a_clonar.moneda
@@ -58,7 +58,7 @@ def ClonarDocumentoCompras(sender, **kwargs):
 
         entrada.save()
 
-        detalles_a_clonar = DocumentoComprasDetalle.objects.filter(documento = documento_a_clonar)
+        detalles_a_clonar = ComprasDocumentoDetalle.objects.filter(documento = documento_a_clonar)
 
         for detalle in detalles_a_clonar:
             InventariosDocumentoDetalle.objects.create(

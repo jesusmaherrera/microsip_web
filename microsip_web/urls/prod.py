@@ -32,6 +32,9 @@ if 'microsip_web.apps.inventarios' in MICROSIP_MODULES:
 if 'microsip_web.apps.ventas' in MICROSIP_MODULES:
     urlpatterns += url(r'^ventas/', include('microsip_web.apps.ventas.urls', namespace='ventas')),
 
+if 'microsip_web.apps.ventas.generar_polizas' in MICROSIP_MODULES:
+    urlpatterns += url(r'ventas/', include('microsip_web.apps.ventas.generar_polizas.urls', namespace='ve_generar_polizas')),
+
 if 'microsip_web.apps.punto_de_venta' in MICROSIP_MODULES:
     urlpatterns += url(r'^punto_de_venta/', include('microsip_web.apps.punto_de_venta.urls', namespace='punto_de_venta')),
 

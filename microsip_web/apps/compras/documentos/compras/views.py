@@ -14,7 +14,7 @@ from forms import *
 def compras_view(request, template_name='compras/documentos/compras/compras.html'):
 
 
-    compras_list = DocumentoCompras.objects.filter(tipo='C').order_by("-id")
+    compras_list = ComprasDocumento.objects.filter(tipo='C').order_by("-id")
 
     paginator = Paginator( compras_list, 15 ) # Muestra 5 inventarios por pagina
     page = request.GET.get( 'page' )
@@ -45,9 +45,9 @@ def compra_manageview(request, id=None, type='C', template_name='compras/documen
     hay_repetido = False
     
     if id:
-        documento = get_object_or_404( DocumentoCompras, pk = id )
+        documento = get_object_or_404( ComprasDocumento, pk = id )
     else:
-        documento = DocumentoCompras()
+        documento = ComprasDocumento()
 
     #Para crear compra de una orden
     documento_fte = None
@@ -68,7 +68,7 @@ def compra_manageview(request, id=None, type='C', template_name='compras/documen
 
         initial_formset=[]
 
-        detalles = DocumentoComprasDetalle.objects.filter(documento=documento)
+        detalles = ComprasDocumentoDetalle.objects.filter(documento=documento)
         for detalle in detalles:
             initial_formset.append({
                     'articulo':detalle.articulo,
@@ -101,7 +101,7 @@ def compra_manageview(request, id=None, type='C', template_name='compras/documen
                 'impuestos_ids':impuestos_ids,
             }
 
-        documento = DocumentoCompras()
+        documento = ComprasDocumento()
 
     comprasdet_forms = DocumentoComprasDetalleFormset(DocumentoComprasDetalleManageForm, extra=1, can_delete=True)
     compradetalles_formset = comprasdet_forms(request.POST or None, instance=documento, initial = initial_formset)
@@ -132,7 +132,7 @@ def compra_manageview(request, id=None, type='C', template_name='compras/documen
         if type == 'O':
             documento_fte.estado = 'R'
             documento_fte.save()
-            documento_liga = DocumentoComprasLiga.objects.create(
+            documento_liga = ComprasDocumentoLiga.objects.create(
                     id=None,
                     documento_fte = documento_fte,
                     documento_dest = documento,
@@ -153,7 +153,7 @@ def compra_manageview(request, id=None, type='C', template_name='compras/documen
                     c.execute(query,[documento.id,  int(impuesto_id), Decimal(compra_neta),  Decimal(otro_impuestos), Decimal(porcentaje_impuestos), Decimal(importe_impuestos)])
                     c.close()
 
-            plazos = CondicionPagoCPPlazo.objects.filter(condicion_de_pago=documento.condicion_pago)
+            plazos = CuentasXPagarCondicionPagoPlazoBase.objects.filter(condicion_de_pago=documento.condicion_pago)
             for plazo in plazos:
                 fecha_vencimiento = documento.fecha + timedelta(days=plazo.dias)
                 c = connections[connection_name].cursor()
@@ -180,7 +180,7 @@ def compra_manageview(request, id=None, type='C', template_name='compras/documen
     
             for detalle_liga in detalle_ligas:
                 if detalle_liga != [u'']:
-                    detalle_doc = DocumentoComprasDetalle.objects.get(pk=detalle_liga)
+                    detalle_doc = ComprasDocumentoDetalle.objects.get(pk=detalle_liga)
                     con = connections[connection_name].cursor()
                     query =  '''INSERT INTO DOCTOS_CM_LIGAS_DET (DOCTO_CM_LIGA_ID, DOCTO_CM_DET_FTE_ID, DOCTO_CM_DET_DEST_ID) \
                         VALUES (%s, %s, %s)'''
@@ -191,8 +191,8 @@ def compra_manageview(request, id=None, type='C', template_name='compras/documen
         
         return HttpResponseRedirect('/compras/compras/')
 
-    documentos_relacionados = DocumentoComprasLiga.objects.filter(documento_dest= documento)
-    # vencimientos = VencimientoCargoCompra.objects.filter(documento=documento)
+    documentos_relacionados = ComprasDocumentoLiga.objects.filter(documento_dest= documento)
+    # vencimientos = ComprasDocumentoCargoVencimiento.objects.filter(documento=documento)
     
     c = {
         'documento_form':documento_form, 

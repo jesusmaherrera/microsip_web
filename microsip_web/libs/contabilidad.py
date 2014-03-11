@@ -215,7 +215,7 @@ def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
 
                 cuenta_temp = getattr(libresClientes.objects.get(id=cliente_id), campo_cuenta[0].campo_cliente) 
                 if cuenta_temp != '' and cuenta_temp != 0 and cuenta_temp != None:
-                    if CuentaCo.objects.filter(cuenta=cuenta_temp).exists():
+                    if ContabilidadCuentaContable.objects.filter(cuenta=cuenta_temp).exists():
                         cuenta = cuenta_temp
                     else:
                         cliente_nombre = Cliente.objects.filter(id=cliente_id)
@@ -362,7 +362,7 @@ def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=Non
             cuenta_depto= cuenta_cantidad[0].split("/")
             
             try:
-                cuenta      =  CuentaCo.objects.get(cuenta=cuenta_depto[0]).cuenta
+                cuenta      =  ContabilidadCuentaContable.objects.get(cuenta=cuenta_depto[0]).cuenta
             except ObjectDoesNotExist:
                 error = 2
                 msg = 'NO EXISTE O ES INCORRECTA almenos una [CUENTA CONTABLE] indicada en un segmento en el documento con folio[%s], Corrigelo para continuar'% documento_folio
@@ -402,7 +402,7 @@ def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=Non
 def get_totales_documento_cc(cuenta_contado = None, documento=None, conceptos_poliza=None, totales_cuentas=None, msg='', error='',depto_co=None, connection_name = None):
     
     try:
-        cuenta_cliente =  CuentaCo.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
+        cuenta_cliente =  ContabilidadCuentaContable.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
     except ObjectDoesNotExist:
         cuenta_cliente = None
 
@@ -515,7 +515,7 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
     campos_particulares = get_object_or_empty(CuentasXPagarDocumentoCargoLibres, pk=documento.id)
 
     try:
-        cuenta_proveedor =  CuentaCo.objects.get(cuenta=documento.proveedor.cuenta_xpagar).cuenta
+        cuenta_proveedor =  ContabilidadCuentaContable.objects.get(cuenta=documento.proveedor.cuenta_xpagar).cuenta
     except ObjectDoesNotExist:
         cuenta_proveedor = None
 
@@ -621,7 +621,7 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
         campos_particulares = VentasDocumentoFacturaDevLibres.objects.filter(pk=documento.id)[0]
 
     try:
-        cuenta_cliente =  CuentaCo.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
+        cuenta_cliente =  ContabilidadCuentaContable.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
     except ObjectDoesNotExist:
         cuenta_cliente = None
 
@@ -712,7 +712,7 @@ def get_impuestos_documento(documento, connection_name):
     """ Para obtener impuestos de un documento determinado """
     documento_tipo = documento.__class__.__name__
     c = connections[connection_name].cursor()
-    if documento_tipo == 'Docto_PV':
+    if documento_tipo == 'PuntoVentaDocumento':
         consulta ="SELECT IMPUESTO_ID, IMPORTE_IMPUESTO FROM IMPUESTOS_DOCTOS_PV WHERE DOCTO_PV_ID= %s"% documento.id
     elif documento_tipo == 'VentasDocumento':
         consulta ="SELECT IMPUESTO_ID, IMPORTE_IMPUESTO FROM IMPUESTOS_DOCTOS_VE WHERE DOCTO_VE_ID= %s"% documento.id
@@ -729,12 +729,12 @@ def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_
     
     es_contado = False
     try:
-        cuenta_cliente =  CuentaCo.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
+        cuenta_cliente =  ContabilidadCuentaContable.objects.get(cuenta=documento.cliente.cuenta_xcobrar).cuenta
     except ObjectDoesNotExist:
         cuenta_cliente = None 
 
     #Para saber si es contado o es credito
-    total_credito = Docto_pv_cobro.objects.filter(documento_pv=documento, forma_cobro__tipo='R').aggregate(total_credito = Sum('importe'))['total_credito']
+    total_credito = PuntoVentaCobro.objects.filter(documento_pv=documento, forma_cobro__tipo='R').aggregate(total_credito = Sum('importe'))['total_credito']
     if total_credito == None:
         total_credito = 0
         es_contado = True
@@ -752,7 +752,7 @@ def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_
     ventas_0_credito    = 0
     ventas_0_contado    = 0
 
-    ventas_0            = Docto_pv_det.objects.filter(documento_pv= documento).extra(
+    ventas_0            = PuntoVentaDocumentoDetalle.objects.filter(documento_pv= documento).extra(
             tables =['impuestos_articulos', 'impuestos'],
             where =
             [
@@ -919,7 +919,7 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
 
                 for posicion_cuenta_depto_tipoAsiento, importe in totales_cuentas:
                     cuenta_deptotipoAsiento = posicion_cuenta_depto_tipoAsiento.split('+')[1].split('/')
-                    cuenta_co = CuentaCo.objects.get(cuenta=cuenta_deptotipoAsiento[0])
+                    cuenta_co = ContabilidadCuentaContable.objects.get(cuenta=cuenta_deptotipoAsiento[0])
                     depto_tipoAsiento = cuenta_deptotipoAsiento[1].split(':')
                     depto_co = ContabilidadDepartamento.objects.get(clave=depto_tipoAsiento[0])
                     tipo_asiento = depto_tipoAsiento[1]

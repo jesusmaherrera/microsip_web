@@ -20,7 +20,7 @@ class OrdenManageForm(forms.ModelForm):
         self.fields['total_impuestos'].widget = forms.HiddenInput()
 
     class Meta:
-        model = DocumentoCompras
+        model = ComprasDocumento
         exclude = (
             'aplicado',
             'usuario_creador',
@@ -59,7 +59,7 @@ class DocumentoComprasDetalleManageForm(forms.ModelForm):
         self.fields['clave_articulo'].required = False
 
     class Meta:
-        model = DocumentoComprasDetalle
+        model = ComprasDocumentoDetalle
         exclude = (
             'porcentaje_descuento_vol',
             'contenido_umed',
@@ -81,7 +81,7 @@ class DocumentoComprasImpuestosManageForm(forms.Form):
     impuestos_ids = forms.CharField(widget=forms.HiddenInput(), required=False)
         
 def DocumentoComprasDetalleFormset(form, formset = BaseInlineFormSet, **kwargs):
-    return inlineformset_factory(DocumentoCompras, DocumentoComprasDetalle, form, formset, **kwargs)
+    return inlineformset_factory(ComprasDocumento, ComprasDocumentoDetalle, form, formset, **kwargs)
 
 
 

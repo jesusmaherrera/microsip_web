@@ -8,7 +8,7 @@ from django.views.generic.base import View
 from decimal import *
 from microsip_web.libs.custom_db.main import get_conecctionname
 
-from microsip_web.apps.config.models import *
+from microsip_api.apps.config.models import *
 from models import *
 from forms import *
 #ORDENES
@@ -29,7 +29,7 @@ def ordenes_view(request, template_name='compras/documentos/ordenes/ordenes.html
         tipo = '&Todas las ordenes'
 
     #FILTRO
-    documentos_list = DocumentoCompras.objects.filter(tipo='O')
+    documentos_list = ComprasDocumento.objects.filter(tipo='O')
     if not ordenes_estado == u'':
         documentos_list = documentos_list.filter(estado=ordenes_estado)
     documentos_list = documentos_list.order_by("-id")
@@ -59,9 +59,9 @@ def orden_manageview(request, id=None, template_name='compras/documentos/ordenes
     hay_repetido = False
     
     if id:
-        documento = get_object_or_404( DocumentoCompras, pk = id )
+        documento = get_object_or_404( ComprasDocumento, pk = id )
     else:
-        documento = DocumentoCompras()
+        documento = ComprasDocumento()
 
     comprasdet_forms = DocumentoComprasDetalleFormset(DocumentoComprasDetalleManageForm, extra=1, can_delete=True)
     compradetalles_formset = comprasdet_forms(request.POST or None, instance=documento)

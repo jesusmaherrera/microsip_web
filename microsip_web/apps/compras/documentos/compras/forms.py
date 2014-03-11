@@ -42,7 +42,7 @@ class ComprasManageForm(forms.ModelForm):
 
     class Meta:
 
-        model = DocumentoCompras
+        model = ComprasDocumento
         exclude = (
             'fecha_entrega',
             'aplicado',
@@ -85,7 +85,7 @@ class DocumentoComprasDetalleManageForm(forms.ModelForm):
 
     class Meta:
         
-        model = DocumentoComprasDetalle
+        model = ComprasDocumentoDetalle
         exclude = (
             'porcentaje_descuento_vol',
             'contenido_umed',
@@ -101,7 +101,7 @@ class DocumentoComprasDetalleManageForm(forms.ModelForm):
 
 def DocumentoComprasDetalleFormset(form, formset = BaseInlineFormSet, **kwargs):
 
-    return inlineformset_factory(DocumentoCompras, DocumentoComprasDetalle, form, formset, **kwargs)
+    return inlineformset_factory(ComprasDocumento, ComprasDocumentoDetalle, form, formset, **kwargs)
 
 class DocumentoComprasImpuestosManageForm(forms.Form):
 

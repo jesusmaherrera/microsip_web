@@ -17,8 +17,7 @@ from microsip_web.libs.tools import split_seq
 from django.db import connections, transaction
 from microsip_web.libs.custom_db.main import get_conecctionname
 from microsip_web.libs.inventarios import ajustar_existencias
-
-from microsip_web.apps.config.models import DerechoUsuario
+from microsip_api.apps.config.models import UsuarioDerecho
 from microsip_web.settings.local_settings import MICROSIP_MODULES
 
 @dajaxice_register( method = 'GET' )
@@ -30,7 +29,7 @@ def aplicar_doctoin( request, **kwargs ):
     return json.dumps( { 'msg' : 'ya'} )
     
 def allow_microsipuser( username = None, clave_objeto=  None ):
-    return DerechoUsuario.objects.filter(usuario__nombre = username, clave_objeto = clave_objeto).exists() or username == 'SYSDBA'
+    return UsuarioDerecho.objects.filter(usuario__nombre = username, clave_objeto = clave_objeto).exists() or username == 'SYSDBA'
 
 def ajustar_seriesinventario_byarticulo( **kwargs ):
     # Parametros
@@ -87,19 +86,19 @@ def ajustar_seriesinventario_byarticulo( **kwargs ):
 
         if detalle.tipo_movto == 'E':
             
-            if ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen, articulo_discreto__clave=serie).exists():
+            if ArticuloDiscretoExistencia.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen, articulo_discreto__clave=serie).exists():
                 unidades =  unidades -1
 
             try:
-                existencia_disc = ExistDiscreto.objects.get(articulo_discreto= articulo_discreto, almacen= almacen,)
+                existencia_disc = ArticuloDiscretoExistencia.objects.get(articulo_discreto= articulo_discreto, almacen= almacen,)
             except ObjectDoesNotExist:
-                ExistDiscreto.objects.create(id= next_id('ID_DOCTOS', connection_name), existencia= 1, articulo_discreto= articulo_discreto, almacen= almacen,)
+                ArticuloDiscretoExistencia.objects.create(id= next_id('ID_DOCTOS', connection_name), existencia= 1, articulo_discreto= articulo_discreto, almacen= almacen,)
             else:
                 existencia_disc.existencia=1
                 existencia_disc.save()
 
         elif detalle.tipo_movto == 'S':
-            ExistDiscreto.objects.filter(articulo_discreto= articulo_discreto, almacen = almacen).update(existencia=0)
+            ArticuloDiscretoExistencia.objects.filter(articulo_discreto= articulo_discreto, almacen = almacen).update(existencia=0)
             
         InventariosDesgloseEnDiscretos.objects.get_or_create(
                     docto_in_det=detalle,
@@ -133,7 +132,7 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
     articulo_id = kwargs.get('articulo_id', None)
     articulo = Articulo.objects.get(pk=articulo_id)
     articulo_clave = first_or_none(
-        ClavesArticulos.objects.filter(articulo=articulo))
+        ArticuloClave.objects.filter(articulo=articulo))
 
     almacen_id = kwargs.get('almacen_id', None)
     almacen = Almacen.objects.get(ALMACEN_ID=almacen_id)
@@ -161,12 +160,12 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
 
     #Checar numeros de serie
     for serie in series:
-        if ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen, articulo_discreto__clave=serie).exists() and serie != '' and unidades > 0 :
+        if ArticuloDiscretoExistencia.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen, articulo_discreto__clave=serie).exists() and serie != '' and unidades > 0 :
             #Si es la primera ves que se cuenta 
             if not ajusteprimerconteo or (ajusteprimerconteo and existe_en_detalles):
                 msg = '%s El numero de serie %s ya esta registrado.' % (msg, serie)
 
-        elif not ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen, articulo_discreto__clave=serie).exists() and serie != '' and unidades < 0:
+        elif not ArticuloDiscretoExistencia.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen, articulo_discreto__clave=serie).exists() and serie != '' and unidades < 0:
             msg = '%s El numero de serie %s no esta registrado.' % (msg, serie)
         if serie == '':
             series.remove(serie)
@@ -178,7 +177,7 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
         request_username = request.user.username
         #AJUSTAR SERIES
         if ajusteprimerconteo and not existe_en_detalles:
-            existdiscretos_aeliminar = ExistDiscreto.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen).exclude(articulo_discreto__clave__in=series)
+            existdiscretos_aeliminar = ArticuloDiscretoExistencia.objects.filter(articulo_discreto__articulo=articulo, existencia__gt=0, almacen=almacen).exclude(articulo_discreto__clave__in=series)
             existdiscretos_aeliminar_count =existdiscretos_aeliminar.count()
             series_aeliminar = []
             for existdiscreto in existdiscretos_aeliminar:
@@ -252,7 +251,7 @@ def get_seriesinventario_byarticulo( request, **kwargs ):
     articulo_id = kwargs.get( 'articulo_id', None )
     almacen_id = kwargs.get( 'almacen_id', None )
     series = ''
-    existenciadiscretos = ExistDiscreto.objects.filter(almacen__ALMACEN_ID = almacen_id, articulo_discreto__articulo__id = articulo_id, existencia__gt = 0)
+    existenciadiscretos = ArticuloDiscretoExistencia.objects.filter(almacen__ALMACEN_ID = almacen_id, articulo_discreto__articulo__id = articulo_id, existencia__gt = 0)
         
     for existenciadiscreto in existenciadiscretos:
         series = "%s%s, "% (series, existenciadiscreto.articulo_discreto.clave)
@@ -308,7 +307,7 @@ def add_existenciasarticulo_byajustes( **kwargs ):
 
     detalle_entradas = first_or_none( InventariosDocumentoDetalle.objects.filter( articulo = articulo, doctosIn = entrada ) )
     detalle_salidas = first_or_none( InventariosDocumentoDetalle.objects.filter( articulo = articulo, doctosIn = salida ) )
-    articulo_clave = first_or_none( ClavesArticulos.objects.filter( articulo = articulo ) )
+    articulo_clave = first_or_none( ArticuloClave.objects.filter( articulo = articulo ) )
 
     detalle = InventariosDocumentoDetalle(
         articulo = articulo,
@@ -567,7 +566,7 @@ def add_articulos_sincontar( **kwargs ):
             InventariosDocumentoIFDetalle.objects.create(
                     id = -1,
                     docto_invfis = inventario,
-                    clave = first_or_none( ClavesArticulos.objects.filter( articulo = articulo ) ),
+                    clave = first_or_none( ArticuloClave.objects.filter( articulo = articulo ) ),
                     articulo = articulo,
                     unidades = 0,
                 )
@@ -628,7 +627,7 @@ def get_detallesarticulo_byid( request, **kwargs ):
     articulo = Articulo.objects.get( pk = articulo_id )
 
     if not articulo_clave:
-        articulo_clave = first_or_none( ClavesArticulos.objects.filter( articulo_id = articulo_id, articulo__estatus = 'A'))
+        articulo_clave = first_or_none( ArticuloClave.objects.filter( articulo_id = articulo_id, articulo__estatus = 'A'))
         if articulo_clave:
             articulo_clave = articulo_clave.clave
 
@@ -649,7 +648,7 @@ def get_articulo_byclave( request, **kwargs ):
     #Paramentros
     clave = kwargs.get( 'clave', None)
     comun_name = kwargs.get( 'comun_name', None)
-    clave_articulo = first_or_none( ClavesArticulos.objects.filter( clave = clave, articulo__estatus = 'A'))
+    clave_articulo = first_or_none( ArticuloClave.objects.filter( clave = clave, articulo__estatus = 'A'))
 
     articulo_id = ''
     articulo_nombre = ''
@@ -666,7 +665,7 @@ def get_articulo_byclave( request, **kwargs ):
         articulo_id = articulo.id
         articulo_nombre = articulo.nombre
     else:
-        claves = ClavesArticulos.objects.filter( clave__contains=clave, articulo__estatus='A',)
+        claves = ArticuloClave.objects.filter( clave__contains=clave, articulo__estatus='A',)
         for c in claves:
             if c.articulo.seguimiento == 'S' or c.articulo.seguimiento == 'N':
                 opciones_clave[str(c.clave)] = c.articulo.nombre
@@ -698,7 +697,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
     articulo_nombre = ''
     articulo_seguimiento = ''
     costo_ultima_compra= ''
-    clave_articulo = first_or_none( ClavesArticulos.objects.filter( clave = articulo_clave, articulo__estatus = 'A'))
+    clave_articulo = first_or_none( ArticuloClave.objects.filter( clave = articulo_clave, articulo__estatus = 'A'))
     
     if clave_articulo:
         if clave_articulo.articulo.seguimiento == 'L':
@@ -776,7 +775,7 @@ def get_existenciasarticulo_byclave( request, **kwargs ):
             costo_ultima_compra = 0
     else:
         error = "no_existe_clave"
-        claves = ClavesArticulos.objects.filter( clave__contains = articulo_clave, articulo__estatus='A',)
+        claves = ArticuloClave.objects.filter( clave__contains = articulo_clave, articulo__estatus='A',)
         for c in claves:
             if c.articulo.seguimiento == 'S' or c.articulo.seguimiento == 'N':
                 opciones_clave[ str( c.clave ) ] = c.articulo.nombre

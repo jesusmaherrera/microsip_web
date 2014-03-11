@@ -38,7 +38,7 @@ def get_precio_articulo(request, template_name='punto_de_venta/articulos/articul
     form = articulo_byclave_form(request.POST or None)
     if form.is_valid():
         clave = form.cleaned_data['clave']
-        articulo = ClavesArticulos.objects.get(clave=clave).articulo
+        articulo = ArticuloClave.objects.get(clave=clave).articulo
 
         c.execute("EXECUTE PROCEDURE GET_PRECIO_ARTCLI(331,%s,'2013/11/27');"%articulo.id)
         row = c.fetchone()
@@ -254,14 +254,14 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
         devoluciones= []
         if ignorar_documentos_cont:
             if crear_polizas_de     == 'V':
-                ventas          = Docto_PV.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='V', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                ventas          = PuntoVentaDocumento.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='V', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
             elif crear_polizas_de   == 'D':
-                devoluciones        = Docto_PV.objects.filter(estado = 'N').filter(tipo ='D', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                devoluciones        = PuntoVentaDocumento.objects.filter(estado = 'N').filter(tipo ='D', contabilizado ='N',  fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
         else:
             if crear_polizas_de     == 'V':
-                ventas          = Docto_PV.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='V', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                ventas          = PuntoVentaDocumento.objects.filter(Q(estado='N')|Q(estado='D'), tipo ='V', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
             elif crear_polizas_de   == 'D':
-                devoluciones        = Docto_PV.objects.filter(estado = 'N').filter(tipo = 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
+                devoluciones        = PuntoVentaDocumento.objects.filter(estado = 'N').filter(tipo = 'D', fecha__gte=fecha_ini, fecha__lte=fecha_fin).order_by('fecha')[:99]
         
         if crear_polizas_de     == 'V':
             msg, documentosData = contabilidad.crear_polizas(
@@ -457,7 +457,7 @@ def ventas_de_mostrador_view(request, template_name='punto_de_venta/documentos/v
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
-    ventas_list = Docto_PV.objects.filter(tipo='V').order_by('-id')
+    ventas_list = PuntoVentaDocumento.objects.filter(tipo='V').order_by('-id')
 
     paginator = Paginator(ventas_list, 15) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -480,9 +480,9 @@ def venta_mostrador_manageView(request, id = None, template_name='punto_de_venta
     
     message = ''
     if id:
-        documento = get_object_or_404(Docto_PV, pk=id)
+        documento = get_object_or_404(PuntoVentaDocumento, pk=id)
     else:
-        documento = Docto_PV()
+        documento = PuntoVentaDocumento()
     
     documento_items = DocumentoPV_items_formset(DocumentoPVDet_ManageForm, extra=1, can_delete=True)
     documentoCobro_items = DocumentoPV_cobro_items_formset(Docto_pv_cobro_ManageForm, extra=1, can_delete=True)
@@ -534,7 +534,7 @@ def devoluciones_de_ventas_view(request, template_name='punto_de_venta/documento
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
-    documentos_list = Docto_PV.objects.filter(tipo='D')
+    documentos_list = PuntoVentaDocumento.objects.filter(tipo='D')
     
     paginator = Paginator(documentos_list, 15) # Muestra 10 documentos por pagina
     page = request.GET.get('page')
@@ -565,7 +565,7 @@ def facturas_view(request, template_name='punto_de_venta/documentos/facturas/fac
 
         return HttpResponseRedirect('/select_db/')
 
-    facturas_list = Docto_PV.objects.filter(tipo='F').order_by('-id')
+    facturas_list = PuntoVentaDocumento.objects.filter(tipo='F').order_by('-id')
 
     paginator = Paginator(facturas_list, 20) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -590,9 +590,9 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
     factura_nueva = False
     
     if id:
-        factura = get_object_or_404( Docto_PV, pk = id )
+        factura = get_object_or_404( PuntoVentaDocumento, pk = id )
     else:
-        factura = Docto_PV()
+        factura = PuntoVentaDocumento()
 
     #Cargar formularios
 
@@ -672,13 +672,13 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
 
         if ventas_faturadas!= [u'']:
             for venta_facturada in ventas_faturadas:
-                venta = Docto_PV.objects.get(pk=venta_facturada)
-                DoctoPVLiga.objects.create(
+                venta = PuntoVentaDocumento.objects.get(pk=venta_facturada)
+                PuntoVentaDocumentoLiga.objects.create(
                         id = -1,
                         docto_pv_fuente = venta,
                         docto_pv_destino = factura,
                     )
-        ventas_ligas = DoctoPVLiga.objects.filter(docto_pv_destino= factura)
+        ventas_ligas = PuntoVentaDocumentoLiga.objects.filter(docto_pv_destino= factura)
         #Se guardan detalles de factura
         for detalle_form in formset:
             detalle = detalle_form.save(commit = False)
@@ -701,8 +701,8 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
                 detalle_ligas = detalle_form.cleaned_data['detalles_liga'].split(',')
                 if detalle_ligas!= [u'']:
                     for detalle_liga in detalle_ligas:
-                        detalle_doc = Docto_pv_det.objects.get(pk=detalle_liga)
-                        documento_liga = DoctoPVLiga.objects.get(docto_pv_fuente= detalle_doc.documento_pv)
+                        detalle_doc = PuntoVentaDocumentoDetalle.objects.get(pk=detalle_liga)
+                        documento_liga = PuntoVentaDocumentoLiga.objects.get(docto_pv_fuente= detalle_doc.documento_pv)
                         c = connections[connection_name].cursor()
                         query =  '''INSERT INTO "DOCTOS_PV_LIGAS_DET" ("DOCTO_PV_LIGA_ID", "DOCTO_PV_DET_FTE_ID", "DOCTO_PV_DET_DEST_ID") \
                             VALUES (%s, %s, %s)'''%(documento_liga.id, detalle_doc.id , detalle.id)
@@ -714,7 +714,7 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
 
                 #Se generan todos los detalles de ligas
                 for docto_pv_liga in ventas_ligas:
-                    for detalle_venta in Docto_pv_det.objects.filter(documento_pv=docto_pv_liga.docto_pv_fuente):
+                    for detalle_venta in PuntoVentaDocumentoDetalle.objects.filter(documento_pv=docto_pv_liga.docto_pv_fuente):
                         c = connections[connection_name].cursor()
                         query =  '''INSERT INTO "DOCTOS_PV_LIGAS_DET" ("DOCTO_PV_LIGA_ID", "DOCTO_PV_DET_FTE_ID", "DOCTO_PV_DET_DEST_ID") \
                             VALUES (%s, %s, %s)'''%(docto_pv_liga.id, detalle_venta.id, detalle.id)
@@ -732,7 +732,7 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
         
         message= 'Factura guardada'
 
-    ventas_factura = DoctoPVLiga.objects.filter(docto_pv_destino= factura)
+    ventas_factura = PuntoVentaDocumentoLiga.objects.filter(docto_pv_destino= factura)
 
     c = {
         'factura_global_fm':factura_global_fm, 

@@ -28,8 +28,8 @@ def ajustes_get_or_create( almacen_id = None, username = '' ):
 
     fecha_actual = datetime.now()
     almacen = Almacen.objects.get( pk = almacen_id )
-    conecpto_ajuste_salida = ConceptosIn.objects.get( pk = 38 )
-    conecpto_ajuste_entrada = ConceptosIn.objects.get( pk = 27 )
+    conecpto_ajuste_salida = InventariosConcepto.objects.get( pk = 38 )
+    conecpto_ajuste_entrada = InventariosConcepto.objects.get( pk = 27 )
     folio = '' 
 
     #salida

@@ -50,7 +50,7 @@ def articulos_view(request, carpeta=1,template_name='main/articulos/articulos/ar
             if articulo != None:
                 return HttpResponseRedirect('%s%s/'% (url_articulo, articulo.id))
             elif clave != '':
-                clave_articulo = ClavesArticulos.objects.filter(clave=clave)
+                clave_articulo = ArticuloClave.objects.filter(clave=clave)
                 if clave_articulo.count() > 0:
                     return HttpResponseRedirect('%s%s/'% (url_articulo, clave_articulo[0].articulo.id))
                 else:
@@ -104,8 +104,8 @@ def articulo_manageview(request, id, template_name='main/articulos/articulos/art
    
     articulo = get_object_or_404(Articulo, pk=id)
 
-    clavesarticulos_fromset = modelformset_factory(ClavesArticulos, form= claves_articulos_form, can_delete=True,)
-    preciosarticulos_fromset = modelformset_factory(PrecioArticulo, form= precios_articulos_form, can_delete=True,)
+    clavesarticulos_fromset = modelformset_factory(ArticuloClave, form= claves_articulos_form, can_delete=True,)
+    preciosarticulos_fromset = modelformset_factory(ArticuloPrecio, form= precios_articulos_form, can_delete=True,)
 
     impuestos_articulo = ImpuestosArticulo.objects.filter(articulo=articulo)
     if impuestos_articulo.count() > 0:
@@ -117,8 +117,8 @@ def articulo_manageview(request, id, template_name='main/articulos/articulos/art
         formset = clavesarticulos_fromset(request.POST, prefix="formset")
         precios_formset = preciosarticulos_fromset(request.POST, prefix="precios_formset")
     else:
-        formset = clavesarticulos_fromset(queryset=ClavesArticulos.objects.filter(articulo=articulo), prefix="formset")
-        precios_formset = preciosarticulos_fromset(queryset=PrecioArticulo.objects.filter(articulo=articulo), prefix="precios_formset")
+        formset = clavesarticulos_fromset(queryset=ArticuloClave.objects.filter(articulo=articulo), prefix="formset")
+        precios_formset = preciosarticulos_fromset(queryset=ArticuloPrecio.objects.filter(articulo=articulo), prefix="precios_formset")
 
     articulo_form = articulos_form(request.POST or None, instance= articulo)
     # precio_articulo_form = precios_articulos_form(request.POST or None, instance=precio_articulo)

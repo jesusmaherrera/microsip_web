@@ -7,7 +7,7 @@ from microsip_web.libs.api.models import *
 #############################################################################################################################################################
         
 class InformacionContable_CP(models.Model):
-    condicion_pago_contado  = models.ForeignKey(CondicionPagoCp, blank=True, null=True)
+    condicion_pago_contado  = models.ForeignKey(CuentasXPagarCondicionPago, blank=True, null=True)
     
     def __unicode__(self):
         return u'%s'% self.id
@@ -47,7 +47,7 @@ class DetallePlantillaPolizas_CP(models.Model):
 
     posicion                = models.CharField(max_length=2)
     plantilla_poliza_CP     = models.ForeignKey(PlantillaPolizas_CP)
-    cuenta_co               = models.ForeignKey(CuentaCo)
+    cuenta_co               = models.ForeignKey(ContabilidadCuentaContable)
     tipo                    = models.CharField(max_length=2, choices=TIPOS, default='C')
     asiento_ingora          = models.CharField(max_length=2, blank=True, null=True)
     valor_tipo              = models.CharField(max_length=20, choices=VALOR_TIPOS)

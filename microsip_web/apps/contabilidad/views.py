@@ -102,7 +102,7 @@ def preferenciasEmpresa_View(request, template_name='contabilidad/herramientas/p
 
 #   if error == 0:
 #       msg=''
-#       cuentas_provedores = CuentaCo.objects.filter(cuenta__contains=informacion_contable.cuenta_proveedores.cuenta)
+#       cuentas_provedores = ContabilidadCuentaContable.objects.filter(cuenta__contains=informacion_contable.cuenta_proveedores.cuenta)
 #       cuentas_diot = Cuenta_DIOT.objects.all()
 #       #objects.sd
 #       if request.method == 'POST':

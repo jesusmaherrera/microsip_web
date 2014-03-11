@@ -32,14 +32,14 @@ def new_factura_global( **kwargs ):
     detalles_list =[]
     ventas_list = []
     # Ventas facturadas
-    ventas_facturadas = DoctoPVLiga.objects.filter(docto_pv_fuente__fecha__gte = fecha_inicio, docto_pv_fuente__fecha__lte = fecha_fin)
+    ventas_facturadas = PuntoVentaDocumentoLiga.objects.filter(docto_pv_fuente__fecha__gte = fecha_inicio, docto_pv_fuente__fecha__lte = fecha_fin)
     if almacen:
         ventas_facturadas = ventas_facturadas.filter(docto_pv_fuente__almacen= almacen)
     ventas_facturadas_list =  list( set( ventas_facturadas.values_list( 'docto_pv_fuente__id', flat = True ) ) ) 
 
     # Ventas sin facturar
-    ventas_sinfacturar =  Docto_PV.objects.exclude( id__in = ventas_facturadas_list).exclude(estado='C').filter(tipo= 'V', fecha__gte = fecha_inicio, fecha__lte = fecha_fin)
-    detalles_factura = Docto_pv_det.objects.exclude(documento_pv__estado='C').exclude(documento_pv__id__in = ventas_facturadas_list)\
+    ventas_sinfacturar =  PuntoVentaDocumento.objects.exclude( id__in = ventas_facturadas_list).exclude(estado='C').filter(tipo= 'V', fecha__gte = fecha_inicio, fecha__lte = fecha_fin)
+    detalles_factura = PuntoVentaDocumentoDetalle.objects.exclude(documento_pv__estado='C').exclude(documento_pv__id__in = ventas_facturadas_list)\
        .filter(documento_pv__tipo = 'V',documento_pv__fecha__gte= fecha_inicio, documento_pv__fecha__lte=fecha_fin)
     if almacen:
         ventas_sinfacturar = ventas_sinfacturar.filter(almacen = almacen)
@@ -68,7 +68,7 @@ def new_factura_global( **kwargs ):
     # si hay ventas por facturar
     if ventas_sinfacturar.count() > 0:
         for venta in ventas_sinfacturar:
-            # detalles_venta = list( set( Docto_pv_det.objects.filter(documento_pv=venta).values_list( 'id', flat = True ) ) ) 
+            # detalles_venta = list( set( PuntoVentaDocumentoDetalle.objects.filter(documento_pv=venta).values_list( 'id', flat = True ) ) ) 
             ventas_list.append({
                     'id':venta.id,
                     'folio': venta.folio,
@@ -87,7 +87,7 @@ def new_factura_global( **kwargs ):
             
             articulo_ventaspg_id = Registry.objects.get( nombre = 'ARTICULO_VENTAS_FG_PV_ID' ).valor
             articulo = Articulo.objects.get(pk=articulo_ventaspg_id)
-            articulo_clave = first_or_none(ClavesArticulos.objects.filter(articulo=articulo))
+            articulo_clave = first_or_none(ArticuloClave.objects.filter(articulo=articulo))
             if articulo_clave:
                 articulo_clave = articulo_clave.clave
             articulo_nombre = articulo.nombre
@@ -122,7 +122,7 @@ def new_factura_global( **kwargs ):
                 articulo = Articulo.objects.get(pk=detalle['articulo'])
                 detalles_relacion = list( set( detalles_factura.filter(articulo=articulo).values_list( 'id', flat = True ) ) )
 
-                articulo_clave = first_or_none(ClavesArticulos.objects.filter(articulo=articulo))
+                articulo_clave = first_or_none(ArticuloClave.objects.filter(articulo=articulo))
                 if articulo_clave:
                     articulo_clave = articulo_clave.clave
 

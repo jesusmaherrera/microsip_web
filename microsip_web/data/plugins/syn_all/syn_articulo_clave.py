@@ -11,7 +11,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import router
-from ....libs.api.models import Articulo, ClavesArticulos, ArticuloClaveRol, articulo_clave_save_signal
+from ....libs.api.models import Articulo, ArticuloClave, ArticuloClaveRol, articulo_clave_save_signal
 from microsip_web.settings.common import MICROSIP_DATABASES
 from microsip_web.libs.custom_db.main import first_or_none
 from .syn_libs import get_indices, set_indices, default_db
@@ -19,7 +19,7 @@ from .syn_libs import get_indices, set_indices, default_db
 
 
 
-@receiver(post_save, sender=ClavesArticulos)
+@receiver(post_save, sender=ArticuloClave)
 def SincronizarArticuloImpuesto(sender, **kwargs):
     ''' Para sincronizar primer plazo de condiciones de pago en todas las empreas registradas. '''
     instance  = kwargs.get('instance')
@@ -34,7 +34,7 @@ def SincronizarArticuloImpuesto(sender, **kwargs):
         for base_de_datos in bases_de_datos[indice:indice_final]:
             articulo = Articulo.objects.using(base_de_datos).get(nombre=articulo_nombre)
                 
-            clave_principal = first_or_none(ClavesArticulos.objects.using(base_de_datos).filter(articulo=articulo, rol__es_ppal='S'))
+            clave_principal = first_or_none(ArticuloClave.objects.using(base_de_datos).filter(articulo=articulo, rol__es_ppal='S'))
 
 
             rol_principal = ArticuloClaveRol.objects.using(base_de_datos).get(es_ppal='S')
@@ -45,7 +45,7 @@ def SincronizarArticuloImpuesto(sender, **kwargs):
                 clave_principal.rol = rol_principal
                 clave_principal.save(using=base_de_datos)
             else:
-                ClavesArticulos.objects.using(base_de_datos).create(
+                ArticuloClave.objects.using(base_de_datos).create(
                         clave = articulo_clave_a_syncronizar.clave,
                         articulo = articulo,
                         rol = rol_principal,

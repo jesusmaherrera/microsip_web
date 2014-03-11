@@ -8,7 +8,7 @@ from microsip_web.libs.api.models import *
 #############################################################################################################################################################
 
 class InformacionContable_C(models.Model):
-    cuenta_proveedores  = models.ForeignKey(CuentaCo)
+    cuenta_proveedores  = models.ForeignKey(ContabilidadCuentaContable)
     
     def __unicode__(self):
         return u'%s'% self.id

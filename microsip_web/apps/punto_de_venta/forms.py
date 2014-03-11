@@ -114,7 +114,7 @@ class PlantillaPolizaManageForm(forms.ModelForm):
 class DetPlantillaPolVentasManageForm(forms.ModelForm):
     posicion        =  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
     asiento_ingora  = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
-    cuenta_co = forms.ModelChoiceField(queryset=CuentaCo.objects.all(), widget=autocomplete_light.ChoiceWidget('CuentaCoAutocomplete'))
+    cuenta_co = forms.ModelChoiceField(queryset=ContabilidadCuentaContable.objects.all(), widget=autocomplete_light.ChoiceWidget('ContabilidadCuentaContableAutocomplete'))
 
     def __init__(self, *args, **kwargs):
         super(DetPlantillaPolVentasManageForm, self).__init__(*args, **kwargs)
@@ -128,14 +128,14 @@ class DetPlantillaPolVentasManageForm(forms.ModelForm):
 
     def clean_cuenta_co(self):
         cuenta_co = self.cleaned_data['cuenta_co']
-        if CuentaCo.objects.filter(cuenta_padre=cuenta_co.id).count() > 0:
+        if ContabilidadCuentaContable.objects.filter(cuenta_padre=cuenta_co.id).count() > 0:
             raise forms.ValidationError(u'la cuenta contable (%s) no es de ultimo nivel, por favor seleciona una cuenta de ultimo nivel' % cuenta_co )
         return cuenta_co
 
 class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
     posicion        =  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
     asiento_ingora  = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
-    cuenta_co = forms.ModelChoiceField(queryset=CuentaCo.objects.all(), widget=autocomplete_light.ChoiceWidget('CuentaCoAutocomplete'))
+    cuenta_co = forms.ModelChoiceField(queryset=ContabilidadCuentaContable.objects.all(), widget=autocomplete_light.ChoiceWidget('ContabilidadCuentaContableAutocomplete'))
 
     def __init__(self, *args, **kwargs):
         super(ConceptoPlantillaPolizaManageForm, self).__init__(*args, **kwargs)
@@ -150,7 +150,7 @@ class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
 
     def clean_cuenta_co(self):
         cuenta_co = self.cleaned_data['cuenta_co']
-        if CuentaCo.objects.filter(cuenta_padre=cuenta_co.id).count() > 0:
+        if ContabilidadCuentaContable.objects.filter(cuenta_padre=cuenta_co.id).count() > 0:
             raise forms.ValidationError(u'la cuenta contable (%s) no es de ultimo nivel, por favor seleciona una cuenta de ultimo nivel' % cuenta_co )
         return cuenta_co
         
@@ -182,8 +182,8 @@ class FacturaManageForm(forms.ModelForm):
         self.fields['importe_descuento'].widget = forms.HiddenInput()
 
     class Meta:
-        widgets = autocomplete_light.get_widgets_dict(Docto_PV)
-        model = Docto_PV
+        widgets = autocomplete_light.get_widgets_dict(PuntoVentaDocumento)
+        model = PuntoVentaDocumento
         
         exclude = (
             'tipo_gen_fac',
@@ -240,8 +240,8 @@ class DocumentoPV_ManageForm(forms.ModelForm):
         self.fields['folio'].required = False
 
     class Meta:
-        widgets = autocomplete_light.get_widgets_dict(Docto_PV)
-        model = Docto_PV
+        widgets = autocomplete_light.get_widgets_dict(PuntoVentaDocumento)
+        model = PuntoVentaDocumento
         exclude = (
             'vendedor',
             'forma_global_emitida',
@@ -302,7 +302,7 @@ class DocumentoPVDet_ManageForm(forms.ModelForm):
         self.fields['clave_articulo'].required = False
 
     class Meta:
-        model = Docto_pv_det
+        model = PuntoVentaDocumentoDetalle
         exclude = (
             'rol',
             'puntos',
@@ -321,7 +321,7 @@ class DocumentoPVDet_ManageForm(forms.ModelForm):
 
 class Docto_pv_cobro_ManageForm(forms.ModelForm):
     class Meta:
-        model = Docto_pv_cobro
+        model = PuntoVentaCobro
         exclude = (
             'importe_mon_doc',
             'tipo',
@@ -329,10 +329,10 @@ class Docto_pv_cobro_ManageForm(forms.ModelForm):
         )
 
 def DocumentoPV_items_formset(form, formset = BaseInlineFormSet, **kwargs):
-    return inlineformset_factory(Docto_PV, Docto_pv_det, form, formset, **kwargs)
+    return inlineformset_factory(PuntoVentaDocumento, PuntoVentaDocumentoDetalle, form, formset, **kwargs)
 
 # def DoctoPVLigas_formset(form, formset = BaseInlineFormSet, **kwargs):
-#     return inlineformset_factory(Docto_PV, DoctoPVLiga, form, formset, **kwargs)
+#     return inlineformset_factory(PuntoVentaDocumento, PuntoVentaDocumentoLiga, form, formset, **kwargs)
 
 def DocumentoPV_cobro_items_formset(form, formset = BaseInlineFormSet, **kwargs):
-    return inlineformset_factory(Docto_PV, Docto_pv_cobro, form, formset, **kwargs)
+    return inlineformset_factory(PuntoVentaDocumento, PuntoVentaCobro, form, formset, **kwargs)

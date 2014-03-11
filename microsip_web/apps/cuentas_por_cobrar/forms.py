@@ -39,7 +39,7 @@ class PlantillaPolizaManageForm(forms.ModelForm):
 class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
     posicion =  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
     asiento_ingora = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
-    cuenta_co = forms.ModelChoiceField(queryset=CuentaCo.objects.all(), widget=autocomplete_light.ChoiceWidget('CuentaCoAutocomplete'))
+    cuenta_co = forms.ModelChoiceField(queryset=ContabilidadCuentaContable.objects.all(), widget=autocomplete_light.ChoiceWidget('ContabilidadCuentaContableAutocomplete'))
 
     def __init__(self, *args, **kwargs):
         super(ConceptoPlantillaPolizaManageForm, self).__init__(*args, **kwargs)
@@ -53,7 +53,7 @@ class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
 
     def clean_cuenta_co(self):
         cuenta_co = self.cleaned_data['cuenta_co']
-        if CuentaCo.objects.filter(cuenta_padre=cuenta_co.id).count() > 1:
+        if ContabilidadCuentaContable.objects.filter(cuenta_padre=cuenta_co.id).count() > 1:
             raise forms.ValidationError(u'la cuenta contable (%s) no es de ultimo nivel, por favor seleciona una cuenta de ultimo nivel' % cuenta_co )
         return cuenta_co
 

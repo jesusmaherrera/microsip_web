@@ -1,7 +1,7 @@
 from django.db import models
 from datetime import datetime 
 
-from microsip_web.libs.api.models import TipoPoliza, CondicionPago, CuentaCo, VentasDocumento, VentasDocumentoDetalle
+from microsip_web.libs.api.models import TipoPoliza, CondicionPago, ContabilidadCuentaContable, VentasDocumento, VentasDocumentoDetalle
 ################################################################
 ####                                                        ####
 ####        MODELOS EXTRA A BASE DE DATOS MICROSIP          ####
@@ -61,7 +61,7 @@ class DetallePlantillaPolizas_V(models.Model):
 
     posicion                = models.CharField(max_length=2)
     plantilla_poliza_v      = models.ForeignKey(PlantillaPolizas_V)
-    cuenta_co               = models.ForeignKey(CuentaCo)
+    cuenta_co               = models.ForeignKey(ContabilidadCuentaContable)
     tipo                    = models.CharField(max_length=2, choices=TIPOS, default='C')
     asiento_ingora          = models.CharField(max_length=3, blank=True, null=True)
     valor_tipo              = models.CharField(max_length=20, choices=VALOR_TIPOS)

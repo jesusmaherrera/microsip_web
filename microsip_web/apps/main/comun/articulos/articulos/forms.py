@@ -12,7 +12,7 @@ class impuestos_articulos_form(forms.ModelForm):
         
 class precios_articulos_form(forms.ModelForm):
     class Meta:
-        model = PrecioArticulo
+        model = ArticuloPrecio
         exclude = ('articulo',)
 
 class articulos_form(forms.ModelForm):
@@ -26,7 +26,7 @@ class articulos_form(forms.ModelForm):
 
 class claves_articulos_form(forms.ModelForm):
     class Meta:
-        model = ClavesArticulos
+        model = ArticuloClave
         exclude = ('articulo',)
     
     def clean_clave(self):
@@ -36,11 +36,11 @@ class claves_articulos_form(forms.ModelForm):
         clave_id  = self.instance.pk
         
         if clave_id != None:
-            old_clave = ClavesArticulos.objects.get(pk=clave_id).clave
+            old_clave = ArticuloClave.objects.get(pk=clave_id).clave
         else:
             old_clave = None
 
-        if ClavesArticulos.objects.exclude(clave = old_clave).filter(clave= clave).exists():
+        if ArticuloClave.objects.exclude(clave = old_clave).filter(clave= clave).exists():
             raise forms.ValidationError(u'La clave [%s] ya se encuentra registrada'% clave)
         return clave
     

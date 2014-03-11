@@ -1,1 +1,1 @@
-from microsip_web.libs.api.models import Articulo, ClavesArticulos, PrecioArticulo, ImpuestosArticulo, Almacen
+from microsip_web.libs.api.models import Articulo, ArticuloClave, ArticuloPrecio, ImpuestosArticulo, Almacen
