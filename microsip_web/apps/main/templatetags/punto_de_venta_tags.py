@@ -9,9 +9,15 @@ def puntos_tab():
     result = '<li class=""><a href="#puntos" data-toggle="tab">Puntos</a></li>'
   return result
 
+def alertas_tab():
+  result = ''
+  if 'microsip_web.apps.main.comun.articulos.articulos.alertas' in settings.MICROSIP_MODULES:
+    result = '<li class=""><a href="#alertas" data-toggle="tab">Alertas</a></li>'
+  return result
+
 def articulos_tab():
   result = ''
-  if 'microsip_web.apps.ventas' in settings.MICROSIP_MODULES:
+  if 'microsip_web.apps.main.comun.clientes.clientes.cliente_articulos' in settings.MICROSIP_MODULES:
     result = '<li class=""><a href="#articulos" data-toggle="tab">Articulos</a></li>'
   return result
 
@@ -79,6 +85,7 @@ def generar_polizas_tag(tag_name):
       
    return result
 register.simple_tag(articulos_tab)
+register.simple_tag(alertas_tab)
 register.simple_tag(puntos_tag)
 register.simple_tag(puntos_tab)
 register.simple_tag(informacion_contable_tab)

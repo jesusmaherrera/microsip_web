@@ -6,6 +6,7 @@
 {% block extra_tabs %}
 	<li class=""><a href="#ventas" data-toggle="tab">Ventas</a></li>
   {% puntos_tab %}
+  {% alertas_tab %}
 {% endblock %}
 {% block ventas_form %}
   <div class="tab-pane fade " id="ventas">  
@@ -47,5 +48,18 @@
     <label>Dinero Elecronico (% de costo)</label>
     <div class="input-prepend input-append">{{ articulo_form.dinero_electronico }}</div>
   </div>
+</div>
+<div class="tab-pane fade " id="alertas">
+  <div class="input-prepend input-append">
+    <div class="input-prepend input-append span4">
+      {{ articulo_form.alerta_unidades }}
+      {{ articulo_form.alerta_unidad_medida }}
+    </div>
+    <div class="btn-group span2" style="color: black;font-size: 12px;vertical-align: bottom;">
+      despues de servicio
+    </div>
+      
+  </div>
+
 </div>
 {% endblock %}

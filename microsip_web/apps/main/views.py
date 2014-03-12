@@ -19,7 +19,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core import management
 import fdb
-from microsip_web.settings.common import MICROSIP_MODULES
+from microsip_web.settings.local_settings import MICROSIP_MODULES
 from microsip_web.apps.inventarios.triggers import triggers as inventarios_triggers
 from microsip_web.apps.inventarios.triggers_salidas import triggers_salidas as inventarios_triggers_salidas
 from microsip_web.apps.punto_de_venta.triggers import triggers as punto_de_venta_triggers
@@ -154,38 +154,46 @@ def sincronizar_tablas( conexion_name = None ):
 
     c = connections[ conexion_name ].cursor()
     ################## STRORE PROCEDURES ###################
-    c.execute( procedures[ 'SIC_PUNTOS_ARTICULOS_AT' ] )
-    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_ARTICULOS_AT;')
-    c.execute('DROP PROCEDURE SIC_PUNTOS_ARTICULOS_AT;')
+    if 'microsip_web.apps.main.comun.articulos.articulos.alertas' in MICROSIP_MODULES:
+        from microsip_web.apps.main.comun.articulos.articulos.alertas.procedures import procedures as alertas_procedures
+        for procedure in alertas_procedures.keys():
+            c.execute( alertas_procedures[procedure] )
+            c.execute('EXECUTE PROCEDURE %s;'%procedure)
+            c.execute('DROP PROCEDURE %s;'%procedure)
 
-    c.execute( procedures[ 'SIC_PUNTOS_LINEASARTICULOS_AT' ] )
-    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_LINEASARTICULOS_AT;')
-    c.execute('DROP PROCEDURE SIC_PUNTOS_LINEASARTICULOS_AT;')
-    
-    c.execute( procedures[ 'SIC_PUNTOS_GRUPOSLINEAS_AT' ] )
-    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_GRUPOSLINEAS_AT;')
-    c.execute('DROP PROCEDURE SIC_PUNTOS_GRUPOSLINEAS_AT;')
-    
-    #Clientes
-    c.execute( procedures[ 'SIC_PUNTOS_CLIENTES_AT' ] )
-    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_CLIENTES_AT;')
-    c.execute('DROP PROCEDURE SIC_PUNTOS_CLIENTES_AT;')
+    if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
+        c.execute( procedures[ 'SIC_PUNTOS_ARTICULOS_AT' ] )
+        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_ARTICULOS_AT;')
+        c.execute('DROP PROCEDURE SIC_PUNTOS_ARTICULOS_AT;')
 
-    c.execute( procedures[ 'SIC_PUNTOS_LIBRESCLIENTES_AT' ] )
-    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_LIBRESCLIENTES_AT;')
-    c.execute('DROP PROCEDURE SIC_PUNTOS_LIBRESCLIENTES_AT;')
-    
-    c.execute( procedures[ 'SIC_PUNTOS_TIPOSCLIENTES_AT' ] )
-    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_TIPOSCLIENTES_AT;')
-    c.execute('DROP PROCEDURE SIC_PUNTOS_TIPOSCLIENTES_AT;')
+        c.execute( procedures[ 'SIC_PUNTOS_LINEASARTICULOS_AT' ] )
+        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_LINEASARTICULOS_AT;')
+        c.execute('DROP PROCEDURE SIC_PUNTOS_LINEASARTICULOS_AT;')
+        
+        c.execute( procedures[ 'SIC_PUNTOS_GRUPOSLINEAS_AT' ] )
+        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_GRUPOSLINEAS_AT;')
+        c.execute('DROP PROCEDURE SIC_PUNTOS_GRUPOSLINEAS_AT;')
+        
+        #Clientes
+        c.execute( procedures[ 'SIC_PUNTOS_CLIENTES_AT' ] )
+        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_CLIENTES_AT;')
+        c.execute('DROP PROCEDURE SIC_PUNTOS_CLIENTES_AT;')
 
-    c.execute( procedures[ 'SIC_PUNTOS_DOCTOSPVDET_AT' ] )
-    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DOCTOSPVDET_AT;')
-    c.execute('DROP PROCEDURE SIC_PUNTOS_DOCTOSPVDET_AT;')
-    
-    c.execute( procedures[ 'SIC_PUNTOS_DOCTOS_PV_AT' ] )
-    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DOCTOS_PV_AT;')
-    c.execute('DROP PROCEDURE SIC_PUNTOS_DOCTOS_PV_AT;')
+        c.execute( procedures[ 'SIC_PUNTOS_LIBRESCLIENTES_AT' ] )
+        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_LIBRESCLIENTES_AT;')
+        c.execute('DROP PROCEDURE SIC_PUNTOS_LIBRESCLIENTES_AT;')
+        
+        c.execute( procedures[ 'SIC_PUNTOS_TIPOSCLIENTES_AT' ] )
+        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_TIPOSCLIENTES_AT;')
+        c.execute('DROP PROCEDURE SIC_PUNTOS_TIPOSCLIENTES_AT;')
+
+        c.execute( procedures[ 'SIC_PUNTOS_DOCTOSPVDET_AT' ] )
+        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DOCTOSPVDET_AT;')
+        c.execute('DROP PROCEDURE SIC_PUNTOS_DOCTOSPVDET_AT;')
+        
+        c.execute( procedures[ 'SIC_PUNTOS_DOCTOS_PV_AT' ] )
+        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DOCTOS_PV_AT;')
+        c.execute('DROP PROCEDURE SIC_PUNTOS_DOCTOS_PV_AT;')
 
     #lbres clientes
     c.execute( procedures[ 'SIC_LIBRES_CLIENTES_AT' ] ) 

@@ -1,7 +1,8 @@
 MICROSIP_MODULES = (
 	'microsip_web.libs.api',
     'microsip_web.apps.main',
-    'microsip_web.apps.main.comun.clientes.clientes.cliente_articulos',
+    # 'microsip_web.apps.main.comun.articulos.articulos.alertas',
+    # 'microsip_web.apps.main.comun.clientes.clientes.cliente_articulos',
     'microsip_api.apps.config',
     'microsip_web.apps.main.filtros',
     'microsip_web.apps.inventarios',
@@ -13,5 +14,5 @@ MICROSIP_MODULES = (
    	'microsip_web.apps.cuentas_por_cobrar',
  #   'microsip_web.apps.contabilidad',
      'microsip_web.apps.punto_de_venta',    
-     'microsip_web.apps.punto_de_venta.puntos',    
+     'microsip_web.apps.punto_de_venta.puntos',
 )
