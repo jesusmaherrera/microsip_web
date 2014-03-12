@@ -31,6 +31,7 @@ def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
     iva_credito     = kwargs.get('iva_credito', 0)
     iva_retenido    = kwargs.get('iva_retenido', 0)
     isr_retenido    = kwargs.get('isr_retenido', 0)
+    ieps            = kwargs.get('ieps', None)
     proveedores     = kwargs.get('proveedores', 0)
     cuenta_proveedor    = kwargs.get('cuenta_proveedor', None)
     
@@ -87,6 +88,13 @@ def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
                         valor_extra  = descuento
                     elif concepto.valor_tipo == 'IVA Retenido':
                         valor_extra  = iva_retenido
+                    elif concepto.valor_tipo = 'IEPS':
+                        if concepto.valor_contado_credito == 'Credito':
+                            valor_extra  = ieps['credito']
+                        elif concepto.valor_contado_credito == 'Contado':
+                            valor_extra  = ieps['contado']
+                        elif concepto.valor_contado_credito == 'Ambos':
+                            valor_extra  = ieps['credito'] + ieps['contado']
                     elif concepto.valor_tipo == 'IVA':
                         if concepto.valor_contado_credito == 'Credito':
                             valor_extra  = iva_credito
@@ -234,6 +242,15 @@ def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
                 importe = iva_contado
             elif concepto.valor_contado_credito == 'Ambos':
                 importe = iva_credito + iva_contado
+
+            cuenta = concepto.cuenta_co.cuenta
+        elif concepto.valor_tipo == 'IEPS' and not concepto.posicion in asientos_a_ingorar:
+            if concepto.valor_contado_credito == 'Credito':
+                importe = ieps['credito']
+            elif concepto.valor_contado_credito == 'Contado':
+                importe = ieps['contado']
+            elif concepto.valor_contado_credito == 'Ambos':
+                importe = ieps['credito'] + ieps['contado']
 
             cuenta = concepto.cuenta_co.cuenta
         elif concepto.valor_tipo == 'IVA Retenido' and not concepto.posicion in asientos_a_ingorar:

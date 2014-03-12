@@ -6,7 +6,7 @@ function ajustarFormulario(selecion) {
     $(selecion).parent().parent().find("select[name*='valor_contado_credito']").hide();
     $(selecion).parent().parent().find("select[name*='impuesto']").hide();
   } 
-  else if ($(selecion).val() == "IVA")
+  else if ($(selecion).val() == "IVA" || $(selecion).val() == "IEPS")
   {
     $(selecion).parent().parent().find("select[name*='valor_contado_credito']").show();
     $(selecion).parent().parent().find("select[name*='valor_iva']").hide();
