@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required, permission_required
+from .cliente_articulos.models import *
 from .models import *
 from .forms import *
 from microsip_web.libs.custom_db.main import get_conecctionname, first_or_none
@@ -13,8 +14,7 @@ def clientes_view(request, template_name='main/clientes/clientes/clientes.html')
     basedatos_activa = request.session['selected_database']
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
-    
-    
+        
     PATH = request.path
     if '/punto_de_venta/clientes/' in PATH:
         modulo = 'punto_de_venta'
@@ -112,7 +112,9 @@ def cliente_manageView(request, id = None, template_name='main/clientes/clientes
         direccion.save()
         return HttpResponseRedirect('/%s/clientes/'%modulo)
     
+    cliente_articulos = ClienteArticulo.objects.filter(cliente=id)
     c = {
+        'cliente_articulos':cliente_articulos,
         'form':form, 
         'direccion_form':direccion_form, 
         'extend':'%s/base.html'%modulo,

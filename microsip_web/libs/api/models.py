@@ -432,7 +432,6 @@ class ClienteDireccion(ClienteDireccionBase):
         super(self.__class__, self).save(*args, **kwargs)
 
 class libresClientes(libreClienteBase):
-    pass
     heredar_puntos_a = models.CharField(max_length=99, db_column='HEREDAR_PUNTOS_A')
     cuenta_1 = models.CharField(max_length=99, db_column='CUENTA_1')
     cuenta_2 = models.CharField(max_length=99, db_column='CUENTA_2')

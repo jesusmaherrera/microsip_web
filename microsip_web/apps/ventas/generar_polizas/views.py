@@ -2,11 +2,19 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
-from models import *
+from .models import *
 from forms import *
-from django.db.models import Sum, Max
+from django.db.models import Sum, Max, Q
+from microsip_web.libs import contabilidad
 # user autentication
 from django.contrib.auth.decorators import login_required, permission_required
+from microsip_api.comun.sic_db import get_conecctionname
+
+##########################################
+##                                      ##
+##        Generacion de polizas         ##
+##                                      ##
+##########################################
 
 def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont = True, crear_polizas_por = 'Documento', crear_polizas_de = '', plantilla_facturas = '', plantilla_devoluciones ='', descripcion = '', connection_name = None, usuario_micorsip=''):
     error   = 0
@@ -23,7 +31,6 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
     
     #Si estadefinida la informacion contable no hay error!!!
     if error == 0:
-
         facturas    = []
         devoluciones= []
         if ignorar_documentos_cont:
@@ -124,3 +131,47 @@ def facturas_View(request, template_name='ventas/herramientas/generar_polizas.ht
     
     c = {'documentos':documentosData, 'polizas_de_devoluciones':polizas_de_devoluciones,'msg':msg,'form':form,'msg_informacion':msg_informacion,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+
+##########################################
+##                                      ##
+##              Plantillas              ##
+##                                      ##
+##########################################
+
+@login_required(login_url='/login/')
+def plantilla_poliza_manageView(request, id = None, template_name='ventas/herramientas/plantilla_poliza.html'):
+    message = ''
+
+    if id:
+        plantilla = get_object_or_404(PlantillaPolizas_V, pk=id)
+    else:
+        plantilla =PlantillaPolizas_V()
+
+    plantilla_form = PlantillaPolizaManageForm(request.POST or None, instance=plantilla)
+    plantilla_items = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
+    plantilla_items_formset = plantilla_items(request.POST or None, instance=plantilla)
+
+    if plantilla_form.is_valid() and plantilla_items_formset.is_valid():
+        plantilla = plantilla_form.save(commit = False)
+        plantilla.save()
+
+        #GUARDA CONCEPTOS DE PLANTILLA
+        for concepto_form in plantilla_items_formset :
+            Detalleplantilla = concepto_form.save(commit = False)
+            #PARA CREAR UNO NUEVO
+            if not Detalleplantilla.id:
+                Detalleplantilla.plantilla_poliza_v = plantilla
+        
+        plantilla_items_formset .save()
+        return HttpResponseRedirect('/ventas/PreferenciasEmpresa/')
+   
+    c = {'plantilla_form': plantilla_form, 'formset': plantilla_items_formset , 'message':message,}
+    return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+@login_required(login_url='/login/')
+def plantilla_poliza_delete(request, id = None):
+    plantilla = get_object_or_404(PlantillaPolizas_V, pk=id)
+    plantilla.delete()
+
+    return HttpResponseRedirect('/ventas/PreferenciasEmpresa/')

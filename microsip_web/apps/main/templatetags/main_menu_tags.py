@@ -10,7 +10,7 @@ def microsip_module_btn(ms_module):
 
    if ms_module in settings.MICROSIP_MODULES:
       if ms_module == 'microsip_web.apps.ventas':
-         result = '<li><a href="/ventas/Facturas/"> <i class="msicon-ventas"></i><label class="small_screen"> Ventas </label></a></li>'
+         result = '<li><a href="/ventas/articulos/"> <i class="msicon-ventas"></i><label class="small_screen"> Ventas </label></a></li>'
       elif ms_module == 'microsip_web.apps.inventarios':
          result ='<li><a href="/inventarios/almacenes/"> <i class="msicon-inventarios"></i> <label class="small_screen"> Inventarios</label></a></li>'
       elif ms_module == 'microsip_web.apps.cuentas_por_pagar':

@@ -21,13 +21,7 @@ from models import *
 from forms import *
 from microsip_web.apps.inventarios.views import c_get_next_key
 from microsip_web.libs import contabilidad
-from microsip_web.libs.custom_db.main import get_conecctionname
-
-##########################################
-##                                      ##
-##        Generacion de polizas         ##
-##                                      ##
-##########################################
+from microsip_api.comun.sic_db import get_conecctionname
 
 @login_required(login_url='/login/')
 def pedido_ManageView(request, id = None, template_name='ventas/documentos/pedidos/pedido.html'):
@@ -92,46 +86,5 @@ def preferenciasEmpresa_View(request, template_name='ventas/herramientas/prefere
     c= {'form':form,'msg':msg,'plantillas':plantillas,'formset':formset,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
-##########################################
-##                                      ##
-##              Plantillas              ##
-##                                      ##
-##########################################
 
-@login_required(login_url='/login/')
-def plantilla_poliza_manageView(request, id = None, template_name='ventas/herramientas/plantilla_poliza.html'):
-    message = ''
-
-    if id:
-        plantilla = get_object_or_404(PlantillaPolizas_V, pk=id)
-    else:
-        plantilla =PlantillaPolizas_V()
-
-    plantilla_form = PlantillaPolizaManageForm(request.POST or None, instance=plantilla)
-    plantilla_items = PlantillaPoliza_items_formset(ConceptoPlantillaPolizaManageForm, extra=1, can_delete=True)
-    plantilla_items_formset = plantilla_items(request.POST or None, instance=plantilla)
-
-    if plantilla_form.is_valid() and plantilla_items_formset.is_valid():
-        plantilla = plantilla_form.save(commit = False)
-        plantilla.save()
-
-        #GUARDA CONCEPTOS DE PLANTILLA
-        for concepto_form in plantilla_items_formset :
-            Detalleplantilla = concepto_form.save(commit = False)
-            #PARA CREAR UNO NUEVO
-            if not Detalleplantilla.id:
-                Detalleplantilla.plantilla_poliza_v = plantilla
-        
-        plantilla_items_formset .save()
-        return HttpResponseRedirect('/ventas/PreferenciasEmpresa/')
-   
-    c = {'plantilla_form': plantilla_form, 'formset': plantilla_items_formset , 'message':message,}
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
-
-@login_required(login_url='/login/')
-def plantilla_poliza_delete(request, id = None):
-    plantilla = get_object_or_404(PlantillaPolizas_V, pk=id)
-    plantilla.delete()
-
-    return HttpResponseRedirect('/ventas/PreferenciasEmpresa/')
 

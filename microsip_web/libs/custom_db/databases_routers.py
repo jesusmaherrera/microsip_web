@@ -12,7 +12,7 @@ class MainRouter(object):
             return 'default'
         elif model._meta.app_label == 'api' or model._meta.app_label == 'cuentas_por_pagar' or\
             model._meta.app_label == 'cuentas_por_cobrar' or model._meta.app_label == 'ventas' or\
-            model._meta.app_label == 'punto_de_venta' or model._meta.app_label == 'contabilidad':
+            model._meta.app_label == 'punto_de_venta' or model._meta.app_label == 'contabilidad' or model._meta.app_label == 'cliente_articulos':
 
             from middleware import my_local_global
             if my_local_global.conexion_activa != None  and my_local_global.database_name != None:
@@ -33,7 +33,7 @@ class MainRouter(object):
             return 'default'
         elif model._meta.app_label == 'api' or model._meta.app_label == 'cuentas_por_pagar' or\
             model._meta.app_label == 'cuentas_por_cobrar' or model._meta.app_label == 'ventas' or\
-            model._meta.app_label == 'punto_de_venta' or model._meta.app_label == 'contabilidad':
+            model._meta.app_label == 'punto_de_venta' or model._meta.app_label == 'contabilidad' or model._meta.app_label == 'cliente_articulos':
             from middleware import my_local_global
             return '%02d-%s'% (my_local_global.conexion_activa ,my_local_global.database_name)
 

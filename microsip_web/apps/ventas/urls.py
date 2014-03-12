@@ -16,12 +16,4 @@ urlpatterns = patterns('',
 	# (r'^pedidos/$', views.pedidos_view),
 	# (r'^pedido/$', views.pedido_ManageView),
 	# (r'^pedido/(?P<id>\d+)/$', views.pedido_ManageView),
-	
-	#Plantilla Poliza
-	(r'^plantilla_poliza/$', views.plantilla_poliza_manageView),
-    (r'^plantilla_poliza/(?P<id>\d+)/', views.plantilla_poliza_manageView),
-    (r'^plantilla_poliza/eliminar/(?P<id>\d+)/', views.plantilla_poliza_delete),
-
-    #Articulos
-    # (r'^articulo/(?P<id>\d+)/', pv_views.articulo_manageView),
 )
