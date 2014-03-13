@@ -29,8 +29,7 @@ try:
     scripts = AplicationPlugin.objects.all()
     for script in scripts:
         __import__('microsip_web.data.plugins.%s'%script.name)
-
-except DatabaseError:
+except django.db.DatabaseError:
     pass
 
 @login_required( login_url = '/login/' )

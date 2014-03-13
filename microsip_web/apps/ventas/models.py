@@ -11,7 +11,7 @@ from microsip_web.libs.api.models import TipoPoliza, CondicionPago, Contabilidad
 class clientes_config_cuenta(models.Model):
     CAMPOS_CLIENTE = (('cuenta_1', 'cuenta_1'),('cuenta_2', 'cuenta_2'),('cuenta_3', 'cuenta_3'),('cuenta_4', 'cuenta_4'),('cuenta_5', 'cuenta_5'),)
     VALOR_CONTADO_CREDITO_TIPOS = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)
-    VALOR_IVA_TIPOS             = (('A', 'Ambos'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
+    VALOR_IVA_TIPOS             = (('A', 'TODOS'),('I', 'Solo IVA'),('0', 'Solo 0%'),('IP', 'Solo IEPS'),)
 
     campo_cliente           = models.CharField(max_length=20, unique=True, choices=CAMPOS_CLIENTE)
     valor_contado_credito   = models.CharField(max_length=10, choices=VALOR_CONTADO_CREDITO_TIPOS, default='Ambos')
