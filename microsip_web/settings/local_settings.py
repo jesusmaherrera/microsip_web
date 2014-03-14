@@ -6,8 +6,11 @@ MICROSIP_MODULES = (
     'microsip_api.apps.config',
     'microsip_web.apps.main.filtros',
     'microsip_web.apps.inventarios',
+    
     'microsip_web.apps.ventas',
-    'microsip_web.apps.ventas.generar_polizas',
+    'microsip_web.apps.ventas.documentos',
+    'microsip_web.apps.ventas.herramientas',
+    
     'microsip_web.apps.compras',
     'microsip_web.apps.cuentas_por_pagar',
    	'microsip_web.apps.cuentas_por_cobrar',

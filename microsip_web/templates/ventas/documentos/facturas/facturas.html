@@ -1,0 +1,58 @@
+{% extends "ventas/base.html" %}
+{% block title %}Facturas{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+  <script src="{{STATIC_URL}}js/ventas/documentos.facturas.js"></script>
+{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} Facturas {% endblock %}
+{% block content %}
+<div class="row-fluid">
+  <div class="span3"><h3 style="margin:0;"> Facturas</h3> </div>
+  <a href="/ventas/factura/nueva/" class="btn"> Nueva</a>
+</div>
+<table class="table tableCell table-hover">
+    <tr>
+      <th>Folio</th>
+      <th>Fecha</th>
+      <!-- <th>Opciones</th> -->
+    </tr>
+    {% for documento in documentos %}
+    <tr>
+      <td>
+        {% if documento.estado = "C" %}
+        <a href="/ventas/factura/{{ documento.id }}/" class="text-error" >{{ documento.folio }}</a>
+        {% else %}
+        <a href="/ventas/factura/{{ documento.id }}/" >{{ documento.folio }}</a>
+        {% endif %}
+      </td>
+      <td>{{ documento.fecha }}</td>
+      <!-- <td>
+        <input type="hidden" value="{{ documento.id }}" class='factura_id'>
+        {% if documento.aplicado == 'N' %} <a href="" class="btn aplicar_btn">Aplicar</a> {% endif %}
+      </td> -->
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if documentos.has_previous %}
+        <li><a href="?page={{ documentos.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ documentos.number }} de {{ documentos.paginator.num_pages }}.</a></li>
+        {% if documentos.has_next %}
+        <li><a href="?page={{ documentos.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}

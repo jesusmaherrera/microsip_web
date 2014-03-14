@@ -1,0 +1,55 @@
+{% extends "ventas/base.html" %}
+{% block title %}remisiones{% endblock %}
+
+<!-- CSS Code -->
+{% block style_css %}{% endblock %}
+
+<!-- JavaScript Code -->
+{% block js_code %}
+  <script src="{{STATIC_URL}}js/ventas/documentos.remisiones.js"></script>
+{% endblock %}
+
+{% block breadcrumb %}{{ block.super }} remisiones {% endblock %}
+{% block content %}
+<div class="row-fluid">
+  <div class="span3"><h3 style="margin:0;"> remisiones</h3> </div>
+  <a href="/ventas/remision/nueva/" class="btn"> Nueva</a>
+</div>
+<table class="table tableCell table-hover">
+    <tr>
+      <th>Folio</th>
+      <th>Fecha</th>
+      <th>Cliente</th>
+    </tr>
+    {% for documento in documentos %}
+    <tr>
+      <td>
+        {% if documento.estado = "C" %}
+        <a href="/ventas/remision/{{ documento.id }}/" class="text-error" >{{ documento.folio }}</a>
+        {% else %}
+        <a href="/ventas/remision/{{ documento.id }}/" >{{ documento.folio }}</a>
+        {% endif %}
+      </td>
+      <td>{{ documento.fecha }}</td>
+      <td>{{ documento.cliente }}</td>
+    </tr>
+    {% endfor %}
+
+    <div class="pagination pagination-mini mainmenu">
+      <ul>
+        {% if documentos.has_previous %}
+        <li><a href="?page={{ documentos.previous_page_number }}">Anterior</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Anterior</a></li>
+        {% endif %}
+        <li class="disabled"><a href="#">Pagina {{ documentos.number }} de {{ documentos.paginator.num_pages }}.</a></li>
+        {% if documentos.has_next %}
+        <li><a href="?page={{ documentos.next_page_number }}">Siguiente</a></li>
+        {% else %}
+        <li class="disabled"><a href="#">Siguiente</a></li>
+        {% endif %} 
+      </ul>
+    </div>
+</table>
+<br>
+{% endblock %}
