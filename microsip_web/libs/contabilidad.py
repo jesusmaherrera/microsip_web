@@ -62,24 +62,13 @@ def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
     compras_0_contado   = kwargs.get('compras_0_contado', 0)
     compras_16_contado  = kwargs.get('compras_16_contado', 0)
     folio_documento = kwargs.get('folio_documento', 0)
-    iva_contado     = kwargs.get('iva_contado', 0)
-    iva_credito     = kwargs.get('iva_credito', 0)
-    iva_retenido    = kwargs.get('iva_retenido', 0)
-    isr_retenido    = kwargs.get('isr_retenido', 0)
-    ieps            = kwargs.get('ieps', None)
-    
+
     impuestos = kwargs.get('impuestos', None)
     ventas = kwargs.get('ventas',None)
     
     proveedores     = kwargs.get('proveedores', 0)
     cuenta_proveedor    = kwargs.get('cuenta_proveedor', None)
     
-    #valores ventas
-    ventas_16_credito   = kwargs.get('ventas_16_credito', 0)
-    ventas_0_credito    = kwargs.get('ventas_0_credito', 0)
-    ventas_0_contado    = kwargs.get('ventas_0_contado', 0)
-    ventas_16_contado   = kwargs.get('ventas_16_contado', 0)
-
     cliente_id  = kwargs.get('cliente_id', 0)
     clientes    = kwargs.get('clientes', 0)
     cuenta_cliente  = kwargs.get('cuenta_cliente', None)
@@ -126,23 +115,23 @@ def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
                     elif concepto.valor_tipo == 'Descuentos':
                         valor_extra  = descuento
                     elif concepto.valor_tipo == 'IVA Retenido':
-                        valor_extra  = iva_retenido
+                        valor_extra  = impuestos['iva_retenido']
                     elif concepto.valor_tipo == 'IEPS':
                         if concepto.valor_contado_credito == 'Credito':
-                            valor_extra  = ieps['credito']
+                            valor_extra  = impuestos['ieps']['credito']
                         elif concepto.valor_contado_credito == 'Contado':
-                            valor_extra  = ieps['contado']
+                            valor_extra  = impuestos['ieps']['contado']
                         elif concepto.valor_contado_credito == 'Ambos':
-                            valor_extra  = ieps['credito'] + ieps['contado']
+                            valor_extra  = impuestos['ieps']['credito'] + impuestos['ieps']['contado']
                     elif concepto.valor_tipo == 'IVA':
                         if concepto.valor_contado_credito == 'Credito':
-                            valor_extra  = iva_credito
+                            valor_extra  = impuestos['iva']['credito']
                         elif concepto.valor_contado_credito == 'Contado':
-                            valor_extra  = iva_contado
+                            valor_extra  = impuestos['iva']['contado']
                         elif concepto.valor_contado_credito == 'Ambos':
-                            valor_extra  = iva_credito + iva_contado
+                            valor_extra  = impuestos['iva']['contado'] + impuestos['iva']['credito']
                     elif concepto.valor_tipo == 'ISR Retenido':
-                        valor_extra = isr_retenido
+                        valor_extra = impuestos['isr_retenido']
                     elif concepto.valor_tipo == 'Compras':
                         if concepto.valor_contado_credito == 'Credito':
                             if concepto.valor_iva == '0':
@@ -171,8 +160,6 @@ def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
                                 valor_contado_credito = concepto.valor_contado_credito,
                                 valor_iva   = concepto.valor_iva
                             )
-                        
-
                 if concepto.asiento_ingora[0]=='-':
                     valor_extra = -valor_extra
 
@@ -245,27 +232,27 @@ def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
             
         elif concepto.valor_tipo == 'IVA' and not concepto.posicion in asientos_a_ingorar:
             if concepto.valor_contado_credito == 'Credito':
-                importe = iva_credito
+                importe = impuestos['iva']['credito']
             elif concepto.valor_contado_credito == 'Contado':
-                importe = iva_contado
+                importe = impuestos['iva']['contado']
             elif concepto.valor_contado_credito == 'Ambos':
-                importe = iva_credito + iva_contado
+                importe = impuestos['iva']['contado'] + impuestos['iva']['credito']
 
             cuenta = concepto.cuenta_co.cuenta
         elif concepto.valor_tipo == 'IEPS' and not concepto.posicion in asientos_a_ingorar:
             if concepto.valor_contado_credito == 'Credito':
-                importe = ieps['credito']
+                importe = impuestos['ieps']['credito']
             elif concepto.valor_contado_credito == 'Contado':
-                importe = ieps['contado']
+                importe = impuestos['ieps']['contado']
             elif concepto.valor_contado_credito == 'Ambos':
-                importe = ieps['credito'] + ieps['contado']
+                importe = impuestos['ieps']['credito'] + impuestos['ieps']['contado']
 
             cuenta = concepto.cuenta_co.cuenta
         elif concepto.valor_tipo == 'IVA Retenido' and not concepto.posicion in asientos_a_ingorar:
-            importe = iva_retenido
+            importe = impuestos['iva_retenido']
             cuenta = concepto.cuenta_co.cuenta
         elif concepto.valor_tipo == 'ISR Retenido' and not concepto.posicion in asientos_a_ingorar:
-            importe = isr_retenido
+            importe = impuestos['isr_retenido']
             cuenta = concepto.cuenta_co.cuenta
         elif concepto.valor_tipo == 'Proveedores' and not concepto.posicion in asientos_a_ingorar:
             if concepto.valor_iva == 'A':
@@ -556,23 +543,30 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
     else:
         es_contado = False
 
-    importesDocto       = CuentasXPagarDocumentoImportes.objects.filter(docto_cp=documento, cancelado='N')
-    
-    impuestos       = 0
+    if es_contado:
+        condicion_pago_txt = 'contado'
+    elif not es_contado:
+        condicion_pago_txt = 'credito'
+
     importe         = 0
     total           = 0
-    iva_retenido    = 0
-    isr_retenido    = 0
     descuento       = 0
 
+    impuestos = {
+        'iva': {'contado':0,'credito':0,},
+        'iva_retenido': 0,
+        'isr_retenido':0,
+    }
+    
+    importesDocto       = CuentasXPagarDocumentoImportes.objects.filter(docto_cp=documento, cancelado='N')
     for importeDocumento in importesDocto:
-        impuestos           = impuestos + (importeDocumento.total_impuestos * documento.tipo_cambio)
-        importe             = importe + (importeDocumento.importe * documento.tipo_cambio)
-        iva_retenido        = iva_retenido + importeDocumento.iva_retenido
-        isr_retenido        = isr_retenido + importeDocumento.isr_retenido
-        descuento           = descuento + importeDocumento.dscto_ppag
+        impuestos['iva'][condicion_pago_txt] = impuestos['iva'][condicion_pago_txt] + (importeDocumento.total_impuestos * documento.tipo_cambio)
+        impuestos['iva_retenido']            = impuestos['iva_retenido'] + importeDocumento.iva_retenido
+        impuestos['isr_retenido']            = impuestos['isr_retenido'] + importeDocumento.isr_retenido
+        importe = importe + (importeDocumento.importe * documento.tipo_cambio)
+        descuento = descuento + importeDocumento.dscto_ppag
 
-    total               = total + impuestos + importe - iva_retenido - isr_retenido
+    total = total + impuestos['iva']['contado'] + impuestos['iva']['credito'] + importe - impuestos['iva_retenido'] - impuestos['isr_retenido']
 
     proveedores         = 0
     bancos              = 0
@@ -582,8 +576,6 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
     compras_0_credito   = 0
     compras_16_contado  = 0
     compras_0_contado   = 0
-    iva_pend_pagar      = 0
-    iva_efec_pagado     = 0
 
     if impuestos <= 0:
         compras_0 = importe
@@ -604,12 +596,10 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
     if not es_contado:
         compras_16_credito  = compras_16
         compras_0_credito   = compras_0
-        iva_pend_pagar      = impuestos
         proveedores         = total - descuento
     elif es_contado:
         compras_16_contado  = compras_16
         compras_0_contado   = compras_0
-        iva_efec_pagado     = impuestos
         bancos              = total - descuento
 
     totales_cuentas, error, msg = agregarTotales(
@@ -618,15 +608,12 @@ def get_totales_documento_cp(cuenta_contado = None, documento=None, conceptos_po
         totales_cuentas     = totales_cuentas, 
         compras_16_credito  = compras_16_credito,
         compras_0_credito   = compras_0_credito,
-        iva_credito         = iva_pend_pagar,
+        impuestos = impuestos,
         proveedores         = proveedores,
         compras_16_contado  = compras_16_contado,
         folio_documento     = documento.folio,
         compras_0_contado   = compras_0_contado,
-        iva_contado         = iva_efec_pagado,
         bancos              = bancos,
-        iva_retenido        = iva_retenido,
-        isr_retenido        = isr_retenido,
         campos_particulares = campos_particulares,
         descuento           = descuento,
         depto_co            = depto_co,
@@ -650,7 +637,7 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
     except ObjectDoesNotExist:
         cuenta_cliente = None
     
-    total_impuestos     = documento.total_impuestos * documento.tipo_cambio
+    total_impuestos     = documento.impuestos_total * documento.tipo_cambio
     importe_neto        = documento.importe_neto * documento.tipo_cambio
     total               = (total_impuestos + importe_neto) * documento.tipo_cambio
     descuento           = get_descuento_total_ve(documento.id, connection_name) * documento.tipo_cambio
@@ -681,21 +668,27 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
         'ieps':{'contado':0,'credito':0,}
     }
 
-    documento_impuestos = VentasDocumentoImpuesto.objects.filter(documento=documento)
-    
-    for documento_impuesto in documento_impuestos:
-        tipo_impuesto = documento_impuesto.impuesto.tipoImpuesto
+    documento_impuestos = VentasDocumentoImpuesto.objects.filter(documento=documento).values_list('impuesto','importe','venta_neta','porcentaje')
+
+    for documento_impuesto_list in documento_impuestos:
+        documento_impuesto = {
+            'tipo': Impuesto.objects.get(pk=documento_impuesto_list[0]).tipoImpuesto,
+            'importe':documento_impuesto_list[1],
+            'venta_neta':documento_impuesto_list[2],
+            'porcentaje': documento_impuesto_list[3],
+        }
+
         #Si es IVA al 0
-        if tipo_impuesto.tipo == 'I' and tipo_impuesto.id_interno == 'V' and documento_impuesto.porcentaje == 0:
-            ventas['iva_0'][condicion_pago_txt] = documento_impuesto.venta_neta * documento.tipo_cambio
+        if documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'V' and documento_impuesto['porcentaje'] == 0:
+            ventas['iva_0'][condicion_pago_txt] = documento_impuesto['venta_neta'] * documento.tipo_cambio
         #Si NO es IVA al 0 (16,15,etc.)
-        if tipo_impuesto.tipo == 'I' and tipo_impuesto.id_interno == 'V' and documento_impuesto.porcentaje > 0:
-            ventas['iva'][condicion_pago_txt] = documento_impuesto.venta_neta * documento.tipo_cambio
-            impuestos['iva'][condicion_pago_txt]  = documento_impuesto.importe * documento.tipo_cambio
+        if documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'V' and documento_impuesto['porcentaje'] > 0:
+            ventas['iva'][condicion_pago_txt] = documento_impuesto['venta_neta'] * documento.tipo_cambio
+            impuestos['iva'][condicion_pago_txt]  = documento_impuesto['importe'] * documento.tipo_cambio
         #Si es IEPS
-        if tipo_impuesto.tipo == 'I' and tipo_impuesto.id_interno == 'P':
-            ventas['ieps'][condicion_pago_txt] = documento_impuesto.venta_neta * documento.tipo_cambio
-            impuestos['ieps'][condicion_pago_txt] = documento_impuesto.importe * documento.tipo_cambio
+        if documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'P':
+            ventas['ieps'][condicion_pago_txt] = documento_impuesto['venta_neta'] * documento.tipo_cambio
+            impuestos['ieps'][condicion_pago_txt] = documento_impuesto['importe'] * documento.tipo_cambio
             
     #si llega a  haber un proveedor que no tenga cargar impuestos
     if ventas['iva']['contado'] < 0 or ventas['iva']['credito'] < 0:
@@ -704,7 +697,6 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
             msg = '%s, REVISA LAS POLIZAS QUE SE CREARON'% msg 
 
         error = 1
-
     totales_cuentas, error, msg = agregarTotales(
         connection_name     = connection_name,
         conceptos_poliza    = conceptos_poliza,
@@ -920,8 +912,8 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
                         grupo_poliza_periodo    = None,
                         integ_ba                = 'N',
                         usuario_creador         = usuario_micorsip,
-                        fechahora_creacion      = datetime.now(), usuario_aut_creacion = None, 
-                        usuario_ult_modif       = usuario_micorsip, fechahora_ult_modif = datetime.now(), usuario_aut_modif    = None,
+                        fechahora_creacion      = datetime.datetime.now(), usuario_aut_creacion = None, 
+                        usuario_ult_modif       = usuario_micorsip, fechahora_ult_modif = datetime.datetime.now(), usuario_aut_modif    = None,
                         usuario_cancelacion     = None, fechahora_cancelacion   =  None, usuario_aut_cancelacion                = None,
                     )
                 

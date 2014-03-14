@@ -57,7 +57,7 @@ class DetallePlantillaPolizas_V(models.Model):
         ('Segmento_4', 'Segmento 4'),
         ('Segmento_5', 'Segmento 5'),
     )
-    VALOR_IVA_TIPOS             = (('A', 'Ambos'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
+    VALOR_IVA_TIPOS             = (('A', 'Todos'),('IP','IEPS'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
     VALOR_CONTADO_CREDITO_TIPOS = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)
 
     posicion                = models.CharField(max_length=2)

@@ -694,6 +694,9 @@ class CuentasXPagarDocumento(CuentasXPagarDocumentoBase):
 class CuentasXPagarDocumentoImportes(CuentasXPagarDocumentoImportesBase):
    pass
 
+class CuentasXPagarDocumentoImportesImpuesto(CuentasXPagarDocumentoImportesImpuestoBase):
+    pass
+
 class CuentasXPagarDocumentoCargoLibres(CuentasXPagarDocumentoCargoLibresBase):
     segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
     segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
