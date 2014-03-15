@@ -34,7 +34,7 @@ def facturas_view(request, template_name='ventas/documentos/facturas/facturas.ht
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required( login_url='/login/' )
-def factura_manageView( request, id = None, template_name='punto_de_venta/documentos/facturas/factura.html' ):
+def factura_manageView( request, id = None, template_name='ventas/documentos/facturas/factura.html' ):
     message = ''
     connection_name = get_conecctionname(request.session)
     documento_nuevo = False

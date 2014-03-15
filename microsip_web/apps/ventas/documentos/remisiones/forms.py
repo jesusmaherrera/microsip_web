@@ -5,10 +5,6 @@ from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from models import *
 
 class VentasDocumentoForm(forms.ModelForm):
-    MODALIDADES_FATURACION = (
-        ('CFDI', 'Factura electrónica CFDI'),   
-    )
-    modalidad_facturacion = forms.ChoiceField(choices= MODALIDADES_FATURACION, required=True)
     descripcion = forms.CharField(widget=forms.Textarea(attrs={'class':'span12', 'rows':2, 'placeholder': 'Descripcion...',}), required= False )
 
     def __init__(self, *args, **kwargs):
@@ -25,9 +21,9 @@ class VentasDocumentoForm(forms.ModelForm):
         widgets = autocomplete_light.get_widgets_dict(VentasDocumento)
         model = VentasDocumento
         exclude = (
+            'modalidad_facturacion',
             'vendedor',
             'email_envio',
-            'almacen',
             'cliente_clave',
             'cliente_direccion',
             'descuento_tipo',
@@ -37,7 +33,6 @@ class VentasDocumentoForm(forms.ModelForm):
             'estado',
             'cargar_sun',
             'tipo',
-            'moneda',
             'envio_enviado',
             'refer_reting',
             'aplicado',
@@ -71,7 +66,6 @@ class VentasDocumentoDetalleForm(forms.ModelForm):
         exclude = (
             'rol',
             'notas',
-            'precio_unitario',
             'comisiones_porcentaje',
             'fpgc_unitario',
             'posicion',
