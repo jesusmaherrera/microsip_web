@@ -174,7 +174,9 @@
     <div class="tab-pane fade" id="ventas_de_mostrador">  
       <div class='row-fluid'>
         <span class='span4'>
-          <a href="/ventas/remisiones/" class="btn">Facturar Remision</a>
+          {% block facturar_remision %}
+            <a href="/ventas/remisiones/" class="btn">Facturar Remision</a>
+          {% endblock %}
           <table class="table tableCell table-hover" id="ligas_fromset"  style="background-color: white;margin-top: 1em;" border="0" cellpadding="0" cellspacing="5">
             <thead>
               <tr>
