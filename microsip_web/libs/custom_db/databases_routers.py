@@ -48,11 +48,11 @@ class MainRouter(object):
         if (obj1._meta.app_label  == 'auth' and obj2._meta.app_label == 'django') or (obj1._meta.app_label  == 'django' and obj2._meta.app_label == 'auth'):
            return True           
         elif (obj1._meta.app_label == 'api' or obj1._meta.app_label == 'cuentas_por_pagar' or\
-            obj1._meta.app_label == 'cuentas_por_cobrar' or obj1._meta.app_label == 'ventas' or model._meta.app_label == 'generar_polizas' or\
-            obj1._meta.app_label == 'punto_de_venta' or model._meta.app_label == 'contabilidad') and \
+            obj1._meta.app_label == 'cuentas_por_cobrar' or obj1._meta.app_label == 'ventas' or obj1._meta.app_label == 'generar_polizas' or\
+            obj1._meta.app_label == 'punto_de_venta' or obj1._meta.app_label == 'contabilidad') and \
             (obj2._meta.app_label == 'api' or obj2._meta.app_label == 'cuentas_por_pagar' or\
-            obj2._meta.app_label == 'cuentas_por_cobrar' or obj2._meta.app_label == 'ventas' or model._meta.app_label == 'generar_polizas' or\
-            obj2._meta.app_label == 'punto_de_venta' or model._meta.app_label == 'contabilidad'):
+            obj2._meta.app_label == 'cuentas_por_cobrar' or obj2._meta.app_label == 'ventas' or obj2._meta.app_label == 'generar_polizas' or\
+            obj2._meta.app_label == 'punto_de_venta' or obj2._meta.app_label == 'contabilidad'):
             return True
         return False
 

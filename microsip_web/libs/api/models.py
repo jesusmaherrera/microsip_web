@@ -445,7 +445,7 @@ class ClienteDireccion(ClienteDireccionBase):
 class libresClientes(libreClienteBase):
     if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
         heredar_puntos_a = models.CharField(max_length=99, db_column='HEREDAR_PUNTOS_A')
-    if 'microsip_web.apps.ventas.generar_polizas' in MICROSIP_MODULES:
+    if 'microsip_web.apps.ventas.herramientas.generar_polizas' or  'microsip_web.apps.ventas.herramientas' in MICROSIP_MODULES:
         cuenta_1 = models.CharField(max_length=99, db_column='CUENTA_1')
         cuenta_2 = models.CharField(max_length=99, db_column='CUENTA_2')
         cuenta_3 = models.CharField(max_length=99, db_column='CUENTA_3')

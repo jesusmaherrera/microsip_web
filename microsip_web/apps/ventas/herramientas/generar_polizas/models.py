@@ -1,7 +1,7 @@
 from django.db import models
 from datetime import datetime 
 
-from microsip_web.libs.api.models import TipoPoliza, CondicionPago, ContabilidadCuentaContable, VentasDocumento, VentasDocumentoDetalle
+from microsip_web.libs.api.models import TipoPoliza, CondicionPago, ContabilidadCuentaContable, VentasDocumento, VentasDocumentoDetalle, ContabilidadDepartamento
 ################################################################
 ####                                                        ####
 ####        MODELOS EXTRA A BASE DE DATOS MICROSIP          ####
@@ -11,7 +11,7 @@ from microsip_web.libs.api.models import TipoPoliza, CondicionPago, Contabilidad
 class clientes_config_cuenta(models.Model):
     CAMPOS_CLIENTE = (('cuenta_1', 'cuenta_1'),('cuenta_2', 'cuenta_2'),('cuenta_3', 'cuenta_3'),('cuenta_4', 'cuenta_4'),('cuenta_5', 'cuenta_5'),)
     VALOR_CONTADO_CREDITO_TIPOS = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)
-    VALOR_IVA_TIPOS             = (('A', 'TODOS'),('I', 'Solo IVA'),('0', 'Solo 0%'),('IP', 'Solo IEPS'),)
+    VALOR_IVA_TIPOS             = (('A', 'TODOS'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
 
     campo_cliente           = models.CharField(max_length=20, unique=True, choices=CAMPOS_CLIENTE)
     valor_contado_credito   = models.CharField(max_length=10, choices=VALOR_CONTADO_CREDITO_TIPOS, default='Ambos')
@@ -57,7 +57,7 @@ class DetallePlantillaPolizas_V(models.Model):
         ('Segmento_4', 'Segmento 4'),
         ('Segmento_5', 'Segmento 5'),
     )
-    VALOR_IVA_TIPOS             = (('A', 'Todos'),('IP','IEPS'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
+    VALOR_IVA_TIPOS             = (('A', 'Todos'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
     VALOR_CONTADO_CREDITO_TIPOS = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)
 
     posicion                = models.CharField(max_length=2)

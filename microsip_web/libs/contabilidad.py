@@ -25,31 +25,25 @@ def get_valortotales_by_concepto(totales, valor_contado_credito, valor_iva):
             return totales['iva_0']['credito']
         elif valor_iva == 'I':
             return totales['iva']['credito']
-        elif valor_iva == 'IP':
-            return totales['ieps']['credito']
         elif valor_iva == 'A':
-            return totales['iva_0']['credito'] + totales['iva']['credito'] + totales['ieps']['credito']
+            return totales['iva_0']['credito'] + totales['iva']['credito']
     #totales de contado
     elif valor_contado_credito == 'Contado':
         if valor_iva == '0':
             return totales['iva_0']['contado']
         elif valor_iva == 'I':
             return totales['iva']['contado']
-        elif valor_iva == 'IP':
-            return totales['ieps']['contado']
         elif valor_iva == 'A':
-            return totales['iva_0']['contado'] + totales['iva']['contado'] + totales['ieps']['contado']
+            return totales['iva_0']['contado'] + totales['iva']['contado'] 
     #totales de contado y credito
     elif valor_contado_credito == 'Ambos':
         if valor_iva == '0':
             return totales['iva_0']['contado'] + totales['iva_0']['credito']
         elif valor_iva == 'I':
             return totales['iva']['contado'] + totales['iva']['credito']
-        elif valor_iva == 'IP':
-            return totales['ieps']['contado'] + totales['ieps']['credito']
         elif valor_iva == 'A':
-            contado = totales['iva_0']['contado'] + totales['iva']['contado'] + totales['ieps']['contado']
-            credito = totales['iva_0']['credito'] + totales['iva']['credito'] + totales['ieps']['credito']
+            contado = totales['iva_0']['contado'] + totales['iva']['contado'] 
+            credito = totales['iva_0']['credito'] + totales['iva']['credito']
             return contado + credito
     return None
 
@@ -65,7 +59,7 @@ def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
 
     impuestos = kwargs.get('impuestos', None)
     ventas = kwargs.get('ventas',None)
-    
+
     proveedores     = kwargs.get('proveedores', 0)
     cuenta_proveedor    = kwargs.get('cuenta_proveedor', None)
     
@@ -282,19 +276,33 @@ def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
         if concepto.posicion in valores_extra:
             importe = importe + valores_extra[concepto.posicion]
 
-        posicion_cuenta_depto_tipoAsiento = "%s+%s/%s:%s"% (concepto.posicion, cuenta, depto_co, concepto.tipo)
-        importe = importe
-
         #Se es tipo segmento pone variables en cero para que no se calculen otra ves valores por ya estan calculados
         if concepto.valor_tipo == 'Segmento_1' or concepto.valor_tipo == 'Segmento_2' or concepto.valor_tipo == 'Segmento_3' or concepto.valor_tipo == 'Segmento_4' or concepto.valor_tipo == 'Segmento_5':
             importe = 0
 
-        if not posicion_cuenta_depto_tipoAsiento == [] and importe > 0:
-            if posicion_cuenta_depto_tipoAsiento in totales_cuentas:
-                totales_cuentas[posicion_cuenta_depto_tipoAsiento] = [totales_cuentas[posicion_cuenta_depto_tipoAsiento][0] + Decimal(importe),int(concepto.posicion)]
+        asiento_id = "%s+%s/%s:%s"% (concepto.posicion, cuenta, depto_co, concepto.tipo)
+        #Si hay algo por agregar
+        if not asiento_id == [] and importe > 0:
+            if asiento_id in totales_cuentas:
+                totales_cuentas[asiento_id] = {
+                    'tipo_asiento':concepto.tipo,
+                    'departamento':depto_co,
+                    'cuenta':cuenta,
+                    'importe':totales_cuentas[asiento_id]['importe'] + Decimal(importe),
+                }
             else:
-                totales_cuentas[posicion_cuenta_depto_tipoAsiento]  = [Decimal(importe),int(concepto.posicion)]
-
+                totales_cuentas[asiento_id]  = {
+                    'tipo_asiento':concepto.tipo,
+                    'departamento':depto_co,
+                    'cuenta':cuenta,
+                    'importe':Decimal(importe),
+                }
+    
+    tipo_cambio = {
+        'tipo_cambio':13.20,
+        'moneda':moneda,
+        'tipo':'G'
+    }
     return totales_cuentas, error, msg
 
 def new_folio_poliza(tipo_poliza, fecha = None, connection_name = None):
@@ -394,14 +402,23 @@ def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=Non
                 msg = 'Cantidad incorrecta en un segmento en el documento [%s], Corrigelo para continuar'% documento_folio
 
             if error == 0:
-                posicion_cuenta_depto_tipoAsiento = "%s+%s/%s:%s"% (asiento_ingora, cuenta, depto_co, concepto_tipo)
-                importe = importe
-
-                if not posicion_cuenta_depto_tipoAsiento == [] and importe > 0:
-                    if posicion_cuenta_depto_tipoAsiento in totales_cuentas:
-                        totales_cuentas[posicion_cuenta_depto_tipoAsiento] = [totales_cuentas[posicion_cuenta_depto_tipoAsiento][0] + Decimal(importe),int(asiento_ingora)]
+                asiento_id = "%s+%s/%s:%s"% (asiento_ingora, cuenta, depto_co, concepto_tipo)
+                #Si hay algo por agregar
+                if not asiento_id == [] and importe > 0:
+                    if asiento_id in totales_cuentas:
+                        totales_cuentas[asiento_id] = {
+                            'tipo_asiento':concepto.tipo,
+                            'departamento':depto_co,
+                            'cuenta':cuenta,
+                            'importe':totales_cuentas[asiento_id]['importe'] + Decimal(importe),
+                        }
                     else:
-                        totales_cuentas[posicion_cuenta_depto_tipoAsiento]  = [Decimal(importe),int(asiento_ingora)]
+                        totales_cuentas[asiento_id]  = {
+                            'tipo_asiento':concepto.tipo,
+                            'departamento':depto_co,
+                            'cuenta':cuenta,
+                            'importe':Decimal(importe),
+                        }
 
     return totales_cuentas, error, msg
 
@@ -637,10 +654,10 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
     except ObjectDoesNotExist:
         cuenta_cliente = None
     
-    total_impuestos     = documento.impuestos_total * documento.tipo_cambio
-    importe_neto        = documento.importe_neto * documento.tipo_cambio
-    total               = (total_impuestos + importe_neto) * documento.tipo_cambio
-    descuento           = get_descuento_total_ve(documento.id, connection_name) * documento.tipo_cambio
+    total_impuestos     = documento.impuestos_total
+    importe_neto        = documento.importe_neto
+    total               = (total_impuestos + importe_neto)
+    descuento           = get_descuento_total_ve(documento.id, connection_name)
 
     #Para saber si es contado o es credito
     try:
@@ -661,7 +678,6 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
     ventas = {
         'iva_0':{'contado':0,'credito':0,},
         'iva'  :{'contado':0,'credito':0,},
-        'ieps' :{'contado':0,'credito':0,},
     }
     impuestos = {
         'iva': {'contado':0,'credito':0,},
@@ -678,17 +694,16 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
             'porcentaje': documento_impuesto_list[3],
         }
 
-        #Si es IVA al 0
-        if documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'V' and documento_impuesto['porcentaje'] == 0:
-            ventas['iva_0'][condicion_pago_txt] = documento_impuesto['venta_neta'] * documento.tipo_cambio
-        #Si NO es IVA al 0 (16,15,etc.)
+        #Si es impuesto tipo IVA (16,15,etc.)
         if documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'V' and documento_impuesto['porcentaje'] > 0:
-            ventas['iva'][condicion_pago_txt] = documento_impuesto['venta_neta'] * documento.tipo_cambio
-            impuestos['iva'][condicion_pago_txt]  = documento_impuesto['importe'] * documento.tipo_cambio
+            ventas['iva'][condicion_pago_txt] = documento_impuesto['venta_neta']
+            impuestos['iva'][condicion_pago_txt]  = documento_impuesto['importe']
+        #Si es IVA al 0
+        elif documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'V' and documento_impuesto['porcentaje'] == 0:
+            ventas['iva_0'][condicion_pago_txt] = documento_impuesto['venta_neta']
         #Si es IEPS
-        if documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'P':
-            ventas['ieps'][condicion_pago_txt] = documento_impuesto['venta_neta'] * documento.tipo_cambio
-            impuestos['ieps'][condicion_pago_txt] = documento_impuesto['importe'] * documento.tipo_cambio
+        elif documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'P':
+            impuestos['ieps'][condicion_pago_txt] = documento_impuesto['importe']
             
     #si llega a  haber un proveedor que no tenga cargar impuestos
     if ventas['iva']['contado'] < 0 or ventas['iva']['credito'] < 0:
@@ -697,6 +712,7 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
             msg = '%s, REVISA LAS POLIZAS QUE SE CREARON'% msg 
 
         error = 1
+    
     totales_cuentas, error, msg = agregarTotales(
         connection_name     = connection_name,
         conceptos_poliza    = conceptos_poliza,
@@ -716,22 +732,6 @@ def get_totales_documento_ve(cuenta_contado= None, documento= None, conceptos_po
     )
 
     return totales_cuentas, error, msg
-
-def get_impuestos_documento(documento, connection_name):
-    """ Para obtener impuestos de un documento determinado """
-    documento_tipo = documento.__class__.__name__
-    c = connections[connection_name].cursor()
-    if documento_tipo == 'PuntoVentaDocumento':
-        consulta ="SELECT IMPUESTO_ID, IMPORTE_IMPUESTO FROM IMPUESTOS_DOCTOS_PV WHERE DOCTO_PV_ID= %s"% documento.id
-    elif documento_tipo == 'VentasDocumento':
-        consulta ="SELECT IMPUESTO_ID, IMPORTE_IMPUESTO FROM IMPUESTOS_DOCTOS_VE WHERE DOCTO_VE_ID= %s"% documento.id
-    elif documento_tipo == 'DoctosCm':
-        consulta ="SELECT IMPUESTO_ID, IMPORTE_IMPUESTO FROM IMPUESTOS_DOCTOS_CM WHERE DOCTO_CM_ID= %s"% documento.id
-    c.execute(consulta)
-    impuestos = c.fetchall()
-    c.close()
-    return impuestos
-
 
 def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_poliza = None, totales_cuentas = None, msg = '', error='', depto_co = None, connection_name = None):  
     """ Obtiene los totales de un documento indicado para posteriormente crear las polizas """
@@ -898,13 +898,16 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
                 referencia = documento.folio
                 if crear_polizas_por == 'Dia':
                     referencia = ''
+                if crear_polizas_por == 'Dia' or crear_polizas_por == 'Periodo':
+                    moneda = moneda_local
+                    tipo_cambio = 1
 
                 poliza = ContabilidadDocumento(
                         id                      = next_id('ID_DOCTOS', connection_name),
                         tipo_poliza             = tipo_poliza,
                         fecha                   = documento.fecha,
-                        moneda                  = moneda_local, 
-                        tipo_cambio             = 1,
+                        moneda                  = moneda, 
+                        tipo_cambio             = tipo_cambio,
                         estatus                 = 'P', cancelado= 'N', aplicado = 'N', ajuste = 'N', integ_co = 'S',
                         descripcion             = descripcion_doc,
                         forma_emitida           = 'N', sistema_origen = 'CO',
@@ -920,37 +923,27 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
                 polizas.append(poliza)
                 #GUARDA LA PILIZA
                 #poliza_o = poliza.save()
+                for asiento_id in totales_cuentas.items():
+                    cuenta_co = ContabilidadCuentaContable.objects.get(cuenta=totales_cuentas[asiento_id]['cuenta'])
+                    depto_co = ContabilidadDepartamento.objects.get(clave= totales_cuentas[asiento_id]['departamento'])
 
-                posicion = 1
-                totales_cuentas = totales_cuentas.items()
-
-                totales_cuentas.sort()
-
-                for posicion_cuenta_depto_tipoAsiento, importe in totales_cuentas:
-                    cuenta_deptotipoAsiento = posicion_cuenta_depto_tipoAsiento.split('+')[1].split('/')
-                    cuenta_co = ContabilidadCuentaContable.objects.get(cuenta=cuenta_deptotipoAsiento[0])
-                    depto_tipoAsiento = cuenta_deptotipoAsiento[1].split(':')
-                    depto_co = ContabilidadDepartamento.objects.get(clave=depto_tipoAsiento[0])
-                    tipo_asiento = depto_tipoAsiento[1]
-                    
                     detalle_poliza = ContabilidadDocumentoDetalle(
                         id              = -1,
                         docto_co        = poliza,
                         cuenta          = cuenta_co,
                         depto_co        = depto_co,
-                        tipo_asiento    = tipo_asiento,
-                        importe         = importe[0],
+                        tipo_asiento    = totales_cuentas[asiento_id]['tipo_asiento'],
+                        importe         = totales_cuentas[asiento_id]['importe'],
                         importe_mn      = 0,#PENDIENTE
                         ref             = referencia,
                         descripcion     = '',
-                        posicion        = posicion,
+                        posicion        = -1,
                         recordatorio    = None,
                         fecha           = documento.fecha,
                         cancelado       = 'N', aplicado = 'N', ajuste = 'N', 
-                        moneda          = moneda_local,
+                        moneda          = moneda,
                     )
 
-                    posicion +=1
                     detalles_polizas.append(detalle_poliza)
 
                 #DE NUEVO CONVIERTO LA VARIABLE A DICCIONARIO
