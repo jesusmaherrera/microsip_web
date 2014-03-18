@@ -21,11 +21,11 @@
   <div id="navbar-example" class="navbar navbar-static">
     <div class="navbar-inner inventarios_btn" >
       <div class="container" style="width: auto;">
-        <!-- <a class="brand" href="#"><i class="icon-home"></i></a> -->
+        <!-- <a class="brand" href="#"><i class="glyphicon glyphicon-home"></i></a> -->
         <button type="button" id="btn-primarymenu" class="btn btn-primary btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
+          <span class="glyphicon glyphicon-bar"></span>
+          <span class="glyphicon glyphicon-bar"></span>
+          <span class="glyphicon glyphicon-bar"></span>
         </button>
         <!-- <a class="brand" href="#"></a> --><div class="span1 label_min"> {% block selected_module %}Microsip{% endblock %}</div>
         <div class="nav-collapse collapse">
@@ -64,24 +64,24 @@
           {% if not user.is_anonymous %}
           <li id="fat-menu" class="dropdown">
             <a href="#" id="drop3" role="button" class="dropdown-toggle" data-toggle="dropdown" style="padding-top: 0.7em;">
-              <i class="icon-user"></i> {{ user.username }} ({{ request.session.selected_database }})
+              <i class="glyphicon glyphicon-user"></i> {{ user.username }} ({{ request.session.selected_database }})
               <b class="caret"></b>
             </a>
             <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="/select_db/"><i class="icon-cog"></i> Cambiar Empresa</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="/select_db/"><i class="glyphicon glyphicon-cog"></i> Cambiar Empresa</a></li>
               <li role="presentation" class="divider"></li>
               {% if request.user.username == 'SYSDBA' %}
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="/conexiones/"><i class="icon-random"></i> Conexiones</a></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="/inicializar_tablas/"><i class="icon-refresh"></i> Actualizar base de datos</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="/conexiones/"><i class="glyphicon glyphicon-random"></i> Conexiones</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="/inicializar_tablas/"><i class="glyphicon glyphicon-refresh"></i> Actualizar base de datos</a></li>
               {% endif %}
               <li role="presentation" class="divider"></li>
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="/logout/"> <i class="icon-remove"></i> Cerrar Sesion</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="/logout/"> <i class="glyphicon glyphicon-remove"></i> Cerrar Sesion</a></li>
             </ul>
           </li>
           {% else %}
           <div id=" span breadcrumbs" style="margin-left: 35px;">
             <div class ='span'style="text-align:right; height:2em; margin-right: 2em; margin-top: 6px; vertical-align:bottom;">
-              <a class="btn btn-small" href="/login/"><i class="icon-user"></i> Iniciar Sesión</a>
+              <a class="btn btn-small" href="/login/"><i class="glyphicon glyphicon-user"></i> Iniciar Sesión</a>
             </div>
           </div>  
           {% endif %}
@@ -96,7 +96,7 @@
   </div>
   <div id="span breadcrumbs" style="clear:both; margin-left: 35px;">
     <div id='breadcrumb' class='span6'>
-    {% block breadcrumb %}<a href="/"><i class="icon-home"></i></a>{% endblock %}
+    {% block breadcrumb %}<a href="/"><i class="glyphicon glyphicon-home"></i></a>{% endblock %}
     </div>
   </div>
   <section class='content' style='clear:both;'>

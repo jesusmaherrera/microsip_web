@@ -7,7 +7,7 @@
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
 
-{% block breadcrumb %}{{ block.super }} <a href="/plugins/">Plugins</a> <i class=" icon-play"></i> Plugin{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/plugins/">Plugins</a> <i class=" glyphicon glyphicon-play"></i> Plugin{% endblock %}
 {% block content %}
 <form method="post" action="" enctype='multipart/form-data'>{% csrf_token %}
   {{ form.errors }}
@@ -21,7 +21,7 @@
     <div class="span3">
       <h3 style="margin:0;"> Plugin</h3> 
     </div>
-      <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button>
+      <button type="submit" class="btn"><i class="glyphicon glyphicon-download-alt"></i> Guardar</button>
   </div>
   <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
     <li class="active"><a href="#general" data-toggle="tab">General</a></li>

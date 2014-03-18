@@ -22,7 +22,7 @@
 {% endif %}
 <div class="row-fluid">
   <h3 class="span3" style='margin:0;'> Prefernecias  </h3> 
-  <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
+  <button type="submit" class="btn"><i class="glyphicon glyphicon-download-alt"></i> Guardar</button> 
 </div>
 <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
   <li class="active"><a href="#general" data-toggle="tab">General</a></li>
@@ -71,7 +71,7 @@
       </fieldset>
       <fieldset>
       <legend>Plantillas Polizas:     
-        <a href='/punto_de_venta/plantilla_poliza/' class="btn btn-success btn-mini"/><i class="icon-plus-sign"></i> Nueva Plantilla</a>
+        <a href='/punto_de_venta/plantilla_poliza/' class="btn btn-success btn-mini"/><i class="glyphicon glyphicon-plus-sign"></i> Nueva Plantilla</a>
       </legend>
       <table class="table tableCell table-hover" border="0" cellpadding="0" cellspacing="2">
         <tbody>
@@ -93,7 +93,7 @@
             <tr>
               <td><a href="/punto_de_venta/plantilla_poliza/{{ plantilla.id }}">{{ plantilla.nombre }}</a></td>
               <td style="text-align:center;">
-                <a href='#myModal{{ plantilla.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
+                <a href='#myModal{{ plantilla.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="glyphicon glyphicon-trash"></i></a>
               </td>
             </tr>
             

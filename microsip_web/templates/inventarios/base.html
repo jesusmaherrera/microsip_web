@@ -29,34 +29,30 @@
     });
 </script>
 {% endblock %}
-{% block selected_module %}<a href="/inventarios/almacenes/"> <i class="msicon-inventarios"></i> <label class="small_screen"> Inventarios</label></a>{% endblock %}
+{% block selected_module %}
+<!-- <a href="/inventarios/almacenes/"> <i class="msicon-inventarios"></i> <label class="small_screen"> Inventarios</label></a> -->{% endblock %}
 {% block btn_modulo_inventarios%}
-<li style='color: #555555; background-color: #e5e5e5;'><a href="/inventarios/almacenes/"> <i class="msicon-inventarios"></i> <label class='small_screen'> Inventarios</label></a> </li>
+<li class='active'><a href="/inventarios/almacenes/"> <i class="msicon-inventarios"></i> <label class='small_screen'> Inventarios</label></a> </li>
 {% endblock %}
 {% block breadcrumb %}{{ block.super }}{% endblock %}
 {% block tools-module %}
-<div class="navbar navbar-static">
-  <ul class="nav" role="navigation">
-    <li><a tabindex="-1" href="/inventarios/almacenes/"><i class="icon-hdd"></i> <span class="">Almacenes</span></a></li>
-    <li><a tabindex="-1" href="/inventarios/articulos/"><i class="icon-barcode"></i> <span class="">Articulos</span></a></li>
-    <li class="dropdown">
-      <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-folder-close"></i> Movimientos <b class="caret"></b></a>
-      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>   
-        <li><a href="/inventarios/entradas/"> <i class="icon-ok"></i> Entradas</a></li>
-        <!-- <li><a href="#"> <i class="icon-remove"></i> Salidas</a></li> -->
-      </ul>
-
-    </li>
-    
-  </ul>
-  <ul class="nav pull-right">
+<ul class="nav nav-pills "style="background-color:white;">
+  <li><a href="/inventarios/almacenes/" ><i class="glyphicon glyphicon-hdd"></i> <span class="hidden-xs">Almacenes</span></a></li>
+  <li><a href="/inventarios/articulos/"><i class="glyphicon glyphicon-barcode"></i> <span class="hidden-xs">Articulos</span></a></li>
+  <li class="dropdown">
+    <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-folder-close"></i><span class="hidden-xs"> Movimientos </span><b class="caret"></b></a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">   
+      <li><a href="/inventarios/entradas/"> <i class="glyphicon glyphicon-ok"></i> Entradas</a></li>
+    </ul>
+  </li>
+</ul>
+  
     <!-- <li class="dropdown">
-      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i> <span class="hidden-phone">Herramientas</span> <b class="caret"></b></a>
+      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="glyphicon glyphicon-cog"></i> <span class="hidden-phone">Herramientas</span> <b class="caret"></b></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
-        <li><a href="/inventarios/preferencias/"> <i class="icon-cog"></i> Preferencias</a></li>
+        <li><a href="/inventarios/preferencias/"> <i class="glyphicon glyphicon-cog"></i> Preferencias</a></li>
       </ul>
     </li> -->
-  </ul>
   <!-- <ul id="menu_ver" class="nav pull-right hidden-phone">
     <li class="dropdown">
       <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> Ver <b class="caret"></b></a>
@@ -65,7 +61,6 @@
       </ul>
     </li>
   </ul> -->
-</div>
 {% endblock %}
 {% block content %}
 {% endblock %}

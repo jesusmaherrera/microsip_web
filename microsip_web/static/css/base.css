@@ -213,3 +213,22 @@ footer {
     line-height: 3em;
   }
 }
+/* Custom button
+    -------------------------------------------------- */
+/* Override base .btn styles */
+/* Apply text and background changes to three key states: default, hover, and active (click). */
+.btn-ttc,
+btn-ttc:hover,
+.btn-ttc:active {
+  color: #000;
+}
+/* Apply the custom-colored gradients */
+/* Note: you'll need to include all the appropriate gradients for various browsers and standards. */
+.btn-ttc {
+  color: #000;
+}
+/* Set the hover state */
+/* An easy hover state is just to move the gradient up a small amount. Add other embellishments as you see fit. */
+.btn-ttc:hover {
+  color: #000;
+}

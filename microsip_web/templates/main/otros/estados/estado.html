@@ -7,12 +7,12 @@
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
 
-{% block breadcrumb %}{{ block.super }} <a href="/{{ modulo }}/estados/">Estados</a> <i class=" icon-play"></i> Estado{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/{{ modulo }}/estados/">Estados</a> <i class=" glyphicon glyphicon-play"></i> Estado{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
   <div class="row-fluid">
     <div class="span3"><h3 style="margin:0;"> Estado</h3> </div>
-    <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
+    <button type="submit" class="btn"><i class="glyphicon glyphicon-download-alt"></i> Guardar</button> 
   </div>
   {{ form.errors }}
   {% if message %}
@@ -43,7 +43,7 @@
         <div class="fluid">
           <label>
             Pais 
-            <a href="/{{modulo}}/pais/" target="_blank" style="vertical-align: middle;" onClick="window.open(this.href, this.target, 'width=850,height=600,top=200px,left=300px'); return false;"><i class="icon-plus-sign"></i></a> 
+            <a href="/{{modulo}}/pais/" target="_blank" style="vertical-align: middle;" onClick="window.open(this.href, this.target, 'width=850,height=600,top=200px,left=300px'); return false;"><i class="glyphicon glyphicon-plus-sign"></i></a> 
           </label>
           <div class="input-prepend input-append">
             {{ form.pais }}

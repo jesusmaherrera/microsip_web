@@ -195,7 +195,7 @@ function cargar_nuevalista(data)
 </script>
 
 {% endblock %}
-{% block breadcrumb %}{{ block.super }} <a href="/ventas/pedidos/">Pedidos</a> <i class=" icon-play"></i> Pedido{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/ventas/pedidos/">Pedidos</a> <i class=" glyphicon glyphicon-play"></i> Pedido{% endblock %}
 {% block content %}
 
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
@@ -251,7 +251,7 @@ function cargar_nuevalista(data)
 </div>
 
   <select id="id_articulos" class='span'></select>
-  <a href="#id_infoModal" id='id_infoarticulo' data-toggle="modal" ><i class=' icon-info-sign'></i></a>
+  <a href="#id_infoModal" id='id_infoarticulo' data-toggle="modal" ><i class=' glyphicon glyphicon-info-sign'></i></a>
   <a class='btn' id='id_add_articulo' href="#">Agregar</a>
   
   <div id="id_infoModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="infoModal" aria-hidden="true">

@@ -8,64 +8,64 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
-{% block selected_module %}<a href="/ventas/articulos/"> <i class="msicon-ventas"></i> <label class="small_screen"> Ventas</label></a>{% endblock %}
+{% block selected_module %}<!-- <a href="/ventas/articulos/"> <i class="msicon-ventas"></i> <label class="small_screen"> Ventas</label></a> -->{% endblock %}
 {% block btn_modulo_ventas%}
 <li><a href="/ventas/Facturas/" style='color: #555555; background-color: #e5e5e5;'> <i class="msicon-ventas"></i><label class='small_screen'> Ventas</label></a></li>
 {% endblock %}
-{% block breadcrumb %}{{ block.super }} Ventas <i class=' icon-play'></i> {% endblock %}
+{% block breadcrumb %}{{ block.super }} Ventas <i class=' glyphicon glyphicon-play'></i> {% endblock %}
 {% block tools-module %}
-<div class="navbar navbar-static">
-  <ul class="nav" role="navigation">
+<div class="navbar navbar-static navbar-default">
+  <ul class="nav navbar-nav" role="navigation">
     <li class="dropdown">
-      <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-folder-close"></i>  
+      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="glyphicon glyphicon-folder-close"></i>  
         Documentos <b class="caret"></b></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-        <li><a tabindex="-1" href="/ventas/facturas/"> <i class="icon-file"></i> Facturas</a></li>
-        <li><a tabindex="-1" href="/ventas/remisiones/"> <i class="icon-file"></i> Remisiones</a></li>
-        <!-- <li><a tabindex="-1" href="/ventas/pedidos"> <i class="icon-tasks"></i> Pedidos</a></li> -->
+        <li><a tabindex="-1" href="/ventas/facturas/"> <i class="glyphicon glyphicon-file"></i> Facturas</a></li>
+        <li><a tabindex="-1" href="/ventas/remisiones/"> <i class="glyphicon glyphicon-file"></i> Remisiones</a></li>
+        <!-- <li><a tabindex="-1" href="/ventas/pedidos"> <i class="glyphicon glyphicon-tasks"></i> Pedidos</a></li> -->
       </ul>
     </li>
     <li class="dropdown">
-      <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-barcode"></i> Articulos <b class="caret"></b></a>
+      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="glyphicon glyphicon-barcode"></i> Articulos <b class="caret"></b></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-        <li><a tabindex="-1" href="/ventas/articulos/"><i class="icon-barcode"></i> Articulos</a></li>
-        <li><a tabindex="-1" href="/ventas/lineas/"><i class="icon-tasks"></i> Lineas</a></li>
-        <li><a tabindex="-1" href="/ventas/grupos/"><i class="icon-globe"></i> Grupos</a></li>
+        <li><a tabindex="-1" href="/ventas/articulos/"><i class="glyphicon glyphicon-barcode"></i> Articulos</a></li>
+        <li><a tabindex="-1" href="/ventas/lineas/"><i class="glyphicon glyphicon-tasks"></i> Lineas</a></li>
+        <li><a tabindex="-1" href="/ventas/grupos/"><i class="glyphicon glyphicon-globe"></i> Grupos</a></li>
       </ul>
     </li>
     <li class="dropdown">
-      <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> 
-        <i class="icon-user"></i> <span class="hidden-phone">Clientes</span> <b class="caret"></b></a>
+      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
+        <i class="glyphicon glyphicon-user"></i> <span class="hidden-sm">Clientes</span> <b class="caret"></b></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-        <li><a tabindex="-1" href="/ventas/clientes/"><i class="icon-user"></i> Clientes</a></li>
-        <li><a tabindex="-1" href="/ventas/condiciones_de_pago/"><i class=" icon-calendar"></i> Condiciones de pago</a></li>
+        <li><a tabindex="-1" href="/ventas/clientes/"><i class="glyphicon glyphicon-user"></i> Clientes</a></li>
+        <li><a tabindex="-1" href="/ventas/condiciones_de_pago/"><i class=" glyphicon glyphicon-calendar"></i> Condiciones de pago</a></li>
       </ul>
     </li>
     <li class="dropdown">
-      <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> 
-        <i class="icon-list-alt"></i> <span class="hidden-phone">Listas</span> <b class="caret"></b></a>
+      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
+        <i class="glyphicon glyphicon-list-alt"></i> <span class="hidden-sm">Listas</span> <b class="caret"></b></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-        <li><a tabindex="-1" href="/ventas/impuestos/"><i class="icon-tag"></i> Impuestos</a></li>
+        <li><a tabindex="-1" href="/ventas/impuestos/"><i class="glyphicon glyphicon-tag"></i> Impuestos</a></li>
       </ul>
     </li>
     <li class="dropdown">
-      <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> 
-        <i class="icon-th"></i> <span class="hidden-phone">Otros</span> <b class="caret"></b></a>
+      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> 
+        <i class="glyphicon glyphicon-th"></i> <span class="hidden-sm">Otros</span> <b class="caret"></b></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-        <li><a tabindex="-1" href="/ventas/tipos_cambio/"><i class="icon-road"></i> Tipos de cambio</a></li>
-        <li><a tabindex="-1" href="/ventas/ciudades/"><i class="icon-road"></i> Ciudades</a></li>
-        <li><a tabindex="-1" href="/ventas/estados/"><i class="icon-flag"></i> Estados</a></li>
-        <li><a tabindex="-1" href="/ventas/paises/"><i class="icon-globe"></i> Paises</a></li>
+        <li><a tabindex="-1" href="/ventas/tipos_cambio/"><i class="glyphicon glyphicon-road"></i> Tipos de cambio</a></li>
+        <li><a tabindex="-1" href="/ventas/ciudades/"><i class="glyphicon glyphicon-road"></i> Ciudades</a></li>
+        <li><a tabindex="-1" href="/ventas/estados/"><i class="glyphicon glyphicon-flag"></i> Estados</a></li>
+        <li><a tabindex="-1" href="/ventas/paises/"><i class="glyphicon glyphicon-globe"></i> Paises</a></li>
       </ul>
     </li>
   </ul>
-  <ul class="nav pull-right">
+  <ul class="nav pull-right navbar-nav">
     <li class="dropdown">
-      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i> Herramientas <b class="caret"></b></a>
-      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
-        <li><a tabindex="-1" href="/ventas/Facturas/"><i class="icon-share"></i> Generar Polizas Contables</a></li>
+      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="glyphicon glyphicon-cog"></i> Herramientas <b class="caret"></b></a>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style="text-align:left;">
+        <li><a tabindex="-1" href="/ventas/Facturas/"><i class="glyphicon glyphicon-share"></i> Generar Polizas Contables</a></li>
         <li role="presentation" class="divider"></li>
-        <li><a tabindex="-1" href="/ventas/PreferenciasEmpresa/"><i class="icon-cog"></i> Preferencias de la empresa</a></li>
+        <li><a tabindex="-1" href="/ventas/PreferenciasEmpresa/"><i class="glyphicon glyphicon-cog"></i> Preferencias de la empresa</a></li>
       </ul>
     </li>
   </ul>

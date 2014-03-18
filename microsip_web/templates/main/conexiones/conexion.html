@@ -7,7 +7,7 @@
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
 
-{% block breadcrumb %}{{ block.super }} <a href="/conexiones/">Conexiones</a> <i class=" icon-play"></i> Conexion{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/conexiones/">Conexiones</a> <i class=" glyphicon glyphicon-play"></i> Conexion{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
   {% csrf_token %}

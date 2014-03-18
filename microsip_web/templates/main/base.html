@@ -10,22 +10,22 @@
 {% block selected_module %} Microsip {% endblock %}
 {% block breadcrumb %}{{ block.super }} {% endblock %}
 {% block tools-module %}
-<div class="navbar navbar-static">
-  <ul class="nav" role="navigation">
+<div class="navbar navbar-static navbar-default">
+  <ul class="nav navbar-nav" role="navigation">
   </ul>
-  <ul class="nav pull-right">
-  	<li class="dropdown">
-  	 {% if request.user.username == 'SYSDBA' %}
-  	  <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i> <span class="hidden-phone">Configuracion</span> <b class="caret"></b></a>
-  	  <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
-        <li><a href="/prefernecias_empresa/"><i class="icon-cog"></i> Preferncias de empresa</a></li>
-  	  	<li><a href="/conexiones/"><i class="icon-random"></i> Conexiones</a></li>
-  	    <li><a href="/inicializar_tablas/"><i class="icon-refresh"></i> Actualizar base de datos</a></li>
-  	    <li role="presentation" class="divider"></li>
-  	    <li><a href="/plugins/"> <i class="icon-hdd"></i> Plugins</a></li>
-  	  </ul>
-  	</li>
-  	{% endif %}
+  <ul class="nav pull-right navbar-nav">
+    <li class="dropdown">
+     {% if request.user.username == 'SYSDBA' %}
+      <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="glyphicon glyphicon-cog"></i> <span class="hidden-sm">Configuracion</span> <b class="caret"></b></a>
+      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style="text-align:left;">
+        <li><a href="/prefernecias_empresa/"><i class="glyphicon glyphicon-cog"></i> Preferncias de empresa</a></li>
+        <li><a href="/conexiones/"><i class="glyphicon glyphicon-random"></i> Conexiones</a></li>
+        <li><a href="/inicializar_tablas/"><i class="glyphicon glyphicon-refresh"></i> Actualizar base de datos</a></li>
+        <li role="presentation" class="divider"></li>
+        <li><a href="/plugins/"> <i class="glyphicon glyphicon-hdd"></i> Plugins</a></li>
+      </ul>
+    </li>
+    {% endif %}
   </ul>
 </div>
 {% endblock %}

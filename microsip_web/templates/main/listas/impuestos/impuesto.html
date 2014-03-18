@@ -7,12 +7,12 @@
 <!-- JavaScript Code -->
 {% block js_code %}{% endblock %}
 
-{% block breadcrumb %}{{ block.super }} <a href="/{{ modulo }}/impuestos/">Impuestos</a> <i class=" icon-play"></i> Impuesto{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/{{ modulo }}/impuestos/">Impuestos</a> <i class=" glyphicon glyphicon-play"></i> Impuesto{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
   <div class="row-fluid">
     <div class="span3"><h3 style="margin:0;"> Impuesto</h3> </div>
-    <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
+    <button type="submit" class="btn"><i class="glyphicon glyphicon-download-alt"></i> Guardar</button> 
   </div>
   {{ form.errors }}
   {% if message %}

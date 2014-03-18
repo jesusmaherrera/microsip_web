@@ -16,32 +16,30 @@
 
 {% block breadcrumb %}{{ block.super }} clientes {% endblock %}
 {% block content %}
-<form method="post" class="form-inline" action="" enctype='multipart/form-data'>{% csrf_token %}  
-  <div class="row-fluid">
-    <div class="span2"><h3 style="margin:0;"> Clientes</h3> </div>
-    <div class='span1' ><a href="/{{ modulo }}/cliente/" class="btn"> Nuevo</a></div>
-    <div class='span2' >
+<form method="post" class="form-inline" action="" enctype='multipart/form-data'&gt;{% csrf_token %}  
+  <div class="row">
+    <div class="col-sm-2 col-md-2"><h3 style="margin:0;"> Clientes</h3> </div>
+    <div class="col-sm-1 col-md-1"><a href="/{{ modulo }}/cliente/" class="btn btn-default"> Nuevo</a></div>
+    <div class="col-sm-2 col-md-2">
        {{ filtro_form.cliente }}
     </div>
     <div class="input-prepend input-append mobile_inputdata">
-       <span class="add-on visible-phone label-data">Clave</span>
+       <span class="add-on label-data visible-sm">Clave</span>
        {{ filtro_form.clave }}
     </div>
     <div class="input-prepend input-append mobile_inputdata">
-       <span class="label-data add-on visible-phone">Nombre</span>
+       <span class="label-data add-on visible-sm">Nombre</span>
        {{ filtro_form.nombre }}
     </div>
-    <button class="btn" type="submit"><i class='icon-search'></i> <span class="visible-phone">Ir</span></button>
+    <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i> <span class="visible-sm">Ir</span></button>
   </div>
-</form>
 
-<table class="table tableCell table-hover">
-    <tr>
-      <th>Nombre</th>    </tr>
+
+
     {% for cliente in clientes%}
     <div id="myModal{{ cliente.id}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel">Seguro que Deseas Eliminar</h3>
       </div>
       <div class="modal-body">
@@ -49,20 +47,13 @@
         <p style="color:red;">Ya no sera posible recuperar los datos del cliente</p>
       </div>
       <div class="modal-footer">
-        <button class="btn" data-dismiss="modal">Cancelar</button>
+        <button class="btn btn-default" data-dismiss="modal">Cancelar</button>
         <a href="#" class="btn btn-primary">Estoy Seguro</a>
       </div>
     </div>
-    <tr>
-      <td><a href="/{{ modulo }}/cliente/{{ cliente.id }}/">{{ cliente.nombre }}</a></td>
-    
-      <!-- <td style="text-align:center;"> -->
-        <!-- <a href='#myModal{{ cliente.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a> -->
-      <!-- </td> -->
-    </tr>
     {% endfor %}
 
-    <div class="pagination pagination-mini mainmenu">
+    <div class="pagination mainmenu pagination-xs">
       <ul>
         {% if clientes.has_previous %}
         <li><a href="?page={{ clientes.previous_page_number }}">Anterior</a></li>
@@ -76,7 +67,16 @@
         <li class="disabled"><a href="#">Siguiente</a></li>
         {% endif %} 
       </ul>
-    </div>
-</table>
+    </div><table class="table tableCell table-hover">
+    <tbody><tr>
+      <th>Nombre</th>    </tr>
+    <tr>
+      <td><a href="/{{ modulo }}/cliente/{{ cliente.id }}/">{{ cliente.nombre }} df</a></td>
+    
+      <!-- <td style="text-align:center;"> -->
+        <!-- <a href='#myModal{{ cliente.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="glyphicon glyphicon-trash"></i></a> -->
+      <!-- </td> -->
+    </tr>
+</tbody></table>
 <br>
 {% endblock %}

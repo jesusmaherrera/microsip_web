@@ -38,13 +38,13 @@
 </script>
 {% endblock %}
 
-{% block breadcrumb %}{{ block.super }} <a href="/{{ modulo }}/lineas/">Lineas Articulos</a> <i class=" icon-play"></i> Linea Articulo{% endblock %}
+{% block breadcrumb %}{{ block.super }} <a href="/{{ modulo }}/lineas/">Lineas Articulos</a> <i class=" glyphicon glyphicon-play"></i> Linea Articulo{% endblock %}
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>{% csrf_token %}
   <div class="row-fluid">
     <div class="span3"><h3 style="margin:0;"> Linea</h3> </div>
-    <button type="submit" class="btn"><i class="icon-download-alt"></i> Guardar</button> 
-    <a href="#" class="btn disabled"><i class="icon-trash"></i></a> 
+    <button type="submit" class="btn"><i class="glyphicon glyphicon-download-alt"></i> Guardar</button> 
+    <a href="#" class="btn disabled"><i class="glyphicon glyphicon-trash"></i></a> 
   </div>
   {{ form.errors }}
   {% if message %}

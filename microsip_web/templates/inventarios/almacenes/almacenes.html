@@ -37,9 +37,9 @@
       <td>{{ almacen.nombre }}</td>
       <td>
       {% if almacen.inventariando %}
-        <a href="{{ url_inventario }}{{ almacen.ALMACEN_ID }}/" class="btn btn-small span2"><i class="icon-list-alt"></i> inventario fisico</a>
+        <a href="{{ url_inventario }}{{ almacen.ALMACEN_ID }}/" class="btn btn-small span2"><i class="glyphicon glyphicon-list-alt"></i> inventario fisico</a>
       {% elif request.user.username == 'SYSDBA' %}
-        <a href="/inventarios/almacenes/abririnventario/{{ almacen.ALMACEN_ID }}/" class='btn btn-small span2' ><i class="icon-folder-open"></i> Abrir inventario fisico</a>
+        <a href="/inventarios/almacenes/abririnventario/{{ almacen.ALMACEN_ID }}/" class='btn btn-small span2' ><i class="glyphicon glyphicon-folder-open"></i> Abrir inventario fisico</a>
       {% endif %}
       </td>
     </tr>

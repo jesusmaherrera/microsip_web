@@ -149,23 +149,23 @@
 
 <!-- END MODALES -->
 <div id="sic_from" class="container-fluid">
-  <div class="row-fluid">
-    <div class="span8">
+  <div class="row">
+    <div class="col-sm-8 col-md-8">
       <div class="container-fluid">
-        <div class="row-fluid">
+        <div class="row">
           <h3>Inventario fisico</h3>  
           {% if request.user.username = 'SYSDBA' %}
-          <ul class="nav btn btn-mini" style=" margin: 0px; ">
+          <ul class="nav btn btn-default btn-xs" style=" margin: 0px; ">
             <li class="dropdown">
-              <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i></a>
-              <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+              <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="glyphicon glyphicon-cog"></i></a>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style="text-align:left;">
                {% if almacen.inventario_conajustes %}
-                <li><a tabindex="-1" href="#articulosnocont_porlinea_Modal" role="button" data-toggle="modal"><i class="icon-tasks"></i> Crear inventario fisico con articulos no contados - por linea</a></li>
-                <li class='divider'></li> 
-                <li><a tabindex="-1" href="#articulosnocont_Modal" role="button" data-toggle="modal"><i class="icon-align-justify"></i> Crear inventario fisico con articulos no contados</a></li>
-                <li class='divider'></li> 
+                <li><a tabindex="-1" href="#articulosnocont_porlinea_Modal" role="button" data-toggle="modal"><i class="glyphicon glyphicon-tasks"></i> Crear inventario fisico con articulos no contados - por linea</a></li>
+                <li class="divider"></li> 
+                <li><a tabindex="-1" href="#articulosnocont_Modal" role="button" data-toggle="modal"><i class="glyphicon glyphicon-align-justify"></i> Crear inventario fisico con articulos no contados</a></li>
+                <li class="divider"></li> 
                 {% endif %}
-                <li><a tabindex="-1" href="#cerrarinventario_Modal" role="button" data-toggle="modal"><i class="icon-folder-close"></i> Cerrar inventario </a></li>
+                <li><a tabindex="-1" href="#cerrarinventario_Modal" role="button" data-toggle="modal"><i class="glyphicon glyphicon-folder-close"></i> Cerrar inventario </a></li>
               </ul>
             </li>
           </ul>
@@ -173,32 +173,32 @@
         </div>
         <div class="row">
           <div class="span">
-            <div id='ubicacionform'>
+            <div id="ubicacionform">
               <label>Ubicacion</label>
               {{ ubicacion_form.ubicacion }}
             </div>
-            <div class='span8'>
+            <div class="col-sm-8 col-md-8">
             {% if almacen.inventario_conajustes %}
-              <label>ajustar en primer conteo <a href="#modal_primerconteo" role="button" data-toggle="modal"><i class="icon-info-sign"></i></a></label>
-              <input checked="checked" type="checkbox" disabled>
+              <label>ajustar en primer conteo <a href="#modal_primerconteo" role="button" data-toggle="modal"><i class="glyphicon glyphicon-info-sign"></i></a></label>
+              <input checked="checked" type="checkbox" disabled="">
             {% endif %}
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="span4">
+    <div class="col-sm-4 col-md-4">
       <div id="sic_form_details" class="container-fluid">
-        <div class="row-fluid">
-          <div class="span6" >
+        <div class="row">
+          <div class="col-sm-6 col-md-6">
             <label>Fecha</label>
-            <div >
+            <div>
               {{ entrada_fecha }} 
             </div>
           </div> 
-          <div class="span6" >
+          <div class="col-sm-6 col-md-6">
             <label>Folios</label>
-            <div >
+            <div>
               Ent {{ folio_entrada }}
               <br>
               Sal {{ folio_salida }}
@@ -207,13 +207,13 @@
         </div>
         
       </div>
-      <div class="row-fluid">
-        <input type="hidden" id="almacen_nombre" value="{{ almacen.nombre }}"/>
-        <input type="hidden" id="almacen_id" value="{{ almacen_id }}"/>
-        <input type="hidden" id="entrada_id" value="{{ entrada_id }}"/>
-        <input type="hidden" id="salida_id" value="{{ salida_id }}"/>
-        <input type="hidden" id="is_mobile" value="{{ is_mobile }}"/>
-        <input type="hidden" id="puede_modificar_costos" value="{{ puede_modificar_costos }}"/>
+      <div class="row">
+        <input type="hidden" id="almacen_nombre" value="{{ almacen.nombre }}" class="form-control">
+        <input type="hidden" id="almacen_id" value="{{ almacen_id }}" class="form-control">
+        <input type="hidden" id="entrada_id" value="{{ entrada_id }}" class="form-control">
+        <input type="hidden" id="salida_id" value="{{ salida_id }}" class="form-control">
+        <input type="hidden" id="is_mobile" value="{{ is_mobile }}" class="form-control">
+        <input type="hidden" id="puede_modificar_costos" value="{{ puede_modificar_costos }}" class="form-control">
         <strong>Alamacen: </strong> {{ almacen }}
       </div>
     </div>
