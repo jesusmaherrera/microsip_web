@@ -298,11 +298,6 @@ def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
                     'importe':Decimal(importe),
                 }
     
-    tipo_cambio = {
-        'tipo_cambio':13.20,
-        'moneda':moneda,
-        'tipo':'G'
-    }
     return totales_cuentas, error, msg
 
 def new_folio_poliza(tipo_poliza, fecha = None, connection_name = None):
@@ -852,7 +847,8 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
     polizas             = []
     detalles_polizas    = []
     totales_cuentas     = {}
-    
+    moneda = moneda_local
+    tipo_cambio = 1
     for documento_no, documento in enumerate(documentos):
         #es_contado = documento.condicion_pago == informacion_contable.condicion_pago_contado
         descripcion_extra   = ''
@@ -898,9 +894,9 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
                 referencia = documento.folio
                 if crear_polizas_por == 'Dia':
                     referencia = ''
-                if crear_polizas_por == 'Dia' or crear_polizas_por == 'Periodo':
-                    moneda = moneda_local
-                    tipo_cambio = 1
+                if crear_polizas_por == 'Documento':
+                    moneda = documento.moneda
+                    tipo_cambio = documento.tipo_cambio
 
                 poliza = ContabilidadDocumento(
                         id                      = next_id('ID_DOCTOS', connection_name),
