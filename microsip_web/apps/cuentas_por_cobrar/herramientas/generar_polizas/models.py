@@ -1,7 +1,6 @@
 #encoding:utf-8
 from django.db import models
-from datetime import datetime 
-from microsip_web.libs.api.models import *
+from microsip_web.libs.api.models import CuentasXCobrarConcepto, ContabilidadCuentaContable, ContabilidadDepartamento, CuentasXCobrarDocumento, CondicionPago, CuentasXCobrarDocumentoCreditoLibres, CuentasXCobrarDocumentoImportes, CuentasXCobrarDocumento
 
 ################################################################
 ####                                                        ####

@@ -4,6 +4,7 @@ from django.db import router
 from django.core.cache import cache
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.sessions.models import Session
 
 from microsip_api.comun.sic_db import next_id, first_or_none

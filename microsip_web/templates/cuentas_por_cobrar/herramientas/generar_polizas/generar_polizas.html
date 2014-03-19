@@ -15,7 +15,7 @@
   $(document).ready(function() {
       $('#id_crear_polizas_de').change(function(event){
         $('#id_plantilla_2').hide(); 
-        Dajaxice.microsip_web.apps.ventas.obtener_plantillas_cc(cargar_plantillas_1, {'tipo_plantilla': $('#id_crear_polizas_de').val()});
+        Dajaxice.microsip_web.apps.cuentas_por_cobrar.herramientas.generar_polizas.obtener_plantillas_cc(cargar_plantillas_1, {'tipo_plantilla': $('#id_crear_polizas_de').val()});
         
       });
   });

@@ -6,12 +6,10 @@ from django.core import serializers
 from django.http import HttpResponse
 import json
 
-from models import *
-from microsip_web.apps.cuentas_por_cobrar.models import PlantillaPolizas_CC
-from microsip_web.apps.cuentas_por_pagar.models import PlantillaPolizas_CP
+# from .models import *
 from microsip_web.apps.main.filtros.models import *
 from microsip_web.apps.main.filtros.views import get_next_id_carpeta
-
+from .herramientas.generar_polizas.models import PlantillaPolizas_V
 
 @dajaxice_register(method='GET')
 def args_example(request, text):
@@ -89,32 +87,6 @@ def obtener_plantillas(request, tipo_plantilla):
     plantillas = []
     if tipo_plantilla =='F' or tipo_plantilla == 'D':
     	plantillas = PlantillaPolizas_V.objects.filter(tipo=tipo_plantilla)
-
-    #se devuelven las ciudades en formato json, solo nos interesa obtener como json
-    #el id y el nombre de las ciudades.
-    data = serializers.serialize("json", plantillas, fields=('id','nombre'))
-    
-
-    return HttpResponse(data, mimetype="application/javascript")
-
-@dajaxice_register(method='GET')
-def obtener_plantillas_cp(request, tipo_plantilla):
-    #se obtiene la provincia
-    
-    plantillas = PlantillaPolizas_CP.objects.filter(tipo=tipo_plantilla)
-
-    #se devuelven las ciudades en formato json, solo nos interesa obtener como json
-    #el id y el nombre de las ciudades.
-    data = serializers.serialize("json", plantillas, fields=('id','nombre'))
-    
-
-    return HttpResponse(data, mimetype="application/javascript")
-
-@dajaxice_register(method='GET')
-def obtener_plantillas_cc(request, tipo_plantilla):
-    #se obtiene la provincia
-    
-    plantillas = PlantillaPolizas_CC.objects.filter(tipo=tipo_plantilla)
 
     #se devuelven las ciudades en formato json, solo nos interesa obtener como json
     #el id y el nombre de las ciudades.

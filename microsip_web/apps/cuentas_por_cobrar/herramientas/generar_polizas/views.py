@@ -1,22 +1,15 @@
 #encoding:utf-8
 from django.shortcuts import render_to_response, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.template import RequestContext
-from microsip_web.apps.inventarios.models import *
-from forms import *
 
-import datetime, time
-from django.db.models import Q
-#Paginacion
-
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .models import *
+from .forms import *
 
 # user autentication
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Sum, Max
-from django.db import connection
-from microsip_web.apps.inventarios.views import c_get_next_key
+
 from microsip_web.libs import contabilidad
 from microsip_web.libs.custom_db.main import get_conecctionname
 
@@ -66,7 +59,7 @@ def generar_polizas(fecha_ini=None, fecha_fin=None, ignorar_documentos_cont=True
     return documentosCCData, msg
 
 @login_required(login_url='/login/')
-def generar_polizas_View(request, template_name='cuentas_por_cobrar/herramientas/generar_polizas.html'):
+def generar_polizas_View(request, template_name='cuentas_por_cobrar/herramientas/generar_polizas/generar_polizas.html'):
     connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
@@ -107,7 +100,7 @@ def generar_polizas_View(request, template_name='cuentas_por_cobrar/herramientas
 ##########################################
 
 @login_required(login_url='/login/')
-def preferenciasEmpresa_View(request, template_name='cuentas_por_cobrar/herramientas/preferencias_empresa.html'):
+def preferenciasEmpresa_View(request, template_name='cuentas_por_cobrar/herramientas/generar_polizas/preferencias_empresa.html'):
     try:
         informacion_contable = InformacionContable_CC.objects.all()[:1]
         informacion_contable = informacion_contable[0]
@@ -134,7 +127,7 @@ def preferenciasEmpresa_View(request, template_name='cuentas_por_cobrar/herramie
 ##########################################
 
 @login_required(login_url='/login/')
-def plantilla_poliza_manageView(request, id = None, template_name='cuentas_por_cobrar/herramientas/plantilla_poliza.html'):
+def plantilla_poliza_manageView(request, id = None, template_name='cuentas_por_cobrar/herramientas/generar_polizas/plantilla_poliza.html'):
     message = ''
 
     if id:

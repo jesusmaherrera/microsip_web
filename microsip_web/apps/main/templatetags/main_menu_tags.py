@@ -28,6 +28,46 @@ def microsip_module_btn(ms_module):
 
 register.simple_tag(microsip_module_btn)
 
+def ventas_tools_menu(tool_name):
+   result = ''
+   installed_modules = settings.MICROSIP_MODULES
+   if tool_name == 'documentos' and 'microsip_web.apps.ventas.documentos' in installed_modules :
+      result = '''<li class="dropdown">
+         <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-folder-close"></i>  
+           Documentos <b class="caret"></b></a>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
+              <li><a tabindex="-1" href="/ventas/facturas/"> <i class="icon-file"></i> Facturas</a></li>
+              <li><a tabindex="-1" href="/ventas/remisiones/"> <i class="icon-file"></i> Remisiones</a></li>
+            </ul>
+         </li>'''
+   
+   if tool_name == 'herramientas':
+      if 'microsip_web.apps.ventas.herramientas' in installed_modules:
+         result = '''
+            <li class="dropdown">
+               <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i> Herramientas <b class="caret"></b></a>
+               <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+                 <li><a tabindex="-1" href="/ventas/PreferenciasEmpresa/"><i class="icon-cog"></i> Preferencias de la empresa</a></li>
+               </ul>
+             </li>
+            '''
+
+      elif 'microsip_web.apps.ventas.herramientas.generar_polizas' in installed_modules:
+         result = '''
+            <li class="dropdown">
+               <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i> Herramientas <b class="caret"></b></a>
+               <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+                 <li><a tabindex="-1" href="/ventas/Facturas/"><i class="icon-share"></i> Generar Polizas Contables</a></li>
+                 <li role="presentation" class="divider"></li>
+                 <li><a tabindex="-1" href="/ventas/PreferenciasEmpresa/"><i class="icon-cog"></i> Preferencias de la empresa</a></li>
+               </ul>
+             </li>
+            '''
+
+   return result
+
+register.simple_tag(microsip_module_btn)
+
 def pv_utilerias_btn():
    result = ''
    if 'microsip_web.apps.punto_de_venta.utilerias' in settings.MICROSIP_MODULES:
@@ -35,4 +75,5 @@ def pv_utilerias_btn():
    return result
 
 register.simple_tag(pv_utilerias_btn)
+register.simple_tag(ventas_tools_menu)
 register.simple_tag(microsip_module_btn)

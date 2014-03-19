@@ -12,6 +12,40 @@ from microsip_api.comun.sic_db import get_conecctionname
 
 ##########################################
 ##                                      ##
+##        Preferencias de empresa       ##
+##                                      ##
+##########################################
+
+@login_required(login_url='/login/')
+def preferenciasEmpresa_View(request, template_name='ventas/herramientas/generar_polizas/preferencias_empresa.html'):
+    try:
+        informacion_contable = InformacionContable_V.objects.all()[:1]
+        informacion_contable = informacion_contable[0]
+    except:
+        informacion_contable = InformacionContable_V()
+
+    cuenta_cliente_formset = modelformset_factory(clientes_config_cuenta, form= clientes_config_cuentaManageForm, can_delete=True,)
+    
+    msg = ''
+    if request.method == 'POST':
+        formset = cuenta_cliente_formset(request.POST, request.FILES)
+
+        form = InformacionContableManageForm(request.POST, instance=informacion_contable)
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            formset = cuenta_cliente_formset()
+            msg = 'Datos Guardados Exitosamente'
+    else:
+        form = InformacionContableManageForm(instance=informacion_contable)
+        formset = cuenta_cliente_formset()
+        
+    plantillas = PlantillaPolizas_V.objects.all()
+    c= {'form':form,'msg':msg,'plantillas':plantillas,'formset':formset,}
+    return render_to_response(template_name, c, context_instance=RequestContext(request))
+    
+##########################################
+##                                      ##
 ##        Generacion de polizas         ##
 ##                                      ##
 ##########################################
@@ -87,7 +121,7 @@ def generar_polizas(fecha_ini = None, fecha_fin = None, ignorar_documentos_cont 
     return documentosGenerados, documentosDataDevoluciones, msg
 
 @login_required(login_url='/login/')
-def facturas_View(request, template_name='ventas/herramientas/generar_polizas.html'):
+def facturas_View(request, template_name='ventas/herramientas/generar_polizas/generar_polizas.html'):
     connection_name = get_conecctionname(request.session)
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
@@ -140,7 +174,7 @@ def facturas_View(request, template_name='ventas/herramientas/generar_polizas.ht
 ##########################################
 
 @login_required(login_url='/login/')
-def plantilla_poliza_manageView(request, id = None, template_name='ventas/herramientas/plantilla_poliza.html'):
+def plantilla_poliza_manageView(request, id = None, template_name='ventas/herramientas/generar_polizas/plantilla_poliza.html'):
     message = ''
 
     if id:

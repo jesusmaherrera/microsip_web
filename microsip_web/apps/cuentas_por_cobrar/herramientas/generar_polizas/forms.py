@@ -1,12 +1,9 @@
 #encoding:utf-8
 from django import forms
-
 import autocomplete_light
-
-from microsip_web.apps.ventas.models import *
-from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
-from microsip_web.apps.cuentas_por_cobrar.models import *
+
+from .models import *
 
 class InformacionContableManageForm(forms.ModelForm):
     condicion_pago_contado  = forms.ModelChoiceField(queryset= CondicionPago.objects.all(), required=True)
