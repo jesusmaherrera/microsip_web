@@ -769,6 +769,61 @@ class ContabilidadRecordatorio(ContabilidadRecordatorioBase):
     pass
 
 class ContabilidadDocumento(ContabilidadDocumentoBase):
+    def next_folio( self, using=None):
+        """ Generar un folio nuevo de una poliza e incrementa el consecutivo de folios """
+        tipo_poliza = self.tipo_poliza
+        prefijo = tipo_poliza.prefijo
+        if not prefijo:
+            prefijo = ''
+        tipo_consecutivo = tipo_poliza.tipo_consec
+
+        try:
+            if tipo_consecutivo == 'M':
+                tipo_poliza_det = TipoPolizaDetalle.objects.get(tipo_poliza = tipo_poliza, mes= self.fecha.month, ano = self.fecha.year)
+            elif tipo_consecutivo == 'E':
+                tipo_poliza_det = TipoPolizaDetalle.objects.get(tipo_poliza = tipo_poliza, ano=self.fecha.year, mes=0)
+            elif tipo_consecutivo == 'P':
+                tipo_poliza_det = TipoPolizaDetalle.objects.get(tipo_poliza = tipo_poliza, mes=0, ano =0)
+        except ObjectDoesNotExist:
+            if tipo_consecutivo == 'M':      
+                tipo_poliza_det = TipoPolizaDetalle.objects.create(id=next_id('ID_CATALOGOS', using), tipo_poliza=tipo_poliza, ano=self.fecha.year, mes=self.fecha.month, consecutivo = 1,)
+            elif tipo_consecutivo == 'E':
+                #Si existe permanente toma su consecutivo para crear uno nuevo si no existe inicia en 1
+                consecutivo = TipoPolizaDetalle.objects.filter(tipo_poliza = tipo_poliza, mes=0, ano =0).aggregate(max = Sum('consecutivo'))['max']
+
+                if consecutivo == None:
+                    consecutivo = 1
+
+                tipo_poliza_det = TipoPolizaDetalle.objects.create(id=next_id('ID_CATALOGOS', using), tipo_poliza=tipo_poliza, ano= self.fecha.year, mes=0, consecutivo=consecutivo,)
+            elif tipo_consecutivo == 'P':
+                consecutivo = TipoPolizaDetalle.objects.all().aggregate(max = Sum('consecutivo'))['max']
+
+                if consecutivo == None:
+                    consecutivo = 1
+
+                tipo_poliza_det = TipoPolizaDetalle.objects.create(id=next_id('ID_CATALOGOS', using), tipo_poliza=tipo_poliza, ano=0, mes=0, consecutivo = consecutivo,)                                
+        
+        folio = '%s%s'% (prefijo,("%09d" % tipo_poliza_det.consecutivo)[len(prefijo):]) 
+
+        #CONSECUTIVO DE FOLIO DE POLIZA
+        tipo_poliza_det.consecutivo += 1 
+        tipo_poliza_det.save()
+        
+        return folio
+    
+    def save(self, *args, **kwargs):
+        
+        if not self.id:
+            using = kwargs.get('using', None)
+            using = using or router.db_for_write(self.__class__, instance=self)
+            self.id = next_id('ID_DOCTOS', using)
+
+            #Si no se define folio se asigna uno
+            if not self.poliza:
+                self.poliza = self.next_folio(using=using)
+
+        super(self.__class__, self).save(*args, **kwargs)
+
     def __unicode__(self):
         return u'%s' % self.id
 
