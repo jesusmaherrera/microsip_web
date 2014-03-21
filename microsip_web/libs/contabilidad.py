@@ -17,318 +17,324 @@ from microsip_web.apps.ventas.herramientas.generar_polizas.models import *
 from microsip_web.apps.punto_de_venta.models import *
 
 from microsip_api.comun.sic_db import next_id
-from microsip_web.apps.ventas.herramientas.generar_polizas.functions import get_totales_documento_ve
-from microsip_web.apps.cuentas_por_pagar.herramientas.generar_polizas.functions import get_totales_documento_cp
-from microsip_web.apps.cuentas_por_cobrar.herramientas.generar_polizas.functions import get_totales_documento_cc
 
+class TotalesCuentas(dict):
+    def __init__(self, conceptos_poliza):
+        ''' conceptos_poliza: son los conceptos que llevan las polizas. '''
+        self.error = None
+        self.msg = ''
+        self.conceptos_poliza = conceptos_poliza
+   
+    def get_valortotales_by_concepto(self, totales, valor_contado_credito, valor_iva):
+        #totales de credito
+        if valor_contado_credito == 'Credito':
+            if valor_iva == '0':
+                return totales['iva_0']['credito']
+            elif valor_iva == 'I':
+                return totales['iva']['credito']
+            elif valor_iva == 'A':
+                return totales['iva_0']['credito'] + totales['iva']['credito']
+        #totales de contado
+        elif valor_contado_credito == 'Contado':
+            if valor_iva == '0':
+                return totales['iva_0']['contado']
+            elif valor_iva == 'I':
+                return totales['iva']['contado']
+            elif valor_iva == 'A':
+                return totales['iva_0']['contado'] + totales['iva']['contado'] 
+        #totales de contado y credito
+        elif valor_contado_credito == 'Ambos':
+            if valor_iva == '0':
+                return totales['iva_0']['contado'] + totales['iva_0']['credito']
+            elif valor_iva == 'I':
+                return totales['iva']['contado'] + totales['iva']['credito']
+            elif valor_iva == 'A':
+                contado = totales['iva_0']['contado'] + totales['iva']['contado'] 
+                credito = totales['iva_0']['credito'] + totales['iva']['credito']
+                return contado + credito
+        return None
 
-def get_valortotales_by_concepto(totales, valor_contado_credito, valor_iva):
-    #totales de credito
-    if valor_contado_credito == 'Credito':
-        if valor_iva == '0':
-            return totales['iva_0']['credito']
-        elif valor_iva == 'I':
-            return totales['iva']['credito']
-        elif valor_iva == 'A':
-            return totales['iva_0']['credito'] + totales['iva']['credito']
-    #totales de contado
-    elif valor_contado_credito == 'Contado':
-        if valor_iva == '0':
-            return totales['iva_0']['contado']
-        elif valor_iva == 'I':
-            return totales['iva']['contado']
-        elif valor_iva == 'A':
-            return totales['iva_0']['contado'] + totales['iva']['contado'] 
-    #totales de contado y credito
-    elif valor_contado_credito == 'Ambos':
-        if valor_iva == '0':
-            return totales['iva_0']['contado'] + totales['iva_0']['credito']
-        elif valor_iva == 'I':
-            return totales['iva']['contado'] + totales['iva']['credito']
-        elif valor_iva == 'A':
-            contado = totales['iva_0']['contado'] + totales['iva']['contado'] 
-            credito = totales['iva_0']['credito'] + totales['iva']['credito']
-            return contado + credito
-    return None
-
-def agregarTotales(totales_cuentas, connection_name = "", **kwargs):
-
-    #Valores cuentas por pagar
-    folio_documento = kwargs.get('folio_documento', 0)
-    compras  = kwargs.get('compras', 0)
-    ventas = kwargs.get('ventas',None)
-    impuestos = kwargs.get('impuestos', None)
-    
-    proveedores     = kwargs.get('proveedores', 0)
-    cuenta_proveedor    = kwargs.get('cuenta_proveedor', None)
-    
-    cliente_id  = kwargs.get('cliente_id', 0)
-    clientes    = kwargs.get('clientes', 0)
-    cuenta_cliente  = kwargs.get('cuenta_cliente', None)
-
-    #Valores generales
-    descuento   = kwargs.get('descuento', 0)
-    bancos      = kwargs.get('bancos', 0)
-    
-    depto_co            = kwargs.get('depto_co', None)
-    conceptos_poliza    = kwargs.get('conceptos_poliza', [])
-    campos_particulares = kwargs.get('campos_particulares', None)
-
-    error = kwargs.get('error', 0)
-    msg = kwargs.get('msg', '')
-    impuestos_documento = kwargs.get('impuestos_documento', [])
-
-    asientos_a_ingorar = []
-    valores_extra = {}
-    valor_extra = 0
-    for concepto in conceptos_poliza:
-        if concepto.valor_tipo == 'Segmento_1' and not campos_particulares.segmento_1 == None and campos_particulares.segmento_1 != '':
-            asientos_a_ingorar.append(concepto.asiento_ingora)
-        if concepto.valor_tipo == 'Segmento_2' and not campos_particulares.segmento_2 == None and campos_particulares.segmento_2 != '':
-            asientos_a_ingorar.append(concepto.asiento_ingora)
-        if concepto.valor_tipo == 'Segmento_3' and not campos_particulares.segmento_3 == None and campos_particulares.segmento_3 != '':
-            asientos_a_ingorar.append(concepto.asiento_ingora)
-        if concepto.valor_tipo == 'Segmento_4' and not campos_particulares.segmento_4 == None and campos_particulares.segmento_4 != '':
-            asientos_a_ingorar.append(concepto.asiento_ingora)
-        if concepto.valor_tipo == 'Segmento_5' and not campos_particulares.segmento_5 == None and campos_particulares.segmento_5 != '':
-            asientos_a_ingorar.append(concepto.asiento_ingora)
-
-        #Para sumar o restar dos asientos
-        if not concepto.asiento_ingora == None and not concepto.asiento_ingora == '' :
-            if not concepto.asiento_ingora[0].isdigit() and (concepto.asiento_ingora[0]=='+' or concepto.asiento_ingora[0]=='-'):
-                if concepto.asiento_ingora[1:].isdigit():
-                    asientos_a_ingorar.append(concepto.posicion)
-
-                    if concepto.valor_tipo == 'Proveedores':
-                        valor_extra  = proveedores
-                    elif concepto.valor_tipo == 'Bancos':
-                        valor_extra  = bancos
-                    elif concepto.valor_tipo == 'Clientes':
-                        valor_extra  = clientes
-                    elif concepto.valor_tipo == 'Descuentos':
-                        valor_extra  = descuento
-                    elif concepto.valor_tipo == 'IVA Retenido':
-                        valor_extra  = impuestos['iva_retenido']
-                    elif concepto.valor_tipo == 'IEPS':
-                        if concepto.valor_contado_credito == 'Credito':
-                            valor_extra  = impuestos['ieps']['credito']
-                        elif concepto.valor_contado_credito == 'Contado':
-                            valor_extra  = impuestos['ieps']['contado']
-                        elif concepto.valor_contado_credito == 'Ambos':
-                            valor_extra  = impuestos['ieps']['credito'] + impuestos['ieps']['contado']
-                    elif concepto.valor_tipo == 'IVA':
-                        if concepto.valor_contado_credito == 'Credito':
-                            valor_extra  = impuestos['iva']['credito']
-                        elif concepto.valor_contado_credito == 'Contado':
-                            valor_extra  = impuestos['iva']['contado']
-                        elif concepto.valor_contado_credito == 'Ambos':
-                            valor_extra  = impuestos['iva']['contado'] + impuestos['iva']['credito']
-                    elif concepto.valor_tipo == 'ISR Retenido':
-                        valor_extra = impuestos['isr_retenido']
-                    elif concepto.valor_tipo == 'Compras':
-                         valor_extra = get_valortotales_by_concepto(
-                                totales = compras,
-                                valor_contado_credito = concepto.valor_contado_credito,
-                                valor_iva   = concepto.valor_iva
-                            )
-                    elif concepto.valor_tipo == 'Ventas':
-                        valor_extra = get_valortotales_by_concepto(
-                                totales = ventas,
-                                valor_contado_credito = concepto.valor_contado_credito,
-                                valor_iva   = concepto.valor_iva
-                            )
-                if concepto.asiento_ingora[0]=='-':
-                    valor_extra = -valor_extra
-
-                if valores_extra.has_key(concepto.asiento_ingora[1:]):
-                    valores_extra[concepto.asiento_ingora[1:]] = valores_extra[concepto.asiento_ingora[1:]] + valor_extra
-                else:
-                    valores_extra[concepto.asiento_ingora[1:]] = valor_extra
-                
-    for concepto in conceptos_poliza:
+    def agregar_totalesbysegmento(self, documento_folio, segmento, depto_co, concepto_tipo, asiento_ingora=0):
         importe = 0
+        if asiento_ingora=='':
+            asiento_ingora = 0
+            
         cuenta  = []
         clave_cuenta_tipoAsiento = []
-        if concepto.valor_tipo == 'Segmento_1' and not campos_particulares.segmento_1 == None and campos_particulares.segmento_1 != '':
-            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_1, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, connection_name)
-        elif concepto.valor_tipo == 'Segmento_2' and not campos_particulares.segmento_2 == None and campos_particulares.segmento_2 != '': 
-            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_2, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, connection_name)
-        elif concepto.valor_tipo == 'Segmento_3' and not campos_particulares.segmento_3 == None and campos_particulares.segmento_3 != '': 
-            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_3, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, connection_name)
-        elif concepto.valor_tipo == 'Segmento_4' and not campos_particulares.segmento_4 == None and campos_particulares.segmento_4 != '':
-            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_4, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, connection_name)
-        elif concepto.valor_tipo == 'Segmento_5' and not campos_particulares.segmento_5 == None and campos_particulares.segmento_5 != '': 
-            totales_cuentas, error, msg = get_totales_cuentas_by_segmento(campos_particulares.segmento_5, totales_cuentas, depto_co, concepto.tipo, error, msg, folio_documento, concepto.asiento_ingora, connection_name)
-        elif concepto.valor_tipo == 'Compras' and not concepto.posicion in asientos_a_ingorar:
-            importe = get_valortotales_by_concepto(
-                   totales = compras,
-                   valor_contado_credito = concepto.valor_contado_credito,
-                   valor_iva   = concepto.valor_iva
-               )
-            cuenta  = concepto.cuenta_co.cuenta
-        elif concepto.valor_tipo == 'Ventas' and not concepto.posicion in asientos_a_ingorar:
-            importe = get_valortotales_by_concepto(
-                totales = ventas,
-                valor_contado_credito = concepto.valor_contado_credito,
-                valor_iva   = concepto.valor_iva
-            )
 
-            campo_cuenta = clientes_config_cuenta.objects.filter(valor_contado_credito= concepto.valor_contado_credito, valor_iva= concepto.valor_iva)
-
-            if campo_cuenta.count() > 0:
-
-                cuenta_temp = getattr(libresClientes.objects.get(id=cliente_id), campo_cuenta[0].campo_cliente) 
-                if cuenta_temp != '' and cuenta_temp != 0 and cuenta_temp != None:
-                    if ContabilidadCuentaContable.objects.filter(cuenta=cuenta_temp).exists():
-                        cuenta = cuenta_temp
-                    else:
-                        cliente_nombre = Cliente.objects.filter(id=cliente_id)
-                        msg = 'existe almenos una cuenta INVALIDA en el cliente %s. Corrigela para continuar'% cliente_nombre
-                        error = 2
-                        cuenta  = concepto.cuenta_co.cuenta        
-                else:
-                    cuenta  = concepto.cuenta_co.cuenta    
-            else:
-                cuenta  = concepto.cuenta_co.cuenta
-            
-        elif concepto.valor_tipo == 'IVA' and not concepto.posicion in asientos_a_ingorar:
-            if concepto.valor_contado_credito == 'Credito':
-                importe = impuestos['iva']['credito']
-            elif concepto.valor_contado_credito == 'Contado':
-                importe = impuestos['iva']['contado']
-            elif concepto.valor_contado_credito == 'Ambos':
-                importe = impuestos['iva']['contado'] + impuestos['iva']['credito']
-
-            cuenta = concepto.cuenta_co.cuenta
-        elif concepto.valor_tipo == 'IEPS' and not concepto.posicion in asientos_a_ingorar:
-            if concepto.valor_contado_credito == 'Credito':
-                importe = impuestos['ieps']['credito']
-            elif concepto.valor_contado_credito == 'Contado':
-                importe = impuestos['ieps']['contado']
-            elif concepto.valor_contado_credito == 'Ambos':
-                importe = impuestos['ieps']['credito'] + impuestos['ieps']['contado']
-
-            cuenta = concepto.cuenta_co.cuenta
-        elif concepto.valor_tipo == 'IVA Retenido' and not concepto.posicion in asientos_a_ingorar:
-            importe = impuestos['iva_retenido']
-            cuenta = concepto.cuenta_co.cuenta
-        elif concepto.valor_tipo == 'ISR Retenido' and not concepto.posicion in asientos_a_ingorar:
-            importe = impuestos['isr_retenido']
-            cuenta = concepto.cuenta_co.cuenta
-        elif concepto.valor_tipo == 'Proveedores' and not concepto.posicion in asientos_a_ingorar:
-            if concepto.valor_iva == 'A':
-                importe = proveedores
-
-            if cuenta_proveedor == None:
-                cuenta = concepto.cuenta_co.cuenta
-            else:
-                cuenta = cuenta_proveedor
-        elif concepto.valor_tipo == 'Clientes' and not concepto.posicion in asientos_a_ingorar:
-            if concepto.valor_iva == 'A':
-                importe = clientes
-
-            if cuenta_cliente == None:
-                cuenta = concepto.cuenta_co.cuenta
-            else:
-                cuenta = cuenta_cliente
-        elif concepto.valor_tipo == 'Bancos' and not concepto.posicion in asientos_a_ingorar:
-            if concepto.valor_iva == 'A':
-                importe =   bancos
-
-            cuenta = concepto.cuenta_co.cuenta
-        elif concepto.valor_tipo == 'Descuentos' and not concepto.posicion in asientos_a_ingorar:
-            importe = descuento
-            cuenta = concepto.cuenta_co.cuenta
+        segmento = segmento.split(',')
         
-        if concepto.posicion in valores_extra:
-            importe = importe + valores_extra[concepto.posicion]
+        if not segmento == []:
+            for importe_segmento in segmento:
 
-        #Se es tipo segmento pone variables en cero para que no se calculen otra ves valores por ya estan calculados
-        if concepto.valor_tipo == 'Segmento_1' or concepto.valor_tipo == 'Segmento_2' or concepto.valor_tipo == 'Segmento_3' or concepto.valor_tipo == 'Segmento_4' or concepto.valor_tipo == 'Segmento_5':
+                cuenta_cantidad     = importe_segmento.split('=')
+                cuenta_depto= cuenta_cantidad[0].split("/")
+                
+                try:
+                    cuenta      =  ContabilidadCuentaContable.objects.get(cuenta=cuenta_depto[0]).cuenta
+                except ObjectDoesNotExist:
+                    self.error = 2
+                    self.msg = 'NO EXISTE O ES INCORRECTA almenos una [CUENTA CONTABLE] indicada en un segmento en el documento con folio[%s], Corrigelo para continuar'% documento_folio
+                
+                
+                if len(cuenta_depto) == 2:
+                    try:
+                        depto_co = ContabilidadDepartamento.objects.get(clave=cuenta_depto[1]).clave
+                    except ObjectDoesNotExist:
+                        self.error = 2
+                        self.msg = 'NO EXISTE almenos un [DEPARTEMENTO CONTABLE] indicado en un segmento en el documento con folio [%s], Corrigelo para continuar'% documento_folio
+                
+                try:
+                    importe = float(cuenta_cantidad[1])
+                except:
+                    self.error = 3
+                    self.msg = 'Cantidad incorrecta en un segmento en el documento [%s], Corrigelo para continuar'% documento_folio
+
+                if self.error == 0:
+                    asiento_id = "%s+%s/%s:%s"% (asiento_ingora, cuenta, depto_co, concepto_tipo)
+                    #Si hay algo por agregar
+                    if not asiento_id == [] and importe > 0:
+                        if asiento_id in self:
+                            self[asiento_id] = {
+                                'tipo_asiento':concepto.tipo,
+                                'departamento':depto_co.clave,
+                                'cuenta':cuenta,
+                                'importe':self[asiento_id]['importe'] + Decimal(importe),
+                            }
+                        else:
+                            self[asiento_id]  = {
+                                'tipo_asiento':concepto.tipo,
+                                'departamento':depto_co.clave,
+                                'cuenta':cuenta,
+                                'importe':Decimal(importe),
+                            }
+
+        return self.error, self.msg
+
+    def agregar_valorcuenta(self, kwargs):
+        #Valores cuentas por pagar
+        folio_documento = kwargs.get('folio_documento', 0)
+        compras  = kwargs.get('compras', 0)
+        ventas = kwargs.get('ventas',None)
+        error  = kwargs.get('error', 0)
+        msg = kwargs.get('msg',None)
+        impuestos = kwargs.get('impuestos', None)
+        
+        proveedores     = kwargs.get('proveedores', 0)
+        cuenta_proveedor    = kwargs.get('cuenta_proveedor', None)
+        
+        cliente_id  = kwargs.get('cliente_id', 0)
+        clientes    = kwargs.get('clientes', 0)
+        cuenta_cliente  = kwargs.get('cuenta_cliente', None)
+
+        #Valores generales
+        descuento   = kwargs.get('descuento', 0)
+        bancos      = kwargs.get('bancos', 0)
+        
+        depto_co            = kwargs.get('depto_co', None)
+        campos_particulares = kwargs.get('campos_particulares', None)
+        impuestos_documento = kwargs.get('impuestos_documento', [])
+        
+        asientos_a_ingorar = []
+        valores_extra = {}
+        valor_extra = 0
+        for concepto in self.conceptos_poliza:
+            if concepto.valor_tipo == 'Segmento_1' and not campos_particulares.segmento_1 == None and campos_particulares.segmento_1 != '':
+                asientos_a_ingorar.append(concepto.asiento_ingora)
+            if concepto.valor_tipo == 'Segmento_2' and not campos_particulares.segmento_2 == None and campos_particulares.segmento_2 != '':
+                asientos_a_ingorar.append(concepto.asiento_ingora)
+            if concepto.valor_tipo == 'Segmento_3' and not campos_particulares.segmento_3 == None and campos_particulares.segmento_3 != '':
+                asientos_a_ingorar.append(concepto.asiento_ingora)
+            if concepto.valor_tipo == 'Segmento_4' and not campos_particulares.segmento_4 == None and campos_particulares.segmento_4 != '':
+                asientos_a_ingorar.append(concepto.asiento_ingora)
+            if concepto.valor_tipo == 'Segmento_5' and not campos_particulares.segmento_5 == None and campos_particulares.segmento_5 != '':
+                asientos_a_ingorar.append(concepto.asiento_ingora)
+
+            #Para sumar o restar dos asientos
+            if not concepto.asiento_ingora == None and not concepto.asiento_ingora == '' :
+                if not concepto.asiento_ingora[0].isdigit() and (concepto.asiento_ingora[0]=='+' or concepto.asiento_ingora[0]=='-'):
+                    if concepto.asiento_ingora[1:].isdigit():
+                        asientos_a_ingorar.append(concepto.posicion)
+
+                        if concepto.valor_tipo == 'Proveedores':
+                            valor_extra  = proveedores
+                        elif concepto.valor_tipo == 'Bancos':
+                            valor_extra  = bancos
+                        elif concepto.valor_tipo == 'Clientes':
+                            valor_extra  = clientes
+                        elif concepto.valor_tipo == 'Descuentos':
+                            valor_extra  = descuento
+                        elif concepto.valor_tipo == 'IVA Retenido':
+                            valor_extra  = impuestos['iva_retenido']
+                        elif concepto.valor_tipo == 'IEPS':
+                            if concepto.valor_contado_credito == 'Credito':
+                                valor_extra  = impuestos['ieps']['credito']
+                            elif concepto.valor_contado_credito == 'Contado':
+                                valor_extra  = impuestos['ieps']['contado']
+                            elif concepto.valor_contado_credito == 'Ambos':
+                                valor_extra  = impuestos['ieps']['credito'] + impuestos['ieps']['contado']
+                        elif concepto.valor_tipo == 'IVA':
+                            if concepto.valor_contado_credito == 'Credito':
+                                valor_extra  = impuestos['iva']['credito']
+                            elif concepto.valor_contado_credito == 'Contado':
+                                valor_extra  = impuestos['iva']['contado']
+                            elif concepto.valor_contado_credito == 'Ambos':
+                                valor_extra  = impuestos['iva']['contado'] + impuestos['iva']['credito']
+                        elif concepto.valor_tipo == 'ISR Retenido':
+                            valor_extra = impuestos['isr_retenido']
+                        elif concepto.valor_tipo == 'Compras':
+                             valor_extra = self.get_valortotales_by_concepto(
+                                    totales = compras,
+                                    valor_contado_credito = concepto.valor_contado_credito,
+                                    valor_iva   = concepto.valor_iva
+                                )
+                        elif concepto.valor_tipo == 'Ventas':
+                            valor_extra = self.get_valortotales_by_concepto(
+                                    totales = ventas,
+                                    valor_contado_credito = concepto.valor_contado_credito,
+                                    valor_iva   = concepto.valor_iva
+                                )
+                    if concepto.asiento_ingora[0]=='-':
+                        valor_extra = -valor_extra
+
+                    if valores_extra.has_key(concepto.asiento_ingora[1:]):
+                        valores_extra[concepto.asiento_ingora[1:]] = valores_extra[concepto.asiento_ingora[1:]] + valor_extra
+                    else:
+                        valores_extra[concepto.asiento_ingora[1:]] = valor_extra
+                    
+        for concepto in self.conceptos_poliza:
             importe = 0
+            cuenta  = []
+            clave_cuenta_tipoAsiento = []
+            
+            if concepto.valor_tipo == 'Segmento_1' or concepto.valor_tipo == 'Segmento_2' or concepto.valor_tipo == 'Segmento_3' or concepto.valor_tipo == 'Segmento_4' or concepto.valor_tipo == 'Segmento_5':
+                segmento = None
+                if concepto.valor_tipo == 'Segmento_1' and campos_particulares.segmento_1 != None and campos_particulares.segmento_1 != '':
+                    segmento =  campos_particulares.segmento_1
+                elif concepto.valor_tipo == 'Segmento_2' and campos_particulares.segmento_2 != None and campos_particulares.segmento_1 != '': 
+                    segmento =  campos_particulares.segmento_2
+                elif concepto.valor_tipo == 'Segmento_3' and campos_particulares.segmento_3 != None and campos_particulares.segmento_1 != '': 
+                    segmento =  campos_particulares.segmento_3
+                elif concepto.valor_tipo == 'Segmento_4' and campos_particulares.segmento_4 != None and campos_particulares.segmento_1 != '':
+                    segmento =  campos_particulares.segmento_4
+                elif concepto.valor_tipo == 'Segmento_5' and campos_particulares.segmento_5 != None and campos_particulares.segmento_1 != '': 
+                    segmento =  campos_particulares.segmento_5    
+                
+                if segmento:
+                    self.error, self.msg = self.agregar_totalesbysegmento(folio_documento, segmento, depto_co, concepto.tipo, concepto.asiento_ingora)
+            elif concepto.valor_tipo == 'Compras' and not concepto.posicion in asientos_a_ingorar:
+                importe = self.get_valortotales_by_concepto(
+                       totales = compras,
+                       valor_contado_credito = concepto.valor_contado_credito,
+                       valor_iva   = concepto.valor_iva
+                   )
+                cuenta  = concepto.cuenta_co.cuenta
+            elif concepto.valor_tipo == 'Ventas' and not concepto.posicion in asientos_a_ingorar:
+                importe = self.get_valortotales_by_concepto(
+                    totales = ventas,
+                    valor_contado_credito = concepto.valor_contado_credito,
+                    valor_iva   = concepto.valor_iva
+                )
 
-        asiento_id = "%s+%s/%s:%s"% (concepto.posicion, cuenta, depto_co, concepto.tipo)
-        #Si hay algo por agregar
-        if not asiento_id == [] and importe > 0:
-            if asiento_id in totales_cuentas:
-                totales_cuentas[asiento_id] = {
-                    'tipo_asiento':concepto.tipo,
-                    'departamento':depto_co.clave,
-                    'cuenta':cuenta,
-                    'importe':totales_cuentas[asiento_id]['importe'] + Decimal(importe),
-                }
-            else:
-                totales_cuentas[asiento_id]  = {
-                    'tipo_asiento':concepto.tipo,
-                    'departamento':depto_co.clave,
-                    'cuenta':cuenta,
-                    'importe':Decimal(importe),
-                }
-    
-    return totales_cuentas, error, msg
+                campo_cuenta = clientes_config_cuenta.objects.filter(valor_contado_credito= concepto.valor_contado_credito, valor_iva= concepto.valor_iva)
+
+                if campo_cuenta.count() > 0:
+
+                    cuenta_temp = getattr(libresClientes.objects.get(id=cliente_id), campo_cuenta[0].campo_cliente) 
+                    if cuenta_temp != '' and cuenta_temp != 0 and cuenta_temp != None:
+                        if ContabilidadCuentaContable.objects.filter(cuenta=cuenta_temp).exists():
+                            cuenta = cuenta_temp
+                        else:
+                            cliente_nombre = Cliente.objects.filter(id=cliente_id)
+                            self.msg = 'existe almenos una cuenta INVALIDA en el cliente %s. Corrigela para continuar'% cliente_nombre
+                            self.error = 2
+                            cuenta  = concepto.cuenta_co.cuenta        
+                    else:
+                        cuenta  = concepto.cuenta_co.cuenta    
+                else:
+                    cuenta  = concepto.cuenta_co.cuenta
+                
+            elif concepto.valor_tipo == 'IVA' and not concepto.posicion in asientos_a_ingorar:
+                if concepto.valor_contado_credito == 'Credito':
+                    importe = impuestos['iva']['credito']
+                elif concepto.valor_contado_credito == 'Contado':
+                    importe = impuestos['iva']['contado']
+                elif concepto.valor_contado_credito == 'Ambos':
+                    importe = impuestos['iva']['contado'] + impuestos['iva']['credito']
+
+                cuenta = concepto.cuenta_co.cuenta
+            elif concepto.valor_tipo == 'IEPS' and not concepto.posicion in asientos_a_ingorar:
+                if concepto.valor_contado_credito == 'Credito':
+                    importe = impuestos['ieps']['credito']
+                elif concepto.valor_contado_credito == 'Contado':
+                    importe = impuestos['ieps']['contado']
+                elif concepto.valor_contado_credito == 'Ambos':
+                    importe = impuestos['ieps']['credito'] + impuestos['ieps']['contado']
+
+                cuenta = concepto.cuenta_co.cuenta
+            elif concepto.valor_tipo == 'IVA Retenido' and not concepto.posicion in asientos_a_ingorar:
+                importe = impuestos['iva_retenido']
+                cuenta = concepto.cuenta_co.cuenta
+            elif concepto.valor_tipo == 'ISR Retenido' and not concepto.posicion in asientos_a_ingorar:
+                importe = impuestos['isr_retenido']
+                cuenta = concepto.cuenta_co.cuenta
+            elif concepto.valor_tipo == 'Proveedores' and not concepto.posicion in asientos_a_ingorar:
+                if concepto.valor_iva == 'A':
+                    importe = proveedores
+
+                if cuenta_proveedor == None:
+                    cuenta = concepto.cuenta_co.cuenta
+                else:
+                    cuenta = cuenta_proveedor
+            elif concepto.valor_tipo == 'Clientes' and not concepto.posicion in asientos_a_ingorar:
+                if concepto.valor_iva == 'A':
+                    importe = clientes
+
+                if cuenta_cliente == None:
+                    cuenta = concepto.cuenta_co.cuenta
+                else:
+                    cuenta = cuenta_cliente
+            elif concepto.valor_tipo == 'Bancos' and not concepto.posicion in asientos_a_ingorar:
+                if concepto.valor_iva == 'A':
+                    importe =   bancos
+
+                cuenta = concepto.cuenta_co.cuenta
+            elif concepto.valor_tipo == 'Descuentos' and not concepto.posicion in asientos_a_ingorar:
+                importe = descuento
+                cuenta = concepto.cuenta_co.cuenta
+            
+            if concepto.posicion in valores_extra:
+                importe = importe + valores_extra[concepto.posicion]
+
+            #Se es tipo segmento pone variables en cero para que no se calculen otra ves valores por ya estan calculados
+            if concepto.valor_tipo == 'Segmento_1' or concepto.valor_tipo == 'Segmento_2' or concepto.valor_tipo == 'Segmento_3' or concepto.valor_tipo == 'Segmento_4' or concepto.valor_tipo == 'Segmento_5':
+                importe = 0
+
+            asiento_id = "%s+%s/%s:%s"% (concepto.posicion, cuenta, depto_co, concepto.tipo)
+            
+            #Si hay algo por agregar
+            if not asiento_id == [] and importe > 0:
+                if asiento_id in self:
+                    self[asiento_id] = {
+                        'tipo_asiento':concepto.tipo,
+                        'departamento':depto_co.clave,
+                        'cuenta':cuenta,
+                        'importe':self[asiento_id]['importe'] + Decimal(importe),
+                    }
+                else:
+                    self[asiento_id]  = {
+                        'tipo_asiento':concepto.tipo,
+                        'departamento':depto_co.clave,
+                        'cuenta':cuenta,
+                        'importe':Decimal(importe),
+                    }
+        return self.error, self.msg
 
 def get_descuento_total_pv(documentoId, connection_name = None):
     c = connections[connection_name].cursor()
     c.execute("SELECT SUM(A.dscto_arts + A.dscto_extra_importe) AS TOTAL FROM CALC_TOTALES_DOCTO_PV(%s,'','',0) AS  A;"% documentoId)
     row = c.fetchone()
     return int(row[0])
-
-def get_totales_cuentas_by_segmento(segmento='',totales_cuentas=[], depto_co=None, concepto_tipo=None, error=0, msg='', documento_folio='', asiento_ingora=0, connection_name=None):
-    importe = 0
-    if asiento_ingora=='':
-        asiento_ingora = 0
-        
-    cuenta  = []
-    clave_cuenta_tipoAsiento = []
-
-    segmento = segmento.split(',')
-    
-    if not segmento == []:
-        for importe_segmento in segmento:
-
-            cuenta_cantidad     = importe_segmento.split('=')
-            cuenta_depto= cuenta_cantidad[0].split("/")
-            
-            try:
-                cuenta      =  ContabilidadCuentaContable.objects.get(cuenta=cuenta_depto[0]).cuenta
-            except ObjectDoesNotExist:
-                error = 2
-                msg = 'NO EXISTE O ES INCORRECTA almenos una [CUENTA CONTABLE] indicada en un segmento en el documento con folio[%s], Corrigelo para continuar'% documento_folio
-            
-            
-            if len(cuenta_depto) == 2:
-                try:
-                    depto_co = ContabilidadDepartamento.objects.get(clave=cuenta_depto[1]).clave
-                except ObjectDoesNotExist:
-                    error = 2
-                    msg = 'NO EXISTE almenos un [DEPARTEMENTO CONTABLE] indicado en un segmento en el documento con folio [%s], Corrigelo para continuar'% documento_folio
-            
-            try:
-                importe = float(cuenta_cantidad[1])
-            except:
-                error = 3
-                msg = 'Cantidad incorrecta en un segmento en el documento [%s], Corrigelo para continuar'% documento_folio
-
-            if error == 0:
-                asiento_id = "%s+%s/%s:%s"% (asiento_ingora, cuenta, depto_co, concepto_tipo)
-                #Si hay algo por agregar
-                if not asiento_id == [] and importe > 0:
-                    if asiento_id in totales_cuentas:
-                        totales_cuentas[asiento_id] = {
-                            'tipo_asiento':concepto.tipo,
-                            'departamento':depto_co.clave,
-                            'cuenta':cuenta,
-                            'importe':totales_cuentas[asiento_id]['importe'] + Decimal(importe),
-                        }
-                    else:
-                        totales_cuentas[asiento_id]  = {
-                            'tipo_asiento':concepto.tipo,
-                            'departamento':depto_co.clave,
-                            'cuenta':cuenta,
-                            'importe':Decimal(importe),
-                        }
-
-    return totales_cuentas, error, msg
 
 ##########################################
 ##                                      ##
@@ -454,27 +460,30 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
     documento_numero    = 0
     polizas             = []
     detalles_polizas    = []
-    totales_cuentas     = {}
     moneda = moneda_local
     tipo_cambio = 1
+
+    totales_cuentas = TotalesCuentas(conceptos_poliza)
+
     for documento_no, documento in enumerate(documentos):
         #es_contado = documento.condicion_pago == informacion_contable.condicion_pago_contado
+
+        #Descripcion extra
         descripcion_extra   = ''
+        if origen_documentos == 'cuentas_por_pagar':
+            descripcion_extra = documento.proveedor.nombre
+        elif origen_documentos == 'ventas':
+            descripcion_extra = documento.folio
 
         siguente_documento = documentos[(documento_no +1)%len(documentos)]
         documento_numero = documento_no
-        if origen_documentos == 'cuentas_por_cobrar':
-            totales_cuentas, error, msg = get_totales_documento_cc(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co, connection_name)
-        elif origen_documentos == 'cuentas_por_pagar':
-            descripcion_extra = documento.proveedor.nombre
-
-            totales_cuentas, error, msg = get_totales_documento_cp(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co, connection_name)
-        elif origen_documentos == 'ventas':
-            totales_cuentas, error, msg = get_totales_documento_ve(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co, connection_name)
-            descripcion_extra = documento.folio
-        elif origen_documentos == 'punto_de_venta':
-            totales_cuentas, error, msg = get_totales_documento_pv(informacion_contable.condicion_pago_contado, documento, conceptos_poliza, totales_cuentas, msg, error, depto_co, connection_name)
         
+        kwargs_totales, error, msg = documento.get_totales(informacion_contable.condicion_pago_contado)
+        kwargs_totales['depto_co'] = depto_co
+        if documento.id == 17834:
+            objects.asd
+        totales_cuentas.agregar_valorcuenta(kwargs_totales)
+
         if error == 0:
             #Cuando la fecha de la documento siguiente sea diferente y sea por DIA, o sea la ultima
             if (not documento.fecha == siguente_documento.fecha and crear_polizas_por == 'Dia') or documento_no +1 == len(documentos) or crear_polizas_por == 'Documento':
@@ -498,7 +507,6 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
                 if documento.descripcion:
                     descripcion = documento.descripcion
                 descripcion_doc = "(%s) %s"% (descripcion_extra, descripcion)
-
 
                 referencia = documento.folio
                 if crear_polizas_por == 'Dia':
@@ -557,7 +565,7 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
                     detalles_polizas.append(detalle_poliza)
 
                 #DE NUEVO CONVIERTO LA VARIABLE A DICCIONARIO
-                totales_cuentas = {}
+                totales_cuentas.clear()
             
             documento.contabilizado ='S'
             documento.save(update_fields=['contabilizado'])

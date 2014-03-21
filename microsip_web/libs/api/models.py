@@ -13,6 +13,7 @@ import django.dispatch
 articulo_clave_save_signal = django.dispatch.Signal()
 plazo_condicion_pago_save_signal = django.dispatch.Signal()
 from microsip_web.settings.local_settings import MICROSIP_MODULES
+from django.db import connections
 
 from microsip_api.models_base.comun.articulos import *
 from microsip_api.models_base.comun.catalogos import *
@@ -51,6 +52,12 @@ from microsip_api.models_base.contabilidad.listas import *
 ####                      MODELOS OTROS                     ####
 ####                                                        ####
 ################################################################
+def get_object_or_empty(model, **kwargs):
+    try:
+        return model.objects.get(**kwargs)
+    except model.DoesNotExist:
+        return model()
+
 
 class Carpeta(models.Model):
     nombre  = models.CharField(max_length=30)
@@ -689,8 +696,108 @@ class CuentasXPagarCondicionPagoPlazoBase(CuentasXPagarCondicionPagoPlazoBase):
 # DOCUMENTOS
 
 class CuentasXPagarDocumento(CuentasXPagarDocumentoBase):
-    def __unicode__(self):
-        return u'%s' % self.id
+
+    def get_totales(self, cuenta_contado = None):
+        ''' Para obtener totales de documento'''
+        error = 0
+        msg = ''
+        campos_particulares = get_object_or_empty(CuentasXPagarDocumentoCargoLibres, pk=self.id)
+
+        try:
+            cuenta_proveedor =  ContabilidadCuentaContable.objects.get(cuenta=self.proveedor.cuenta_xpagar).cuenta
+        except ObjectDoesNotExist:
+            cuenta_proveedor = None
+
+        #Para saber si es contado o es credito
+        if self.naturaleza_concepto == 'C':
+            try:
+                es_contado = self.condicion_pago == cuenta_contado
+            except ObjectDoesNotExist:    
+                es_contado = True
+                error = 1
+                msg='El documento con folio[%s] no tiene condicion de pago indicado, por favor indicalo para poder generar las polizas.'% self.folio
+        else:
+            es_contado = False
+
+        if es_contado:
+            condicion_pago_txt = 'contado'
+        elif not es_contado:
+            condicion_pago_txt = 'credito'
+
+        importe         = 0
+        total           = 0
+        descuento       = 0
+
+        impuestos = {
+            'iva': {'contado':0,'credito':0,},
+            'iva_retenido': 0,
+            'isr_retenido':0,
+        }
+        
+        importesDocto       = CuentasXPagarDocumentoImportes.objects.filter(docto_cp=self, cancelado='N')
+        for importeDocumento in importesDocto:
+            impuestos['iva'][condicion_pago_txt] = impuestos['iva'][condicion_pago_txt] + (importeDocumento.total_impuestos)
+            impuestos['iva_retenido']            = impuestos['iva_retenido'] + importeDocumento.iva_retenido
+            impuestos['isr_retenido']            = impuestos['isr_retenido'] + importeDocumento.isr_retenido
+            importe = importe + importeDocumento.importe
+            descuento = descuento + importeDocumento.dscto_ppag
+
+        total = total + impuestos['iva']['contado'] + impuestos['iva']['credito'] + importe - impuestos['iva_retenido'] - impuestos['isr_retenido']
+
+        proveedores         = 0
+        bancos              = 0
+        compras_0           = 0
+        compras_16          = 0
+        compras_16_credito  = 0
+        compras_0_credito   = 0
+        compras_16_contado  = 0
+        compras_0_contado   = 0
+
+        if impuestos <= 0:
+            compras_0 = importe
+        else:
+            compras_16 = importe
+
+        #si llega a  haber un proveedor que no tenga cargar impuestos
+        if compras_16 < 0:
+            compras_0 += compras_16
+            compras_16 = 0
+            msg = 'Existe al menos una documento donde el proveedor [no tiene indicado cargar inpuestos] POR FAVOR REVISTA ESO!!'
+            if crear_polizas_por == 'Dia':
+                msg = '%s, REVISA LAS POLIZAS QUE SE CREARON'% msg 
+
+            error = 1
+
+        #Si es a credito
+        if not es_contado:
+            compras_16_credito  = compras_16
+            compras_0_credito   = compras_0
+            proveedores         = total - descuento
+        elif es_contado:
+            compras_16_contado  = compras_16
+            compras_0_contado   = compras_0
+            bancos              = total - descuento
+
+        compras = {
+            'iva_0':{'contado':compras_0_contado,'credito':compras_0_credito,},
+            'iva'  :{'contado':compras_16_contado,'credito':compras_16_credito,},
+        }
+
+        kwargs = {
+            'compras'             : compras,
+            'impuestos'           : impuestos,
+            'proveedores'         : proveedores,
+            'folio_documento'     : self.folio,
+            'bancos'              : bancos,
+            'campos_particulares' : campos_particulares,
+            'descuento'           : descuento,
+            'cuenta_proveedor'    : cuenta_proveedor
+        }
+
+        return kwargs, error, msg
+
+        def __unicode__(self):
+            return u'%s' % self.id
 
 class CuentasXPagarDocumentoImportes(CuentasXPagarDocumentoImportesBase):
    pass
@@ -723,6 +830,119 @@ class CuentasXCobrarConcepto(CuentasXCobrarConceptoBase):
 # DOCUMENTOS
 
 class CuentasXCobrarDocumento(CuentasXCobrarDocumentoBase):
+    
+    def get_totales(self, cuenta_contado = None):
+        error = 0
+        msg = ''
+        
+        try:
+            cuenta_cliente =  ContabilidadCuentaContable.objects.get(cuenta=self.cliente.cuenta_xcobrar).cuenta
+        except ObjectDoesNotExist:
+            cuenta_cliente = None
+
+        #Para saber si es contado o es credito
+        campos_particulares = []
+        if self.naturaleza_concepto == 'C':
+            try:
+                es_contado = self.condicion_pago == cuenta_contado
+            except ObjectDoesNotExist:    
+                es_contado = True
+                error = 1
+                msg='El documento con folio[%s] no tiene condicion de pago indicado, por favor indicalo para poder generar las polizas.'% self.folio
+
+            try:
+                campos_particulares = CuentasXCobrarDocumentoCargoLibres.objects.get(pk=self.id)
+            except ObjectDoesNotExist:
+                campos_particulares =[]
+
+        elif self.naturaleza_concepto == 'R':
+            es_contado = True
+            try:
+                campos_particulares = CuentasXCobrarDocumentoCreditoLibres.objects.get(pk=self.id)
+            except ObjectDoesNotExist:
+                campos_particulares =[]
+
+        if not campos_particulares == []:
+            campos_particulares = campos_particulares
+
+        importesDocto       = CuentasXCobrarDocumentoImportes.objects.filter(docto_cc=self, cancelado='N')
+
+        impuestos       = 0
+        importe     = 0
+        total           = 0
+        iva_retenido    = 0
+        isr_retenido = 0
+        descuento           = 0
+
+        for importeDocumento in importesDocto:
+            impuestos       = impuestos + (importeDocumento.total_impuestos * self.tipo_cambio)
+            importe         = importe + (importeDocumento.importe * self.tipo_cambio)
+            iva_retenido    = iva_retenido + importeDocumento.iva_retenido
+            isr_retenido    = isr_retenido + importeDocumento.isr_retenido
+            descuento       = descuento + importeDocumento.dscto_ppag
+
+        total               = total + impuestos + importe - iva_retenido - isr_retenido
+        clientes            = 0
+        bancos              = 0
+        ventas_0            = 0
+        ventas_16           = 0
+        ventas_16_credito   = 0
+        ventas_0_credito    = 0
+        ventas_16_contado   = 0
+        ventas_0_contado    = 0
+        iva_efec_cobrado    = 0
+        iva_pend_cobrar     = 0
+
+        if impuestos <= 0:
+            ventas_0 = importe
+        else:
+            ventas_16 = importe
+
+        #si llega a  haber un proveedor que no tenga cargar impuestos
+        if ventas_16 < 0:
+            ventas_0 += ventas_16
+            ventas_16 = 0
+            msg = 'Existe al menos una documento donde el proveedor [no tiene indicado cargar inpuestos] POR FAVOR REVISTA ESO!!'
+            if crear_polizas_por == 'Dia':
+                msg = '%s, REVISA LAS POLIZAS QUE SE CREARON'% msg 
+
+            error = 1
+
+        #Si es a credito
+        if not es_contado:
+            ventas_16_credito   = ventas_16
+            ventas_0_credito    = ventas_0
+            iva_pend_cobrar     = impuestos
+            clientes            = total - descuento
+        elif es_contado:
+            ventas_16_contado   = ventas_16
+            ventas_0_contado    = ventas_0
+            iva_efec_cobrado    = impuestos
+            bancos              = total - descuento
+        
+        ventas = {
+            'iva_0':{'contado':ventas_0_contado,'credito':ventas_0_credito,},
+            'iva'  :{'contado':ventas_16_contado,'credito':ventas_16_credito,},
+        }
+
+        impuestos = {
+            'iva': {'contado':iva_efec_cobrado,'credito':iva_pend_cobrar,},
+            # 'ieps':{'contado':0,'credito':0,}
+        }
+
+        kwargs = {
+            'ventas'              : ventas,
+            'impuestos'           : impuestos,
+            'iva_retenido'        : iva_retenido,
+            'isr_retenido'        : isr_retenido,
+            'descuento'           : descuento,
+            'clientes'            : clientes,
+            'cuenta_cliente'      : cuenta_cliente,
+            'bancos'              : bancos,
+            'campos_particulares' : campos_particulares,
+        }
+        
+        return kwargs, error, msg
     def __unicode__(self):
         return u'%s' % self.id
 
@@ -770,6 +990,7 @@ class ContabilidadRecordatorio(ContabilidadRecordatorioBase):
     pass
 
 class ContabilidadDocumento(ContabilidadDocumentoBase):
+
     def next_folio( self, using=None):
         """ Generar un folio nuevo de una poliza e incrementa el consecutivo de folios """
         tipo_poliza = self.tipo_poliza
@@ -855,6 +1076,105 @@ class ContabilidadDepartamento(ContabilidadDepartamentoBase):
 # DOCUMENTOS
 
 class VentasDocumento(VentasDocumentoBase):
+    
+    def get_descuento_total(self, **kwargs):
+        
+        using = kwargs.get('using', None)
+        using = using or router.db_for_write(self.__class__, instance=self)
+
+        c = connections[using].cursor()
+        c.execute("SELECT SUM(A.dscto_arts + A.dscto_extra_importe) AS TOTAL FROM CALC_TOTALES_DOCTO_VE(%s,'S') AS  A;"% self.id)
+        row = c.fetchone()
+        return int(row[0])
+
+    def get_totales(self, cuenta_contado= None):  
+        
+        error = 0
+        msg = ''
+        #Si es una factura
+        if self.tipo == 'F':
+            campos_particulares = VentasDocumentoFacturaLibres.objects.filter(pk=self.id)[0]
+        #Si es una devolucion
+        elif self.tipo == 'D':
+            campos_particulares = VentasDocumentoFacturaDevLibres.objects.filter(pk=self.id)[0]
+
+        try:
+            cuenta_cliente =  ContabilidadCuentaContable.objects.get(cuenta=self.cliente.cuenta_xcobrar).cuenta
+        except ObjectDoesNotExist:
+            cuenta_cliente = None
+        
+        total_impuestos     = self.impuestos_total
+        importe_neto        = self.importe_neto
+        total               = (total_impuestos + importe_neto)
+        descuento           = self.get_descuento_total()
+
+        #Para saber si es contado o es credito
+        try:
+            es_contado = self.condicion_pago == cuenta_contado
+        except ObjectDoesNotExist:    
+            es_contado = True
+            error = 1
+            msg='El documento con folio[%s] no tiene condicion de pago indicado, por favor indicalo para poder generar las polizas.'% self.folio
+        
+        clientes, bancos = 0, 0
+        if es_contado:
+            condicion_pago_txt = 'contado'
+            bancos = total - descuento
+        elif not es_contado:
+            condicion_pago_txt = 'credito'
+            clientes = total - descuento
+
+        ventas = {
+            'iva_0':{'contado':0,'credito':0,},
+            'iva'  :{'contado':0,'credito':0,},
+        }
+        impuestos = {
+            'iva': {'contado':0,'credito':0,},
+            'ieps':{'contado':0,'credito':0,}
+        }
+
+        documento_impuestos = VentasDocumentoImpuesto.objects.filter(documento=self).values_list('impuesto','importe','venta_neta','porcentaje')
+
+        for documento_impuesto_list in documento_impuestos:
+            documento_impuesto = {
+                'tipo': Impuesto.objects.get(pk=documento_impuesto_list[0]).tipoImpuesto,
+                'importe':documento_impuesto_list[1],
+                'venta_neta':documento_impuesto_list[2],
+                'porcentaje': documento_impuesto_list[3],
+            }
+
+            #Si es impuesto tipo IVA (16,15,etc.)
+            if documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'V' and documento_impuesto['porcentaje'] > 0:
+                ventas['iva'][condicion_pago_txt] = documento_impuesto['venta_neta']
+                impuestos['iva'][condicion_pago_txt]  = documento_impuesto['importe']
+            #Si es IVA al 0
+            elif documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'V' and documento_impuesto['porcentaje'] == 0:
+                ventas['iva_0'][condicion_pago_txt] = documento_impuesto['venta_neta']
+            #Si es IEPS
+            elif documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'P':
+                impuestos['ieps'][condicion_pago_txt] = documento_impuesto['importe']
+                
+        #si llega a  haber un proveedor que no tenga cargar impuestos
+        if ventas['iva']['contado'] < 0 or ventas['iva']['credito'] < 0:
+            msg = 'Existe al menos una documento donde el proveedor [no tiene indicado cargar inpuestos] POR FAVOR REVISTA ESO!!'
+            if crear_polizas_por == 'Dia':
+                msg = '%s, REVISA LAS POLIZAS QUE SE CREARON'% msg 
+
+            error = 1
+        
+        kwargs = {
+            'ventas'              : ventas,
+            'impuestos'           : impuestos,
+            'folio_documento'     : self.folio,
+            'descuento'           : descuento,
+            'cliente_id'          : self.cliente.id,
+            'clientes'            : clientes,
+            'cuenta_cliente'      : cuenta_cliente,
+            'bancos'              : bancos,
+            'campos_particulares' : campos_particulares,
+        }
+
+        return kwargs, error, msg
 
     def __unicode__( self ):
         return u'%s'% self.folio

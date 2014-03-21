@@ -1,6 +1,6 @@
 from django.db import models
 from datetime import datetime 
-from microsip_web.libs.api.models import CuentasXPagarCondicionPago, ContabilidadCuentaContable, CuentasXPagarConcepto, CuentasXPagarDocumentoCargoLibres, CuentasXPagarDocumentoImportes
+from microsip_web.libs.api.models import CuentasXPagarCondicionPago, ContabilidadCuentaContable, CuentasXPagarConcepto, CuentasXPagarDocumentoCargoLibres, CuentasXPagarDocumento, CuentasXPagarDocumentoImportes, ContabilidadDepartamento
 
 #############################################################################################################################################################
 ##################################################MODELOS DE APLICACION DJANGO###############################################################################

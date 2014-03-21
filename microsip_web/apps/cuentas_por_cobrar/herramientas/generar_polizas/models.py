@@ -1,6 +1,6 @@
 #encoding:utf-8
 from django.db import models
-from microsip_web.libs.api.models import CuentasXCobrarConcepto, ContabilidadCuentaContable, ContabilidadDepartamento, CuentasXCobrarDocumento, CondicionPago, CuentasXCobrarDocumentoCreditoLibres, CuentasXCobrarDocumentoImportes, CuentasXCobrarDocumento
+from microsip_web.libs.api.models import CuentasXCobrarConcepto, ContabilidadCuentaContable, ContabilidadDepartamento, CuentasXCobrarDocumento, CondicionPago, CuentasXCobrarDocumentoCreditoLibres, CuentasXCobrarDocumentoImportes, CuentasXCobrarDocumento, ContabilidadDepartamento
 
 ################################################################
 ####                                                        ####
