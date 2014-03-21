@@ -1,9 +1,9 @@
 MICROSIP_MODULES = (
-	'microsip_web.libs.api',
+    'microsip_api.apps.config',
+    'microsip_web.libs.api',
     'microsip_web.apps.main',
     # 'microsip_web.apps.main.comun.articulos.articulos.alertas',
     # 'microsip_web.apps.main.comun.clientes.clientes.cliente_articulos',
-    'microsip_api.apps.config',
     # 'microsip_web.apps.main.filtros',
     # 'microsip_web.apps.inventarios',
     

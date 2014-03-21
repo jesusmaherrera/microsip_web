@@ -1119,12 +1119,13 @@ class VentasDocumento(VentasDocumentoBase):
         clientes, bancos = 0, 0
         if es_contado:
             condicion_pago_txt = 'contado'
-            bancos = total - descuento
+            bancos = total #- descuento
         elif not es_contado:
             condicion_pago_txt = 'credito'
-            clientes = total - descuento
+            clientes = total# - descuento
 
         ventas = {
+            'importe_neto':self.importe_neto,
             'iva_0':{'contado':0,'credito':0,},
             'iva'  :{'contado':0,'credito':0,},
         }
@@ -1132,6 +1133,8 @@ class VentasDocumento(VentasDocumentoBase):
             'iva': {'contado':0,'credito':0,},
             'ieps':{'contado':0,'credito':0,}
         }
+
+        venta_neta_ieps = {'contado':0, 'credito':0,}
 
         documento_impuestos = VentasDocumentoImpuesto.objects.filter(documento=self).values_list('impuesto','importe','venta_neta','porcentaje')
 
@@ -1152,8 +1155,12 @@ class VentasDocumento(VentasDocumentoBase):
                 ventas['iva_0'][condicion_pago_txt] = documento_impuesto['venta_neta']
             #Si es IEPS
             elif documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'P':
-                impuestos['ieps'][condicion_pago_txt] = documento_impuesto['importe']
-                
+                # venta_neta_ieps[condicion_pago_txt] = venta_neta_ieps[condicion_pago_txt] + documento_impuesto['venta_neta']
+                impuestos['ieps'][condicion_pago_txt] = impuestos['ieps'][condicion_pago_txt] + documento_impuesto['importe']
+         
+         # Si el ieps va a iva o a 0
+        if self.id == 17834:
+            objects.asd
         #si llega a  haber un proveedor que no tenga cargar impuestos
         if ventas['iva']['contado'] < 0 or ventas['iva']['credito'] < 0:
             msg = 'Existe al menos una documento donde el proveedor [no tiene indicado cargar inpuestos] POR FAVOR REVISTA ESO!!'

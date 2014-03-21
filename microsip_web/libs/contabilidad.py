@@ -119,7 +119,11 @@ class TotalesCuentas(dict):
         error  = kwargs.get('error', 0)
         msg = kwargs.get('msg',None)
         impuestos = kwargs.get('impuestos', None)
-        
+
+        importe_neto = kwargs.get('importe_neto', None)
+        if importe_neto:
+            ventas
+
         proveedores     = kwargs.get('proveedores', 0)
         cuenta_proveedor    = kwargs.get('cuenta_proveedor', None)
         
@@ -157,39 +161,39 @@ class TotalesCuentas(dict):
                         asientos_a_ingorar.append(concepto.posicion)
 
                         if concepto.valor_tipo == 'Proveedores':
-                            valor_extra  = proveedores
+                            valor_extra  += proveedores
                         elif concepto.valor_tipo == 'Bancos':
-                            valor_extra  = bancos
+                            valor_extra  += bancos
                         elif concepto.valor_tipo == 'Clientes':
-                            valor_extra  = clientes
+                            valor_extra  += clientes
                         elif concepto.valor_tipo == 'Descuentos':
-                            valor_extra  = descuento
+                            valor_extra  += descuento
                         elif concepto.valor_tipo == 'IVA Retenido':
-                            valor_extra  = impuestos['iva_retenido']
+                            valor_extra  += impuestos['iva_retenido']
                         elif concepto.valor_tipo == 'IEPS':
                             if concepto.valor_contado_credito == 'Credito':
-                                valor_extra  = impuestos['ieps']['credito']
+                                valor_extra  += impuestos['ieps']['credito']
                             elif concepto.valor_contado_credito == 'Contado':
-                                valor_extra  = impuestos['ieps']['contado']
+                                valor_extra  += impuestos['ieps']['contado']
                             elif concepto.valor_contado_credito == 'Ambos':
-                                valor_extra  = impuestos['ieps']['credito'] + impuestos['ieps']['contado']
+                                valor_extra  += impuestos['ieps']['credito'] + impuestos['ieps']['contado']
                         elif concepto.valor_tipo == 'IVA':
                             if concepto.valor_contado_credito == 'Credito':
-                                valor_extra  = impuestos['iva']['credito']
+                                valor_extra  += impuestos['iva']['credito']
                             elif concepto.valor_contado_credito == 'Contado':
-                                valor_extra  = impuestos['iva']['contado']
+                                valor_extra  += impuestos['iva']['contado']
                             elif concepto.valor_contado_credito == 'Ambos':
-                                valor_extra  = impuestos['iva']['contado'] + impuestos['iva']['credito']
+                                valor_extra  += impuestos['iva']['contado'] + impuestos['iva']['credito']
                         elif concepto.valor_tipo == 'ISR Retenido':
-                            valor_extra = impuestos['isr_retenido']
+                            valor_extra += impuestos['isr_retenido']
                         elif concepto.valor_tipo == 'Compras':
-                             valor_extra = self.get_valortotales_by_concepto(
+                             valor_extra += self.get_valortotales_by_concepto(
                                     totales = compras,
                                     valor_contado_credito = concepto.valor_contado_credito,
                                     valor_iva   = concepto.valor_iva
                                 )
                         elif concepto.valor_tipo == 'Ventas':
-                            valor_extra = self.get_valortotales_by_concepto(
+                            valor_extra += self.get_valortotales_by_concepto(
                                     totales = ventas,
                                     valor_contado_credito = concepto.valor_contado_credito,
                                     valor_iva   = concepto.valor_iva
@@ -358,6 +362,7 @@ def get_totales_documento_pv(cuenta_contado = None, documento = None, conceptos_
         es_contado = True
 
     impuestos           = documento.total_impuestos * documento.tipo_cambio
+    impuestos           = documento.total_impuestos * documento.tipo_cambio
     importe_neto        = documento.importe_neto * documento.tipo_cambio
     total               = impuestos + importe_neto
     descuento           = get_descuento_total_pv(documento.id, connection_name) * documento.tipo_cambio
@@ -480,8 +485,8 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
         
         kwargs_totales, error, msg = documento.get_totales(informacion_contable.condicion_pago_contado)
         kwargs_totales['depto_co'] = depto_co
-        if documento.id == 17834:
-            objects.asd
+        # if documento.id == 17834:
+        #     objects.asd
         totales_cuentas.agregar_valorcuenta(kwargs_totales)
 
         if error == 0:

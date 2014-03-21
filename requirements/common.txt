@@ -4,3 +4,4 @@ fdb==1.4
 django-dajaxice==0.5.5
 xlrd==0.8.0
 django-mobi
+microsip_api

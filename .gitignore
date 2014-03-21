@@ -166,3 +166,4 @@ pip-log.txt
 
 #settings files
 *.FDB
+microsip_web/data/LOGIN.FDB
