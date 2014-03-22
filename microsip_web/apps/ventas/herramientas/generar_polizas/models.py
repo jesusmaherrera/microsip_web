@@ -48,7 +48,7 @@ class DetallePlantillaPolizas_V(models.Model):
         ('Ventas', 'Ventas'),
         ('Clientes', 'Clientes'),
         ('Bancos', 'Bancos'),
-        ('Descuentos', 'Descuentos'),
+        # ('Descuentos', 'Descuentos'),
         ('IVA', 'IVA'),
         ('IEPS', 'IEPS'),
         ('Segmento_1', 'Segmento 1'),
