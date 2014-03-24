@@ -57,10 +57,10 @@ class DetallePlantillaPolizas_V(models.Model):
         ('Segmento_4', 'Segmento 4'),
         ('Segmento_5', 'Segmento 5'),
     )
-    VALOR_IVA_TIPOS             = (('A', 'Todos'),('I', 'Solo IVA'),('0', 'Solo 0%'),)
+    VALOR_IVA_TIPOS             = (('A', 'Todos'),('I', 'IVA'),('0', 'IVA 0%'),('IP', 'IEPS'),)
     VALOR_CONTADO_CREDITO_TIPOS = (('Ambos', 'Ambos'),('Contado', 'Contado'),('Credito', 'Credito'),)
 
-    posicion                = models.CharField(max_length=2)
+    posicion                = models.IntegerField()
     plantilla_poliza_v      = models.ForeignKey(PlantillaPolizas_V)
     cuenta_co               = models.ForeignKey(ContabilidadCuentaContable)
     tipo                    = models.CharField(max_length=2, choices=TIPOS, default='C')

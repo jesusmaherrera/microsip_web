@@ -47,7 +47,7 @@ class PlantillaPolizaManageForm(forms.ModelForm):
         model = PlantillaPolizas_V
 
 class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
-    posicion        =  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
+    posicion  =  forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
     asiento_ingora  = forms.RegexField(regex=r'^(?:\+|-)?\d+$', widget=forms.TextInput(attrs={'class':'span1'}), required= False)
 
     def __init__(self, *args, **kwargs):
@@ -76,5 +76,9 @@ class ConceptoPlantillaPolizaManageForm(forms.ModelForm):
             raise forms.ValidationError(u'los Aisetntos tipo segmentno no pueden agregar ni eliminar otros solo sustiturilos')
         return cleaned_data
 
-def PlantillaPoliza_items_formset(form, formset = BaseInlineFormSet, **kwargs):
+class OrderedFormSet(BaseInlineFormSet):
+    def get_queryset(self):
+        return super(OrderedFormSet, self).get_queryset().order_by('posicion')
+
+def PlantillaPoliza_items_formset(form, formset = OrderedFormSet, **kwargs):
     return inlineformset_factory(PlantillaPolizas_V, DetallePlantillaPolizas_V, form, formset, **kwargs)

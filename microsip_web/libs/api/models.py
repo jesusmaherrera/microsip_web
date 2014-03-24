@@ -1115,6 +1115,7 @@ class VentasDocumento(VentasDocumentoBase):
         importe_neto_desglosado = {
             'iva_0':{'contado':0,'credito':0,},
             'iva'  :{'contado':0,'credito':0,},
+            'ieps'  :{'contado':0,'credito':0,},
         }
 
         impuestos_desglosado = {
@@ -1141,11 +1142,10 @@ class VentasDocumento(VentasDocumentoBase):
                 importe_neto_desglosado['iva_0'][condicion_pago_txt] = documento_impuesto['venta_neta']
             #Si es IEPS
             elif documento_impuesto['tipo'].tipo == 'I' and documento_impuesto['tipo'].id_interno == 'P':
+                importe_neto_desglosado['ieps'][condicion_pago_txt] += documento_impuesto['venta_neta']
                 # venta_neta_ieps[condicion_pago_txt] = venta_neta_ieps[condicion_pago_txt] + documento_impuesto['venta_neta']
-                impuestos_desglosado['ieps'][condicion_pago_txt] = impuestos_desglosado['ieps'][condicion_pago_txt] + documento_impuesto['importe']
-         
-        # if self.id == 17834:
-        #     objects.asd
+                impuestos_desglosado['ieps'][condicion_pago_txt] += documento_impuesto['importe']
+    
         #si llega a  haber un proveedor que no tenga cargar impuestos
         if importe_neto_desglosado['iva']['contado'] < 0 or importe_neto_desglosado['iva']['credito'] < 0:
             msg = 'Existe al menos una documento donde el proveedor [no tiene indicado cargar inpuestos] POR FAVOR REVISTA ESO!!'
@@ -1175,7 +1175,7 @@ class VentasDocumento(VentasDocumentoBase):
             'campos_particulares':campos_particulares,
             'descuento':0,
         }
-
+        
         kwargs = {'totales':totales,}
         return kwargs, error, msg
 

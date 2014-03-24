@@ -32,23 +32,28 @@ class TotalesCuentas(dict):
         #si es contado o credito
         if condicion_pago == 'credito' or condicion_pago == 'contado':
             if valor_iva == '0':
-                return totales['iva_0'][condicion_pago]
+                value = totales['iva_0'][condicion_pago]
             elif valor_iva == 'I':
-                return totales['iva'][condicion_pago]
+                value = totales['iva'][condicion_pago]
+            elif valor_iva == 'IP':
+                value = totales['ieps'][condicion_pago]
             elif valor_iva == 'A':
-                return totales['iva_0'][condicion_pago] + totales['iva'][condicion_pago]
+                value = totales['iva_0'][condicion_pago] + totales['iva'][condicion_pago]+ totales['ieps'][condicion_pago]
         
         #totales de contado y credito
         elif condicion_pago == 'ambos':
             if valor_iva == '0':
-                return totales['iva_0']['contado'] + totales['iva_0']['credito']
+                value = totales['iva_0']['contado'] + totales['iva_0']['credito']
             elif valor_iva == 'I':
-                return totales['iva']['contado'] + totales['iva']['credito']
+                value = totales['iva']['contado'] + totales['iva']['credito']
+            elif valor_iva == 'IP':
+                value = totales['ieps']['contado'] + totales['ieps']['credito']
             elif valor_iva == 'A':
-                contado = totales['iva_0']['contado'] + totales['iva']['contado'] 
-                credito = totales['iva_0']['credito'] + totales['iva']['credito']
-                return contado + credito
-        return None
+                contado = totales['iva_0']['contado'] + totales['iva']['contado'] + totales['ieps']['contado']
+                credito = totales['iva_0']['credito'] + totales['iva']['credito'] + totales['ieps']['credito']
+                value = contado + credito
+        
+        return value
 
     def agregar_totalesbysegmento(self, documento_folio, segmento, concepto_tipo, asiento_ingora=0):
         importe = 0
@@ -94,6 +99,7 @@ class TotalesCuentas(dict):
                     if not asiento_id == [] and importe > 0:
                         if asiento_id in self:
                             self[asiento_id] = {
+                                'posicion':concepto.posicion,
                                 'tipo_asiento':concepto.tipo,
                                 'departamento':depto_co.clave,
                                 'cuenta':cuenta,
@@ -101,6 +107,7 @@ class TotalesCuentas(dict):
                             }
                         else:
                             self[asiento_id]  = {
+                                'posicion':concepto.posicion,
                                 'tipo_asiento':concepto.tipo,
                                 'departamento':depto_co.clave,
                                 'cuenta':cuenta,
@@ -197,7 +204,8 @@ class TotalesCuentas(dict):
                         valores_extra[concepto.asiento_ingora[1:]] = valores_extra[concepto.asiento_ingora[1:]] + valor_extra
                     else:
                         valores_extra[concepto.asiento_ingora[1:]] = valor_extra
-                    
+
+                     
         for concepto in self.conceptos_poliza:
             importe = 0
             cuenta  = []
@@ -310,13 +318,16 @@ class TotalesCuentas(dict):
             if not asiento_id == [] and importe > 0:
                 if asiento_id in self:
                     self[asiento_id] = {
+                        'posicion':concepto.posicion,
                         'tipo_asiento':concepto.tipo,
                         'departamento':'GRAL',
                         'cuenta':cuenta,
                         'importe':self[asiento_id]['importe'] + Decimal(importe),
+
                     }
                 else:
                     self[asiento_id]  = {
+                        'posicion':concepto.posicion,
                         'tipo_asiento':concepto.tipo,
                         'departamento':'GRAL',
                         'cuenta':cuenta,
@@ -474,8 +485,6 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
         documento_numero = documento_no
         
         kwargs_totales, error, msg = documento.get_totales(informacion_contable.condicion_pago_contado)
-        # if documento.id == 17834:
-        #     objects.asd
         totales_cuentas.agregar_valorcuenta(kwargs_totales)
 
         if error == 0:
@@ -533,9 +542,10 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
                     )
                 
                 polizas.append(poliza)
-                #GUARDA LA PILIZA
-                #poliza_o = poliza.save()
-                for asiento in totales_cuentas.itervalues():
+
+                asientos_ordenados_keys = sorted(totales_cuentas.keys(), key = lambda x: totales_cuentas[x]['posicion'])
+                for asiento_key in asientos_ordenados_keys:
+                    asiento = totales_cuentas[asiento_key]
                     cuenta_co = ContabilidadCuentaContable.objects.get(cuenta=asiento['cuenta'])
                     depto_co = ContabilidadDepartamento.objects.get(clave= asiento['departamento'])
 

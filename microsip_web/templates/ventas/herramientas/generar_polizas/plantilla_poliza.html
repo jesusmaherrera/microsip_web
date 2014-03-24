@@ -35,6 +35,15 @@ $(function() {
 });
 
 $(document).ready(function() {
+  // $( "#sortable" ).sortable({
+  //   update: function( event, ui ) {
+  //     $("input[name*='posicion']" ).each(function( index ) {
+  //        $(this).val(index+1);
+  //     });
+  //   },
+    
+  // });
+  // $( "#sortable" ).disableSelection();
   $("a[class*='btn-success']").click(function() {
     
     $("select[name*='valor_tipo']").each(function(){ ajustarFormulario(this);});
@@ -96,17 +105,17 @@ $(document).ready(function() {
       <table class="table tableCell table-hover" id="id_detalles_data" border="0" cellpadding="0" cellspacing="5">
         <thead>
           <tr>
-            <th>Numero</th>
+            <th>Posicion</th>
             <th>Tipo</th>
             <th>Valor</th>
-            <th>IVA</th>
+            <th>Impuesto</th>
             <th>Cred/Cont</th>
             <th>Cuenta</th>
             <th></th>
           </tr>
         </thead>
-        <tbody>
-          {% for form in formset.forms %}
+        <tbody id="sortable">
+          {% for form in formset.forms%}
           <tr id="{{ form.prefix }}-row" class="form-container">
             {{ form.errors }}
             <td>{{ form.posicion }}</td>
