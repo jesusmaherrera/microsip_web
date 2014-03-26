@@ -145,26 +145,27 @@ class TotalesCuentas(dict):
 
         for concepto in self.conceptos_poliza:
             if concepto.valor_tipo == 'Segmento_1' and not campos_particulares.segmento_1 == None and campos_particulares.segmento_1 != '':
-                asientos_a_ingorar.append(concepto.asiento_ingora)
+                asientos_a_ingorar.append(str(concepto.asiento_ingora))
             if concepto.valor_tipo == 'Segmento_2' and not campos_particulares.segmento_2 == None and campos_particulares.segmento_2 != '':
-                asientos_a_ingorar.append(concepto.asiento_ingora)
+                asientos_a_ingorar.append(str(concepto.asiento_ingora))
             if concepto.valor_tipo == 'Segmento_3' and not campos_particulares.segmento_3 == None and campos_particulares.segmento_3 != '':
-                asientos_a_ingorar.append(concepto.asiento_ingora)
+                asientos_a_ingorar.append(str(concepto.asiento_ingora))
             if concepto.valor_tipo == 'Segmento_4' and not campos_particulares.segmento_4 == None and campos_particulares.segmento_4 != '':
-                asientos_a_ingorar.append(concepto.asiento_ingora)
+                asientos_a_ingorar.append(str(concepto.asiento_ingora))
             if concepto.valor_tipo == 'Segmento_5' and not campos_particulares.segmento_5 == None and campos_particulares.segmento_5 != '':
-                asientos_a_ingorar.append(concepto.asiento_ingora)
+                asientos_a_ingorar.append(str(concepto.asiento_ingora))
 
             #Para sumar o restar dos asientos
             if not concepto.asiento_ingora == None and not concepto.asiento_ingora == '' :
                 if not concepto.asiento_ingora[0].isdigit() and (concepto.asiento_ingora[0]=='+' or concepto.asiento_ingora[0]=='-'):
                     if concepto.asiento_ingora[1:].isdigit():
-                        asientos_a_ingorar.append(concepto.posicion)
+                        asientos_a_ingorar.append(str(concepto.posicion))
 
                         if concepto.valor_tipo == 'Proveedores':
                             valor_extra  += total_importes['proveedores']
                         elif concepto.valor_tipo == 'Bancos':
                             valor_extra  += total_importes['bancos']
+
                         elif concepto.valor_tipo == 'Clientes':
                             valor_extra  += total_importes['clientes']
                         elif concepto.valor_tipo == 'IVA Retenido':
@@ -201,7 +202,7 @@ class TotalesCuentas(dict):
                         valor_extra = -valor_extra
 
                     if valores_extra.has_key(concepto.asiento_ingora[1:]):
-                        valores_extra[concepto.asiento_ingora[1:]] = valores_extra[concepto.asiento_ingora[1:]] + valor_extra
+                        valores_extra[concepto.asiento_ingora[1:]] = valores_extra[str(concepto.asiento_ingora[1:])] + valor_extra
                     else:
                         valores_extra[concepto.asiento_ingora[1:]] = valor_extra
 
@@ -226,14 +227,14 @@ class TotalesCuentas(dict):
                 
                 if segmento:
                     self.error, self.msg = self.agregar_totalesbysegmento(totales['folio'], segmento, concepto.tipo, concepto.asiento_ingora)
-            elif concepto.valor_tipo == 'Compras' and not concepto.posicion in asientos_a_ingorar:
+            elif concepto.valor_tipo == 'Compras' and not str(concepto.posicion) in asientos_a_ingorar:
                 importe = self.get_valortotales_by_concepto(
                        totales = importe_neto['desglosado'],
                        valor_contado_credito = concepto.valor_contado_credito,
                        valor_iva   = concepto.valor_iva
                    )
                 cuenta  = concepto.cuenta_co.cuenta
-            elif concepto.valor_tipo == 'Ventas' and not concepto.posicion in asientos_a_ingorar:
+            elif concepto.valor_tipo == 'Ventas' and not str(concepto.posicion) in asientos_a_ingorar:
                 importe = self.get_valortotales_by_concepto(
                     totales = importe_neto['desglosado'],
                     valor_contado_credito = concepto.valor_contado_credito,
@@ -258,7 +259,7 @@ class TotalesCuentas(dict):
                 else:
                     cuenta  = concepto.cuenta_co.cuenta
                 
-            elif concepto.valor_tipo == 'IVA' and not concepto.posicion in asientos_a_ingorar:
+            elif concepto.valor_tipo == 'IVA' and not str(concepto.posicion) in asientos_a_ingorar:
                 if concepto.valor_contado_credito == 'Credito':
                     importe = impuestos['desglosado']['iva']['credito']
                 elif concepto.valor_contado_credito == 'Contado':
@@ -267,7 +268,7 @@ class TotalesCuentas(dict):
                     importe = impuestos['desglosado']['iva']['contado'] + impuestos['desglosado']['iva']['credito']
 
                 cuenta = concepto.cuenta_co.cuenta
-            elif concepto.valor_tipo == 'IEPS' and not concepto.posicion in asientos_a_ingorar:
+            elif concepto.valor_tipo == 'IEPS' and not str(concepto.posicion) in asientos_a_ingorar:
                 if concepto.valor_contado_credito == 'Credito':
                     importe = impuestos['desglosado']['ieps']['credito']
                 elif concepto.valor_contado_credito == 'Contado':
@@ -276,13 +277,13 @@ class TotalesCuentas(dict):
                     importe = impuestos['desglosado']['ieps']['credito'] + impuestos['desglosado']['ieps']['contado']
 
                 cuenta = concepto.cuenta_co.cuenta
-            elif concepto.valor_tipo == 'IVA Retenido' and not concepto.posicion in asientos_a_ingorar:
+            elif concepto.valor_tipo == 'IVA Retenido' and not str(concepto.posicion) in asientos_a_ingorar:
                 importe = impuestos['desglosado']['iva_retenido']
                 cuenta = concepto.cuenta_co.cuenta
-            elif concepto.valor_tipo == 'ISR Retenido' and not concepto.posicion in asientos_a_ingorar:
+            elif concepto.valor_tipo == 'ISR Retenido' and not str(concepto.posicion) in asientos_a_ingorar:
                 importe = impuestos['desglosado']['isr_retenido']
                 cuenta = concepto.cuenta_co.cuenta
-            elif concepto.valor_tipo == 'Proveedores' and not concepto.posicion in asientos_a_ingorar:
+            elif concepto.valor_tipo == 'Proveedores' and not str(concepto.posicion) in asientos_a_ingorar:
                 if concepto.valor_iva == 'A':
                     importe = total_importes['proveedores']
 
@@ -290,24 +291,25 @@ class TotalesCuentas(dict):
                     cuenta = concepto.cuenta_co.cuenta
                 else:
                     cuenta = a_nombre_de['cuenta_contable']
-            elif concepto.valor_tipo == 'Clientes' and not concepto.posicion in asientos_a_ingorar:
+            elif concepto.valor_tipo == 'Clientes' and not str(concepto.posicion) in asientos_a_ingorar:
                 if concepto.valor_iva == 'A':
                     importe = total_importes['clientes']
-
+                
+                    
                 if a_nombre_de['cuenta_contable'] == None:
                     cuenta = concepto.cuenta_co.cuenta
                 else:
                     cuenta = a_nombre_de['cuenta_contable']
-
-            elif concepto.valor_tipo == 'Bancos' and not concepto.posicion in asientos_a_ingorar:
+                
+            elif concepto.valor_tipo == 'Bancos' and not str(concepto.posicion) in asientos_a_ingorar:
                 if concepto.valor_iva == 'A':
                     importe =   total_importes['bancos']
-
+                
                 cuenta = concepto.cuenta_co.cuenta
-            
-            if concepto.posicion in valores_extra:
-                importe = importe + valores_extra[concepto.posicion]
-
+          
+            if str(concepto.posicion) in valores_extra:
+                importe = importe + valores_extra[str(concepto.posicion)]
+                
             #Se es tipo segmento pone variables en cero para que no se calculen otra ves valores por ya estan calculados
             if concepto.valor_tipo == 'Segmento_1' or concepto.valor_tipo == 'Segmento_2' or concepto.valor_tipo == 'Segmento_3' or concepto.valor_tipo == 'Segmento_4' or concepto.valor_tipo == 'Segmento_5':
                 importe = 0
@@ -333,6 +335,7 @@ class TotalesCuentas(dict):
                         'cuenta':cuenta,
                         'importe':Decimal(importe),
                     }
+            
         return self.error, self.msg
 
 def get_descuento_total_pv(documentoId, connection_name = None):
@@ -485,8 +488,9 @@ def crear_polizas(origen_documentos, documentos, depto_co, informacion_contable,
         documento_numero = documento_no
         
         kwargs_totales, error, msg = documento.get_totales(informacion_contable.condicion_pago_contado)
+        
         totales_cuentas.agregar_valorcuenta(kwargs_totales)
-
+        
         if error == 0:
             #Cuando la fecha de la documento siguiente sea diferente y sea por DIA, o sea la ultima
             if (not documento.fecha == siguente_documento.fecha and crear_polizas_por == 'Dia') or documento_no +1 == len(documentos) or crear_polizas_por == 'Documento':
