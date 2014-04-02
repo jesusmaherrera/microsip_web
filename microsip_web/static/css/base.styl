@@ -1,3 +1,5 @@
+@import "fonts.styl"
+
 @font-face
   font-family: Marcellus SC
   src: url('MarcellusSC-Regular.ttf')
@@ -7,6 +9,45 @@ body
  color: #584941
  text-shadow: 0 1px 1px rgba(255, 255, 255, .5)
  background-color: rgb(231, 231, 231)
+ font-size 12px
+
+header
+  background-image -webkit-gradient(linear,0 0,0 100%,from(#fff),to(#f2f2f2))
+  height 38px
+  padding-right 3em
+  text-shadow: rgba(255, 255, 255, 0.498039) 0px 1px 1px;
+  .menu-tools
+    li
+      display inline-block
+
+ul
+  text-decoration none
+a
+  text-decoration none
+  &:hover
+    color #AFAFAF
+
+.menu-tools
+  margin 0
+  padding 0
+
+  &li
+    display inline
+
+.button-menu
+  font-size 2.5em
+  color #c0c0c0
+  position relative
+  left -6px
+  text-decoration none
+  height 31px
+  width 62px
+  float left
+
+.button-modulo 
+  position absolute
+  top 3px
+  left 35px
 
 #id_doctosIn_table
   margin-bottom: 0;
