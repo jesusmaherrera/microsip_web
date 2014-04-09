@@ -5,7 +5,7 @@ from django.conf import settings
 from django.views import generic
 from dajaxice.core import dajaxice_autodiscover, dajaxice_config
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from  microsip_web.settings.prod import MICROSIP_MODULES
+from  microsip_web.settings.prod import MICROSIP_MODULES, MICROSIP_PLUGINS
 
 dajaxice_autodiscover()
 import autocomplete_light
@@ -50,5 +50,9 @@ if 'microsip_web.apps.compras' in MICROSIP_MODULES:
 
 if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
     urlpatterns += url(r'punto_de_venta/', include('microsip_web.apps.punto_de_venta.puntos.urls', namespace='pv_puntos')),
+
+for plugin in MICROSIP_PLUGINS:
+        # urlpatterns += url(plugin['url_main_path'], include(plugin['app']+'.urls', namespace='plugins_remisiones_cxc')),
+    urlpatterns += url(plugin['url_main_path'], include(plugin['app']+'.urls', namespace='plugins_remisiones_cxc')),
 
 urlpatterns += staticfiles_urlpatterns()

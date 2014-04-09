@@ -47,6 +47,8 @@ from microsip_api.models_base.contabilidad.documentos import *
 from microsip_api.models_base.contabilidad.catalogos import *
 from microsip_api.models_base.contabilidad.listas import *
 
+from microsip_api.comun.comun_functions import split_letranumero
+
 ################################################################
 ####                                                        ####
 ####                      MODELOS OTROS                     ####
@@ -821,7 +823,33 @@ class CuentasXCobrarConcepto(CuentasXCobrarConceptoBase):
 # DOCUMENTOS
 
 class CuentasXCobrarDocumento(CuentasXCobrarDocumentoBase):
-    
+    def next_folio( self, using=None):
+        """ Generar un folio nuevo del concepto del documento e incrementa el consecutivo de folio """
+        concepto = self.concepto    
+        folio = concepto.sig_folio
+
+        prefijo, consecutivo = split_letranumero(concepto.sig_folio)
+        consecutivo +=1
+        concepto.sig_folio = '%s%s'% (prefijo,("%09d" % consecutivo)[len(prefijo):])
+        concepto.save( update_fields=('sig_folio',) )
+
+        return folio
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            using = kwargs.get('using', None)
+            using = using or router.db_for_write(self.__class__, instance=self)
+            self.id = next_id('ID_DOCTOS', using)
+
+            #Siguiente folio
+            if self.concepto.sig_folio and not self.folio:
+                self.folio = self.next_folio(using=using)
+            
+            self.naturaleza_concepto = self.concepto.naturaleza
+            
+            
+        super(self.__class__, self).save(*args, **kwargs)
+
     def get_totales(self, cuenta_contado = None):
         error = 0
         msg = ''
@@ -1067,7 +1095,9 @@ class ContabilidadDepartamento(ContabilidadDepartamentoBase):
 # DOCUMENTOS
 
 class VentasDocumento(VentasDocumentoBase):
-    
+    # if 'microsip_web.plugins.crearcargos_deremisiones' in MICROSIP_MODULES:
+    cargo_generado = models.BooleanField( db_column = 'SIC_CARGO_GENERADO' )
+
     def get_descuento_total(self, **kwargs):
         
         using = kwargs.get('using', None)

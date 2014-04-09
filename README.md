@@ -1,3 +1,5 @@
+DELETE FROM DJANGO_CONTENT_TYPE WHERE APP_LABEL='api';
+error en content type
 
 select b.articulo_id, b.entradas, c.salidas from doctos_in_det a INNER JOIN
         (select sum(doctos_in_det.unidades) as entradas, doctos_in_det.articulo_id from doctos_in_det

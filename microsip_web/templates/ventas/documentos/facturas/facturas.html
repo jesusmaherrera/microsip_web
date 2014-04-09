@@ -14,15 +14,26 @@
 <div class="row-fluid">
   <div class="span3"><h3 style="margin:0;"> Facturas</h3> </div>
   <a href="/ventas/factura/nueva/" class="btn"> Nueva</a>
+  <div class="btn-group">
+    <button class="btn dropdown-toggle" data-toggle="dropdown"> <span class="icon-th"></span> <b class="caret"></b></button>
+    <ul class="dropdown-menu">
+      <li class="divider"></li>
+      <li><a href="#" > <i class="icon-minus-sign"></i> Cancelar Facturas</a></li>
+    </ul>
+  </div>
 </div>
 <table class="table tableCell table-hover">
     <tr>
+      <th></th>
       <th>Folio</th>
+      <th>Cliente</th>
       <th>Fecha</th>
+      <th>Importe neto</th>
       <!-- <th>Opciones</th> -->
     </tr>
     {% for documento in documentos %}
     <tr>
+      <td><input type="checkbox" name="option3" value="{{ documento.id }}"></td>
       <td>
         {% if documento.estado = "C" %}
         <a href="/ventas/factura/{{ documento.id }}/" class="text-error" >{{ documento.folio }}</a>
@@ -30,7 +41,9 @@
         <a href="/ventas/factura/{{ documento.id }}/" >{{ documento.folio }}</a>
         {% endif %}
       </td>
+      <td>{{ documento.cliente }}</td>
       <td>{{ documento.fecha }}</td>
+      <td>{{ documento.importe_neto }}</td>
       <!-- <td>
         <input type="hidden" value="{{ documento.id }}" class='factura_id'>
         {% if documento.aplicado == 'N' %} <a href="" class="btn aplicar_btn">Aplicar</a> {% endif %}

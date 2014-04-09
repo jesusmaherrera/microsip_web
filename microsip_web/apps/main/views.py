@@ -19,7 +19,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core import management
 import fdb
-from microsip_web.settings.local_settings import MICROSIP_MODULES
+from microsip_web.settings.local_settings import MICROSIP_MODULES, MICROSIP_PLUGINS
 from microsip_web.apps.inventarios.triggers import triggers as inventarios_triggers
 from microsip_web.apps.inventarios.triggers_salidas import triggers_salidas as inventarios_triggers_salidas
 from microsip_web.apps.punto_de_venta.triggers import triggers as punto_de_venta_triggers
@@ -152,6 +152,25 @@ def sincronizar_tablas( conexion_name = None ):
     """ Modifica todas las tablas con campos nuevos para uso en aplicacion. """
 
     c = connections[ conexion_name ].cursor()
+    
+    import importlib
+
+    for plugin in MICROSIP_PLUGINS:
+        plugin_procedures = None
+        path = plugin['app']+'.procedures'
+        try:
+            plugin_procedures_module = importlib.import_module(plugin['app']+'.procedures')
+        except ImportError:
+            pass
+        else:
+            plugin_procedures = plugin_procedures_module.procedures
+
+        if plugin_procedures:
+            for procedure in plugin_procedures.keys():
+                c.execute( plugin_procedures[procedure] )
+                c.execute('EXECUTE PROCEDURE %s;'%procedure)
+                c.execute('DROP PROCEDURE %s;'%procedure)
+
     ################## STRORE PROCEDURES ###################
     if 'microsip_web.apps.main.comun.articulos.articulos.alertas' in MICROSIP_MODULES:
         from microsip_web.apps.main.comun.articulos.articulos.alertas.procedures import procedures as alertas_procedures

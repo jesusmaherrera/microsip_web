@@ -16,7 +16,11 @@ DJANGO_APPS = (
 )
 
 # Combine all the apps in the django variable INSTALLED_APPS
-INSTALLED_APPS = DJANGO_APPS + MICROSIP_MODULES
+MICROSIP_PLUGINS_APPS = ()
+for microsip_app in MICROSIP_PLUGINS:
+    MICROSIP_PLUGINS_APPS += (microsip_app['app'],)
+
+INSTALLED_APPS = DJANGO_APPS + MICROSIP_MODULES + MICROSIP_PLUGINS_APPS
 
 ROOT_URLCONF = 'microsip_web.urls.prod'
 

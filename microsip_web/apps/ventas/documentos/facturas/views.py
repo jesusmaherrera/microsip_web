@@ -16,7 +16,7 @@ def facturas_view(request, template_name='ventas/documentos/facturas/facturas.ht
     if connection_name == '':
         return HttpResponseRedirect('/select_db/')
 
-    documentos_list = VentasDocumento.objects.filter(tipo='F').order_by('-id')
+    documentos_list = VentasDocumento.objects.filter(tipo='F').order_by('-fecha','cliente')
 
     paginator = Paginator(documentos_list, 20) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
