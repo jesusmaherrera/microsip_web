@@ -847,7 +847,6 @@ class CuentasXCobrarDocumento(CuentasXCobrarDocumentoBase):
             
             self.naturaleza_concepto = self.concepto.naturaleza
             
-            
         super(self.__class__, self).save(*args, **kwargs)
 
     def get_totales(self, cuenta_contado = None):
@@ -966,8 +965,22 @@ class CuentasXCobrarDocumento(CuentasXCobrarDocumentoBase):
         return u'%s' % self.id
 
 class CuentasXCobrarDocumentoImportes(CuentasXCobrarDocumentoImportesBase):
+    def save(self, *args, **kwargs):
+        if not self.id:
+            using = kwargs.get('using', None)
+            using = using or router.db_for_write(self.__class__, instance=self)
+            self.id = next_id('ID_DOCTOS', using)
+            
+        super(self.__class__, self).save(*args, **kwargs)
+
     def __unicode__(self):
         return u'%s' % self.id
+
+class CuentasXCobrarDocumentoImportesImpuesto(CuentasXCobrarDocumentoImportesImpuestoBase): 
+    pass
+
+class CuentasXCobrarDocumentoCargoVencimiento(CuentasXCobrarDocumentoCargoVencimientoBase):
+    pass
 
 class CuentasXCobrarDocumentoCargoLibres(CuentasXCobrarDocumentoCargoLibresBase):
     segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
