@@ -4,4 +4,4 @@ from microsip_web.libs.api.models import (VentasDocumento,  VentasDocumentoImpue
 	CuentasXCobrarDocumento, CuentasXCobrarDocumentoImportes,
 	CuentasXCobrarDocumentoImportesImpuesto,
 	CuentasXCobrarConcepto, CuentasXCobrarDocumentoCargoVencimiento,
-	CondicionPagoPlazo, Impuesto,)
+	CondicionPagoPlazo, Impuesto, Cliente)

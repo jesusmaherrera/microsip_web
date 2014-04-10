@@ -6,38 +6,49 @@ from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta
 from django.db import connections
+from datetime import datetime
 
 #Paginacion
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # user autentication
 from .models import *
+from .forms import *
 from microsip_api.comun.sic_db import get_conecctionname
+from django.views.generic.list import ListView
 
-@login_required(login_url='/login/')
-def remisiones_view(request, template_name='ventas/documentos/remisiones_crear_cargos/remisiones.html'):
-    connection_name = get_conecctionname(request.session)
-    if connection_name == '':
-        return HttpResponseRedirect('/select_db/')
+import django_filters
 
-    documentos_list = VentasDocumento.objects.filter(tipo='R').order_by('-id')
+class VentasDocumentoRemisionesListView(ListView):
+    context_object_name = "documentos"
+    model = VentasDocumento
+    template_name = 'ventas/documentos/remisiones_crear_cargos/remisiones.html'
+    paginate_by = 20
 
-    paginator = Paginator(documentos_list, 20) # Muestra 10 ventas por pagina
-    page = request.GET.get('page')
+    def get_queryset(self):
+        get_dict = self.request.GET
+        form =  SearchForm(self.request.GET)
+        documentos = VentasDocumento.objects.filter(tipo='R', estado='P').order_by('-id')
+        
+        if form.is_valid():
+            if 'inicio' in get_dict:
+                if get_dict['inicio']:
+                    inicio = datetime.strptime(get_dict['inicio'], '%d/%m/%Y')
+                    documentos = documentos.filter(fecha__gte=inicio)
+            if 'fin' in get_dict:
+                if get_dict['fin']:
+                    fin = datetime.strptime(get_dict['fin'], '%d/%m/%Y')
+                    documentos = documentos.filter(fecha__lte=fin)
+            if 'cliente' in get_dict:
+                documentos = documentos.filter(cliente__id=get_dict['cliente'])
 
-    #####PARA PAGINACION##############
-    try:
-        documentos = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        documentos = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        documentos = paginator.page(paginator.num_pages)
+        return documentos
 
-    c = {'documentos':documentos,}
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
-
+    def get_context_data(self, **kwargs):
+        context = super(VentasDocumentoRemisionesListView, self).get_context_data(**kwargs)
+        context['search_form'] = SearchForm(self.request.GET or None)
+        return context
+    
 from django.core import serializers
 import json
 

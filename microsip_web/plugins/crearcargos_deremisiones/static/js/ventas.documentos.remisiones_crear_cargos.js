@@ -1,5 +1,7 @@
 $(document).ready(function() {
 
+    $( "#id_inicio" ).datepicker({dateFormat:'dd/mm/yy',});
+    $( "#id_fin" ).datepicker({dateFormat:'dd/mm/yy',});
 	$("input[type='checkbox']").on("click", mostrar_botones);
 	
 	function mostrar_botones(){
