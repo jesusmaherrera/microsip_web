@@ -274,8 +274,9 @@ class Articulo(ArticuloBase):
         puntos = models.IntegerField(default = 0, blank = True, null = True, db_column = 'SIC_PUNTOS' )
         dinero_electronico  = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_DINERO_ELECTRONICO' )
         hereda_puntos = models.BooleanField( db_column = 'SIC_HEREDA_PUNTOS' )
+        
     carpeta = models.ForeignKey( Carpeta, blank = True, null = True, db_column = 'SIC_CARPETA_ID' )
-
+    
     def save(self, *args, **kwargs):    
         using = kwargs.get('using', None)
         using = using or router.db_for_write(self.__class__, instance=self)
@@ -284,10 +285,7 @@ class Articulo(ArticuloBase):
             self.id = next_id('ID_CATALOGOS', using)  
        
         super(self.__class__, self).save(*args, **kwargs)
-        
-    def __unicode__( self) :
-        return u'%s (%s)' % ( self.nombre, self.unidad_venta )
-
+    
 class ArticuloClaveRol(ArticuloClaveRolBase):
     def __unicode__(self):
         return u'%s' % self.nombre

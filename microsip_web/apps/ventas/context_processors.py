@@ -64,7 +64,7 @@ def menu(request):
 		)
 	if 'microsip_web.apps.ventas'in settings.MICROSIP_MODULES:
 		context['menu_modulos'].append(
-			{'name':'Ventas', 'url':'/ventas/', 'icon_class':'msicon-ventas', },
+			{'name':'Ventas', 'url':'/ventas/main/', 'icon_class':'msicon-ventas', },
 		)
 	if 'microsip_web.apps.cuentas_por_pagar'in settings.MICROSIP_MODULES:
 		context['menu_modulos'].append(
