@@ -1,8 +1,10 @@
 from django.conf.urls import patterns, url, include
 INDEX_EXTEND = "ventas/base.html"
 from microsip_web.settings.local_settings import MICROSIP_MODULES
+from microsip_web.apps.main.comun.articulos.articulos.views import articulos_view
 
 urlpatterns = patterns('',
+	url(r'',articulos_view)
 )
 
 if 'microsip_web.apps.ventas.documentos' in MICROSIP_MODULES:

@@ -2,17 +2,14 @@ from django.views import generic
 from microsip_web.apps.punto_de_venta import views
 from  microsip_web.settings.prod import MICROSIP_MODULES
 from django.conf.urls import patterns, include, url
-
+from microsip_web.apps.main.comun.articulos.articulos.views import articulos_view
 urlpatterns = patterns('',    
 
 	# (r'^venta/$', views.venta_mostrador_manageView),
  #    (r'^venta/(?P<id>\d+)/', views.venta_mostrador_manageView),
 	# (r'^ventas/$', views.ventas_de_mostrador_view),
-    url(r'', include('microsip_web.apps.main.comun.otros.urls', namespace='pv_main_otros')),
-    url(r'', include('microsip_web.apps.main.comun.clientes.urls', namespace='pv_main_clientes')),
-    url(r'', include('microsip_web.apps.main.comun.listas.urls', namespace='pv_main_listas')),
-    url(r'', include('microsip_web.apps.main.comun.articulos.urls', namespace='pv_main_articulos')),
     #facturas
+    (r'^main/$', articulos_view),
     (r'^facturas/$', views.facturas_view),
     (r'^factura/nueva/', views.factura_manageView),
     
@@ -52,3 +49,15 @@ urlpatterns = patterns('',
     (r'^cliente_search/', views.cliente_searchView),
     (r'^cliente_search/(?P<id>\d+)/', views.cliente_searchView),
 )
+
+if 'microsip_web.apps.main.comun.articulos' in MICROSIP_MODULES:
+    urlpatterns += url(r'', include('microsip_web.apps.main.comun.articulos.urls', namespace='v_main_articulos')),
+
+if 'microsip_web.apps.main.comun.clientes' in MICROSIP_MODULES:
+    urlpatterns += url(r'', include('microsip_web.apps.main.comun.clientes.urls', namespace='v_main_clientes')),
+
+if 'microsip_web.apps.main.comun.listas' in MICROSIP_MODULES:
+    urlpatterns += url(r'', include('microsip_web.apps.main.comun.listas.urls', namespace='v_main_listas')),
+    
+if 'microsip_web.apps.main.comun.otros' in MICROSIP_MODULES:
+    urlpatterns += url(r'', include('microsip_web.apps.main.comun.otros.urls', namespace='v_main_otros')),

@@ -1,9 +1,10 @@
 from microsip_web.settings.local_settings import MICROSIP_MODULES
+from django.conf import settings
 
 def menu(request):
-	context = {'menu':[]}
+	context = {'menu_ventas':[],'menu_modulos':[],}
 	if 'microsip_web.apps.ventas.documentos' in MICROSIP_MODULES:
-		context['menu'].append({
+		context['menu_ventas'].append({
 			'name': 'Documentos',
 			'icon_class':'icon-folder-close',
 			'items':[
@@ -13,7 +14,7 @@ def menu(request):
 		})
 
 	if 'microsip_web.apps.main.comun.articulos' in MICROSIP_MODULES:
-		context['menu'].append({
+		context['menu_ventas'].append({
 			'name':'Articulos',
 			'icon_class':'icon-barcode',
 			'items':[
@@ -24,7 +25,7 @@ def menu(request):
 		})
 
 	if 'microsip_web.apps.main.comun.clientes' in MICROSIP_MODULES:
-		context['menu'].append({
+		context['menu_ventas'].append({
 			'name':'Clientes',
 			'icon_class':'icon-user',
 			'items':[
@@ -34,7 +35,7 @@ def menu(request):
 		})
 
 	if 'microsip_web.apps.main.comun.listas' in MICROSIP_MODULES:
-		context['menu'].append({
+		context['menu_ventas'].append({
 			'name':'Listas',
 			'icon_class':'icon-list-alt',
 			'items':[
@@ -42,7 +43,7 @@ def menu(request):
 			]
 		})
 	if 'microsip_web.apps.main.comun.otros' in MICROSIP_MODULES:	
-		context['menu'].append({
+		context['menu_ventas'].append({
 			'name':'Otros',
 			'icon_class':'icon-th',
 			'items':[
@@ -52,4 +53,47 @@ def menu(request):
 				{'name':'Paises', 'url':'/ventas/paises/', 'icon_class':'icon-globe'},
 			]
 		})
+
+	if 'microsip_web.apps.cuentas_por_cobrar'in settings.MICROSIP_MODULES:
+		context['menu_modulos'].append(
+			{'name':'Cuentas por cobrar', 'url':'/cuentas_por_cobrar/', 'icon_class':'msicon-cuentas_por_cobrar', },
+		)
+	if 'microsip_web.apps.inventarios'in settings.MICROSIP_MODULES:
+		context['menu_modulos'].append(
+			{'name':'Inventarios', 'url':'/inventarios/main/', 'icon_class':'msicon-inventarios',},
+		)
+	if 'microsip_web.apps.ventas'in settings.MICROSIP_MODULES:
+		context['menu_modulos'].append(
+			{'name':'Ventas', 'url':'/ventas/', 'icon_class':'msicon-ventas', },
+		)
+	if 'microsip_web.apps.cuentas_por_pagar'in settings.MICROSIP_MODULES:
+		context['menu_modulos'].append(
+			{'name':'Cuentas por pagar', 'url':'/cuentas_por_pagar/main/', 'icon_class':'msicon-cuentas_por_pagar',},
+		)
+	if 'microsip_web.apps.compras'in settings.MICROSIP_MODULES:
+		context['menu_modulos'].append(
+			{'name':'Compras', 'url':'/compras/main/', 'icon_class':'msicon-compras', },
+		)
+	if 'microsip_web.apps.punto_de_venta'in settings.MICROSIP_MODULES:
+		context['menu_modulos'].append(
+			{'name':'Punto de venta', 'url':'/punto_de_venta/main/', 'icon_class':'msicon-punto_de_venta', },
+		)
+	if 'microsip_web.apps.contabilidad'in settings.MICROSIP_MODULES:
+		context['menu_modulos'].append(
+			{'name':'Contabilidad', 'url':'/contabilidad/polizas_pendientes/', 'icon_class':'msicon-contabilidad', },
+		)
+
+	for item in context['menu_modulos']:
+		if item['url'].replace('main/', '') in request.path:
+			item['active']= True
+
+	# context['menu_modulos'].append(
+	# 	{'name':'Ventas', 'url':'/ventas/articulos/', 'icon_class':'msicon-ventas',},
+	# )
+	# context['menu_modulos'].append(
+	# 	{'name':'Ventas', 'url':'/ventas/articulos/', 'icon_class':'msicon-ventas',},
+	# )
+	# context['menu_modulos'].append(
+	# 	{'name':'Ventas', 'url':'/ventas/articulos/', 'icon_class':'msicon-ventas',},
+	# )
 	return context

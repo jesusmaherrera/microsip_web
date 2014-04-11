@@ -32,37 +32,14 @@
         <!-- <a class="brand" href="#"></a> --><div class="span1 label_min"> {% block selected_module %}Microsip{% endblock %}</div>
         <div class="nav-collapse collapse">
           <ul class="nav" role="navigation">
-            
-            {% load main_menu_tags %}
-            {% block btn_modulo_cuentas_por_cobrar %}
-              {% microsip_module_btn 'microsip_web.apps.cuentas_por_cobrar' %}
-            {% endblock %}
-
-            {% block btn_modulo_inventarios%}
-              {% microsip_module_btn 'microsip_web.apps.inventarios' %}
-            {% endblock %}
-
-            {% block btn_modulo_ventas%}
-              {% microsip_module_btn 'microsip_web.apps.ventas' %}
-            {% endblock %}
-
-            {% block btn_modulo_cuentas_por_pagar %}
-              {% microsip_module_btn 'microsip_web.apps.cuentas_por_pagar' %}
-            {% endblock %}
-            
-            {% block btn_modulo_compras %}
-              {% microsip_module_btn 'microsip_web.apps.compras' %}
-            {% endblock %}
-
-            {% block btn_modulo_punto_venta %}
-              {% microsip_module_btn 'microsip_web.apps.punto_de_venta' %}
-              <!-- {% microsip_module_btn 'admin' %} -->
-            {% endblock %}
-
-            {% block btn_modulo_contabilidad %}
-              {% microsip_module_btn 'microsip_web.apps.contabilidad' %}
-            {% endblock %}
-            
+            {% for modulo in menu_modulos %}
+              <li>
+                <a href="{{ modulo.url }}" {% if modulo.active %} style='color: #555555; background-color: #e5e5e5;' {% endif %}> 
+                  <i class="{{ modulo.icon_class }}"></i>
+                  <label class="small_screen"> {{ modulo.name }} </label>
+                </a>
+              </li>
+            {% endfor %}
           </ul>
           <ul class="nav pull-right">  
           {% if not user.is_anonymous %}

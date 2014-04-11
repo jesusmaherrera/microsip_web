@@ -31,11 +31,11 @@ def articulos_view(request, carpeta=1,template_name='main/articulos/articulos/ar
         url_articulo = '/punto_de_venta/articulo/'
     
     PATH = request.path
-    if '/punto_de_venta/articulos/' in PATH:
+    if '/punto_de_venta/' in PATH:
         modulo = 'punto_de_venta'
-    elif '/ventas/articulos/' in PATH:
+    elif '/ventas/' in PATH:
         modulo = 'ventas'
-    elif '/inventarios/articulos/' in PATH:
+    elif '/inventarios/' in PATH:
         modulo = 'inventarios'
     url_articulo = '/%s/articulo/'%modulo
 

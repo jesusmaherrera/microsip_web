@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     
     
     (r'^almacenes/$', views.almacenes_view),
+    (r'main/', views.almacenes_view),
     (r'^almacenes/abririnventario/(?P<almacen_id>\d+)/$', views.abrir_inventario_byalmacen),
     
     url(r'', include('microsip_web.apps.main.comun.articulos.urls', namespace='in_main_articulos')),
