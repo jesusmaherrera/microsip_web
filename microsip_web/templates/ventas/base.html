@@ -17,40 +17,17 @@
 <div class="navbar navbar-static">
   <ul class="nav" role="navigation">
     {% load main_menu_tags %}
-    {% ventas_tools_menu 'documentos' %}
+    <!-- {% ventas_tools_menu 'documentos' %} -->
+    {% for submenu in menu %}
     <li class="dropdown">
-      <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-barcode"></i> Articulos <b class="caret"></b></a>
+      <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="{{ submenu.icon_class }}"></i> {{ submenu.name }} <b class="caret"></b></a>
       <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-        <li><a tabindex="-1" href="/ventas/articulos/"><i class="icon-barcode"></i> Articulos</a></li>
-        <li><a tabindex="-1" href="/ventas/lineas/"><i class="icon-tasks"></i> Lineas</a></li>
-        <li><a tabindex="-1" href="/ventas/grupos/"><i class="icon-globe"></i> Grupos</a></li>
+        {% for link in submenu.items %}
+          <li><a tabindex="-1" href="{{ link.url }}"><i class="{{ link.icon_class }}"></i> {{ link.name }}</a></li>  
+        {% endfor %}
       </ul>
-    </li>
-    <li class="dropdown">
-      <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> 
-        <i class="icon-user"></i> <span class="hidden-phone">Clientes</span> <b class="caret"></b></a>
-      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-        <li><a tabindex="-1" href="/ventas/clientes/"><i class="icon-user"></i> Clientes</a></li>
-        <li><a tabindex="-1" href="/ventas/condiciones_de_pago/"><i class=" icon-calendar"></i> Condiciones de pago</a></li>
-      </ul>
-    </li>
-    <li class="dropdown">
-      <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> 
-        <i class="icon-list-alt"></i> <span class="hidden-phone">Listas</span> <b class="caret"></b></a>
-      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-        <li><a tabindex="-1" href="/ventas/impuestos/"><i class="icon-tag"></i> Impuestos</a></li>
-      </ul>
-    </li>
-    <li class="dropdown">
-      <a id="drop1" href="#"role="button" class="dropdown-toggle" data-toggle="dropdown"> 
-        <i class="icon-th"></i> <span class="hidden-phone">Otros</span> <b class="caret"></b></a>
-      <ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-        <li><a tabindex="-1" href="/ventas/tipos_cambio/"><i class="icon-road"></i> Tipos de cambio</a></li>
-        <li><a tabindex="-1" href="/ventas/ciudades/"><i class="icon-road"></i> Ciudades</a></li>
-        <li><a tabindex="-1" href="/ventas/estados/"><i class="icon-flag"></i> Estados</a></li>
-        <li><a tabindex="-1" href="/ventas/paises/"><i class="icon-globe"></i> Paises</a></li>
-      </ul>
-    </li>
+    </li>  
+    {% endfor %}
   </ul>
   <ul class="nav pull-right">
     {% ventas_tools_menu 'herramientas' %}

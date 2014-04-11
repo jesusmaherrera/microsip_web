@@ -1,8 +1,21 @@
 $(document).ready(function() {
-
+	$("#id_cliente_text").focus();
     $( "#id_inicio" ).datepicker({dateFormat:'dd/mm/yy',});
     $( "#id_fin" ).datepicker({dateFormat:'dd/mm/yy',});
-	$("input[type='checkbox']").on("click", mostrar_botones);
+	
+	$("input[type='checkbox'][name='seleccion']").on("click", mostrar_botones);
+	$("input[name='seleccion_all']").on("click", sellect_all);
+	function sellect_all(){
+		seleccionar = this.checked;
+
+		$("input[type='checkbox'][name='seleccion']").each(function(){
+			this.checked = seleccionar;
+			if(seleccionar)
+				$("#generar_cargos").removeClass('hidden');
+			else
+				$("#generar_cargos").addClass('hidden');
+		});
+	}
 	
 	function mostrar_botones(){
 		if ($( "input:checked" ).length > 0)
@@ -15,7 +28,7 @@ $(document).ready(function() {
 
 	function generar_cargos(){
 		var ids = '';
-		$("input[type='checkbox']").each(function(){
+		$("input[type='checkbox'][name='seleccion']").each(function(){
 			if (this.checked){
 				ids += this.value+ ","
 			}

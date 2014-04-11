@@ -2,8 +2,6 @@
 from django import forms
 
 import autocomplete_light
-from microsip_web.apps.inventarios.models import *
-from microsip_web.apps.ventas.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from models import *
