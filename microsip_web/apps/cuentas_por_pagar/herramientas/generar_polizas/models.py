@@ -7,7 +7,7 @@ from microsip_web.libs.api.models import CuentasXPagarCondicionPago, Contabilida
 #############################################################################################################################################################
         
 class InformacionContable_CP(models.Model):
-    condicion_pago_contado  = models.ForeignKey(CuentasXPagarCondicionPago, blank=True, null=True)
+    condicion_pago_contado  = models.ForeignKey(CuentasXPagarCondicionPago, blank=True, null=True, related_name='generar_polizas_cxp')
     
     def __unicode__(self):
         return u'%s'% self.id
@@ -17,7 +17,7 @@ class InformacionContable_CP(models.Model):
 
 class PlantillaPolizas_CP(models.Model):
     nombre  = models.CharField(max_length=200)
-    tipo    = models.ForeignKey(CuentasXPagarConcepto)
+    tipo    = models.ForeignKey(CuentasXPagarConcepto, related_name='generar_polizas_cxp_tipo')
     
     def __unicode__(self):
         return u'%s'%self.nombre
@@ -47,7 +47,7 @@ class DetallePlantillaPolizas_CP(models.Model):
 
     posicion                = models.CharField(max_length=2)
     plantilla_poliza_CP     = models.ForeignKey(PlantillaPolizas_CP)
-    cuenta_co               = models.ForeignKey(ContabilidadCuentaContable)
+    cuenta_co               = models.ForeignKey(ContabilidadCuentaContable, related_name='detallesplantillacxp_cuenta_co')
     tipo                    = models.CharField(max_length=2, choices=TIPOS, default='C')
     asiento_ingora          = models.CharField(max_length=2, blank=True, null=True)
     valor_tipo              = models.CharField(max_length=20, choices=VALOR_TIPOS)

@@ -9,7 +9,7 @@ from microsip_web.libs.api.models import CuentasXCobrarConcepto, ContabilidadCue
 ################################################################
 
 class InformacionContable_CC(models.Model):
-    condicion_pago_contado  = models.ForeignKey(CondicionPago, blank=True, null=True)
+    condicion_pago_contado  = models.ForeignKey(CondicionPago, blank=True, null=True, related_name='informacioncontable_cxc_condicionpago',)
 
     def __unicode__(self):
         return u'%s'% self.id
@@ -19,7 +19,7 @@ class InformacionContable_CC(models.Model):
 
 class PlantillaPolizas_CC(models.Model):
     nombre  = models.CharField(max_length=200)
-    tipo    = models.ForeignKey(CuentasXCobrarConcepto)
+    tipo    = models.ForeignKey(CuentasXCobrarConcepto, related_name='plantillapoliza_cxc_tipo')
     
     def __unicode__(self):
         return u'%s'%self.nombre
@@ -48,7 +48,7 @@ class DetallePlantillaPolizas_CC(models.Model):
     
     posicion                = models.CharField(max_length=2)
     plantilla_poliza_CC     = models.ForeignKey(PlantillaPolizas_CC)
-    cuenta_co               = models.ForeignKey(ContabilidadCuentaContable)
+    cuenta_co               = models.ForeignKey(ContabilidadCuentaContable, related_name='detallesplantillacxc_cuenta_co')
     tipo                    = models.CharField(max_length=2, choices=TIPOS, default='C')
     asiento_ingora          = models.CharField(max_length=2, blank=True, null=True)
     valor_tipo              = models.CharField(max_length=20, choices=VALOR_TIPOS)
