@@ -114,6 +114,7 @@ def inicializar_tablas( request ):
             
         conexion_name = "%02d-%s"%( conexion_activa_id, basedatos_activa )
         
+
         # Campos nuevos en tablas
         sincronizar_tablas( conexion_name = conexion_name )
         
@@ -152,7 +153,7 @@ def sincronizar_tablas( conexion_name = None ):
     """ Modifica todas las tablas con campos nuevos para uso en aplicacion. """
 
     c = connections[ conexion_name ].cursor()
-    
+    c.execute("DELETE FROM DJANGO_CONTENT_TYPE;")
     import importlib
 
     for plugin in MICROSIP_PLUGINS:

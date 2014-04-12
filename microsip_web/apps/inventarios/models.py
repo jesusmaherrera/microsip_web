@@ -2,7 +2,8 @@
 from django.db import models
 from datetime import datetime 
 from microsip_web.libs.api.models import (Articulo, ImpuestosArticulo, ArticuloPrecio, ArticuloClave, 
-	ConexionDB, LineaArticulos, InventariosConcepto, InventariosDocumento, InventariosDocumentoDetalle, Almacen, InventariosDocumentoIF, InventariosDocumentoIFDetalle, ArticuloDiscreto, )
+	ConexionDB, LineaArticulos, InventariosConcepto, InventariosDocumento, InventariosDocumentoDetalle, Almacen, InventariosDocumentoIF, InventariosDocumentoIFDetalle, ArticuloDiscreto,
+	Registry, )
 
 # class DocumentoInventarioAjustes(models.Model):
 #     no_inventario = models.CharField(max_length=150)

@@ -165,68 +165,46 @@ class Pais(PaisBase):
         using = kwargs.get('using', None)
         using = using or router.db_for_write(self.__class__, instance=self)
         
-        if self.id == None:
-            self.id = next_id('ID_CATALOGOS', using)  
-
         if self.es_predet == 'S':
             Pais.objects.using(using).all().exclude(pk=self.id).update(es_predet='N')
 
         super(self.__class__, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return u'%s' % self.nombre
-
-class Estado(EstadoBase):
     
+class Estado(EstadoBase):
     def save(self, *args, **kwargs):
         using = kwargs.get('using', None)
         using = using or router.db_for_write(self.__class__, instance=self)
-            
-        if self.id == None:
-            self.id = next_id('ID_CATALOGOS', using)  
         
         if self.es_predet == 'S':
             Estado.objects.using(using).all().exclude(pk=self.id).update(es_predet='N')
 
         super(self.__class__, self).save(*args, **kwargs)
 
-    def __unicode__(self):
-        return u'%s, %s' % (self.nombre, self.pais)
-
 class Ciudad(CiudadBase):
     def save(self, *args, **kwargs):
         using = kwargs.get('using', None)
         using = using or router.db_for_write(self.__class__, instance=self)
-            
-        if self.id == None:
-            self.id = next_id('ID_CATALOGOS', using)  
-
+        
         if self.es_predet == 'S':
             Ciudad.objects.using(using).all().exclude(pk=self.id).update(es_predet='N')
 
         super(self.__class__, self).save(*args, **kwargs)
 
-    def __unicode__(self):
-        return u'%s, %s'%(self.nombre, self.estado)
 
 class Moneda(MonedaBase):
-    def __unicode__(self):
-        return u'%s' % self.nombre
+    pass
 
 class TipoCambio(TipoCambioBase):
-    def __unicode__(self):
-        return u'%s' % self.id
+    pass
 
 class ViaEmbarque(ViaEmbarqueBase):
    pass
 
 class FolioVenta(FolioVentaBase):
-    def __unicode__(self):
-        return u'%s'%self.id
+    pass
 
 class FolioCompra(FolioCompraBase):
-    def __unicode__(self):
-        return u'%s'%self.id
+    pass
 
 # ARTICULOS
 
@@ -234,35 +212,12 @@ class GrupoLineas(GrupoLineasBase):
     if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
         puntos = models.IntegerField(blank=True, null=True, db_column='SIC_PUNTOS')
         dinero_electronico = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
-    
-    def save(self, *args, **kwargs):    
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
-
-        if self.id == None:
-            self.id = next_id('ID_CATALOGOS', using)  
-       
-        super(self.__class__, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return u'%s' % self.nombre
 
 class LineaArticulos(LineaArticulosBase):
     if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
         puntos = models.IntegerField(blank=True, null=True, db_column='SIC_PUNTOS')
         dinero_electronico = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
         hereda_puntos = models.BooleanField( db_column='SIC_HEREDA_PUNTOS')
-
-    def save(self, *args, **kwargs):    
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
-
-        if self.id == None:
-            self.id = next_id('ID_CATALOGOS', using)  
-        super(self.__class__, self).save(*args, **kwargs)
-        
-    def __unicode__(self):
-        return u'%s' % self.nombre
 
 class Articulo(ArticuloBase):
     if 'microsip_web.apps.main.comun.articulos.articulos.alertas' in MICROSIP_MODULES:
@@ -277,57 +232,29 @@ class Articulo(ArticuloBase):
         
     carpeta = models.ForeignKey( Carpeta, blank = True, null = True, db_column = 'SIC_CARPETA_ID' )
     
-    def save(self, *args, **kwargs):    
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
-
-        if self.id == None:
-            self.id = next_id('ID_CATALOGOS', using)  
-       
-        super(self.__class__, self).save(*args, **kwargs)
-    
 class ArticuloClaveRol(ArticuloClaveRolBase):
-    def __unicode__(self):
-        return u'%s' % self.nombre
+    pass
 
 class ArticuloClave(ArticuloClaveBase):
     def save_send_signal(self, *args, **kwargs):
         articulo_clave_save_signal.send(sender=self, *args, **kwargs)
 
-    def save(self, *args, **kwargs):    
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
-        if self.id == None:
-            self.id = next_id('ID_CATALOGOS', using)  
-       
-        super(self.__class__, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return u'%s' % self.clave
-
 class ArticuloPrecio(ArticuloPrecioBase):
-    def __unicode__(self):
-        return u'%s' % self.id
+    pass
 
 class Almacen(AlmacenBase):
     inventariando = models.BooleanField(default= False, db_column = 'SIC_INVENTARIANDO' )
     inventario_conajustes = models.BooleanField(default= False, db_column = 'SIC_INVCONAJUSTES' )
     inventario_modifcostos = models.BooleanField(default= False, db_column = 'SIC_INVMODIFCOSTOS' )
     
-    def __unicode__(self):
-        return self.nombre
-
 class PrecioEmpresa(PrecioEmpresaBase):
-    def __unicode__(self):
-        return u'%s' % self.nombre
+    pass
 
 class ArticuloDiscreto(ArticuloDiscretoBase):
-    def __unicode__(self):
-        return u'%s' % self.clave
+    pass
 
 class ArticuloDiscretoExistencia(ArticuloDiscretoExistenciaBase):
-    def __unicode__(self):
-        return u'%s' % self.id
+    pass
 
 #CATALOGOS
 
@@ -337,79 +264,43 @@ class Banco(BancoBase):
 # LISTAS
 
 class ImpuestoTipo(ImpuestoTipoBase):
-    def __unicode__(self):
-        return u'%s' % self.nombre
+    pass
 
 class Impuesto(ImpuestoBase):
     def save(self, *args, **kwargs):    
         using = kwargs.get('using', None)
         using = using or router.db_for_write(self.__class__, instance=self)
 
-        if self.id == None:
-            self.id = next_id('ID_CATALOGOS', using)  
-        
         if self.es_predet == 'S':
             Impuesto.objects.using(using).all().exclude(pk=self.id).update(es_predet='N')
 
         super(self.__class__, self).save(*args, **kwargs)
 
-    def __unicode__(self):
-        return self.nombre
     
 class ImpuestosArticulo(ImpuestoArticuloBase):
-    def save(self, *args, **kwargs):    
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
-
-        if self.id == None:
-            self.id = next_id('ID_CATALOGOS', using)  
-       
-        super(self.__class__, self).save(*args, **kwargs)
-        
-    def __unicode__(self):
-        return self.impuesto
+    pass    
 
 class Vendedor(VendedorBase):
-    def __unicode__(self):
-        return self.nombre
-
+    pass
 
 # CLIENTES
-
 class ClienteTipo(ClienteTipoBase):
     if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
         valor_puntos    = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_VALOR_PUNTOS' )
-
-    def __unicode__( self ):
-        return self.nombre
 
 class CondicionPago(CondicionPagoBase):
     def save(self, *args, **kwargs):    
         using = kwargs.get('using', None)
         using = using or router.db_for_write(self.__class__, instance=self)
 
-        if not self.id:
-            self.id = next_id('ID_CATALOGOS', using)
-        
         if self.es_predet == 'S':
             CondicionPago.objects.using(using).all().exclude(pk=self.id).update(es_predet='N')
 
         super(self.__class__, self).save(*args, **kwargs)
 
-    def __unicode__(self):
-        return self.nombre
-
 class CondicionPagoPlazo(CondicionPagoPlazoBase):
     def save_send_signal(self, *args, **kwargs):
         articulo_clave_save_signal.send(sender=self, *args, **kwargs)
-
-    def save(self, *args, **kwargs):    
-        if not self.id:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_CATALOGOS', using)
-
-        super(self.__class__, self).save(*args, **kwargs)
 
 class Cliente(ClienteBase):
     if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
@@ -421,34 +312,14 @@ class Cliente(ClienteBase):
         valor_puntos = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_VALOR_PUNTOS' )
         hereda_puntos_a = models.ForeignKey( 'self', db_column = 'SIC_HEREDAR_PUNTOS_A', related_name = 'hereda_puntos_a_cliente', blank = True, null = True )
 
-    def save(self, *args, **kwargs):    
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
-
-        if self.id == None:
-            self.id = next_id('ID_CATALOGOS', using)  
-
-        super(self.__class__, self).save(*args, **kwargs)
-
-    def __unicode__( self ):
-        return self.nombre
-
 class ClienteClaveRol(ClienteClaveRolBase):
     pass
 
 class ClienteClave(ClienteClaveBase):
-    def __unicode__(self):
-        return self.clave
+    pass
 
 class ClienteDireccion(ClienteDireccionBase):
-    def save(self, *args, **kwargs):    
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
-
-        if self.id == None:
-            self.id = next_id('ID_CATALOGOS', using)  
-            
-        super(self.__class__, self).save(*args, **kwargs)
+    pass
 
 class libresClientes(libreClienteBase):
     if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
@@ -463,13 +334,10 @@ class libresClientes(libreClienteBase):
 # PROVEEDORES
 
 class ProveedorTipo(ProveedorTipoBase):
-    def __unicode__(self):
-        return u'%s' % self.nombre
+    pass
         
 class Proveedor(ProveedorBase):
-    def __unicode__(self):
-        return u'%s' % self.nombre
-
+    pass
 
 ################################################################
 ####                                                        ####
@@ -543,49 +411,27 @@ class ComprasDocumento(ComprasDocumentoBase):
         return folio
 
     def save(self, *args, **kwargs):
-        if not self.id:
+        if self.folio == '':
             using = kwargs.get('using', None)
             using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-
-            consecutivo = ''
-            #Si no se define folio se asigna uno
-            if self.folio == '':
-                self.folio = self.next_folio(connection_name=using)
+            self.folio = self.next_folio(connection_name=using)
 
         super(self.__class__, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return u'%s' % self.id
 
 class ComprasDocumentoCargoVencimiento(ComprasDocumentoCargoVencimientoBase):
     pass
 
 class ComprasDocumentoDetalle(ComprasDocumentoDetalleBase):
-    def save(self, *args, **kwargs):
-        if not self.id:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-
-        super(self.__class__, self).save(*args, **kwargs)
+    pass
 
 class ComprasDocumentoImpuesto(ComprasDocumentoImpuestoBase):
    pass
 
 class ComprasDocumentoLiga(ComprasDocumentoLigaBase):
-    def save(self, *args, **kwargs):
-        if not self.id:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_LIGAS_DOCTOS', using)
-
-        super(self.__class__, self).save(*args, **kwargs)
+    pass
 
 class ComprasDocumentoLigaDetalle(ComprasDocumentoLigaDetalleBase):
-    def __unicode__(self):
-        return u'%s'% (self.documento_liga, self.detalle_fuente )
-
+    pass
 
 #####################################################
 ##
@@ -597,12 +443,10 @@ class ComprasDocumentoLigaDetalle(ComprasDocumentoLigaDetalleBase):
 # CATALOGOS
 
 class InventariosConcepto(InventariosConceptoBase):
-    def __unicode__(self):
-        return self.nombre_abrev
+    pass
 
 class InventariosCentroCostos(InventariosCentroCostosBase):
-    def __unicode__(self):
-        return self.nombre 
+   pass
 
 #  DOCUMENTOS
 
@@ -621,15 +465,10 @@ class InventariosDocumento(InventariosDocumentoBase):
         return folio
 
     def save(self, *args, **kwargs):
-        
-        if not self.id:
+        if not self.folio and self.concepto.folio_autom == 'S':
             using = kwargs.get('using', None)
             using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-
-            #Si no se define folio se asigna uno
-            if not self.folio and self.concepto.folio_autom == 'S':
-                self.folio = self.next_folio()
+            self.folio = self.next_folio()
 
         super(self.__class__, self).save(*args, **kwargs)
 
@@ -638,34 +477,19 @@ class InventariosDocumentoDetalle(InventariosDocumentoDetalleBase):
     usuario_ult_modif = models.CharField(blank=True, null=True, max_length=31, db_column='SIC_USUARIO_ULT_MODIF')
     detalle_modificacionestime = models.CharField(blank=True, null=True, max_length=400, db_column='SIC_DETALLETIME_MODIFICACIONES')
     
-    def save(self, *args, **kwargs):
-        if not self.id:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-
-        super(self.__class__, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return u'%s' % self.id
-
 class InventariosDocumentoIF(InventariosDocumentoIFBase):
-    def __unicode__(self):
-        return u'%s' % self.id
+    pass
 
 class InventariosDocumentoIFDetalle(InventariosDocumentoIFDetalleBase):
-    def __unicode__(self):
-        return u'%s' % self.id
+    pass
 
 # OTROS
 
 class InventariosDesgloseEnDiscretos(InventariosDesgloseEnDiscretosBase):
-    def __unicode__(self):
-        return u'%s' % self.id
+    pass
 
 class InventariosDesgloseEnDiscretosIF(InventariosDesgloseEnDiscretosIFBase):
-    def __unicode__(self):
-        return u'%s' % self.id
+    pass
 
 
 ################################################################
