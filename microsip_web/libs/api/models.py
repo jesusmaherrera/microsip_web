@@ -67,6 +67,7 @@ class Carpeta(models.Model):
 
     def __unicode__(self):
         return u'%s'% self.nombre
+
     class Meta:
         db_table = u'sic_carpeta'
 
@@ -117,40 +118,15 @@ class AplicationPlugin(models.Model):
 # PREFERENCIAS
 
 class Registry(RegistryBase):
-    def __unicode__(self):
-        return u'%s' % self.nombre
-    
-    def get_value(self):
-        if self.valor == '':
-            return None
-        return u"%s"%self.valor
+    pass
 
 #FOLIOS FISCALES
 
 class ConfiguracionFolioFiscal(ConfiguracionFolioFiscalBase): 
-    def __str__(self):  
-          return u'%s' % self.id
-    def save(self, *args, **kwargs):
-        if not self.id:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-
-        super(self.__class__, self).save(*args, **kwargs)
+    pass
 
 class ConfiguracionFolioFiscalUso(ConfiguracionFolioFiscalUsoBase):
-    def __str__(self):  
-          return u'%s' % self.id    
-          
-    def save(self, *args, **kwargs):
-        
-        if self.id == -1:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-
-        super(self.__class__, self).save(*args, **kwargs)
-
+    pass
 
 ################################################################
 ####                                                        ####
@@ -276,7 +252,6 @@ class Impuesto(ImpuestoBase):
 
         super(self.__class__, self).save(*args, **kwargs)
 
-    
 class ImpuestosArticulo(ImpuestoArticuloBase):
     pass    
 
@@ -385,7 +360,6 @@ class ComprasConsignatario(ComprasConsignatarioBase):
     pass
 
 class ComprasDocumento(ComprasDocumentoBase):
-    
     def next_folio( self, connection_name=None, **kwargs ):
         ''' Funcion para generar el siguiente folio de un documento de ventas '''
 
@@ -501,21 +475,13 @@ class InventariosDesgloseEnDiscretosIF(InventariosDesgloseEnDiscretosIFBase):
 # CATALOGOS
 
 class CuentasXPagarConcepto(CuentasXPagarConceptoBase):
-    def __unicode__(self):
-        return self.nombre_abrev
+    pass
 
 class CuentasXPagarCondicionPago(CuentasXPagarCondicionPagoBase):
-    def __unicode__(self):
-        return self.nombre
+    pass
 
 class CuentasXPagarCondicionPagoPlazoBase(CuentasXPagarCondicionPagoPlazoBase):
-    def save(self, *args, **kwargs):    
-        if self.id == -1:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_CATALOGOS', using)
-
-        super(self.__class__, self).save(*args, **kwargs)
+    pass
 
 # DOCUMENTOS
 
@@ -611,10 +577,6 @@ class CuentasXPagarDocumento(CuentasXPagarDocumentoBase):
 
         return kwargs, error, msg
 
-
-    def __unicode__(self):
-        return u'%s' % self.id
-
 class CuentasXPagarDocumentoImportes(CuentasXPagarDocumentoImportesBase):
    pass
 
@@ -628,9 +590,6 @@ class CuentasXPagarDocumentoCargoLibres(CuentasXPagarDocumentoCargoLibresBase):
     segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
     segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
     
-    def __unicode__(self):
-        return u'%s' % self.id
-
 ################################################################
 ####                                                        ####
 ####               MODELOS CUENTAS POR COBRAR               ####
@@ -640,13 +599,11 @@ class CuentasXPagarDocumentoCargoLibres(CuentasXPagarDocumentoCargoLibresBase):
 # CATALOGOS
 
 class CuentasXCobrarConcepto(CuentasXCobrarConceptoBase):
-    def __unicode__(self):
-        return self.nombre_abrev
+    pass
 
 # DOCUMENTOS
 
 class CuentasXCobrarDocumento(CuentasXCobrarDocumentoBase, models.Model):
-    
     def get_totales(self, cuenta_contado = None):
         error = 0
         msg = ''
@@ -759,47 +716,9 @@ class CuentasXCobrarDocumento(CuentasXCobrarDocumentoBase, models.Model):
         }
         
         return kwargs, error, msg
-        
-    def __unicode__(self):
-        return u'%s' % self.id
-
-    def next_folio( self, using=None):
-        """ Generar un folio nuevo del concepto del documento e incrementa el consecutivo de folio """
-        concepto = self.concepto    
-        folio = concepto.sig_folio
-
-        prefijo, consecutivo = split_letranumero(concepto.sig_folio)
-        consecutivo +=1
-        concepto.sig_folio = '%s%s'% (prefijo,("%09d" % consecutivo)[len(prefijo):])
-        concepto.save( update_fields=('sig_folio',) )
-
-        return folio
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-
-            #Siguiente folio
-            if self.concepto.sig_folio and not self.folio:
-                self.folio = self.next_folio(using=using)
-            
-            self.naturaleza_concepto = self.concepto.naturaleza
-            
-        super(self.__class__, self).save(*args, **kwargs)
-
+    
 class CuentasXCobrarDocumentoImportes(CuentasXCobrarDocumentoImportesBase):
-    def save(self, *args, **kwargs):
-        if not self.id:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-            
-        super(self.__class__, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return u'%s' % self.id
+    pass
 
 class CuentasXCobrarDocumentoImportesImpuesto(CuentasXCobrarDocumentoImportesImpuestoBase): 
     pass
@@ -813,9 +732,7 @@ class CuentasXCobrarDocumentoCargoLibres(CuentasXCobrarDocumentoCargoLibresBase)
     segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
     segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
     segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
-    def __unicode__(self):
-        return u'%s' % self.id
-
+    
 class CuentasXCobrarDocumentoCreditoLibres(CuentasXCobrarDocumentoCreditoLibresBase):
     segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
     segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
@@ -823,9 +740,7 @@ class CuentasXCobrarDocumentoCreditoLibres(CuentasXCobrarDocumentoCreditoLibresB
     segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
     segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
     
-    def __unicode__(self):
-        return u'%s' % self.id
-
+    
 ################################################################
 ####                                                        ####
 ####               MODELOS CONTABILIDAD                     ####
@@ -835,8 +750,7 @@ class CuentasXCobrarDocumentoCreditoLibres(CuentasXCobrarDocumentoCreditoLibresB
 # CATALOGOS
 
 class ContabilidadCuentaContable(ContabilidadCuentaContableBase):
-    def __unicode__(self):
-        return u'%s (%s)' % (self.cuenta, self.nombre)
+    pass
 
 # DOCUMENTOS
 
@@ -847,7 +761,6 @@ class ContabilidadRecordatorio(ContabilidadRecordatorioBase):
     pass
 
 class ContabilidadDocumento(ContabilidadDocumentoBase):
-
     def next_folio( self, using=None):
         """ Generar un folio nuevo de una poliza e incrementa el consecutivo de folios """
         tipo_poliza = self.tipo_poliza
@@ -892,19 +805,12 @@ class ContabilidadDocumento(ContabilidadDocumentoBase):
     
     def save(self, *args, **kwargs):
         
-        if not self.id:
+        if not self.poliza:
             using = kwargs.get('using', None)
             using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-
-            #Si no se define folio se asigna uno
-            if not self.poliza:
-                self.poliza = self.next_folio(using=using)
+            self.poliza = self.next_folio(using=using)
 
         super(self.__class__, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return u'%s' % self.id
 
 class ContabilidadDocumentoDetalle(ContabilidadDocumentoDetalleBase):
     pass
@@ -912,17 +818,13 @@ class ContabilidadDocumentoDetalle(ContabilidadDocumentoDetalleBase):
 # LISTAS
 
 class TipoPoliza(TipoPolizaBase):
-    def __unicode__(self):
-        return u'%s' % self.nombre 
+    pass
 
 class TipoPolizaDetalle(TipoPolizaDetalleBase):
-    def __unicode__(self):
-        return u'%s' % self.id
+    pass
 
 class ContabilidadDepartamento(ContabilidadDepartamentoBase):
-    def __unicode__(self):
-        return u'%s' % self.clave
-
+    pass
 
 ################################################################
 ####                                                        ####
@@ -931,7 +833,6 @@ class ContabilidadDepartamento(ContabilidadDepartamentoBase):
 ################################################################
 
 # DOCUMENTOS
-
 class VentasDocumento(VentasDocumentoBase):
     # if 'microsip_web.plugins.crearcargos_deremisiones' in MICROSIP_MODULES:
     cargo_generado = models.BooleanField( db_column = 'SIC_CARGO_GENERADO' )
@@ -1047,9 +948,6 @@ class VentasDocumento(VentasDocumentoBase):
         kwargs = {'totales':totales,}
         return kwargs, error, msg
 
-    def __unicode__( self ):
-        return u'%s'% self.folio
-    
     def next_folio( self, connection_name=None, **kwargs ):
         ''' Funcion para generar el siguiente folio de un documento de ventas '''
 
@@ -1074,43 +972,40 @@ class VentasDocumento(VentasDocumentoBase):
 
         return folio, consecutivo
 
-
     def save(self, *args, **kwargs):
-        
-        if not self.id:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-            consecutivo = ''
-            #Si no se define folio se asigna uno
-            if self.folio == '':
-                self.folio, consecutivo = self.next_folio(connection_name=using)
+        using = kwargs.get('using', None)
+        using = using or router.db_for_write(self.__class__, instance=self)
 
-            #si es factura 
-            if consecutivo != '' and self.tipo == 'F' and self.modalidad_facturacion == 'CFDI':
+        consecutivo = ''
+        #Si no se define folio se asigna uno
+        if self.folio == '':
+            self.folio, consecutivo = self.next_folio(connection_name=using)
+
+        #si es factura 
+        if consecutivo != '' and self.tipo == 'F' and self.modalidad_facturacion == 'CFDI':
+            folios_fiscales = first_or_none(ConfiguracionFolioFiscal.objects.using(using).filter(modalidad_facturacion=self.modalidad_facturacion))
+            if not folios_fiscales:
+                ConfiguracionFolioFiscal.objects.using(using).create(
+                        serie = '@',
+                        folio_ini = 1,
+                        folio_fin = 999999999,
+                        ultimo_utilizado = 0,
+                        num_aprobacion ="1",
+                        ano_aprobacion = 1,
+                        modalidad_facturacion = self.modalidad_facturacion,
+                    )
                 folios_fiscales = first_or_none(ConfiguracionFolioFiscal.objects.using(using).filter(modalidad_facturacion=self.modalidad_facturacion))
-                if not folios_fiscales:
-                    ConfiguracionFolioFiscal.objects.using(using).create(
-                            serie = '@',
-                            folio_ini = 1,
-                            folio_fin = 999999999,
-                            ultimo_utilizado = 0,
-                            num_aprobacion ="1",
-                            ano_aprobacion = 1,
-                            modalidad_facturacion = self.modalidad_facturacion,
-                        )
-                    folios_fiscales = first_or_none(ConfiguracionFolioFiscal.objects.using(using).filter(modalidad_facturacion=self.modalidad_facturacion))
 
-                if folios_fiscales:
-                    ConfiguracionFolioFiscalUso.objects.using(using).create(
-                            id= -1,
-                            folios_fiscales = folios_fiscales,
-                            folio= consecutivo,
-                            fecha = datetime.now(),
-                            sistema = self.sistema_origen,
-                            documento = self.id,
-                            xml = '',
-                        )
+            if folios_fiscales:
+                ConfiguracionFolioFiscalUso.objects.using(using).create(
+                        id= -1,
+                        folios_fiscales = folios_fiscales,
+                        folio= consecutivo,
+                        fecha = datetime.now(),
+                        sistema = self.sistema_origen,
+                        documento = self.id,
+                        xml = '',
+                    )
 
         super(self.__class__, self).save(*args, **kwargs)
 
@@ -1121,17 +1016,7 @@ class VentasDocumentoImpuesto(VentasDocumentoImpuestoBase):
     pass
 
 class VentasDocumentoDetalle(VentasDocumentoDetalleBase):
-    def __unicode__(self):
-        return u'%s(%s)'% (self.id, self.documento_pv)
-    
-    def save(self, *args, **kwargs):
-        
-        if not self.id:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-
-        super(self.__class__, self).save(*args, **kwargs)
+    pass
 
 class VentasDocumentoLiga(VentasDocumentoLigaBase):
     pass
@@ -1143,18 +1028,12 @@ class VentasDocumentoFacturaLibres(VentasDocumentoFacturaLibresBase):
     segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
     segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
 
-    def __unicode__(self):
-        return u'%s' % self.id
-    
 class VentasDocumentoFacturaDevLibres(VentasDocumentoFacturaDevLibresBase):
     segmento_1    = models.CharField(max_length=99, db_column='SEGMENTO_1')
     segmento_2    = models.CharField(max_length=99, db_column='SEGMENTO_2')
     segmento_3    = models.CharField(max_length=99, db_column='SEGMENTO_3')
     segmento_4    = models.CharField(max_length=99, db_column='SEGMENTO_4')
     segmento_5    = models.CharField(max_length=99, db_column='SEGMENTO_5')
-
-    def __unicode__(self):
-        return u'%s' % self.id
 
 ################################################################
 ####                                                        ####
@@ -1165,20 +1044,16 @@ class VentasDocumentoFacturaDevLibres(VentasDocumentoFacturaDevLibresBase):
 #LISTAS
 
 class Cajero(CajeroBase):
-    def __unicode__(self):
-        return self.nombre
+    pass
 
 class Caja(CajaBase):
-    def __unicode__(self):
-        return self.nombre 
+    pass
 
 class FormaCobro(FormaCobroBase):
-    def __unicode__(self):
-        return self.nombre
+    pass
 
 class FormaCobroReferencia(FormaCobroReferenciaBase):
-    def __unicode__(self):
-        return self.nombre
+    pass
 
 #DOCUMENTOS
 
@@ -1187,9 +1062,6 @@ class PuntoVentaDocumento(PuntoVentaDocumentoBase):
         puntos                  = models.IntegerField(db_column='SIC_PUNTOS')
         dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
 
-    def __unicode__( self ):
-        return u'%s'% self.folio
-    
     def next_folio( self, connection_name=None, **kwargs ):
         ''' Funcion para generar el siguiente folio de un documento de ventas '''
 
@@ -1214,75 +1086,48 @@ class PuntoVentaDocumento(PuntoVentaDocumentoBase):
 
         return folio, consecutivo - 1
 
-
     def save(self, *args, **kwargs):
+        using = kwargs.get('using', None)
+        using = using or router.db_for_write(self.__class__, instance=self)
         
-        if self.id == -1:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-            consecutivo = ''
-            #Si no se define folio se asigna uno
-            if self.folio == '':
-                self.folio, consecutivo = self.next_folio(connection_name=using)
+        consecutivo = ''
+        #Si no se define folio se asigna uno
+        if self.folio == '':
+            self.folio, consecutivo = self.next_folio(connection_name=using)
 
-            #si es factura 
-            if consecutivo != '' and self.tipo == 'F' and self.modalidad_facturacion == 'CFDI':
-                folios_fiscales = first_or_none(ConfiguracionFolioFiscal.objects.filter(modalidad_facturacion=self.modalidad_facturacion))
-                if folios_fiscales:
-                    ConfiguracionFolioFiscalUso.objects.create(
-                            id= -1,
-                            folios_fiscales = folios_fiscales,
-                            folio= consecutivo,
-                            fecha = datetime.now(),
-                            sistema = self.sistema_origen,
-                            documento = self.id,
-                            xml = '',
-                        )
+        #si es factura 
+        if consecutivo != '' and self.tipo == 'F' and self.modalidad_facturacion == 'CFDI':
+            folios_fiscales = first_or_none(ConfiguracionFolioFiscal.objects.filter(modalidad_facturacion=self.modalidad_facturacion))
+            if folios_fiscales:
+                ConfiguracionFolioFiscalUso.objects.create(
+                        id= -1,
+                        folios_fiscales = folios_fiscales,
+                        folio= consecutivo,
+                        fecha = datetime.now(),
+                        sistema = self.sistema_origen,
+                        documento = self.id,
+                        xml = '',
+                    )
 
         super(self.__class__, self).save(*args, **kwargs)
 
 class PuntoVentaDocumentoDetalle(PuntoVentaDocumentoDetalleBase):
-    def __unicode__(self):
-        return u'%s(%s)'% (self.id, self.documento_pv)
-    
-    def save(self, *args, **kwargs):
-        
-        if self.id == -1:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_DOCTOS', using)
-
-        super(self.__class__, self).save(*args, **kwargs)
+    pass
 
 class PuntoVentaDocumentoLiga(PuntoVentaDocumentoLigaBase):
-    def __unicode__(self):
-        return u'%s'% self.id 
-    
-    def save(self, *args, **kwargs):
-        
-        if self.id == -1:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.id = next_id('ID_LIGAS_DOCTOS', using)
-
-        super(self.__class__, self).save(*args, **kwargs)
+    pass
 
 class PuntoVentaDocumentoLigaDetalle(PuntoVentaDocumentoLigaDetalleBase):
-    def __unicode__(self):
-        return u'%s'% (self.documento_liga, self.detalle_fuente )
+    pass
 
 class PuntoVentaDocumentoDetalleTransferencia(PuntoVentaDocumentoDetalleTransferenciaBase):
-    def __unicode__(self):
-        return u'%s'% self.id 
+    pass
 
 class PuntoVentaCobro(PuntoVentaCobroBase):
-    def __unicode__(self):
-        return u'%s'% self.id
+    pass
 
 class PuntoVentaCobroReferencia(PuntoVentaCobroReferenciaBase):
-    def __unicode__(self):
-        return u'%s'% self.id 
+    pass
 
 class PuntoVentaDocumentoImpuesto(PuntoVentaDocumentoImpuestoBase):
     pass
