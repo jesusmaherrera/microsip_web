@@ -59,7 +59,7 @@ def generar_tarjetas( request, template_name = 'punto_de_venta/herramientas/gene
                 hereda_puntos_a = hereda_puntos_a,
                 )
 
-            ClavesClientes.objects.create( id = -1, clave = clave, cliente = cliente, rol =  rolclaves )
+            ClienteClave.objects.create( id = -1, clave = clave, cliente = cliente, rol =  rolclaves )
         msg = 'Clientes generados correctamente.'
         form = generartarjetas_form()
 

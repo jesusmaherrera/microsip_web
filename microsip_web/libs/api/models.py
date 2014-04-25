@@ -834,8 +834,6 @@ class ContabilidadDepartamento(ContabilidadDepartamentoBase):
 
 # DOCUMENTOS
 class VentasDocumento(VentasDocumentoBase):
-    # if 'microsip_web.plugins.crearcargos_deremisiones' in MICROSIP_MODULES:
-    cargo_generado = models.BooleanField( db_column = 'SIC_CARGO_GENERADO' )
 
     def get_descuento_total(self, **kwargs):
         

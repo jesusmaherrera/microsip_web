@@ -131,9 +131,9 @@ class SelectDBForm(forms.Form):
 
             # T: Acceso total L: Acceso solo a determinadas empresas
             if acceso_empresas == 'T':
-                consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS"
+                consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS order by nombre_corto"
             elif acceso_empresas == 'L':
-                consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS_USUARIOS, EMPRESAS, USUARIOS WHERE USUARIOS.usuario_id = empresas_usuarios.usuario_id AND EMPRESAS.empresa_id = empresas_usuarios.empresa_id AND usuarios.nombre = '%s'"% usuario
+                consulta = u"SELECT EMPRESAS.nombre_corto FROM EMPRESAS_USUARIOS, EMPRESAS, USUARIOS WHERE USUARIOS.usuario_id = empresas_usuarios.usuario_id AND EMPRESAS.empresa_id = empresas_usuarios.empresa_id AND usuarios.nombre = '%s' order by nombre_corto"% usuario
             
             db= fdb.connect(host=conexion_activa.servidor, user= conexion_activa.usuario, password=conexion_activa.password, database="%s\System\CONFIG.FDB"%conexion_activa.carpeta_datos)
             cur = db.cursor()

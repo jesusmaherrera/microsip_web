@@ -212,7 +212,7 @@ def cliente_searchView(request, template_name='main/clientes/clientes/cliente_se
         form = ClienteSearchForm(request.POST)
         if form.is_valid():
             try:
-                cliente = ClavesClientes.objects.get(clave=form.cleaned_data['cliente']).cliente
+                cliente = ClienteClave.objects.get(clave=form.cleaned_data['cliente']).cliente
                 if cliente.hereda_valorpuntos:
                     valor_puntos =  cliente.tipo_cliente.valor_puntos
                 else:
@@ -613,7 +613,7 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
         factura = factura_form.save(commit=False)
 
         cliente = factura.cliente
-        cliente_clave = first_or_none( ClavesClientes.objects.filter( cliente= cliente ) )
+        cliente_clave = first_or_none( ClienteClave.objects.filter( cliente= cliente ) )
         cliente_direccion =  first_or_none( ClienteDireccion.objects.filter( cliente= cliente ) )
         factura_global_tipo = factura_global_fm.cleaned_data['tipo']
         #Si es una factura nueva

@@ -33,7 +33,7 @@ class generartarjetas_form( forms.Form ):
             for numero in range( iniciar_en, iniciar_en + cantidad ):
                 claves.append( '%s' % '%s%s'% ( prefijo, ( "%09d" % numero ) ) )
 
-            if ClavesClientes.objects.filter( clave__in = claves ).exists():
+            if ClienteClave.objects.filter( clave__in = claves ).exists():
                 raise forms.ValidationError(u'Ya Existe una o mas claves en este rango')
 
         return cleaned_data
