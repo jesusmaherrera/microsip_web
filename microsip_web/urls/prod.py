@@ -49,7 +49,7 @@ if 'microsip_web.apps.compras' in MICROSIP_MODULES:
     # urlpatterns += url(r'^compras/', include('microsip_web.apps.compras.documentos.ordenes.urls', namespace='compras_doc_ordenes')),
 
 if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-    urlpatterns += url(r'punto_de_venta/', include('microsip_web.apps.punto_de_venta.puntos.urls', namespace='pv_puntos')),
+    urlpatterns += url(r'punto_de_venta/puntos/', include('microsip_web.apps.punto_de_venta.puntos.urls', namespace='pv_puntos')),
 
 for plugin in MICROSIP_PLUGINS:
         # urlpatterns += url(plugin['url_main_path'], include(plugin['app']+'.urls', namespace='plugins_remisiones_cxc')),

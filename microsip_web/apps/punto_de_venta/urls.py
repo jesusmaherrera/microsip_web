@@ -25,10 +25,6 @@ urlpatterns = patterns('',
     (r'^plantilla_poliza/(?P<id>\d+)/', views.plantilla_poliza_manageView),
     #(r'^plantilla_poliza/eliminar/(?P<id>\d+)/', views.plantilla_poliza_delete),
 
-     #Puntos
-    (r'^inicializar_puntos_clientes/$', views.inicializar_puntos_clientes),
-    (r'^inicializar_puntos_articulos/$', views.inicializar_puntos_articulos),
-
     #Articulos
     (r'^articulo/precio/', views.get_precio_articulo),
 	

@@ -55,28 +55,6 @@ def get_precio_articulo(request, template_name='punto_de_venta/articulos/articul
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 @login_required(login_url='/login/')
-def inicializar_puntos_clientes(request):
-    connection_name = get_conecctionname(request.session)
-    if connection_name == '':
-        return HttpResponseRedirect('/select_db/')
-
-    Cliente.objects.update(puntos=0, dinero_electronico=0, hereda_valorpuntos=1, valor_puntos=0)
-    ClienteTipo.objects.update(valor_puntos=0)
-    return HttpResponseRedirect('/punto_de_venta/clientes/')
-
-@login_required(login_url='/login/')
-def inicializar_puntos_articulos(request):
-    basedatos_activa = request.session['selected_database']
-    if basedatos_activa == '':
-        return HttpResponseRedirect('/select_db/')
-
-    Articulo.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
-    LineaArticulos.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
-    GrupoLineas.objects.update(puntos=0, dinero_electronico=0)
-    
-    return HttpResponseRedirect('/punto_de_venta/articulos/')
-
-@login_required(login_url='/login/')
 def articulo_manageView(request, id = None, template_name='punto_de_venta/articulos/articulos/articulo.html'):
     message = ''
 

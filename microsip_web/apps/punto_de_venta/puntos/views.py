@@ -9,6 +9,28 @@ from microsip_web.libs.custom_db.main import get_conecctionname, next_id
 # user autentication
 from django.contrib.auth.decorators import login_required, permission_required
 
+@login_required(login_url='/login/')
+def inicializar_puntos_clientes(request):
+    connection_name = get_conecctionname(request.session)
+    if connection_name == '':
+        return HttpResponseRedirect('/select_db/')
+
+    Cliente.objects.update(puntos=0, dinero_electronico=0, hereda_valorpuntos=1, valor_puntos=0)
+    ClienteTipo.objects.update(valor_puntos=0)
+    return HttpResponseRedirect('/punto_de_venta/clientes/')
+
+@login_required(login_url='/login/')
+def inicializar_puntos_articulos(request):
+    basedatos_activa = request.session['selected_database']
+    if basedatos_activa == '':
+        return HttpResponseRedirect('/select_db/')
+
+    Articulo.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
+    LineaArticulos.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
+    GrupoLineas.objects.update(puntos=0, dinero_electronico=0)
+    
+    return HttpResponseRedirect('/punto_de_venta/articulos/')
+
 @login_required( login_url = '/login/' )
 def generar_tarjetas( request, template_name = 'punto_de_venta/herramientas/generar_tarjetas.html' ):
     msg = ''

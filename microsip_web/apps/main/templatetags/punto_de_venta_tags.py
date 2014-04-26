@@ -25,7 +25,7 @@ def puntos_tag(tag_name):
    result = ''
    if 'microsip_web.apps.punto_de_venta.puntos' in settings.MICROSIP_MODULES:
       if tag_name == 'generar_tarjetas':
-         result = '<li role="presentation" class="divider"></li><li><a tabindex="-1" href="/punto_de_venta/generar_tarjetas/"><i class="icon-user"></i> Generar Lote de tarjetas</a></li>'
+         result = '<li role="presentation" class="divider"></li><li><a tabindex="-1" href="/punto_de_venta/puntos/generar_tarjetas/"><i class="icon-user"></i> Generar Lote de tarjetas</a></li>'
       if tag_name == 'inicializar_puntos':
          result ='<li role="presentation" class="divider"></li><li><a tabindex="-1" href="#myModal_inicializar_puntos_clientes" data-toggle="modal" >\
          <i class="icon-warning-sign" style="margin-left: 0px;"></i> Inicializar puntos de clientes</a></li>\
