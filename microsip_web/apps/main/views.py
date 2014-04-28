@@ -24,6 +24,7 @@ from microsip_web.apps.inventarios.triggers import triggers as inventarios_trigg
 from microsip_web.apps.inventarios.triggers_salidas import triggers_salidas as inventarios_triggers_salidas
 from microsip_web.apps.punto_de_venta.triggers import triggers as punto_de_venta_triggers
 from microsip_web.libs.custom_db.main import first_or_none
+from django.db.utils import DatabaseError
 
 try:
     scripts = AplicationPlugin.objects.all()
@@ -151,9 +152,13 @@ def inicializar_tablas( request ):
 
 def sincronizar_tablas( conexion_name = None ):
     """ Modifica todas las tablas con campos nuevos para uso en aplicacion. """
-
     c = connections[ conexion_name ].cursor()
-    c.execute("DELETE FROM DJANGO_CONTENT_TYPE;")
+    try:
+        c.execute("DELETE FROM DJANGO_CONTENT_TYPE;")
+    except DatabaseError:
+        pass
+    
+   
     import importlib
 
     for plugin in MICROSIP_PLUGINS:

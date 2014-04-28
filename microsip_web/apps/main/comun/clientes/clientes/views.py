@@ -32,7 +32,7 @@ def clientes_view(request, template_name='main/clientes/clientes/clientes.html')
             if cliente != None:
                 return HttpResponseRedirect('/punto_de_venta/cliente/%s/'% cliente.id)
             elif clave != '':
-                clave_cliente = ClavesClientes.objects.filter(clave=clave)
+                clave_cliente = ClienteClave.objects.filter(clave=clave)
                 if clave_cliente.count() > 0:
                     return HttpResponseRedirect('/punto_de_venta/cliente/%s/'% clave_cliente[0].cliente.id)
                 else:
