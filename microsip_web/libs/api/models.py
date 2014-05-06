@@ -6,7 +6,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.sessions.models import Session
-
 from microsip_api.comun.sic_db import next_id, first_or_none
 import django.dispatch
 
@@ -134,38 +133,31 @@ class ConfiguracionFolioFiscalUso(ConfiguracionFolioFiscalUsoBase):
 ####                                                        ####
 ################################################################
 
-# OTROS
-    
 class Pais(PaisBase):
     def save(self, *args, **kwargs):    
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
+        kwargs['using'] = kwargs.get('using', router.db_for_write(self.__class__, instance=self))
+        super(self.__class__, self).save(*args, **kwargs)
         
         if self.es_predet == 'S':
-            Pais.objects.using(using).all().exclude(pk=self.id).update(es_predet='N')
+            Pais.objects.using(kwargs['using']).all().exclude(pk=self.id).update(es_predet='N')
 
-        super(self.__class__, self).save(*args, **kwargs)
-    
+
 class Estado(EstadoBase):
     def save(self, *args, **kwargs):
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
+        kwargs['using'] = kwargs.get('using', router.db_for_write(self.__class__, instance=self))
+        super(self.__class__, self).save(*args, **kwargs)
         
         if self.es_predet == 'S':
-            Estado.objects.using(using).all().exclude(pk=self.id).update(es_predet='N')
+            Estado.objects.using(kwargs['using']).all().exclude(pk=self.id).update(es_predet='N')
 
-        super(self.__class__, self).save(*args, **kwargs)
 
 class Ciudad(CiudadBase):
     def save(self, *args, **kwargs):
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
-        
-        if self.es_predet == 'S':
-            Ciudad.objects.using(using).all().exclude(pk=self.id).update(es_predet='N')
-
+        kwargs['using'] = kwargs.get('using', router.db_for_write(self.__class__, instance=self))
         super(self.__class__, self).save(*args, **kwargs)
 
+        if self.es_predet == 'S':
+            Ciudad.objects.using(kwargs['using']).all().exclude(pk=self.id).update(es_predet='N')
 
 class Moneda(MonedaBase):
     pass
@@ -244,13 +236,12 @@ class ImpuestoTipo(ImpuestoTipoBase):
 
 class Impuesto(ImpuestoBase):
     def save(self, *args, **kwargs):    
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
+        kwargs['using'] = kwargs.get('using', router.db_for_write(self.__class__, instance=self))
+        super(self.__class__, self).save(*args, **kwargs)
 
         if self.es_predet == 'S':
-            Impuesto.objects.using(using).all().exclude(pk=self.id).update(es_predet='N')
+            Impuesto.objects.using(kwargs['using']).all().exclude(pk=self.id).update(es_predet='N')
 
-        super(self.__class__, self).save(*args, **kwargs)
 
 class ImpuestosArticulo(ImpuestoArticuloBase):
     pass    
@@ -265,13 +256,12 @@ class ClienteTipo(ClienteTipoBase):
 
 class CondicionPago(CondicionPagoBase):
     def save(self, *args, **kwargs):    
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
+        kwargs['using'] = kwargs.get('using', router.db_for_write(self.__class__, instance=self))
+        super(self.__class__, self).save(*args, **kwargs)
 
         if self.es_predet == 'S':
-            CondicionPago.objects.using(using).all().exclude(pk=self.id).update(es_predet='N')
+            CondicionPago.objects.using(kwargs['using']).all().exclude(pk=self.id).update(es_predet='N')
 
-        super(self.__class__, self).save(*args, **kwargs)
 
 class CondicionPagoPlazo(CondicionPagoPlazoBase):
     def save_send_signal(self, *args, **kwargs):
@@ -386,9 +376,8 @@ class ComprasDocumento(ComprasDocumentoBase):
 
     def save(self, *args, **kwargs):
         if self.folio == '':
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.folio = self.next_folio(connection_name=using)
+            kwargs['using'] = kwargs.get('using', router.db_for_write(self.__class__, instance=self))
+            self.folio = self.next_folio(connection_name=kwargs['using'])
 
         super(self.__class__, self).save(*args, **kwargs)
 
@@ -440,8 +429,7 @@ class InventariosDocumento(InventariosDocumentoBase):
 
     def save(self, *args, **kwargs):
         if not self.folio and self.concepto.folio_autom == 'S':
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
+            kwargs['using'] = kwargs.get('using', router.db_for_write(self.__class__, instance=self))
             self.folio = self.next_folio()
 
         super(self.__class__, self).save(*args, **kwargs)
@@ -806,9 +794,8 @@ class ContabilidadDocumento(ContabilidadDocumentoBase):
     def save(self, *args, **kwargs):
         
         if not self.poliza:
-            using = kwargs.get('using', None)
-            using = using or router.db_for_write(self.__class__, instance=self)
-            self.poliza = self.next_folio(using=using)
+            kwargs['using'] = kwargs.get('using', router.db_for_write(self.__class__, instance=self))
+            self.poliza = self.next_folio(using=kwargs['using'])
 
         super(self.__class__, self).save(*args, **kwargs)
 
@@ -837,10 +824,9 @@ class VentasDocumento(VentasDocumentoBase):
 
     def get_descuento_total(self, **kwargs):
         
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
+        kwargs['using'] = kwargs.get('using', router.db_for_write(self.__class__, instance=self))
 
-        c = connections[using].cursor()
+        c = connections[kwargs['using']].cursor()
         c.execute("SELECT SUM(A.dscto_arts + A.dscto_extra_importe) AS TOTAL FROM CALC_TOTALES_DOCTO_VE(%s,'S') AS  A;"% self.id)
         row = c.fetchone()
         return int(row[0])
@@ -971,19 +957,19 @@ class VentasDocumento(VentasDocumentoBase):
         return folio, consecutivo
 
     def save(self, *args, **kwargs):
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
+        kwargs['using'] = kwargs.get('using', router.db_for_write(self.__class__, instance=self))
 
         consecutivo = ''
         #Si no se define folio se asigna uno
         if self.folio == '':
-            self.folio, consecutivo = self.next_folio(connection_name=using)
+            self.folio, consecutivo = self.next_folio(connection_name=kwargs['using'])
+        super(self.__class__, self).save(*args, **kwargs)
 
         #si es factura 
         if consecutivo != '' and self.tipo == 'F' and self.modalidad_facturacion == 'CFDI':
-            folios_fiscales = first_or_none(ConfiguracionFolioFiscal.objects.using(using).filter(modalidad_facturacion=self.modalidad_facturacion))
+            folios_fiscales = first_or_none(ConfiguracionFolioFiscal.objects.using(kwargs['using']).filter(modalidad_facturacion=self.modalidad_facturacion))
             if not folios_fiscales:
-                ConfiguracionFolioFiscal.objects.using(using).create(
+                ConfiguracionFolioFiscal.objects.using(kwargs['using']).create(
                         serie = '@',
                         folio_ini = 1,
                         folio_fin = 999999999,
@@ -992,10 +978,10 @@ class VentasDocumento(VentasDocumentoBase):
                         ano_aprobacion = 1,
                         modalidad_facturacion = self.modalidad_facturacion,
                     )
-                folios_fiscales = first_or_none(ConfiguracionFolioFiscal.objects.using(using).filter(modalidad_facturacion=self.modalidad_facturacion))
+                folios_fiscales = first_or_none(ConfiguracionFolioFiscal.objects.using(kwargs['using']).filter(modalidad_facturacion=self.modalidad_facturacion))
 
             if folios_fiscales:
-                ConfiguracionFolioFiscalUso.objects.using(using).create(
+                ConfiguracionFolioFiscalUso.objects.using(kwargs['using']).create(
                         id= -1,
                         folios_fiscales = folios_fiscales,
                         folio= consecutivo,
@@ -1005,7 +991,6 @@ class VentasDocumento(VentasDocumentoBase):
                         xml = '',
                     )
 
-        super(self.__class__, self).save(*args, **kwargs)
 
 class VentasDocumentoVencimiento(VentasDocumentoVencimientoBase):
     pass
@@ -1085,19 +1070,20 @@ class PuntoVentaDocumento(PuntoVentaDocumentoBase):
         return folio, consecutivo - 1
 
     def save(self, *args, **kwargs):
-        using = kwargs.get('using', None)
-        using = using or router.db_for_write(self.__class__, instance=self)
+        kwargs['using'] = kwargs.get('using', router.db_for_write(self.__class__, instance=self))
         
         consecutivo = ''
         #Si no se define folio se asigna uno
         if self.folio == '':
-            self.folio, consecutivo = self.next_folio(connection_name=using)
+            self.folio, consecutivo = self.next_folio(connection_name=kwargs['using'])
 
+        super(self.__class__, self).save(*args, **kwargs)
+        
         #si es factura 
         if consecutivo != '' and self.tipo == 'F' and self.modalidad_facturacion == 'CFDI':
-            folios_fiscales = first_or_none(ConfiguracionFolioFiscal.objects.filter(modalidad_facturacion=self.modalidad_facturacion))
+            folios_fiscales = first_or_none(ConfiguracionFolioFiscal.objects.using(kwargs['using']).filter(modalidad_facturacion=self.modalidad_facturacion))
             if folios_fiscales:
-                ConfiguracionFolioFiscalUso.objects.create(
+                ConfiguracionFolioFiscalUso.objects.using(kwargs['using']).create(
                         id= -1,
                         folios_fiscales = folios_fiscales,
                         folio= consecutivo,
@@ -1107,7 +1093,6 @@ class PuntoVentaDocumento(PuntoVentaDocumentoBase):
                         xml = '',
                     )
 
-        super(self.__class__, self).save(*args, **kwargs)
 
 class PuntoVentaDocumentoDetalle(PuntoVentaDocumentoDetalleBase):
     pass
@@ -1132,3 +1117,5 @@ class PuntoVentaDocumentoImpuesto(PuntoVentaDocumentoImpuestoBase):
 
 class PuntoVentaDocumentoImpuestoGravado(PuntoVentaDocumentoImpuestoGravadoBase):
     pass
+
+import signals
