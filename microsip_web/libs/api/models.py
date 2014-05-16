@@ -1095,8 +1095,10 @@ class PuntoVentaDocumento(PuntoVentaDocumentoBase):
 
 
 class PuntoVentaDocumentoDetalle(PuntoVentaDocumentoDetalleBase):
-    pass
-
+    if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
+        puntos                  = models.IntegerField(db_column='SIC_PUNTOS')
+        dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
+    
 class PuntoVentaDocumentoLiga(PuntoVentaDocumentoLigaBase):
     pass
 
