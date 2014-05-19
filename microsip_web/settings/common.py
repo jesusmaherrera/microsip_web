@@ -4,7 +4,7 @@
 import os
 import fdb
 import sqlite3
-from local_settings import MICROSIP_MODULES, MICROSIP_PLUGINS
+from local_settings import MICROSIP_MODULES, MICROSIP_PLUGINS, MICROSIP_VERSION
 
 RUTA_PROYECTO =os.path.dirname(os.path.realpath(__file__)).strip('settings')
 DIR = os.path.abspath(os.path.dirname(__file__))
