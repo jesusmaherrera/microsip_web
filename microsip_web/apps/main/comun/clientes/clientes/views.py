@@ -102,10 +102,16 @@ def cliente_manageView(request, id = None, template_name='main/clientes/clientes
         pais = estado.pais
         direccion.nombre_consignatario = u'Dirección principal'
 
+        #direccion.calle = '''%s %s %s,
+        #%s%s,
+        #%s
+        #'''%(direccion.calle_nombre, direccion.numero_exterior, direccion.numero_interior, direccion.colonia, direccion.poblacion, direccion.referencia)
+
         direccion.calle = '''%s %s %s,
-        %s%s,
+        %s,
         %s
-        '''%(direccion.calle_nombre, direccion.numero_exterior, direccion.numero_interior, direccion.colonia, direccion.poblacion, direccion.referencia)
+        '''%(direccion.calle_nombre, direccion.numero_exterior, direccion.numero_interior, direccion.colonia, direccion.referencia)
+        
         direccion.estado = estado
         direccion.pais= pais
         direccion.es_ppal = 'S'
