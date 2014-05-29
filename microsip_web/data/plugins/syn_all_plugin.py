@@ -9,15 +9,11 @@
 '''
 from .syn_all.syn_ciudad import *
 from .syn_all.syn_cliente import *
-from .syn_all.syn_cliente_direccion import *
 from .syn_all.syn_condicion_pago import *
-from .syn_all.syn_condicion_pago_plazo import *
 from .syn_all.syn_estado import *
 from .syn_all.syn_impuesto import *
 from .syn_all.syn_pais import *
 from .syn_all.syn_estado import *
 from .syn_all.syn_articulo import *
-from .syn_all.syn_articulo_clave import *
-from .syn_all.syn_articulo_impuesto import *
 from .syn_all.syn_articulo_linea import *
 from .syn_all.syn_articulo_linea_grupo import *

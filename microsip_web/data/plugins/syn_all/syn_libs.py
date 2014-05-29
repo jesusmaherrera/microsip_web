@@ -36,6 +36,7 @@ def set_indices(indice_final, bases_de_datos_count, tipo):
     
     if indice == 0:
         print "La sincronizacion de %sS termino correctamente"%tipo
+        
     else:
         print "Indice en:%s"%indice
 

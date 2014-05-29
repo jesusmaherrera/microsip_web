@@ -72,16 +72,11 @@ def condicion_de_pago_manageView(request, id = None, template_name='main/cliente
     plazo_formset = plazo_forms(request.POST or None, instance=condicion_de_pago)
     
     if form.is_valid() and plazo_formset.is_valid():
+
         condicion_pago = form.save(commit=False)
         condicion_pago.usuario_creador = request.user.username
         condicion_pago.usuario_ult_modif = condicion_pago.usuario_creador
         condicion_pago.save()
-        
-        for form in plazo_formset:
-            plazo = form.save(commit=False)
-            if not form.has_changed():
-                plazo.save_send_signal(using=conexion_base_datos)
-                
         plazo_formset.save()
 
         return HttpResponseRedirect('/%s/condiciones_de_pago/'%modulo)
@@ -93,3 +88,5 @@ def condicion_de_pago_manageView(request, id = None, template_name='main/cliente
         'modulo':modulo,
     }
     return render_to_response(template_name, c, context_instance=RequestContext(request))
+
+

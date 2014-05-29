@@ -5,11 +5,11 @@ MICROSIP_MODULES = (
     # 'microsip_web.apps.main.filtros',
     'microsip_web.apps.main.comun.articulos',
     # 'microsip_web.apps.main.comun.articulos.articulos.alertas',
-    # 'microsip_web.apps.main.comun.listas',
-    # 'microsip_web.apps.main.comun.otros',
+     'microsip_web.apps.main.comun.listas',
+    'microsip_web.apps.main.comun.otros',
     'microsip_web.apps.main.comun.clientes',
-    'microsip_web.apps.main.comun.clientes.clientes.cliente_articulos',
-    # 'microsip_web.apps.ventas',
+    # 'microsip_web.apps.main.comun.clientes.clientes.cliente_articulos',
+    'microsip_web.apps.ventas',
     # 'microsip_web.apps.ventas.documentos',
     # 'microsip_web.apps.ventas.herramientas.generar_polizas',
     
@@ -19,8 +19,8 @@ MICROSIP_MODULES = (
     # 'microsip_web.apps.cuentas_por_pagar.herramientas.generar_polizas',
     # 'microsip_web.apps.cuentas_por_cobrar',
     # 'microsip_web.apps.cuentas_por_cobrar.herramientas.generar_polizas',
-    'microsip_web.apps.punto_de_venta',    
-    'microsip_web.apps.punto_de_venta.puntos',
+    # 'microsip_web.apps.punto_de_venta',    
+    # 'microsip_web.apps.punto_de_venta.puntos',
 )
 
 MICROSIP_VERSION = 2012

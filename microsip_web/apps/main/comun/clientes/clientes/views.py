@@ -66,6 +66,8 @@ def clientes_view(request, template_name='main/clientes/clientes/clientes.html')
     }
     return render_to_response(template_name, c, context_instance=RequestContext(request))
 
+from django.db.utils import DatabaseError
+
 @login_required(login_url='/login/')
 def cliente_manageView(request, id = None, template_name='main/clientes/clientes/cliente.html'):
     connection_name = get_conecctionname(request.session)
@@ -118,7 +120,13 @@ def cliente_manageView(request, id = None, template_name='main/clientes/clientes
         direccion.save()
         return HttpResponseRedirect('/%s/clientes/'%modulo)
     
-    cliente_articulos = ClienteArticulo.objects.filter(cliente=id)
+    
+    # cliente_articulos = ClienteArticulo.objects.filter(cliente=id)
+
+    # except DatabaseError:
+
+    cliente_articulos= None
+
     c = {
         'cliente_articulos':cliente_articulos,
         'form':form, 

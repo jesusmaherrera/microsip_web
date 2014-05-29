@@ -10,6 +10,7 @@ from .forms import *
 from django.db.models import Q
 from microsip_web.libs.custom_db.main import get_conecctionname, first_or_none
 from django.forms.models import modelformset_factory
+from django.core.exceptions import FieldError
 
 @detect_mobile
 @login_required(login_url='/login/')
@@ -60,7 +61,12 @@ def articulos_view(request, carpeta=1,template_name='main/articulos/articulos/ar
                 articulos_list = Articulo.objects.filter(nombre__icontains=nombre).order_by('nombre')
     else:
         filtro_form = filtroarticulos_form()
-        articulos_list = Articulo.objects.filter(Q(carpeta__id=carpeta)| Q(carpeta__id=None)).order_by('nombre') #filter(carpeta = carpeta)
+        try:
+            Articulo._meta.get_field_by_name('carpeta')
+        except:
+            articulos_list = Articulo.objects.all().order_by('nombre') #filter(carpeta = carpeta)
+        else:
+            articulos_list = Articulo.objects.filter(Q(carpeta__id=carpeta)| Q(carpeta__id=None)).order_by('nombre') #filter(carpeta = carpeta)
     
     paginator = Paginator(articulos_list, articulos_porpagina) # Muestra 10 ventas por pagina
     page = request.GET.get('page')
@@ -135,10 +141,7 @@ def articulo_manageview(request, id, template_name='main/articulos/articulos/art
             if not clave.id:
                 clave.id = -1
                 clave.articulo = articulo
-            elif not form.has_changed():
-                clave.save_send_signal(using=conexion_base_datos)
-
-
+            
         formset.save()
 
         for form in precios_formset :

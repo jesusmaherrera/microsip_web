@@ -20,23 +20,23 @@ from .syn_libs import get_indices, set_indices, default_db
 def SincronizarPais(sender, **kwargs):
     ''' Para sincronizar ciudad en todas las empreas. '''
     
-    
     if kwargs.get('using') == default_db:
         bases_de_datos = MICROSIP_DATABASES.keys()
         bases_de_datos.remove(kwargs.get('using'))
         
         pais_a_syncronizar =  kwargs.get('instance')
-        
         indice, indice_final = get_indices(len(bases_de_datos), 100, 'PAIS')
         for base_de_datos in bases_de_datos[indice:indice_final]:
 
             pais_old = first_or_none(Pais.objects.using(default_db).filter(pk=pais_a_syncronizar.id))
+
             if pais_old:
                 pais_nombre = pais_old.nombre
             else:
                 pais_nombre = pais_a_syncronizar.nombre
 
             pais = first_or_none(Pais.objects.using(base_de_datos).filter(nombre=pais_nombre))
+            
             if pais:
                 pais.nombre= pais_a_syncronizar.nombre
                 pais.es_predet= pais_a_syncronizar.es_predet

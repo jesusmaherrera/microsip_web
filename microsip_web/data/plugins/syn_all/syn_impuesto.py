@@ -28,25 +28,34 @@ def SincronizarImpuesto(sender, **kwargs):
 
         indice, indice_final = get_indices(len(bases_de_datos), 100, 'IMPUESTO')
         for base_de_datos in bases_de_datos[indice:indice_final]:
-            try:
-                impuesto_nombre = Impuesto.objects.using(default_db).get(pk=impuesto_a_syncronizar.id).nombre
-            except ObjectDoesNotExist: 
-                impuesto_nombre = impuesto_a_syncronizar.nombre
-                
-            impuesto = first_or_none(Impuesto.objects.using(base_de_datos).filter(nombre=impuesto_nombre))
-            if impuesto:
-                impuesto.porcentaje = impuesto_a_syncronizar.porcentaje
-                impuesto.nombre= impuesto_a_syncronizar.nombre
-                impuesto.tipoImpuesto= impuesto_a_syncronizar.tipoImpuesto
-                impuesto.es_predet= impuesto_a_syncronizar.es_predet
-                impuesto.save(using=base_de_datos)
+            
+            impuesto_old = first_or_none(Impuesto.objects.using(default_db).filter(pk=impuesto_a_syncronizar.id))
+
+            if impuesto_old:
+                impuesto_nombre = impuesto_old.nombre
             else:
-                tipo_impuesto = first_or_none(ImpuestoTipo.objects.using(base_de_datos).filter(nombre=impuesto_a_syncronizar.tipoImpuesto.nombre))
+                impuesto_nombre = impuesto_a_syncronizar.nombre
+     
+            impuesto = first_or_none(Impuesto.objects.using(base_de_datos).filter(nombre=impuesto_nombre))
+
+            if impuesto:
+                tipo_impuesto = first_or_none(ImpuestoTipo.objects.using(base_de_datos).filter(nombre=impuesto_old.tipoImpuesto.nombre))
+
+                if tipo_impuesto:
+                    impuesto.porcentaje = impuesto_old.porcentaje
+                    impuesto.nombre= impuesto_old.nombre
+                    impuesto.tipoImpuesto = tipo_impuesto
+                    impuesto.tipo_iva = impuesto_old.tipo_iva
+                    impuesto.es_predet= impuesto_old.es_predet
+                    impuesto.save(using=base_de_datos)
+            else:
+                tipo_impuesto = first_or_none(ImpuestoTipo.objects.using(base_de_datos).filter(nombre=impuesto_old.tipoImpuesto.nombre))
                 if tipo_impuesto:
                     Impuesto.objects.using(base_de_datos).create(
                             id=-1,
-                            nombre= impuesto_a_syncronizar.nombre,
+                            nombre= impuesto_old.nombre,
                             tipoImpuesto = tipo_impuesto,
-                            porcentaje = impuesto_a_syncronizar.porcentaje
+                            tipo_iva = impuesto_old.tipo_iva,
+                            porcentaje = impuesto_old.porcentaje
                         )
         set_indices(indice_final, len(bases_de_datos), 'IMPUESTO')

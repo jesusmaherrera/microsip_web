@@ -10,6 +10,7 @@ import json
 from microsip_web.apps.main.filtros.models import *
 from microsip_web.apps.main.filtros.views import get_next_id_carpeta
 from .herramientas.generar_polizas.models import PlantillaPolizas_V
+from microsip_web.settings.local_settings import MICROSIP_MODULES
 
 @dajaxice_register(method='GET')
 def args_example(request, text):
@@ -69,9 +70,14 @@ def buscar_hijos(data=[]):
         data = datoshijos
     return data
 
+
 @dajaxice_register(method='GET')
 def get_estructura_carpetas(request):
-    datos = buscar_hijos(None)
+    if 'microsip_web.apps.main.filtros' in MICROSIP_MODULES:
+        datos = buscar_hijos(None)
+    else:
+        datos = {}
+        
     return HttpResponse(json.dumps(datos), mimetype="application/javascript")
 
 @dajaxice_register(method='GET')

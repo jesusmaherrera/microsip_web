@@ -9,8 +9,6 @@ from django.contrib.sessions.models import Session
 from microsip_api.comun.sic_db import next_id, first_or_none
 import django.dispatch
 
-articulo_clave_save_signal = django.dispatch.Signal()
-plazo_condicion_pago_save_signal = django.dispatch.Signal()
 from microsip_web.settings.local_settings import MICROSIP_MODULES
 from django.db import connections
 
@@ -198,14 +196,13 @@ class Articulo(ArticuloBase):
         dinero_electronico  = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_DINERO_ELECTRONICO' )
         hereda_puntos = models.BooleanField( db_column = 'SIC_HEREDA_PUNTOS' )
         
-    carpeta = models.ForeignKey( Carpeta, blank = True, null = True, db_column = 'SIC_CARPETA_ID' )
+        carpeta = models.ForeignKey( Carpeta, blank = True, null = True, db_column = 'SIC_CARPETA_ID' )
     
 class ArticuloClaveRol(ArticuloClaveRolBase):
     pass
 
 class ArticuloClave(ArticuloClaveBase):
-    def save_send_signal(self, *args, **kwargs):
-        articulo_clave_save_signal.send(sender=self, *args, **kwargs)
+    pass
 
 class ArticuloPrecio(ArticuloPrecioBase):
     pass
@@ -264,8 +261,7 @@ class CondicionPago(CondicionPagoBase):
 
 
 class CondicionPagoPlazo(CondicionPagoPlazoBase):
-    def save_send_signal(self, *args, **kwargs):
-        articulo_clave_save_signal.send(sender=self, *args, **kwargs)
+    pass
 
 class Cliente(ClienteBase):
     if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
