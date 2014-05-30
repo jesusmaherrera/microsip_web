@@ -74,7 +74,7 @@ def SincronizarArticulo(sender, **kwargs):
 def SincronizarDependencias(**kwargs):
     ''' Para sincronizar primer plazo de condiciones de pago en todas las empreas registradas. '''
     bases_de_datos = MICROSIP_DATABASES.keys()
-    bases_de_datos.remove(kwargs.get('using'))
+    bases_de_datos.remove(default_db)
     articulo_nombre= kwargs.get('articulo_nombre')
 
     fuente_articulo = Articulo.objects.using(default_db).get(nombre=articulo_nombre)

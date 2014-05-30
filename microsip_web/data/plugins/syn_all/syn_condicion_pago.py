@@ -59,7 +59,7 @@ def SincronizarCondicionPago(sender, **kwargs):
 
 def sync_condicion_pago_plazo(**kwargs):  
     bases_de_datos = MICROSIP_DATABASES.keys()
-    bases_de_datos.remove(kwargs.get('using'))
+    bases_de_datos.remove(default_db)
     condicion_pago_nombre_a_syncronizar =  kwargs.get('condicion_pago_nombre')
     condicion_de_pago_fuente = CondicionPago.objects.using(default_db).get(nombre=condicion_pago_nombre_a_syncronizar)
     primer_plazos_fuente =  first_or_none(CondicionPagoPlazo.objects.filter(condicion_de_pago= condicion_de_pago_fuente))
