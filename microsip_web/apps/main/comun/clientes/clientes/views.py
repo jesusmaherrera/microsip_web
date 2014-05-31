@@ -112,7 +112,7 @@ def cliente_manageView(request, id = None, template_name='main/clientes/clientes
         direccion.calle = '''%s %s %s,
         %s,
         %s
-        '''%(direccion.calle_nombre, direccion.numero_exterior, direccion.numero_interior, direccion.colonia, direccion.referencia)
+        '''%(direccion.calle_nombre, direccion.numero_exterior, direccion.numero_interior, direccion.colonia, direccion.referencia or '')
         
         direccion.estado = estado
         direccion.pais= pais
