@@ -73,47 +73,45 @@ def SincronizarArticulo(sender, **kwargs):
 
 def SincronizarDependencias(**kwargs):
     ''' Para sincronizar primer plazo de condiciones de pago en todas las empreas registradas. '''
-    bases_de_datos = MICROSIP_DATABASES.keys()
-    bases_de_datos.remove(default_db)
+    using =  kwargs.get('using')
     articulo_nombre= kwargs.get('articulo_nombre')
-
+    #DATOS FUENTE
     fuente_articulo = Articulo.objects.using(default_db).get(nombre=articulo_nombre)
     fuente_articulo_clave = first_or_none(ArticuloClave.objects.using(default_db).filter(articulo=fuente_articulo, rol__es_ppal='S'))
     fuente_impuesto_articulo = first_or_none(ImpuestosArticulo.objects.using(default_db).filter(articulo=fuente_articulo))
 
-    indice, indice_final = get_indices(len(bases_de_datos), 40, 'ARTICULO')
-    for base_de_datos in bases_de_datos[indice:indice_final]:
-        articulo = Articulo.objects.using(base_de_datos).get(nombre=articulo_nombre)
+    #DATOS ORIGEN
+    articulo = Articulo.objects.using(using).get(nombre=articulo_nombre)
 
-        ####################################
-        #  Actualiza la primer clave
-        ####################################
-        articulo_clave = first_or_none(ArticuloClave.objects.using(base_de_datos).filter(articulo=articulo, rol__es_ppal='S'))
-        rol_principal = ArticuloClaveRol.objects.using(base_de_datos).get(es_ppal='S')
-        
-        if articulo_clave:
-            articulo_clave.clave = fuente_articulo_clave.clave
-            articulo_clave.articulo = articulo
-            articulo_clave.rol = rol_principal
-            articulo_clave.save(using=base_de_datos)
-        else:
-            ArticuloClave.objects.using(base_de_datos).create(
-                    clave = fuente_articulo_clave.clave,
+    ####################################
+    #  Actualiza la primer clave
+    ####################################
+    articulo_clave = first_or_none(ArticuloClave.objects.using(using).filter(articulo=articulo, rol__es_ppal='S'))
+    rol_principal = ArticuloClaveRol.objects.using(using).get(es_ppal='S')
+    
+    if articulo_clave:
+        articulo_clave.clave = fuente_articulo_clave.clave
+        articulo_clave.articulo = articulo
+        articulo_clave.rol = rol_principal
+        articulo_clave.save(using=using)
+    else:
+        ArticuloClave.objects.using(using).create(
+                clave = fuente_articulo_clave.clave,
+                articulo = articulo,
+                rol = rol_principal,
+            )
+
+    ####################################
+    #  Actualiza el primer impuesto
+    ####################################    
+    impuesto_articulo = first_or_none(ImpuestosArticulo.objects.using(using).filter(articulo=articulo))
+    impuesto = Impuesto.objects.using(using).get(nombre=fuente_impuesto_articulo.impuesto.nombre)
+
+    if impuesto_articulo:
+        impuesto_articulo.impuesto = impuesto
+        impuesto_articulo.save(using=using)
+    else:
+        ImpuestosArticulo.objects.using(using).create(
                     articulo = articulo,
-                    rol = rol_principal,
+                    impuesto = impuesto,
                 )
-
-        ####################################
-        #  Actualiza el primer impuesto
-        ####################################    
-        impuesto_articulo = first_or_none(ImpuestosArticulo.objects.using(base_de_datos).filter(articulo=articulo))
-        impuesto = Impuesto.objects.using(base_de_datos).get(nombre=fuente_impuesto_articulo.impuesto.nombre)
-
-        if impuesto_articulo:
-            impuesto_articulo.impuesto = impuesto
-            impuesto_articulo.save(using=base_de_datos)
-        else:
-            ImpuestosArticulo.objects.using(base_de_datos).create(
-                        articulo = articulo,
-                        impuesto = impuesto,
-                    )

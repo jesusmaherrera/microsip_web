@@ -53,31 +53,25 @@ def SincronizarCondicionPago(sender, **kwargs):
                         usuario_ult_modif= condicion_pago_a_syncronizar.usuario_creador
                     )
 
-            sync_condicion_pago_plazo(using=kwargs.get('using'), condicion_pago_nombre= condicion_pago_nombre)
+            sync_condicion_pago_plazo(using=base_de_datos, condicion_pago_nombre= condicion_pago_nombre)
 
         set_indices(indice_final, len(bases_de_datos), 'CONDICIONPAGO')
 
 def sync_condicion_pago_plazo(**kwargs):  
-    bases_de_datos = MICROSIP_DATABASES.keys()
-    bases_de_datos.remove(default_db)
-    condicion_pago_nombre_a_syncronizar =  kwargs.get('condicion_pago_nombre')
-    condicion_de_pago_fuente = CondicionPago.objects.using(default_db).get(nombre=condicion_pago_nombre_a_syncronizar)
-    primer_plazos_fuente =  first_or_none(CondicionPagoPlazo.objects.filter(condicion_de_pago= condicion_de_pago_fuente))
-    
-    indice, indice_final = get_indices(len(bases_de_datos), 40, 'CONDICIONPAGO')
+    using =  kwargs.get('using')
+    fuente_condicion_pago_nombre = kwargs.get('condicion_pago_nombre')
+    fuente_primer_plazo = first_or_none(CondicionPagoPlazo.objects.using(default_db).filter(condicion_de_pago__nombre= fuente_condicion_pago_nombre))
 
-    for base_de_datos in bases_de_datos[indice:indice_final]:
-        condicion_de_pago = CondicionPago.objects.using(base_de_datos).get(nombre=condicion_de_pago_fuente.nombre)
-        
-        primer_plazo = first_or_none(CondicionPagoPlazo.objects.using(base_de_datos).filter(condicion_de_pago= condicion_de_pago))
-        
-        if primer_plazo:
-            primer_plazo.dias = primer_plazos_fuente.dias
-            primer_plazo.porcentaje_de_venta= primer_plazos_fuente.porcentaje_de_venta
-            primer_plazo.save(using=base_de_datos)
-        else:
-            CondicionPagoPlazo.objects.using(base_de_datos).create(
-                        condicion_de_pago = condicion_de_pago,
-                        dias = primer_plazos_fuente.dias,
-                        porcentaje_de_venta = primer_plazos_fuente.porcentaje_de_venta
-                    )
+    condicion_de_pago = CondicionPago.objects.using(using).get(nombre=fuente_condicion_pago_nombre)
+    primer_plazo = first_or_none(CondicionPagoPlazo.objects.using(using).filter(condicion_de_pago= condicion_de_pago))
+    
+    if primer_plazo:
+        primer_plazo.dias = fuente_primer_plazo.dias
+        primer_plazo.porcentaje_de_venta= fuente_primer_plazo.porcentaje_de_venta
+        primer_plazo.save(using=using)
+    else:
+        CondicionPagoPlazo.objects.using(using).create(
+                    condicion_de_pago = condicion_de_pago,
+                    dias = fuente_primer_plazo.dias,
+                    porcentaje_de_venta = fuente_primer_plazo.porcentaje_de_venta
+                )
