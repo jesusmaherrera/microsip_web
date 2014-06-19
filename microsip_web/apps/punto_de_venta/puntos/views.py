@@ -25,9 +25,9 @@ def inicializar_puntos_articulos(request):
     if basedatos_activa == '':
         return HttpResponseRedirect('/select_db/')
 
-    Articulo.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
-    LineaArticulos.objects.update(puntos=0, dinero_electronico=0, hereda_puntos=1)
-    GrupoLineas.objects.update(puntos=0, dinero_electronico=0)
+    Articulo.objects.update(puntos=None, dinero_electronico=None, hereda_puntos=1)
+    LineaArticulos.objects.update(puntos=None, dinero_electronico=None, hereda_puntos=1)
+    GrupoLineas.objects.update(puntos=None, dinero_electronico=None)
     
     return HttpResponseRedirect('/punto_de_venta/articulos/')
 

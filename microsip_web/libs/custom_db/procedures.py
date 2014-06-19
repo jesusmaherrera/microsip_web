@@ -104,12 +104,12 @@ procedures['SIC_PUNTOS_ARTICULOS_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_PUNTOS')) then
-            execute statement 'ALTER TABLE ARTICULOS ADD SIC_PUNTOS SMALLINT DEFAULT 0';
+            execute statement 'ALTER TABLE ARTICULOS ADD SIC_PUNTOS SMALLINT';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE ARTICULOS ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2) DEFAULT 0';
+            execute statement 'ALTER TABLE ARTICULOS ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2)';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
@@ -130,13 +130,13 @@ procedures['SIC_PUNTOS_LINEASARTICULOS_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2) DEFAULT 0';
+            execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2)';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_PUNTOS')) then
-            execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD SIC_PUNTOS ENTERO DEFAULT 0';
-
+            execute statement 'ALTER TABLE LINEAS_ARTICULOS ADD SIC_PUNTOS SMALLINT';
+        
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'LINEAS_ARTICULOS' and rf.RDB$FIELD_NAME = 'SIC_HEREDA_PUNTOS')) then
@@ -151,12 +151,12 @@ procedures['SIC_PUNTOS_GRUPOSLINEAS_AT'] = '''
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'GRUPOS_LINEAS' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE GRUPOS_LINEAS ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2) DEFAULT 0';
+            execute statement 'ALTER TABLE GRUPOS_LINEAS ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2)';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'GRUPOS_LINEAS' and rf.RDB$FIELD_NAME = 'SIC_PUNTOS')) then
-            execute statement 'ALTER TABLE GRUPOS_LINEAS ADD SIC_PUNTOS ENTERO DEFAULT 0';
+            execute statement 'ALTER TABLE GRUPOS_LINEAS ADD SIC_PUNTOS SMALLINT';
 
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
@@ -198,9 +198,18 @@ procedures['SIC_PUNTOS_CLIENTES_AT'] = '''
         select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_HEREDAR_PUNTOS_A')) then
             execute statement 'ALTER TABLE CLIENTES ADD SIC_HEREDAR_PUNTOS_A ENTERO_ID';
+
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_FECHA_CORTE')) then
+            execute statement 'ALTER TABLE CLIENTES ADD SIC_FECHA_CORTE DATE';
+
+        if (not exists(
+        select 1 from RDB$RELATION_FIELDS rf
+        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_APLICAR_DSCTO')) then
+            execute statement 'ALTER TABLE CLIENTES ADD SIC_APLICAR_DSCTO SMALLINT DEFAULT 0';
     END
     '''
-
 procedures['SIC_PUNTOS_LIBRESCLIENTES_AT'] = '''
     CREATE OR ALTER PROCEDURE SIC_PUNTOS_LIBRESCLIENTES_AT
     as

@@ -13,7 +13,7 @@ MICROSIP_MODULES = (
     # 'microsip_web.apps.ventas.documentos',
     # 'microsip_web.apps.ventas.herramientas.generar_polizas',
     
-    # 'microsip_web.apps.inventarios',
+     'microsip_web.apps.inventarios',
     # 'microsip_web.apps.compras',
     # 'microsip_web.apps.cuentas_por_pagar',
     # 'microsip_web.apps.cuentas_por_pagar.herramientas.generar_polizas',

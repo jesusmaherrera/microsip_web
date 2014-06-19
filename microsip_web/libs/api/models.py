@@ -272,6 +272,9 @@ class Cliente(ClienteBase):
         hereda_valorpuntos = models.BooleanField( db_column = 'SIC_HEREDA_VALORPUNTOS' )
         valor_puntos = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_VALOR_PUNTOS' )
         hereda_puntos_a = models.ForeignKey( 'self', db_column = 'SIC_HEREDAR_PUNTOS_A', related_name = 'hereda_puntos_a_cliente', blank = True, null = True )
+        fecha_corte = models.DateField(blank=True, null=True, db_column='SIC_FECHA_CORTE')
+        aplicar_descuento_sin_tarjeta = models.BooleanField( db_column = 'SIC_APLICAR_DSCTO' )
+        
 
 class ClienteClaveRol(ClienteClaveRolBase):
     pass
@@ -1040,6 +1043,9 @@ class PuntoVentaDocumento(PuntoVentaDocumentoBase):
     if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
         puntos                  = models.IntegerField(db_column='SIC_PUNTOS')
         dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
+        cliente_tarjeta = models.ForeignKey(Cliente, db_column='sic_cliente_tarjeta',  related_name='cliente_tarjeta', blank=True, null=True)
+        puntos_pago = models.IntegerField(db_column='SIC_PUNTOS_PAGO')
+        dinero_electronico_pago = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO_PAGO')
 
     def next_folio( self, connection_name=None, **kwargs ):
         ''' Funcion para generar el siguiente folio de un documento de ventas '''

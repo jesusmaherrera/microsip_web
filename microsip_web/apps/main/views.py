@@ -121,7 +121,49 @@ def inicializar_tablas( request ):
         
         #Triggers
         if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
+            borrar_triggers_puntodeventa( conexion_name = conexion_name )
             actualizar_triggers_puntodeventa( conexion_name = conexion_name )
+            
+            padre = first_or_none(Registry.objects.filter(nombre='PreferenciasEmpresa'))
+            if padre:
+                if not Registry.objects.filter( nombre = 'SIC_PUNTOS_CORTE_DIA' ).exists():
+
+                    Registry.objects.create(
+                        nombre = 'SIC_PUNTOS_CORTE_DIA',
+                        tipo = 'V',
+                        padre = padre,
+                        valor= datetime.datetime.now().day
+                    ) 
+                if not Registry.objects.filter( nombre = 'SIC_PUNTOS_CORTE_MES' ).exists():
+                    Registry.objects.create(
+                            nombre = 'SIC_PUNTOS_CORTE_MES',
+                            tipo = 'V',
+                            padre = padre,
+                            valor= datetime.datetime.now().month
+                        ) 
+                if not Registry.objects.filter( nombre = 'SIC_PUNTOS_CORTE_ANIO' ).exists():
+                    Registry.objects.create(
+                            nombre = 'SIC_PUNTOS_CORTE_ANIO',
+                            tipo = 'V',
+                            padre = padre,
+                            valor= datetime.datetime.now().year
+                        ) 
+
+                if not Registry.objects.filter( nombre = 'SIC_PUNTOS_ARTICULO_PUNTOS_PREDET' ).exists():
+                    Registry.objects.create(
+                            nombre = 'SIC_PUNTOS_ARTICULO_PUNTOS_PREDET',
+                            tipo = 'V',
+                            padre = padre,
+                            valor=0
+                        ) 
+                if not Registry.objects.filter( nombre = 'SIC_PUNTOS_ARTICULO_DINERO_ELECT_PREDET' ).exists():
+                    Registry.objects.create(
+                            nombre = 'SIC_PUNTOS_ARTICULO_DINERO_ELECT_PREDET',
+                            tipo = 'V',
+                            padre = padre,
+                            valor=0
+                        ) 
+
         else:
             borrar_triggers_puntodeventa( conexion_name = conexion_name )
 
@@ -286,12 +328,9 @@ def actualizar_triggers_puntodeventa( conexion_name = None ):
     ####################### TRIGGERS #######################
      #DETALLE DE VENTAS
     c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_DOCTOSPVDET_BU' ] )
-    c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_DOCTOSPVDET_AD' ] )
     #VENTAS
     c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_DOCTOSPV_BU' ] )
-    c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_DOCTOSPV_AD' ] )
-    #CLIENTES
-    c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_CLIENTES_BU' ] )
+    
     #EXCEPTION
     try:
         c.execute(
