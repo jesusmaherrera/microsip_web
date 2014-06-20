@@ -183,7 +183,7 @@ def get_fecha_de_corte(cliente_id):
     fecha_corte = Cliente.objects.get(pk=cliente_id).fecha_corte
     if fecha_corte:
         return fecha_corte
-
+    
     corte_dia = Registry.objects.get(nombre='SIC_PUNTOS_CORTE_DIA').get_value()
     corte_mes = Registry.objects.get(nombre='SIC_PUNTOS_CORTE_MES').get_value()
     corte_anio = Registry.objects.get(nombre='SIC_PUNTOS_CORTE_ANIO').get_value()
@@ -199,6 +199,16 @@ def get_fecha_de_corte(cliente_id):
     if not corte_anio or corte_anio == u'0' or corte_anio == '':
         corte_anio = datetime.now().year
     
+    dias_de_mes= { '1':31, '2':28, '3':31, '4':30, '5':31, '6':30, '7':31, '8':30, '9':30, '10':31, '11':30, '12':31,}
+    
+    if (int(corte_anio) % 4) == 0:
+        dias_de_mes['2'] = 29
+    else:
+        dias_de_mes['2'] = 28 
+
+    if  corte_dia > dias_de_mes[str(corte_mes)]:
+        corte_dia = dias_de_mes[str(corte_mes)]
+
     return datetime.strptime('%s%s%s'%(corte_dia, corte_mes, corte_anio), "%d%m%Y").date()
 
 @login_required(login_url='/login/')
@@ -208,6 +218,7 @@ def cliente_searchView(request, template_name='main/clientes/clientes/cliente_se
     dinero_en_puntos = 0
     total_puntos =0
     total_dinero_electronico =0
+
     if request.method == 'POST':
         form = ClienteSearchForm(request.POST)
         if form.is_valid():
@@ -417,16 +428,12 @@ def preferenciasEmpresa_View(request, template_name='punto_de_venta/herramientas
             msg = 'Datos guardados correctamente'
 
     #Validar formularios y guardar datos
-    if preferencias_generalform.is_valid():
+    if preferencias_generalform.is_valid() and form_reg.is_valid() and form.is_valid():
         preferencias_generalform.save()
-        msg = 'Datos guardados correctamente'
-    if form_reg.is_valid():
         form_reg.save()
-        msg = 'Datos guardados correctamente'
-    if form.is_valid():
         form.save()
         msg = 'Datos guardados correctamente'
-
+    
     plantillas = PlantillaPolizas_pv.objects.all()
     
     c = {

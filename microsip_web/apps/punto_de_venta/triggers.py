@@ -118,7 +118,7 @@ triggers['SIC_PUNTOS_PV_DOCTOSPVDET_BU'] = '''
 #####################
 
 triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'] = '''
-    CREATE OR ALTER TRIGGER SIC_PUNTOS_PV_DOCTOSPV_BU FOR DOCTOS_PV
+   CREATE OR ALTER TRIGGER SIC_PUNTOS_PV_DOCTOSPV_BU FOR DOCTOS_PV
     ACTIVE BEFORE UPDATE POSITION 0
     AS
     DECLARE VARIABLE cliente_heredar_puntos_a INTEGER;
@@ -131,7 +131,18 @@ triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'] = '''
     DECLARE VARIABLE corte_mes INTEGER;
     DECLARE VARIABLE corte_anio INTEGER;
     DECLARE VARIABLE corte_fecha date;
-
+    declare variable ene smallint = 31;
+    declare variable feb smallint = 28;
+    declare variable mar smallint = 31;
+    declare variable abr smallint = 30;
+    declare variable may smallint = 31;
+    declare variable jun smallint = 30;
+    declare variable jul smallint = 31;
+    declare variable ago smallint = 30;
+    declare variable sep smallint = 30;
+    declare variable oct smallint = 31;
+    declare variable nov smallint = 30;
+    declare variable dic smallint = 31;
 
     DECLARE VARIABLE cliente_tipo_id INTEGER;
     DECLARE VARIABLE cliente_tipo_nombre char(50);
@@ -162,6 +173,12 @@ triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'] = '''
     DECLARE VARIABLE dinero_electronico_pago DOUBLE PRECISION;
 
     BEGIN
+    feb = mod(corte_anio, 4);
+    if (feb=0)then
+        feb = 29;
+    else
+        feb = 28;
+
         IF (NEW.tipo_docto = 'V' or NEW.tipo_docto = 'D' ) THEN
         BEGIN
             select cliente_id from claves_clientes where clave_cliente = new.clave_cliente into :cliente_clave_id;
@@ -280,7 +297,32 @@ triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'] = '''
                         corte_mes = EXTRACT(MONTH FROM CURRENT_DATE );
                     if (corte_anio is null or corte_anio = '0') then
                         corte_anio = EXTRACT(YEAR FROM CURRENT_DATE );
-        
+
+                    if (corte_mes= 1 and corte_dia > ene) then
+                        corte_dia = ene;
+                    if (corte_mes= 2 and corte_dia > feb) then
+                        corte_dia = feb;
+                    if (corte_mes= 3 and corte_dia > mar) then
+                        corte_dia = mar;
+                    if (corte_mes= 4 and corte_dia > abr) then
+                        corte_dia = abr;
+                    if (corte_mes= 5 and corte_dia > may) then
+                        corte_dia = may;
+                    if (corte_mes= 6 and corte_dia > jun) then
+                        corte_dia = jun;
+                    if (corte_mes= 7 and corte_dia > jul) then
+                        corte_dia = jul;
+                    if (corte_mes= 8 and corte_dia > ago) then
+                        corte_dia = ago;
+                    if (corte_mes= 9 and corte_dia > sep) then
+                        corte_dia = sep;
+                    if (corte_mes= 10 and corte_dia > oct) then
+                        corte_dia = oct;
+                    if (corte_mes= 11 and corte_dia > nov) then
+                        corte_dia = nov;
+                    if (corte_mes= 12 and corte_dia > dic) then
+                        corte_dia = dic;
+
                     corte_fecha = cast(corte_anio||'-'||corte_mes||'-'||corte_dia as date);
                 end
 

@@ -5,6 +5,7 @@ import autocomplete_light
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from models import *
+import datetime
 
 class articulo_byclave_form( forms.Form ):
     clave = forms.CharField(max_length=100)
@@ -69,6 +70,22 @@ class PreferenciasPuntosManageForm(forms.Form):
 
     articulo_puntos = forms.IntegerField(min_value=0)
     articulo_dinero_electronico = forms.DecimalField(min_value=0)
+
+    def clean(self, *args, **kwargs):
+        cleaned_data = self.cleaned_data
+        dia = cleaned_data.get('corte_dia')
+        mes = cleaned_data.get('corte_mes')
+        anio = cleaned_data.get('corte_anio')
+        
+        if mes:
+            if not anio or anio == 0:
+                anio = datetime.datetime.now().year
+            try:
+                datetime.datetime(year=int(anio), month=int(mes),  day=int(dia))
+            except ValueError:
+                raise forms.ValidationError(u'fecha invalida')
+
+        return cleaned_data
 
     def save(self, *args, **kwargs):
         corte_dia_obj = Registry.objects.get( nombre = 'SIC_PUNTOS_CORTE_DIA')
