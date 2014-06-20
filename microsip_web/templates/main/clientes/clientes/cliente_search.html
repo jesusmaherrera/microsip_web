@@ -8,11 +8,17 @@
 <script type="text/javascript">
   $(document).ready(function(){
     $('#id_cliente').focus();
+
+    setTimeout(cerrar, 7000);
   });
 
+  function cerrar(){
+    open(location, '_self').close();
+  }
+
+  
 </script>
 {% endblock %}
-
 {% block content %}
 <form method="post" class="form-horizontal" action="" width="300px"  enctype='multipart/form-data'>
   {% csrf_token %}
