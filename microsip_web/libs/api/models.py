@@ -1137,5 +1137,3 @@ class PuntoVentaDocumentoImpuesto(PuntoVentaDocumentoImpuestoBase):
 
 class PuntoVentaDocumentoImpuestoGravado(PuntoVentaDocumentoImpuestoGravadoBase):
     pass
-
-import signals
