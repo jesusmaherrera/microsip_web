@@ -89,17 +89,18 @@ def SincronizarDependencias(**kwargs):
     articulo_clave = first_or_none(ArticuloClave.objects.using(using).filter(articulo=articulo, rol__es_ppal='S'))
     rol_principal = ArticuloClaveRol.objects.using(using).get(es_ppal='S')
     
-    if articulo_clave:
-        articulo_clave.clave = fuente_articulo_clave.clave
-        articulo_clave.articulo = articulo
-        articulo_clave.rol = rol_principal
-        articulo_clave.save(using=using)
-    else:
-        ArticuloClave.objects.using(using).create(
-                clave = fuente_articulo_clave.clave,
-                articulo = articulo,
-                rol = rol_principal,
-            )
+    if fuente_articulo_clave:
+        if articulo_clave:
+            articulo_clave.clave = fuente_articulo_clave.clave
+            articulo_clave.articulo = articulo
+            articulo_clave.rol = rol_principal
+            articulo_clave.save(using=using)
+        else:
+            ArticuloClave.objects.using(using).create(
+                    clave = fuente_articulo_clave.clave,
+                    articulo = articulo,
+                    rol = rol_principal,
+                )
 
     ####################################
     #  Actualiza el primer impuesto

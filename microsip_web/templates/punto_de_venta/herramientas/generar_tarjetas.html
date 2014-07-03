@@ -31,10 +31,7 @@ $(function() {
       if ($('#id_valor_puntos').val() == '') 
         $('#id_valor_puntos').val(0);
     }
-  });
-  
-  if ($('#id_tipo_tarjeta').val()=='N')
-    $('#div_darpuntos_a').hide();
+  });    
 
   if ($('#id_tipo_tarjeta').val()=='P')
     $('#div_valor_puntos').show();
@@ -45,12 +42,7 @@ $(function() {
     if ($('#id_tipo_tarjeta').val()=='P')
       $('#div_valor_puntos').show();
     else
-      $('#div_valor_puntos').hide(); 
-
-    if ($('#id_tipo_tarjeta').val()=='N')
-      $('#div_darpuntos_a').hide();
-    else
-      $('#div_darpuntos_a').show();
+      $('#div_valor_puntos').hide();   
   });
 
 });
@@ -83,31 +75,39 @@ $(function() {
         {{ form.tipo_tarjeta}}
       </div>
     </div>
+  </div>
+  <fieldset  id='div_valor_puntos'>
+    <legend>Valor de cada punto($)</legend>
+    <div class="span2">
+      <label>Valor</label>
+      <div>
+        {{ form.valor_puntos }}
+      </div>
+    </div>
+    <div class="span3 ">  
+      <label>Heredar del tipo de cliente</label>
+      <div>
+        {{ form.hereda_valorpuntos }}
+      </div>
+    </div>
+  </fieldset>
+  
+  <fieldset  id='div_valor_puntos'>
+    <legend>Puntos y/o dinero extra</legend>
     <div class="span" >
-      <label>Puntos</label>
+      <label>Puntos extra</label>
       <div class="input-prepend input-append">
         {{ form.puntos }}
       </div>
     </div>
     <div class="span" >
-      <label>Dinero Electronico</label>
+      <label>Dinero Electronico extra</label>
       <div class="input-prepend input-append">
         {{ form.dinero_electronico }}
       </div>
     </div>
-    <div class="span" id='div_valor_puntos'>
-      <label>Hereda valor de puntos {{ form.hereda_valorpuntos }}</label>
-      <div class="input-prepend input-append">
-        {{ form.valor_puntos }}
-      </div>
-    </div>
-    <div class="span" id="div_darpuntos_a">
-      <label>Dar puntos a</label>
-      <div class="input-prepend input-append">
-        {{ form.hereda_puntos_a }}
-      </div>
-    </div>
-  </div>
+  </fieldset>
+  <hr>
   <div  class="row">
     <div class="span" >
       <label>Prefijo</label>

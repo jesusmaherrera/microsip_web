@@ -266,8 +266,6 @@ class CondicionPagoPlazo(CondicionPagoPlazoBase):
 class Cliente(ClienteBase):
     if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
         TIPOS = ( ( 'N', 'No Aplica' ),( 'P', 'Puntos' ),( 'D', 'Dinero Electronico' ), )
-        puntos = models.IntegerField(default = 0, blank = True, null = True, db_column = 'SIC_PUNTOS' )
-        dinero_electronico = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_DINERO_ELECTRONICO' )
         tipo_tarjeta = models.CharField( default = 'N', max_length = 1, choices = TIPOS, db_column = 'SIC_TIPO_TARJETA' )
         hereda_valorpuntos = models.BooleanField( db_column = 'SIC_HEREDA_VALORPUNTOS' )
         valor_puntos = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_VALOR_PUNTOS' )
@@ -1031,6 +1029,11 @@ class Cajero(CajeroBase):
 class Caja(CajaBase):
     pass
 
+class CajaFolios(CajaFoliosBase):
+    pass 
+
+class CajeroCaja(CajeroCajaBase):
+    pass
 class FormaCobro(FormaCobroBase):
     pass
 
@@ -1044,30 +1047,43 @@ class PuntoVentaDocumento(PuntoVentaDocumentoBase):
         puntos                  = models.IntegerField(db_column='SIC_PUNTOS')
         dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
         cliente_tarjeta = models.ForeignKey(Cliente, db_column='sic_cliente_tarjeta',  related_name='cliente_tarjeta', blank=True, null=True)
-        puntos_pago = models.IntegerField(db_column='SIC_PUNTOS_PAGO')
+        puntos_pago = models.IntegerField(default=0, db_column='SIC_PUNTOS_PAGO')
         dinero_electronico_pago = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO_PAGO')
 
     def next_folio( self, connection_name=None, **kwargs ):
         ''' Funcion para generar el siguiente folio de un documento de ventas '''
-
+        
         #Parametros opcionales
         serie = kwargs.get('serie', None)
-        consecutivos_folios = FolioVenta.objects.using(connection_name).filter(tipo_doc = self.tipo, modalidad_facturacion = self.modalidad_facturacion)
-        if serie:
-            consecutivos_folios = consecutivos_folios.filter(serie=serie)
+        
+        if self.tipo == 'F':
+            consecutivos_folios = FolioVenta.objects.using(connection_name).filter(tipo_doc = self.tipo, modalidad_facturacion = self.modalidad_facturacion)
+            if serie:
+                consecutivos_folios = consecutivos_folios.filter(serie=serie)
 
-        consecutivo_row = first_or_none(consecutivos_folios)
-        consecutivo = ''
-        if consecutivo_row:
-            consecutivo = consecutivo_row.consecutivo 
-            serie = consecutivo_row.serie
-            if serie == u'@':
-                serie = ''
+            consecutivo_row = first_or_none(consecutivos_folios)
+            consecutivo = ''
+            if consecutivo_row:
+                consecutivo = consecutivo_row.consecutivo 
+                serie = consecutivo_row.serie
+                if serie == u'@':
+                    serie = ''
+
+            consecutivo_row.consecutivo = consecutivo_row.consecutivo + 1
+            consecutivo_row.save()
+
+        elif self.tipo == 'V':
+            caja_folios_list =  CajaFolios.objects.filter(caja= self.caja, documento_tipo = self.tipo).values_list( 'serie', 'consecutivo')[0]
+            serie = caja_folios_list[0]
+            consecutivo = caja_folios_list[1]
+
+            c = connections[connection_name].cursor()
+            query = '''UPDATE FOLIOS_CAJAS set CONSECUTIVO=%s WHERE CAJA_ID = %s and TIPO_DOCTO = %s;'''
+            c.execute(query,[consecutivo+1, self.caja.id, self.tipo])
+            c.close()
+            # management.call_command( 'syncdb', database = using, interactive= False)
 
         folio = '%s%s'% (serie,("%09d" % int(consecutivo))[len(serie):]) 
-
-        consecutivo_row.consecutivo = consecutivo_row.consecutivo + 1
-        consecutivo_row.save()
 
         return folio, consecutivo - 1
 

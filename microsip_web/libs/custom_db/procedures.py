@@ -171,16 +171,6 @@ procedures['SIC_PUNTOS_CLIENTES_AT'] = '''
     BEGIN
         if (not exists(
         select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_DINERO_ELECTRONICO')) then
-            execute statement 'ALTER TABLE CLIENTES ADD SIC_DINERO_ELECTRONICO NUMERIC(15,2) DEFAULT 0';
-
-        if (not exists(
-        select 1 from RDB$RELATION_FIELDS rf
-        where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_PUNTOS')) then
-            execute statement 'ALTER TABLE CLIENTES ADD SIC_PUNTOS ENTERO DEFAULT 0';
-
-        if (not exists(
-        select 1 from RDB$RELATION_FIELDS rf
         where rf.RDB$RELATION_NAME = 'CLIENTES' and rf.RDB$FIELD_NAME = 'SIC_TIPO_TARJETA')) then
             execute statement 'ALTER TABLE CLIENTES ADD SIC_TIPO_TARJETA CHAR(1)';
         

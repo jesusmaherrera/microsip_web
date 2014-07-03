@@ -24,7 +24,7 @@ def new_factura_global( **kwargs ):
     almacen = kwargs.get('almacen', None)
     cliente = kwargs.get('cliente', None)
     cliente_direccion = kwargs.get('cliente_direccion', None)
-    cliente_clave = first_or_none( ClavesClientes.objects.filter( cliente=cliente ) )
+    cliente_clave = first_or_none( ClienteClave.objects.filter( cliente=cliente ) )
     
     factura_tipo = kwargs.get('factura_tipo', None)
     modalidad_facturacion = kwargs.get('modalidad_facturacion', None)
@@ -39,6 +39,7 @@ def new_factura_global( **kwargs ):
 
     # Ventas sin facturar
     ventas_sinfacturar =  PuntoVentaDocumento.objects.exclude( id__in = ventas_facturadas_list).exclude(estado='C').filter(tipo= 'V', fecha__gte = fecha_inicio, fecha__lte = fecha_fin)
+    
     detalles_factura = PuntoVentaDocumentoDetalle.objects.exclude(documento_pv__estado='C').exclude(documento_pv__id__in = ventas_facturadas_list)\
        .filter(documento_pv__tipo = 'V',documento_pv__fecha__gte= fecha_inicio, documento_pv__fecha__lte=fecha_fin)
     if almacen:
@@ -77,7 +78,7 @@ def new_factura_global( **kwargs ):
                     # 'detalles': detalles_venta,
                 })
         
-        impuestos_doc =  Impuestos_docto_pv.objects.filter(documento_pv__in=ventas_sinfacturar_list).filter(venta_neta__gt=0).values('impuesto','porcentaje_impuestos').annotate(
+        impuestos_doc =  PuntoVentaDocumentoImpuesto.objects.filter(documento_pv__in=ventas_sinfacturar_list).filter(venta_neta__gt=0).values('impuesto','porcentaje_impuestos').annotate(
                 venta_neta = Sum('venta_neta'),
                 otros_impuestos = Sum('otros_impuestos'),
                 importe_impuesto = Sum('importe_impuesto'),

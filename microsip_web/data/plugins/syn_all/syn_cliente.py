@@ -127,5 +127,5 @@ def SincronizarClienteDireccion(**kwargs):
         
         if settings.MICROSIP_VERSION >= 2013:
             kwargs['poblacion']= fuente_direccion.poblacion
-
+        
         ClienteDireccion.objects.create_simple(**kwargs)

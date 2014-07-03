@@ -3,7 +3,8 @@ from django.db import models
 import datetime
 
 from microsip_web.libs.api.models import (CondicionPago, Impuesto, ContabilidadCuentaContable, Almacen, Articulo, ClienteTipo, TipoPoliza, PuntoVentaDocumento,
-    PuntoVentaDocumentoDetalle, PuntoVentaCobro,  PuntoVentaDocumentoLiga, Registry, Cliente, ClienteClave, LineaArticulos)
+    PuntoVentaDocumentoDetalle, PuntoVentaCobro,  PuntoVentaDocumentoLiga, Registry, Cliente, ClienteClave, LineaArticulos, Cajero, Caja, CajeroCaja, CajaFolios,
+    ClienteDireccion, ClienteClave, PuntoVentaDocumentoImpuesto, ArticuloClave)
 
 ################################################################
 ####                                                        ####

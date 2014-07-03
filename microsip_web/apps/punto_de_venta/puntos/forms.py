@@ -3,6 +3,7 @@ from django import forms
 from microsip_web.libs.api.models import *
 from models import *
 import autocomplete_light
+from django.core.exceptions import ObjectDoesNotExist
 
 class generartarjetas_form( forms.Form ):
     prefijo = forms.CharField( max_length = 3, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
@@ -12,9 +13,8 @@ class generartarjetas_form( forms.Form ):
     tipo_tarjeta = forms.ChoiceField( choices = TIPOS_TARJETA )
     puntos = forms.IntegerField( initial = 0, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ))
     dinero_electronico = forms.DecimalField( initial = 0, max_value = 2000, decimal_places = 2, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
-    hereda_valorpuntos = forms.BooleanField( initial = True, required = False )
-    valor_puntos = forms.DecimalField( initial = 0, max_digits = 15, decimal_places = 2, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
-    hereda_puntos_a = forms.ModelChoiceField( queryset = Cliente.objects.all(), widget=autocomplete_light.ChoiceWidget('ClienteAutocomplete'), required = False )
+    hereda_valorpuntos = forms.BooleanField( initial = False, required = False )
+    valor_puntos = forms.DecimalField( initial = 1, max_digits = 15, decimal_places = 2, widget = forms.TextInput( attrs = { 'class' : 'input-mini' } ) )
     
     def clean_iniciar_en(self):
         iniciar_en = self.cleaned_data['iniciar_en']
@@ -27,7 +27,17 @@ class generartarjetas_form( forms.Form ):
         prefijo = cleaned_data.get("prefijo")
         iniciar_en = cleaned_data.get("iniciar_en")
         cantidad = cleaned_data.get("cantidad")
-        
+
+        if not Registry.objects.get(nombre='ARTICULO_VENTAS_FG_PV_ID').get_value():
+            raise forms.ValidationError(u'Por favor define primero el articulo general en preferencias de empresa de microsip')
+        if not Registry.objects.get(nombre='CLIENTE_EVENTUAL_PV_ID').get_value():
+            raise forms.ValidationError(u'Por favor define primero el cliente eventual en preferencias de empresa de microsip')
+
+        try:
+            Articulo.objects.get(nombre='PARA PUNTOS')
+        except ObjectDoesNotExist:
+            raise forms.ValidationError(u'No existe un ariculo llamado [PARA PUNTOS]')
+
         if iniciar_en != None and cantidad != None:
             claves = []
             for numero in range( iniciar_en, iniciar_en + cantidad ):

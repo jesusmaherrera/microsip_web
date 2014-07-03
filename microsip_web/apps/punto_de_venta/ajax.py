@@ -30,9 +30,9 @@ def generar_factura_global( request, **kwargs ):
 
     # Parametros
     connection_name = get_conecctionname(request.session)
-    fecha_inicio = datetime.strptime( kwargs.get( 'fecha_inicio', None ), '%d/%m/%Y' ).date()
+    fecha_inicio = datetime.datetime.strptime( kwargs.get( 'fecha_inicio', None ), '%d/%m/%Y' ).date()
     # fecha_fin = datetime.strptime( kwargs.get( 'fecha_inicio', None ), '%d/%m/%Y' ).date()
-    fecha_fin = datetime.strptime( kwargs.get( 'fecha_fin', None ), '%d/%m/%Y' ).date()
+    fecha_fin = datetime.datetime.strptime( kwargs.get( 'fecha_fin', None ), '%d/%m/%Y' ).date()
     almacen = first_or_none( Almacen.objects.filter( pk = kwargs.get('almacen_id', None) ) )
     cliente = Cliente.objects.get( pk = int( kwargs.get('cliente_id', None) ) )
     cliente_direccion =  first_or_none( ClienteDireccion.objects.filter(cliente=cliente) )
