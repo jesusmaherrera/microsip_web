@@ -47,6 +47,8 @@ def ventas_tools_menu(tool_name):
             <li class="dropdown">
                <a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-cog"></i> Herramientas <b class="caret"></b></a>
                <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
+                 <li><a tabindex="-1" href="/ventas/generar_polizas/"><i class="icon-share"></i> Generar Polizas Contables</a></li>
+                 <li role="presentation" class="divider"></li>
                  <li><a tabindex="-1" href="/ventas/PreferenciasEmpresa/"><i class="icon-cog"></i> Preferencias de la empresa</a></li>
                </ul>
              </li>
