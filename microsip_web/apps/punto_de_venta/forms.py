@@ -126,6 +126,7 @@ class PreferenciasGeneralManageForm(forms.Form):
 
     def save(self, *args, **kwargs):
         articulo_general_obj = Registry.objects.get( nombre = 'ARTICULO_VENTAS_FG_PV_ID')
+        
         if articulo_general_obj.valor != self.cleaned_data['articulo_general']:
             articulo_general_obj.valor = self.cleaned_data['articulo_general']
             articulo_general_obj.save()

@@ -411,6 +411,7 @@ def preferenciasEmpresa_View(request, template_name='punto_de_venta/herramientas
     form_reg = InformacioncontableRegManageForm( request.POST or None, initial= infcontable_initialvalues)
     form = InformacionContableManageForm(request.POST or None, instance=informacion_contable)
     from_puntos = None
+
     if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
         puntos_initial = {
             'corte_dia': Registry.objects.get(nombre='SIC_PUNTOS_CORTE_DIA').get_value(),
@@ -426,13 +427,26 @@ def preferenciasEmpresa_View(request, template_name='punto_de_venta/herramientas
         if from_puntos.is_valid():
             from_puntos.save()
             msg = 'Datos guardados correctamente'
+    fallo = None
+    QUE_FALLO = ''
+    
+    if request.POST:
+        if form.is_valid():
+            form.save()
+            msg = 'Datos guardados correctamente'        
+        else:
+            fallo = True    
+            QUE_FALLO = 'FORM'
 
-    #Validar formularios y guardar datos
-    if preferencias_generalform.is_valid() and form_reg.is_valid() and form.is_valid():
-        preferencias_generalform.save()
-        form_reg.save()
-        form.save()
-        msg = 'Datos guardados correctamente'
+        if preferencias_generalform.is_valid():
+            preferencias_generalform.save()
+            msg = 'Datos guardados correctamente'
+        else:
+            fallo = True
+            QUE_FALLO = 'PREF'
+
+    if fallo:
+        msg = 'FALLO ('+QUE_FALLO+')'
     
     plantillas = PlantillaPolizas_pv.objects.all()
     
