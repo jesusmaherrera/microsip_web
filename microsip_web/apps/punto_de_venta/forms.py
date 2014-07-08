@@ -120,7 +120,8 @@ class PreferenciasPuntosManageForm(forms.Form):
 
 
 class PreferenciasGeneralManageForm(forms.Form):
-    articulo_general= forms.ModelChoiceField(Articulo.objects.filter( es_almacenable= 'N' ), 
+
+    articulo_general= forms.ModelChoiceField(Articulo.objects.filter( es_almacenable= 'N', es_juego='N'), 
             widget= autocomplete_light.ChoiceWidget('Articulos_noalm_Autocomplete')
         )
 

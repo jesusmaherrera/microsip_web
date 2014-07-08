@@ -428,7 +428,6 @@ def preferenciasEmpresa_View(request, template_name='punto_de_venta/herramientas
             from_puntos.save()
             msg = 'Datos guardados correctamente'
     fallo = None
-    QUE_FALLO = ''
     
     if request.POST:
         if form.is_valid():
@@ -436,17 +435,15 @@ def preferenciasEmpresa_View(request, template_name='punto_de_venta/herramientas
             msg = 'Datos guardados correctamente'        
         else:
             fallo = True    
-            QUE_FALLO = 'FORM'
 
         if preferencias_generalform.is_valid():
             preferencias_generalform.save()
             msg = 'Datos guardados correctamente'
         else:
             fallo = True
-            QUE_FALLO = 'PREF'
 
     if fallo:
-        msg = 'FALLO ('+QUE_FALLO+')'
+        msg = ''
     
     plantillas = PlantillaPolizas_pv.objects.all()
     

@@ -21,7 +21,7 @@ autocomplete_light.register(
 		Articulo, 
 		autocomplete_js_attributes = {'placeholder':'Articulo'},
 	    search_fields = ('nombre',), 
-	    choices= Articulo.objects.filter( es_almacenable= 'N' ),
+	    choices= Articulo.objects.filter( es_almacenable= 'N', es_juego='N'),
 	    name='Articulos_noalm_Autocomplete',
     )
 
