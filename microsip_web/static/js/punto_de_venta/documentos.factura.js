@@ -9,17 +9,17 @@ function cargar_factura_global(data){
   }
   else
   {
-    $.each(data.detalles, function( index, detalle ) {
-      seleccionar_articulo({'articulo_id':detalle.articulo_id, 'articulo_nombre':detalle.articulo_nombre, 'comun_name':'docto_pv_det_set-'+index+'-'});
-      $("input[name='docto_pv_det_set-"+index+"-unidades']").val(detalle.unidades);
-      $("input[name='docto_pv_det_set-"+index+"-precio_unitario']").val(detalle.precio);
-      $("input[name='docto_pv_det_set-"+index+"-precio_total_neto']").val(detalle.precio_total_neto);
-      $("input[name='docto_pv_det_set-"+index+"-clave_articulo']").val(detalle.articulo_clave);
-      $("input[name='docto_pv_det_set-"+index+"-porcentaje_descuento']").val(detalle.porcentaje_descuento);
-      $("input[name='docto_pv_det_set-"+index+"-detalles_liga']").val(detalle.detalles_relacion);
-      if (data.detalles.length-1 > index)
-        $('#id_doctosIn_table').find('a:last').click();
-    });
+      $.each(data.detalles, function( index, detalle ) {
+        seleccionar_articulo({'articulo_id':detalle.articulo_id, 'articulo_nombre':detalle.articulo_nombre, 'comun_name':'docto_pv_det_set-'+index+'-'});
+        $("input[name='docto_pv_det_set-"+index+"-unidades']").val(detalle.unidades);
+        $("input[name='docto_pv_det_set-"+index+"-precio_unitario']").val(detalle.precio);
+        $("input[name='docto_pv_det_set-"+index+"-precio_total_neto']").val(detalle.precio_total_neto);
+        $("input[name='docto_pv_det_set-"+index+"-clave_articulo']").val(detalle.articulo_clave);
+        $("input[name='docto_pv_det_set-"+index+"-porcentaje_descuento']").val(detalle.porcentaje_descuento);
+        $("input[name='docto_pv_det_set-"+index+"-detalles_liga']").val(detalle.detalles_relacion);
+        if (data.detalles.length-1 > index)
+          $('#id_doctosIn_table').find('a:last').click();
+      });
     
     $("#id_importe_neto").val(data.totales.importe_neto);
     $("#id_total_impuestos").val(data.totales.total_impuestos).trigger('change');

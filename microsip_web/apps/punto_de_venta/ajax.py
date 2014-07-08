@@ -46,9 +46,9 @@ def generar_factura_global( request, **kwargs ):
         c = {'message':'por favor primero espesifica un articulo general',}
         return HttpResponse( json.dumps(c), mimetype = "application/javascript" )
     
-    if cliente_direccion.rfc_curp != "XAXX010101000":
-        c = {'message':'Una factura global solo puede realizar a clientes con \nRFC: XAXX010101000',}
-        return HttpResponse( json.dumps(c), mimetype = "application/javascript" )
+    # if cliente_direccion.rfc_curp != "XAXX010101000":
+    #     c = {'message':'Una factura global solo puede realizar a clientes con \nRFC: XAXX010101000',}
+    #     return HttpResponse( json.dumps(c), mimetype = "application/javascript" )
 
     data = new_factura_global(
             fecha_inicio = fecha_inicio,
@@ -71,5 +71,5 @@ def generar_factura_global( request, **kwargs ):
         'fecha_fin':data['fecha_fin'],
         'impuestos': data['impuestos'],
         }
-
+        
     return HttpResponse( json.dumps(c), mimetype = "application/javascript" )

@@ -14,6 +14,7 @@ class factura_global_form( forms.Form ):
     TIPOS_GEN_FACTURA = (
         ('P', 'Una partida'),
         ('C', 'Concentrada'),
+        ('D', 'Detallada'),
     )
     fecha_inicio = forms.DateField( widget = forms.TextInput( attrs = { 'class' : 'input-small' } ), required= True )
     fecha_fin = forms.DateField(widget = forms.TextInput( attrs = { 'class' : 'input-small' } ) , required= True)

@@ -22,7 +22,8 @@ from microsip_web.libs import contabilidad
 from microsip_web.apps.main.forms import filtroarticulos_form
 from microsip_web.libs.custom_db.main import get_conecctionname, first_or_none
 from microsip_web.libs.punto_de_venta import new_factura_global
-from microsip_web.settings.local_settings import MICROSIP_MODULES
+from microsip_web.settings.local_settings import MICROSIP_MODULES, MICROSIP_VERSION
+
 ##########################################
 ##                                      ##
 ##              Articulos               ##
@@ -689,12 +690,13 @@ def factura_manageView( request, id = None, template_name='punto_de_venta/docume
             factura.tipo_cambio= 1
             factura.unidad_comprom= 'S'
             factura.tipo_descuento= 'I'
-
+            
             #datos de factura global
-            # factura.tipo_gen_fac='R'
-            # factura.es_fac_global='S'
-            # factura.fecha_ini_fac_global = fecha_ini_fac_global
-            # factura.fecha_fin_fac_global = fecha_fin_fac_global
+            if MICROSIP_VERSION >= 2013:    
+                factura.tipo_gen_fac='R'
+                factura.es_fac_global='S'
+                factura.fecha_ini_fac_global = fecha_ini_fac_global
+                factura.fecha_fin_fac_global = fecha_fin_fac_global
 
             factura.porcentaje_descuento=0
             

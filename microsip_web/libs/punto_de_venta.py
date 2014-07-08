@@ -38,7 +38,7 @@ def new_factura_global( **kwargs ):
     ventas_facturadas_list =  list( set( ventas_facturadas.values_list( 'docto_pv_fuente__id', flat = True ) ) ) 
 
     # Ventas sin facturar
-    ventas_sinfacturar =  PuntoVentaDocumento.objects.exclude( id__in = ventas_facturadas_list).exclude(estado='C').filter(tipo= 'V', fecha__gte = fecha_inicio, fecha__lte = fecha_fin)
+    ventas_sinfacturar =  PuntoVentaDocumento.objects.exclude( id__in = ventas_facturadas_list).exclude(estado='C').filter(tipo= 'V', fecha__gte = fecha_inicio, fecha__lte = fecha_fin, cliente=cliente)
     
     detalles_factura = PuntoVentaDocumentoDetalle.objects.exclude(documento_pv__estado='C').exclude(documento_pv__id__in = ventas_facturadas_list)\
        .filter(documento_pv__tipo = 'V',documento_pv__fecha__gte= fecha_inicio, documento_pv__fecha__lte=fecha_fin)
@@ -173,5 +173,4 @@ def new_factura_global( **kwargs ):
         'fecha_fin':str(fecha_fin),
         'impuestos': impuestos,
     }
-
     return data
