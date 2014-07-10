@@ -120,8 +120,10 @@ def articulo_manageview(request, id, template_name='main/articulos/articulos/art
         impuesto_articulo = ImpuestosArticulo()
     
     if request.method == 'POST':
+        precios_formset = None
         formset = clavesarticulos_fromset(request.POST, prefix="formset")
-        precios_formset = preciosarticulos_fromset(request.POST, prefix="precios_formset")
+        if modulo ==  'ventas' or modulo ==  'inventarios':
+            precios_formset = preciosarticulos_fromset(request.POST, prefix="precios_formset")
     else:
         formset = clavesarticulos_fromset(queryset=ArticuloClave.objects.filter(articulo=articulo), prefix="formset")
         precios_formset = preciosarticulos_fromset(queryset=ArticuloPrecio.objects.filter(articulo=articulo), prefix="precios_formset")
@@ -131,33 +133,34 @@ def articulo_manageview(request, id, template_name='main/articulos/articulos/art
     impuesto_articulo_form = impuestos_articulos_form(request.POST or None, instance=impuesto_articulo)
 
     #Si los datos de los formularios son correctos # and 
-    if articulo_form.is_valid() and formset.is_valid() and impuesto_articulo_form.is_valid() and precios_formset.is_valid():
-        articulo_form.save()
+    if request.method == 'POST' and articulo_form.is_valid() and formset.is_valid() and impuesto_articulo_form.is_valid():
+        if ((modulo ==  'ventas' or modulo == 'inventarios') and precios_formset.is_valid()) or modulo == 'punto_de_venta':
+            articulo_form.save()
 
-        for form in formset :
-            clave = form.save(commit = False)
-            #PARA CREAR UNO NUEVO
-            
-            if not clave.id:
-                clave.id = -1
-                clave.articulo = articulo
-            
-        formset.save()
+            for form in formset :
+                clave = form.save(commit = False)
+                #PARA CREAR UNO NUEVO
+                
+                if not clave.id:
+                    clave.id = -1
+                    clave.articulo = articulo
+                
+            formset.save()
+            if modulo ==  'ventas':
+                for form in precios_formset :
+                    precio = form.save(commit = False)
+                    #PARA CREAR UNO NUEVO
+                    if not precio.id:
+                        precio.id = -1
+                        precio.articulo = articulo
 
-        for form in precios_formset :
-            precio = form.save(commit = False)
-            #PARA CREAR UNO NUEVO
-            if not precio.id:
-                precio.id = -1
-                precio.articulo = articulo
+                precios_formset.save()
 
-        precios_formset.save()
-
-        impuesto_articulo_form.save(commit = False)
-        if not impuesto_articulo.id:
-            impuesto_articulo.id = -1
-        impuesto_articulo.articulo = articulo
-        impuesto_articulo.save()
+            impuesto_articulo_form.save(commit = False)
+            if not impuesto_articulo.id:
+                impuesto_articulo.id = -1
+            impuesto_articulo.articulo = articulo
+            impuesto_articulo.save()
 
         return HttpResponseRedirect('/%s/articulos/'%modulo)
 
