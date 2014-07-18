@@ -119,54 +119,6 @@ def inicializar_tablas( request ):
         # Campos nuevos en tablas
         sincronizar_tablas( conexion_name = conexion_name )
         
-        #Triggers
-        if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-            borrar_triggers_puntodeventa( conexion_name = conexion_name )
-            actualizar_triggers_puntodeventa( conexion_name = conexion_name )
-            
-            padre = first_or_none(Registry.objects.filter(nombre='PreferenciasEmpresa'))
-            if padre:
-                if not Registry.objects.filter( nombre = 'SIC_PUNTOS_CORTE_DIA' ).exists():
-
-                    Registry.objects.create(
-                        nombre = 'SIC_PUNTOS_CORTE_DIA',
-                        tipo = 'V',
-                        padre = padre,
-                        valor= datetime.datetime.now().day
-                    ) 
-                if not Registry.objects.filter( nombre = 'SIC_PUNTOS_CORTE_MES' ).exists():
-                    Registry.objects.create(
-                            nombre = 'SIC_PUNTOS_CORTE_MES',
-                            tipo = 'V',
-                            padre = padre,
-                            valor= datetime.datetime.now().month
-                        ) 
-                if not Registry.objects.filter( nombre = 'SIC_PUNTOS_CORTE_ANIO' ).exists():
-                    Registry.objects.create(
-                            nombre = 'SIC_PUNTOS_CORTE_ANIO',
-                            tipo = 'V',
-                            padre = padre,
-                            valor= datetime.datetime.now().year
-                        ) 
-
-                if not Registry.objects.filter( nombre = 'SIC_PUNTOS_ARTICULO_PUNTOS_PREDET' ).exists():
-                    Registry.objects.create(
-                            nombre = 'SIC_PUNTOS_ARTICULO_PUNTOS_PREDET',
-                            tipo = 'V',
-                            padre = padre,
-                            valor=0
-                        ) 
-                if not Registry.objects.filter( nombre = 'SIC_PUNTOS_ARTICULO_DINERO_ELECT_PREDET' ).exists():
-                    Registry.objects.create(
-                            nombre = 'SIC_PUNTOS_ARTICULO_DINERO_ELECT_PREDET',
-                            tipo = 'V',
-                            padre = padre,
-                            valor=0
-                        ) 
-
-        else:
-            borrar_triggers_puntodeventa( conexion_name = conexion_name )
-
         if 'microsip_web.apps.punto_de_venta' in MICROSIP_MODULES:
             if not Registry.objects.filter( nombre = 'ARTICULO_VENTAS_FG_PV_ID' ).exists():
                 padre = first_or_none(Registry.objects.filter(nombre='PreferenciasEmpresa'))
@@ -176,8 +128,6 @@ def inicializar_tablas( request ):
                             tipo = 'V',
                             padre = padre
                         ) 
-
-
 
         if 'microsip_web.apps.inventarios' in MICROSIP_MODULES:
             actualizar_triggers_inventarios( conexion_name = conexion_name )
@@ -227,40 +177,6 @@ def sincronizar_tablas( conexion_name = None ):
             c.execute('EXECUTE PROCEDURE %s;'%procedure)
             c.execute('DROP PROCEDURE %s;'%procedure)
 
-    if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-        c.execute( procedures[ 'SIC_PUNTOS_ARTICULOS_AT' ] )
-        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_ARTICULOS_AT;')
-        c.execute('DROP PROCEDURE SIC_PUNTOS_ARTICULOS_AT;')
-
-        c.execute( procedures[ 'SIC_PUNTOS_LINEASARTICULOS_AT' ] )
-        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_LINEASARTICULOS_AT;')
-        c.execute('DROP PROCEDURE SIC_PUNTOS_LINEASARTICULOS_AT;')
-        
-        c.execute( procedures[ 'SIC_PUNTOS_GRUPOSLINEAS_AT' ] )
-        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_GRUPOSLINEAS_AT;')
-        c.execute('DROP PROCEDURE SIC_PUNTOS_GRUPOSLINEAS_AT;')
-        
-        #Clientes
-        c.execute( procedures[ 'SIC_PUNTOS_CLIENTES_AT' ] )
-        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_CLIENTES_AT;')
-        c.execute('DROP PROCEDURE SIC_PUNTOS_CLIENTES_AT;')
-
-        c.execute( procedures[ 'SIC_PUNTOS_LIBRESCLIENTES_AT' ] )
-        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_LIBRESCLIENTES_AT;')
-        c.execute('DROP PROCEDURE SIC_PUNTOS_LIBRESCLIENTES_AT;')
-        
-        c.execute( procedures[ 'SIC_PUNTOS_TIPOSCLIENTES_AT' ] )
-        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_TIPOSCLIENTES_AT;')
-        c.execute('DROP PROCEDURE SIC_PUNTOS_TIPOSCLIENTES_AT;')
-
-        c.execute( procedures[ 'SIC_PUNTOS_DOCTOSPVDET_AT' ] )
-        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DOCTOSPVDET_AT;')
-        c.execute('DROP PROCEDURE SIC_PUNTOS_DOCTOSPVDET_AT;')
-        
-        c.execute( procedures[ 'SIC_PUNTOS_DOCTOS_PV_AT' ] )
-        c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DOCTOS_PV_AT;')
-        c.execute('DROP PROCEDURE SIC_PUNTOS_DOCTOS_PV_AT;')
-
     #lbres clientes
     c.execute( procedures[ 'SIC_LIBRES_CLIENTES_AT' ] ) 
     c.execute('EXECUTE PROCEDURE SIC_LIBRES_CLIENTES_AT;')
@@ -306,39 +222,6 @@ def borrar_triggers_inventarios( conexion_name = None ):
     c.execute( procedures[ 'SIC_PUERTA_DEL_TRIGGERS' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUERTA_DEL_TRIGGERS;')
     c.execute('drop PROCEDURE SIC_PUERTA_DEL_TRIGGERS;')
-
-    transaction.commit_unless_managed()
-
-def borrar_triggers_puntodeventa( conexion_name = None ):
-    """ Borra los triggers de punto de venta """
-
-    c = connections[conexion_name].cursor()
-
-    c.execute( procedures[ 'SIC_PUNTOS_DEL_TRIGGERS' ] )
-    c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DEL_TRIGGERS;')
-    c.execute('drop PROCEDURE SIC_PUNTOS_DEL_TRIGGERS;')
-
-    transaction.commit_unless_managed()
-
-def actualizar_triggers_puntodeventa( conexion_name = None ):
-    """ Agrega trigger a base de datos para aplicacion punto de venta. """
-
-    c = connections[conexion_name].cursor()
-     
-    ####################### TRIGGERS #######################
-     #DETALLE DE VENTAS
-    c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_DOCTOSPVDET_BU' ] )
-    #VENTAS
-    c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_DOCTOSPV_BU' ] )
-    
-    #EXCEPTION
-    try:
-        c.execute(
-        '''
-        CREATE EXCEPTION EX_CLIENTE_SIN_SALDO 'El cliente no tiene suficiente saldo';   
-        ''')
-    except Exception, e:
-       temp = 0
 
     transaction.commit_unless_managed()
 

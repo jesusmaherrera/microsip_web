@@ -42,8 +42,6 @@ urlpatterns = patterns('',
     (r'^tipos_cliente/$', views.tipos_cliente_view),
     (r'^tipo_cliente/(?P<id>\d+)/', views.tipo_cliente_manageView),
 
-    (r'^cliente_search/', views.cliente_searchView),
-    (r'^cliente_search/(?P<id>\d+)/', views.cliente_searchView),
 )
 
 if 'microsip_web.apps.main.comun.articulos' in MICROSIP_MODULES:

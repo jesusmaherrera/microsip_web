@@ -28,8 +28,6 @@
     <tr>
       <th>Folio</th>
       <th>Fecha</th>
-      <th>Puntos</th>
-      <th>Dinero elecronico</th>
       <th>Opciónes</th>
     </tr>
     {% for venta in ventas%}
@@ -50,8 +48,6 @@
     <tr>
       <td><a href="/punto_de_venta/venta/{{ venta.id }}/">{{ venta.folio }}</a></td>
       <td>{{ venta.fecha }}</td>
-      <td>{{ venta.puntos }}</td>
-      <td>{{ venta.dinero_electronico }}</td>
       <td style="text-align:center;">
         <a href='#myModal{{ venta.id}}' data-toggle="modal" class="btn btn-mini btn-danger"><i class="icon-trash"></i></a>
       </td>

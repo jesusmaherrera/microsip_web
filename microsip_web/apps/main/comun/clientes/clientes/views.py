@@ -97,8 +97,6 @@ def cliente_manageView(request, id = None, template_name='main/clientes/clientes
     if form.is_valid() and direccion_form.is_valid():
         clienteform =  form.save( commit = False )
         clienteform.usuario_ult_modif = request.user.username
-        # clienteform.puntos = 0
-        # clienteform.dinero_electronico = 0
         clienteform.save()
         direccion = direccion_form.save(commit=False)
         direccion.cliente = clienteform

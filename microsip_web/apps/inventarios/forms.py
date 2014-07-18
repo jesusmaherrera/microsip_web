@@ -26,7 +26,7 @@ class precios_articulos_form(forms.ModelForm):
 class articulos_form(forms.ModelForm):
     class Meta:
         model = Articulo
-        exclude = ('seguimiento', 'estatus', 'puntos','es_almacenable',)
+        exclude = ('seguimiento', 'estatus','es_almacenable',)
 
     def __init__(self, *args, **kwargs):
         super(articulos_form, self).__init__(*args, **kwargs)

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Punto de venta{% endblock %}
 {% load punto_de_venta_tags %}
+{% block title %}Punto de venta{% endblock %}
 <!-- CSS Code -->
 {% block style_css %}{% endblock %}
 {% block modulestyle_css %}{% endblock %}
@@ -58,28 +58,9 @@
       <ul class="dropdown-menu" role="menu" aria-labelledby="drop1" style='text-align:left;'>
         <li><a tabindex="-1" href="/punto_de_venta/PreferenciasEmpresa/"><i class="icon-cog"></i> Preferencias de la empresa</a></li>
         {% generar_polizas_tag 'generar_polizas'%}
-        {% if request.user.username == 'SYSDBA' %}
-          {% puntos_tag 'generar_tarjetas' %}
-          {% puntos_tag 'inicializar_puntos' %}        
-        {% endif %}
       </ul>
     </li>
   </ul>
-</div>
-
-<div id="myModal_inicializar_puntos_articulos" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3 id="myModalLabel">Seguro que Deseas inicializar los puntos de los Articulos</h3>
-      </div>
-      <div class="modal-body">
-        <h4>Al Inicializar los puntos de los Articulos</h4>
-        <p style="color:red;">Se eliminaran puntos y dinero elecronico de "TODOS" los articulos, lineas y grupos</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" data-dismiss="modal">Cancelar</button>
-        <a href="/punto_de_venta/puntos/inicializar_puntos_articulos" class="btn btn-primary">Estoy Seguro</a>
-      </div>
 </div>
 
 {% endblock %}

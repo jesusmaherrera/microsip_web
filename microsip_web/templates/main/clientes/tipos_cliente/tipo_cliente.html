@@ -1,5 +1,4 @@
 {% extends "punto_de_venta/base.html" %}
-{% load punto_de_venta_tags %}
 {% block title %}Tipo Cliente{% endblock %}
 
 <!-- CSS Code -->
@@ -26,7 +25,6 @@
   {{ form.errors }}
   <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
     <li class="active"><a href="#general" data-toggle="tab">General</a></li>
-    {% puntos_tab %}
   </ul>
   <div id="myTabContent" class="tab-content">
     <div class="tab-pane fade active in" id="general" style="padding-bottom: 0;">
@@ -34,15 +32,6 @@
         <label>Nombre</label>
         <div class="input-prepend input-append">
           {{ form.nombre }}
-        </div>
-      </div>
-      <br>
-    </div>
-    <div class="tab-pane fade in" id="puntos" style="padding-bottom: 0;">
-      <div class="row-fluid">
-        <label>Valor puntos</label>
-        <div class="input-prepend input-append">
-          {{ form.valor_puntos }}
         </div>
       </div>
       <br>

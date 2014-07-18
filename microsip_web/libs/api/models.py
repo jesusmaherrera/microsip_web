@@ -175,15 +175,10 @@ class FolioCompra(FolioCompraBase):
 # ARTICULOS
 
 class GrupoLineas(GrupoLineasBase):
-    if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-        puntos = models.IntegerField(blank=True, null=True, db_column='SIC_PUNTOS')
-        dinero_electronico = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
+    pass
 
 class LineaArticulos(LineaArticulosBase):
-    if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-        puntos = models.IntegerField(blank=True, null=True, db_column='SIC_PUNTOS')
-        dinero_electronico = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
-        hereda_puntos = models.BooleanField( db_column='SIC_HEREDA_PUNTOS')
+    pass
 
 class Articulo(ArticuloBase):
     if 'microsip_web.apps.main.comun.articulos.articulos.alertas' in MICROSIP_MODULES:
@@ -191,12 +186,7 @@ class Articulo(ArticuloBase):
         alerta_unidades = models.IntegerField(default = 0, blank = True, null = True, db_column = 'SIC_ALERTA_UNIDADES' )
         alerta_unidad_medida = models.CharField( default = 'N', max_length = 1, choices = UNIDADES_MEDIDA, db_column = 'SIC_ALERTA_UNIDAD_MEDIDA' )
         
-    if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-        puntos = models.IntegerField(default = 0, blank = True, null = True, db_column = 'SIC_PUNTOS' )
-        dinero_electronico  = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_DINERO_ELECTRONICO' )
-        hereda_puntos = models.BooleanField( db_column = 'SIC_HEREDA_PUNTOS' )
-        
-        carpeta = models.ForeignKey( Carpeta, blank = True, null = True, db_column = 'SIC_CARPETA_ID' )
+        # carpeta = models.ForeignKey( Carpeta, blank = True, null = True, db_column = 'SIC_CARPETA_ID' )
     
 class ArticuloClaveRol(ArticuloClaveRolBase):
     pass
@@ -248,8 +238,7 @@ class Vendedor(VendedorBase):
 
 # CLIENTES
 class ClienteTipo(ClienteTipoBase):
-    if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-        valor_puntos    = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_VALOR_PUNTOS' )
+    pass
 
 class CondicionPago(CondicionPagoBase):
     def save(self, *args, **kwargs):    
@@ -264,14 +253,7 @@ class CondicionPagoPlazo(CondicionPagoPlazoBase):
     pass
 
 class Cliente(ClienteBase):
-    if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-        TIPOS = ( ( 'N', 'No Aplica' ),( 'P', 'Puntos' ),( 'D', 'Dinero Electronico' ), )
-        tipo_tarjeta = models.CharField( default = 'N', max_length = 1, choices = TIPOS, db_column = 'SIC_TIPO_TARJETA' )
-        hereda_valorpuntos = models.BooleanField( db_column = 'SIC_HEREDA_VALORPUNTOS' )
-        valor_puntos = models.DecimalField( default = 0, blank = True, null = True, max_digits = 15, decimal_places = 2, db_column = 'SIC_VALOR_PUNTOS' )
-        hereda_puntos_a = models.ForeignKey( 'self', db_column = 'SIC_HEREDAR_PUNTOS_A', related_name = 'hereda_puntos_a_cliente', blank = True, null = True )
-        fecha_corte = models.DateField(blank=True, null=True, db_column='SIC_FECHA_CORTE')
-        aplicar_descuento_sin_tarjeta = models.BooleanField( db_column = 'SIC_APLICAR_DSCTO' )
+    pass
         
 
 class ClienteClaveRol(ClienteClaveRolBase):
@@ -284,8 +266,6 @@ class ClienteDireccion(ClienteDireccionBase):
     pass
 
 class libresClientes(libreClienteBase):
-    if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-        heredar_puntos_a = models.CharField(max_length=99, db_column='HEREDAR_PUNTOS_A')
     if 'microsip_web.apps.ventas.herramientas.generar_polizas' or  'microsip_web.apps.ventas.herramientas' in MICROSIP_MODULES:
         cuenta_1 = models.CharField(max_length=99, db_column='CUENTA_1')
         cuenta_2 = models.CharField(max_length=99, db_column='CUENTA_2')
@@ -1042,13 +1022,7 @@ class FormaCobroReferencia(FormaCobroReferenciaBase):
 
 #DOCUMENTOS
 
-class PuntoVentaDocumento(PuntoVentaDocumentoBase): 
-    if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-        puntos                  = models.IntegerField(db_column='SIC_PUNTOS')
-        dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
-        cliente_tarjeta = models.ForeignKey(Cliente, db_column='sic_cliente_tarjeta',  related_name='cliente_tarjeta', blank=True, null=True)
-        puntos_pago = models.IntegerField(default=0, db_column='SIC_PUNTOS_PAGO')
-        dinero_electronico_pago = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO_PAGO')
+class PuntoVentaDocumento(PuntoVentaDocumentoBase):
 
     def next_folio( self, connection_name=None, **kwargs ):
         ''' Funcion para generar el siguiente folio de un documento de ventas '''
@@ -1113,9 +1087,7 @@ class PuntoVentaDocumento(PuntoVentaDocumentoBase):
 
 
 class PuntoVentaDocumentoDetalle(PuntoVentaDocumentoDetalleBase):
-    if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-        puntos                  = models.IntegerField(db_column='SIC_PUNTOS')
-        dinero_electronico      = models.DecimalField(default=0, blank=True, null=True, max_digits=15, decimal_places=2, db_column='SIC_DINERO_ELECTRONICO')
+    pass
     
 class PuntoVentaDocumentoLiga(PuntoVentaDocumentoLigaBase):
     pass

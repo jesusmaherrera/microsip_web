@@ -1,10 +1,7 @@
 {% extends "main/articulos/articulos/articulo_base.html" %}
 {% load filtros_tags %}
-{% load punto_de_venta_tags %}
-
 {% block extra_tabs %}
   {% filtros_tab %}
-  {% puntos_tab %}
 {% endblock %}
 {% block ventas_form %}
   <div class="tab-pane fade " id="ventas">  
@@ -32,22 +29,6 @@
     <label>Impuesto</label>
     {{ impuesto_articulo_form.impuesto }}      
   </div>
-{% endblock %}
-{% block puntos_form %}
-<div class="tab-pane fade " id="puntos">
-  <div>
-    <label>Hereda puntos o dinero electronico</label>
-    <div class="input-prepend input-append">{{ articulo_form.hereda_puntos }}</div>
-  </div>
-  <div id="div_puntos">
-    <label>Puntos</label>
-    <div class="input-prepend input-append">{{ articulo_form.puntos }}</div>
-  </div>
-  <div id="div_dinero_electronico" >
-    <label>Dinero Elecronico (% de costo)</label>
-    <div class="input-prepend input-append">{{ articulo_form.dinero_electronico }}</div>
-  </div>
-</div>
 {% endblock %}
 {% block filtros_form %}
 <div class="tab-pane fade " id="filtros">

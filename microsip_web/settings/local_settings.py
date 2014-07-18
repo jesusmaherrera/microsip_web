@@ -19,8 +19,7 @@ MICROSIP_MODULES = (
     'microsip_web.apps.cuentas_por_pagar.herramientas.generar_polizas',
     'microsip_web.apps.cuentas_por_cobrar',
     'microsip_web.apps.cuentas_por_cobrar.herramientas.generar_polizas',
-    'microsip_web.apps.punto_de_venta',    
-    'microsip_web.apps.punto_de_venta.puntos',
+    'microsip_web.apps.punto_de_venta',
 )
 
 MICROSIP_VERSION = 2012

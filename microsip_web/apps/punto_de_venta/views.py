@@ -179,83 +179,6 @@ def tipo_cliente_manageView(request, id = None, template_name='main/clientes/tip
 
     c = {'form':form,}
     return render_to_response(template_name, c, context_instance=RequestContext(request))
-def get_fecha_de_corte(cliente_id):
-    fecha_corte = Cliente.objects.get(pk=cliente_id).fecha_corte
-    if fecha_corte:
-        return fecha_corte
-    
-    corte_dia = Registry.objects.get(nombre='SIC_PUNTOS_CORTE_DIA').get_value()
-    corte_mes = Registry.objects.get(nombre='SIC_PUNTOS_CORTE_MES').get_value()
-    corte_anio = Registry.objects.get(nombre='SIC_PUNTOS_CORTE_ANIO').get_value()
-    
-    if corte_dia and corte_dia != '0' and corte_dia != '':
-        corte_dia = int(corte_dia);
-    
-    if (not corte_mes or corte_mes == '0' or corte_mes == '') and (not corte_anio or corte_anio == '0' or corte_anio == '') and corte_dia > datetime.now().day:
-        corte_dia = datetime.now().day
-
-    if not corte_mes or corte_mes == '0' or corte_mes == '':
-        corte_mes = datetime.now().month
-    if not corte_anio or corte_anio == u'0' or corte_anio == '':
-        corte_anio = datetime.now().year
-    
-    dias_de_mes= { '1':31, '2':28, '3':31, '4':30, '5':31, '6':30, '7':31, '8':30, '9':30, '10':31, '11':30, '12':31,}
-    
-    if (int(corte_anio) % 4) == 0:
-        dias_de_mes['2'] = 29
-    else:
-        dias_de_mes['2'] = 28 
-
-    if  corte_dia > dias_de_mes[str(corte_mes)]:
-        corte_dia = dias_de_mes[str(corte_mes)]
-
-    return datetime.strptime('%s%s%s'%(corte_dia, corte_mes, corte_anio), "%d%m%Y").date()
-
-@login_required(login_url='/login/')
-def cliente_searchView(request, template_name='main/clientes/clientes/cliente_search.html'):
-    message = ''
-    cliente =  Cliente()
-    dinero_en_puntos = 0
-    total_puntos =0
-    total_dinero_electronico =0
-
-    if request.method == 'POST':
-        form = ClienteSearchForm(request.POST)
-        if form.is_valid():
-            try:
-                cliente = ClienteClave.objects.get(clave=form.cleaned_data['cliente']).cliente
-                fecha_corte = get_fecha_de_corte(cliente.id)
-                ventas = PuntoVentaDocumento.objects.filter(fecha__gte=fecha_corte, tipo='V', cliente_tarjeta = cliente).filter(Q(estado='N')|Q(estado='D')).aggregate(
-                    total_puntos=Sum('puntos'), total_puntos_pago=Sum('puntos_pago'), total_dinero_elect=Sum('dinero_electronico'), total_dinero_electronico_pago =Sum('dinero_electronico_pago'))
-                
-                ventas['total_puntos'] =ventas['total_puntos'] or 0
-                ventas['total_puntos_pago'] =ventas['total_puntos_pago'] or 0
-                ventas['total_dinero_elect'] =ventas['total_dinero_elect'] or 0
-                ventas['total_dinero_electronico_pago'] =ventas['total_dinero_electronico_pago'] or 0
-
-                ventas_puntos = ventas['total_puntos'] - ventas['total_puntos_pago']
-                ventas_dinero_electronico = ventas['total_dinero_elect'] - ventas['total_dinero_electronico_pago']
-
-                devoluciones = PuntoVentaDocumento.objects.filter(fecha__gte=fecha_corte, tipo='D', estado='N', cliente_tarjeta = cliente, ).aggregate(total_puntos=Sum('puntos'), total_dinero_electronico = Sum('dinero_electronico'))
-                devoluciones['total_puntos'] = devoluciones['total_puntos'] or 0;
-                devoluciones['total_dinero_electronico'] = devoluciones['total_dinero_electronico'] or 0;
-                
-                total_puntos = ventas_puntos - devoluciones['total_puntos']
-                total_dinero_electronico = ventas_dinero_electronico - devoluciones['total_dinero_electronico']
-                
-                valor_puntos = cliente.valor_puntos
-                if cliente.hereda_valorpuntos and cliente.tipo_cliente:
-                    valor_puntos =  cliente.tipo_cliente.valor_puntos
-                        
-                dinero_en_puntos =  valor_puntos * total_puntos
-            except ObjectDoesNotExist:
-                cliente = Cliente();
-                message='No se encontro un cliente con esta clave, intentalo de nuevo.'
-    else:
-        form = ClienteSearchForm()
-        
-    c = {'form':form, 'cliente':cliente,'total_puntos':total_puntos, 'total_dinero_electronico':total_dinero_electronico, 'message':message, 'dinero_en_puntos':dinero_en_puntos, }
-    return render_to_response(template_name, c, context_instance=RequestContext(request))
 
 ##########################################
 ##                                      ##
@@ -410,23 +333,9 @@ def preferenciasEmpresa_View(request, template_name='punto_de_venta/herramientas
     }
     form_reg = InformacioncontableRegManageForm( request.POST or None, initial= infcontable_initialvalues)
     form = InformacionContableManageForm(request.POST or None, instance=informacion_contable)
-    from_puntos = None
+    
 
-    if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-        puntos_initial = {
-            'corte_dia': Registry.objects.get(nombre='SIC_PUNTOS_CORTE_DIA').get_value(),
-            'corte_mes': Registry.objects.get(nombre='SIC_PUNTOS_CORTE_MES').get_value(),
-            'corte_anio': Registry.objects.get(nombre='SIC_PUNTOS_CORTE_ANIO').get_value(),
-            
-            'articulo_puntos': Registry.objects.get(nombre='SIC_PUNTOS_ARTICULO_PUNTOS_PREDET').get_value(),
-            'articulo_dinero_electronico': Registry.objects.get(nombre='SIC_PUNTOS_ARTICULO_DINERO_ELECT_PREDET').get_value(),
-
-        }
-        from_puntos  = PreferenciasPuntosManageForm(request.POST or None, initial=puntos_initial)
-
-        if from_puntos.is_valid():
-            from_puntos.save()
-            msg = 'Datos guardados correctamente'
+    
     fallo = None
     
     if request.POST:
@@ -449,7 +358,6 @@ def preferenciasEmpresa_View(request, template_name='punto_de_venta/herramientas
     
     c = {
         'form':form,
-        'from_puntos':from_puntos,
         'preferencias_generalform': preferencias_generalform,
         'msg':msg,
         'plantillas':plantillas,

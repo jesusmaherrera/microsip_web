@@ -42,83 +42,6 @@ class TipoClienteManageForm(forms.ModelForm):
     class Meta:
         model = ClienteTipo
 
-class PreferenciasPuntosManageForm(forms.Form):
-    MESES = (
-        ('', '--------'),
-        ('1', 'Enero'),
-        ('2', 'Febrero'),
-        ('3', 'Marzo'),
-        ('4', 'Abril'),
-        ('5', 'Mayo'),
-        ('6', 'Junio'),
-        ('7', 'Julio'),
-        ('8', 'Agosto'),
-        ('9', 'Septiembre'),
-        ('10', 'Octubre'),
-        ('11', 'Noviembre'),
-        ('12', 'Diciembre'),
-
-    )
-
-    DIAS = []
-    for dia in range(1,32):
-        DIAS.append((str(dia),str(dia)))
-
-    corte_dia = forms.ChoiceField(choices=DIAS)
-    corte_mes = forms.ChoiceField(choices=MESES, required= False)
-    corte_anio = forms.IntegerField(required= False)
-
-    articulo_puntos = forms.IntegerField(min_value=0)
-    articulo_dinero_electronico = forms.DecimalField(min_value=0)
-
-    def clean(self, *args, **kwargs):
-        cleaned_data = self.cleaned_data
-        dia = cleaned_data.get('corte_dia')
-        mes = cleaned_data.get('corte_mes')
-        anio = cleaned_data.get('corte_anio')
-        
-        if mes:
-            if not anio or anio == 0:
-                anio = datetime.datetime.now().year
-            try:
-                datetime.datetime(year=int(anio), month=int(mes),  day=int(dia))
-            except ValueError:
-                raise forms.ValidationError(u'fecha invalida')
-
-        return cleaned_data
-
-    def save(self, *args, **kwargs):
-        corte_dia_obj = Registry.objects.get( nombre = 'SIC_PUNTOS_CORTE_DIA')
-        corte_mes_obj = Registry.objects.get( nombre = 'SIC_PUNTOS_CORTE_MES')
-        corte_anio_obj = Registry.objects.get( nombre = 'SIC_PUNTOS_CORTE_ANIO')
-
-        corte_dia = self.cleaned_data['corte_dia'] or 0
-        corte_mes = self.cleaned_data['corte_mes'] or 0
-        corte_anio = self.cleaned_data['corte_anio'] or 0
-
-        if corte_dia_obj.valor != corte_dia:
-            corte_dia_obj.valor = corte_dia
-            corte_dia_obj.save()
-        
-        if corte_mes_obj.valor != corte_mes:
-            corte_mes_obj.valor = corte_mes
-            corte_mes_obj.save()
-      
-        if corte_anio_obj.valor != corte_anio:
-            corte_anio_obj.valor = corte_anio
-            corte_anio_obj.save()
-
-        articulo_puntos_obj = Registry.objects.get( nombre = 'SIC_PUNTOS_ARTICULO_PUNTOS_PREDET')
-        articulo_dinero_electronico_obj = Registry.objects.get( nombre = 'SIC_PUNTOS_ARTICULO_DINERO_ELECT_PREDET')
-
-        articulo_puntos_obj.valor = self.cleaned_data['articulo_puntos']
-        articulo_dinero_electronico_obj.valor = self.cleaned_data['articulo_dinero_electronico']
-
-        articulo_puntos_obj.save()
-        articulo_dinero_electronico_obj.save()
-
-
-
 class PreferenciasGeneralManageForm(forms.Form):
 
     articulo_general= forms.ModelChoiceField(Articulo.objects.filter( es_almacenable= 'N', es_juego='N'), 
@@ -304,7 +227,6 @@ class FacturaManageForm(forms.ModelForm):
             'usuario_cancelacion',
             'usuario_ult_modif',
             'fechahora_ult_modif',
-            'puntos',
             )
 
 
@@ -362,7 +284,6 @@ class DocumentoPV_ManageForm(forms.ModelForm):
             'fechahora_creacion',
             'usuario_ult_modif',
             'fechahora_ult_modif',
-            'puntos',
             )
 
 class DocumentoPVDet_ManageForm(forms.ModelForm):
@@ -383,7 +304,6 @@ class DocumentoPVDet_ManageForm(forms.ModelForm):
         model = PuntoVentaDocumentoDetalle
         exclude = (
             'rol',
-            'puntos',
             'precio_modificado',
             'notas',
             'precio_unitario_impto',

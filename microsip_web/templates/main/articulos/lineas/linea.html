@@ -1,5 +1,4 @@
 {% extends extend %}
-{% load punto_de_venta_tags %}
 {% block title %}Linea Articulo{% endblock %}
 
 <!-- CSS Code -->
@@ -7,35 +6,6 @@
 
 <!-- JavaScript Code -->
 {% block js_code %}
-<script>
-  $(function() {
-    
-    if ($('#id_hereda_puntos').is(':checked'))
-      $('#div_puntos, #div_dinero_electronico').hide();
-    else
-    {
-      $('#div_puntos, #div_dinero_electronico').show();
-      if ($('#id_puntos').val() == '') 
-        $('#id_puntos').val(0);
-      if ($('#id_dinero_electronico').val() == '') 
-        $('#id_dinero_electronico').val(0);
-    }
-        
-
-    $('#id_hereda_puntos').click(function() {
-        if ($(this).is(':checked')) 
-          $('#div_puntos, #div_dinero_electronico').hide();
-        else
-        {
-          $('#div_puntos, #div_dinero_electronico').show();
-          if ($('#id_puntos').val() == '') 
-            $('#id_puntos').val(0);
-          if ($('#id_dinero_electronico').val() == '') 
-            $('#id_dinero_electronico').val(0);
-        }
-    });
-  });
-</script>
 {% endblock %}
 
 {% block breadcrumb %}{{ block.super }} <a href="/{{ modulo }}/lineas/">Lineas Articulos</a> <i class=" icon-play"></i> Linea Articulo{% endblock %}
@@ -56,7 +26,6 @@
   {% endif %}
   <ul id="myTab" class="nav nav-tabs " style="margin-bottom: 0;">
     <li class="active"><a href="#general" data-toggle="tab">General</a></li>
-    {% puntos_tab %}
   </ul>
   <div id="myTabContent" class="tab-content">
     <div class="tab-pane fade active in" id="general" style="padding-bottom: 0;">
@@ -71,30 +40,6 @@
           <label>Grupo <a href="/{{ modulo }}/grupo/{{form.grupo.value}}/">Ir a Grupo</a></label>
           <div class="input-prepend input-append">
             {{ form.grupo }}
-          </div>
-        </div>
-      </div>
-      <br>
-    </div>
-
-    <div class="tab-pane fade" id="puntos" style="padding-bottom: 0;">
-      <div class="row-fluid">
-        <div class="span4"  style='clear:both;'>
-          <label>Hereda puntos o dinero electronico</label>
-          <div class="input-prepend input-append">
-            {{ form.hereda_puntos }}
-          </div>
-        </div>
-        <div id="div_puntos"class="span4" >
-          <label>Puntos</label>
-          <div class="input-prepend input-append">
-            {{ form.puntos }}
-          </div>
-        </div>
-        <div id="div_dinero_electronico" class="span4" >
-          <label>Dinero Elecronico (% de costo)</label>
-          <div class="input-prepend input-append">
-            {{ form.dinero_electronico }}
           </div>
         </div>
       </div>

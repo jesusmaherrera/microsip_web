@@ -1,28 +1,12 @@
 {% extends "main/articulos/articulos/articulo_base.html" %}
-{% block js_code %}
-  {{ block.super }}
-  <script type="text/javascript">
-    $(function () {
-      if ($("#id_hereda_puntos").attr('checked')=='checked') {
-        $("#datos_puntos").hide();
-      };
-      $("#id_hereda_puntos").on("click", function(){
-        if ($("#id_hereda_puntos").attr('checked')=='checked')
-          $("#datos_puntos").hide();
-        else
-          $("#datos_puntos").show();
-      });
-    });
-    
-  </script>
-{% endblock %}
 {% load punto_de_venta_tags %}
+{% block js_code %}
+{% endblock %}
 {% block errors %}
   {{ impuesto_articulo_form.errors }}
 {% endblock %}
 {% block extra_tabs %}
 	<li class=""><a href="#ventas" data-toggle="tab">Ventas</a></li>
-  {% puntos_tab %}
   {% alertas_tab %}
 {% endblock %}
 {% block ventas_form %}
@@ -50,35 +34,4 @@
     <label>Impuesto</label>
     {{ impuesto_articulo_form.impuesto }}      
   </div>
-{% endblock %}
-{% block puntos_form %}
-<div class="tab-pane fade " id="puntos">
-  <div>
-    <label>Hereda puntos o dinero electronico</label>
-    <div class="input-prepend input-append">{{ articulo_form.hereda_puntos }}</div>
-  </div>
-  <div id='datos_puntos'>
-    <div id="div_puntos">
-      <label>Puntos</label>
-      <div class="input-prepend input-append">{{ articulo_form.puntos }}</div>
-    </div>
-    <div id="div_dinero_electronico" >
-      <label>Dinero Elecronico (% de costo)</label>
-      <div class="input-prepend input-append">{{ articulo_form.dinero_electronico }}</div>
-    </div>
-  </div>
-</div>
-<div class="tab-pane fade " id="alertas">
-  <div class="input-prepend input-append">
-    <div class="input-prepend input-append span4">
-      {{ articulo_form.alerta_unidades }}
-      {{ articulo_form.alerta_unidad_medida }}
-    </div>
-    <div class="btn-group span2" style="font-size: 12px;margin-left: 72px;">
-      despues de servicio
-    </div>
-      
-  </div>
-
-</div>
 {% endblock %}
