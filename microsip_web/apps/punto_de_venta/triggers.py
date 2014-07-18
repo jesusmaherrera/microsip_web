@@ -160,7 +160,6 @@ triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'] = '''
     DECLARE VARIABLE documentos_total_dinero_elect DOUBLE PRECISION;
 
     /* variables para clientes */
-    DECLARE VARIABLE cliente_total_puntos INTEGER;
     DECLARE VARIABLE cliente_total_dinero_electronico DOUBLE PRECISION;
     DECLARE VARIABLE cliente_hereda_valorpuntos SMALLINT;
     DECLARE VARIABLE cliente_aplicar_descuento_sin_tarjeta SMALLINT;
@@ -216,16 +215,14 @@ triggers['SIC_PUNTOS_PV_DOCTOSPV_BU'] = '''
             end
 
             /*DATOS DEL CLIENTE TARJETA*/
-            SELECT sic_tipo_tarjeta, sic_puntos, sic_dinero_electronico, sic_hereda_valorpuntos, sic_valor_puntos, tipo_cliente_id, sic_aplicar_dscto
+            SELECT sic_tipo_tarjeta, sic_dinero_electronico, sic_hereda_valorpuntos, sic_valor_puntos, tipo_cliente_id, sic_aplicar_dscto
             FROM clientes
             WHERE cliente_id = NEW.sic_cliente_tarjeta
-            INTO :cliente_tipo_tarjeta, :cliente_total_puntos, :cliente_total_dinero_electronico, :cliente_hereda_valorpuntos, :cliente_valor_puntos, :cliente_tipo_id, :cliente_aplicar_descuento_sin_tarjeta;
+            INTO :cliente_tipo_tarjeta, :cliente_total_dinero_electronico, :cliente_hereda_valorpuntos, :cliente_valor_puntos, :cliente_tipo_id, :cliente_aplicar_descuento_sin_tarjeta;
 
             IF (cliente_total_dinero_electronico IS NULL) THEN
                 cliente_total_dinero_electronico = 0;
-            IF (cliente_total_puntos IS NULL) THEN
-                cliente_total_puntos = 0;
-
+            
             /*DATOS el cliente hereda el valor de los puntos*/
             IF ( NOT cliente_tipo_id IS NULL AND cliente_hereda_valorpuntos = 1) THEN
             BEGIN

@@ -10,6 +10,7 @@ MICROSIP_MODULES = (
     'microsip_web.apps.main.comun.clientes',
      #'microsip_web.apps.main.comun.clientes.clientes.cliente_articulos',
     'microsip_web.apps.ventas',
+    'microsip_web.apps.contabilidad',
     'microsip_web.apps.ventas.documentos',
     'microsip_web.apps.ventas.herramientas',
       'microsip_web.apps.ventas.herramientas.generar_polizas',

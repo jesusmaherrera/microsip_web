@@ -1,10 +1,10 @@
 #encoding:utf-8
 from django import forms
-from microsip_web.apps.ventas.models import *
+# from microsip_web.apps.ventas.models import *
 from django.contrib.auth.models import User
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.forms import formsets
-from models import *
+from .models import *
 import autocomplete_light
 from django.forms.models import modelformset_factory
 

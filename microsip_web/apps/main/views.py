@@ -121,13 +121,10 @@ def inicializar_tablas( request ):
         
         #Triggers
         if 'microsip_web.apps.punto_de_venta.puntos' in MICROSIP_MODULES:
-            borrar_triggers_puntodeventa( conexion_name = conexion_name )
-            actualizar_triggers_puntodeventa( conexion_name = conexion_name )
             
             padre = first_or_none(Registry.objects.filter(nombre='PreferenciasEmpresa'))
             if padre:
                 if not Registry.objects.filter( nombre = 'SIC_PUNTOS_CORTE_DIA' ).exists():
-
                     Registry.objects.create(
                         nombre = 'SIC_PUNTOS_CORTE_DIA',
                         tipo = 'V',
@@ -164,8 +161,6 @@ def inicializar_tablas( request ):
                             valor=0
                         ) 
 
-        else:
-            borrar_triggers_puntodeventa( conexion_name = conexion_name )
 
         if 'microsip_web.apps.punto_de_venta' in MICROSIP_MODULES:
             if not Registry.objects.filter( nombre = 'ARTICULO_VENTAS_FG_PV_ID' ).exists():
@@ -317,28 +312,6 @@ def borrar_triggers_puntodeventa( conexion_name = None ):
     c.execute( procedures[ 'SIC_PUNTOS_DEL_TRIGGERS' ] )
     c.execute('EXECUTE PROCEDURE SIC_PUNTOS_DEL_TRIGGERS;')
     c.execute('drop PROCEDURE SIC_PUNTOS_DEL_TRIGGERS;')
-
-    transaction.commit_unless_managed()
-
-def actualizar_triggers_puntodeventa( conexion_name = None ):
-    """ Agrega trigger a base de datos para aplicacion punto de venta. """
-
-    c = connections[conexion_name].cursor()
-     
-    ####################### TRIGGERS #######################
-     #DETALLE DE VENTAS
-    c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_DOCTOSPVDET_BU' ] )
-    #VENTAS
-    c.execute( punto_de_venta_triggers[ 'SIC_PUNTOS_PV_DOCTOSPV_BU' ] )
-    
-    #EXCEPTION
-    try:
-        c.execute(
-        '''
-        CREATE EXCEPTION EX_CLIENTE_SIN_SALDO 'El cliente no tiene suficiente saldo';   
-        ''')
-    except Exception, e:
-       temp = 0
 
     transaction.commit_unless_managed()
 
