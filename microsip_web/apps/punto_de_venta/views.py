@@ -13,7 +13,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import datetime, time
 from forms import *
 from models import *
-from triggers import triggers
 from mobi.decorators import detect_mobile
 from django.core import management
 from microsip_web.apps.main.filtros.models import *

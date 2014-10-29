@@ -82,9 +82,17 @@ function add_series()
 {
   var series='';
   error =  0; 
+  var arrayte = $("input[id^='id_numeroserie']").map(function() {return this.value;}).get();
+  var array_temp = $.unique(arrayte);
+  var array = $("input[id^='id_numeroserie']").map(function() {return this.value;}).get();
+  if (array != array_temp) {
+    alert('Error Series Duplicadas.');
+    error = 1;
+  };
+
   $("input[id^='id_numeroserie']").each(function( index ) { 
     if ($(this).val() == "" && error == 0)  
-    {
+    { 
       alert('por favor llena todos los campos')
       error = 1;
     }  
@@ -94,21 +102,29 @@ function add_series()
   if (error == 1)
     return;
 
-  
-  Dajaxice.microsip_web.apps.inventarios.add_seriesinventario_byarticulo(series_agregadas, 
-  {
-    'articulo_id': $("#id_articulo").val()[0], 
-    'almacen_id': $("#almacen_id").val(),
-    'series': series,
-    'entrada_id':  $("#entrada_id").val(),
-    'salida_id':  $("#salida_id").val(),
-    'ubicacion': $("#id_ubicacion").val(),
-    'unidades' : $("#id_unidades").val(),
+  $.ajax({
+    url:'/inventarios/add_seriesinventario_byarticulo', 
+    type : 'get', 
+    data:{
+      'articulo_id': $("#id_articulo").val()[0], 
+      'almacen_id': $("#almacen_id").val(),
+      'series': series,
+      'entrada_id':  $("#entrada_id").val(),
+      'salida_id':  $("#salida_id").val(),
+      'ubicacion': $("#id_ubicacion").val(),
+      'unidades' : $("#id_unidades").val(),
+    }, 
+    success: series_agregadas,
+    error: function() {
+      alert("fallo algo");
+    },
   });
+ 
 }
 
 function series_agregadas(data)
 {
+ 
   $("#add_seies_btn").attr("disabled",true);
   $("#add_seies_btn").text("Enviando...");
   
@@ -167,7 +183,7 @@ function add_existenciasarticulo_byajuste()
     $("#id_unidades").focus();
     return;
   }
-  else if ($.isNumeric($('#id_unidades').val()) == false )
+  else if (($.isNumeric($('#id_unidades').val()) == false)||($('#id_unidades').val() == 0)  )
   {
     alert("Unidades incorrectas");
     $("#id_unidades").focus();

@@ -255,6 +255,8 @@ class CondicionPagoPlazo(CondicionPagoPlazoBase):
 class Cliente(ClienteBase):
     pass
         
+class Zona(ZonaBase):
+    pass
 
 class ClienteClaveRol(ClienteClaveRolBase):
     pass

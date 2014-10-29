@@ -22,7 +22,7 @@ import fdb
 from microsip_web.settings.local_settings import MICROSIP_MODULES, MICROSIP_PLUGINS
 from microsip_web.apps.inventarios.triggers import triggers as inventarios_triggers
 from microsip_web.apps.inventarios.triggers_salidas import triggers_salidas as inventarios_triggers_salidas
-from microsip_web.apps.punto_de_venta.triggers import triggers as punto_de_venta_triggers
+
 from microsip_web.libs.custom_db.main import first_or_none
 from django.db.utils import DatabaseError
 

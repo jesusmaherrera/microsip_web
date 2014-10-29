@@ -124,34 +124,32 @@ def ajustar_seriesinventario_byarticulo( **kwargs ):
     detalle.save( update_fields = [ 'unidades', 'fechahora_ult_modif','detalle_modificacionestime', ] )
     return msg
 
-@dajaxice_register( method = 'GET' )
 def add_seriesinventario_byarticulo( request, **kwargs ):
     # Parametros
     connection_name = get_conecctionname(request.session)
     error = False
-    articulo_id = kwargs.get('articulo_id', None)
+    articulo_id = request.GET.get('articulo_id', None)
     articulo = Articulo.objects.get(pk=articulo_id)
     articulo_clave = first_or_none(
         ArticuloClave.objects.filter(articulo=articulo))
 
-    almacen_id = kwargs.get('almacen_id', None)
+    almacen_id = request.GET.get('almacen_id', None)
     almacen = Almacen.objects.get(ALMACEN_ID=almacen_id)
 
-    entrada_id = kwargs.get('entrada_id', None)
+    entrada_id = request.GET.get('entrada_id', None)
     entrada = InventariosDocumento.objects.get(pk=entrada_id)
 
-    salida_id = kwargs.get('salida_id', None)
+    salida_id = request.GET.get('salida_id', None)
     salida = InventariosDocumento.objects.get(pk=salida_id)
 
-    ubicacion = kwargs.get('ubicacion', None)
-    unidades = kwargs.get('unidades', None)
+    ubicacion = request.GET.get('ubicacion', None)
+    unidades = request.GET.get('unidades', None)
     unidades = int(unidades)
     ajusteprimerconteo = almacen.inventario_conajustes
 
-    series = kwargs.get('series', None)
+    series = request.GET.get('series', None)
     series = series.split(',')
     msg = ''
-
     existe_en_detalles = InventariosDocumentoDetalle.objects.filter(
         Q(doctosIn__concepto=27) | Q(doctosIn__concepto=38), articulo=articulo,
         almacen=almacen,
@@ -242,7 +240,15 @@ def add_seriesinventario_byarticulo( request, **kwargs ):
     else:
         error = True
         exitencia =''
-    return json.dumps( { 'msg' : msg, 'error': error,'articulo_nombre': articulo.nombre, 'existencia_actual':  str(exitencia),} ) 
+
+    data = { 
+        'msg' : msg, 
+        'error': error,
+        'articulo_nombre': articulo.nombre, 
+        'existencia_actual':  str(exitencia),
+    }
+    
+    return HttpResponse(json.dumps(data), mimetype="application/json")
 
 @dajaxice_register( method = 'GET' )
 def get_seriesinventario_byarticulo( request, **kwargs ):
@@ -257,8 +263,6 @@ def get_seriesinventario_byarticulo( request, **kwargs ):
         series = "%s%s, "% (series, existenciadiscreto.articulo_discreto.clave)
     
     return json.dumps( { 'series' : series, } ) 
-
-
 
 def add_existenciasarticulo_byajustes( **kwargs ):
     """ Para agregar existencia a un articulo por ajuste 
@@ -872,6 +876,7 @@ def get_existenciasarticulo_byid( request, **kwargs ):
         articulo_linea = articulo.linea.nombre
     except ObjectDoesNotExist:
         articulo_linea = 'No indicada aun'
+
 
     return json.dumps( { 
         'existencias' : int( inv_fin ), 
