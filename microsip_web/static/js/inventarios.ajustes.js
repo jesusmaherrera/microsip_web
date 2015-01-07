@@ -85,10 +85,10 @@ function add_series()
   var arrayte = $("input[id^='id_numeroserie']").map(function() {return this.value;}).get();
   var array_temp = $.unique(arrayte);
   var array = $("input[id^='id_numeroserie']").map(function() {return this.value;}).get();
-  if (array != array_temp) {
-    alert('Error Series Duplicadas.');
-    error = 1;
-  };
+  // if (array != array_temp) {
+  //   alert('Error Series Duplicadas.');
+  //   error = 1;
+  // };
 
   $("input[id^='id_numeroserie']").each(function( index ) { 
     if ($(this).val() == "" && error == 0)  
